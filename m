@@ -1,45 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=156.67.10.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793454945;
-	b=vHQr4FAjxPul69y3wT0Rrx/hIlx5WXucIHmyCreNrpLHrCI3u0UK5vGo1OKvDLOqCe3H
-	 38c1nI3CJneeu4Wbiga9YfeTio6Q8S7Zc93goAukcaBlXRWQU11K61dJU56Jw8Rirxk6e
-	 CsxSUZ7iofSu7/X1ExiYBUxLepsw34j0vV3Tsx9s6Zs5nagSZ+qVRXNyTLh/vVUh3xbn1
-	 RRB8HNX34fjHUFwalwLF/5JoKOCUBNNc1QuGz7Y21WRinYkmLHXV0WpYwauaQFNVi72DE
-	 rSSrZHyAEme5FXmEQqVb3UK59axvUiKxSLrwANSj1SURg8Z2YLUKPuD0cG4hyczE5kA==
+	t=1793455102;
+	b=PZPyNN8L2z5yMjPWc0mpzrbhaNx4CFWnVP5HE/vwtl4+rKPhvvz80khtKjndB7TalkpX
+	 cB+wYl54Qa9sd1329qHbiZrdtIjKjRclk4VckpQDi4xtiVFdtTABxyP18H0QifrkXXrGD
+	 y+hgO0//H4frs3hN/sKmS4euqbHW2ZXH0WcSbccqvKBmc7QAcltXG9Pkm71bXlXTd0dkO
+	 O+cLgcJ+CbEc0KjyWEVeyFWHHn8mnjpq7cd2s463kKh+NCosw0xe4r8QEA04a+KfRVHje
+	 M3xhCas5kLH+k1Trz0H16DKX6ugRNCgddmn0lur79xoJoWmnhB8EMod5h/9M0VMkIXg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793454945;
-	h=Received:DKIM-Signature:Content-Type:MIME-Version:Message-Id:
-	 In-Reply-To:References:Subject:From:To:Cc:Date;
-	bh=zuwM5CVnMPYRTsQ2zk+vWa+3BadmP9dyz74B+bdHmF0=;
-	b=SOQIT0Rhzuf+3QenP2pUdfQOXUbrlB4K4e0eGffv1EMoBP16mJKsHig0ZhsxZ8UgmwfR
-	 AjUUzhDrqO9G9LYdpjqgb9J5KQr7utCrvTqt345ELQ7lbyMteX/OnHN7QPyu21rfwdMXT
-	 ocjC2A7r0gpddpNLvojnPStck1Lx4O/4fcAPkPR0lhhfz8iJRAI134cf07T1L30MGVlaY
-	 HZBlYX5E2JuOXa1fuVbhm8N/Ultqt9GwqfewjocO//ovAj5UMrbbUKQv3g41CD70MJeZz
-	 6QbKxrO2GVrfpxCwrp/SYFeT5jHBEsfenslxA9x1JshbMqoKLJzS6RlX3HaSbjY96dw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793455102;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=KdwwhQ4hmLe2ojysKovryYH2AE4HDI2oZLgU2MxJ0ZM=;
+	b=A2dnR3KZh3+sKFBAyvMlQlu2+AybGPM3OpURLZ8y9ODL1S9eA/Am7NiLkEe1SpfUfZQa
+	 NXb6YoHTqZ352PZksnF//rzQ3kZwYhB7FHeoz5QoiWuPMgfnfrLpHtQ4hYBqEGKuovLJm
+	 svpndXHZqsvwTd7hXJk7a8MogmpEFQiIXA2h9OPkg2IR5xucPwFYcUJ6t8XmY/8ZE9Urr
+	 lodgW0tNGhviMunavtuo0UA/ak8aYxSxk8oI+Ugeq7pCUS6dbmvvad/8Rh6X85MhzIRQV
+	 FMvn4R9t/qexo+H1z4kCdWYdRmy7xEuW8N6cCffNe6zHDORfqtVsMyw/D3qCCl2atvg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AqCh+Yfp;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=lunn.ch;
+	spf=pass smtp.mailfrom=lunn.ch;
+	dkim=pass header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=isS3ErHr;
+	arc=none smtp.remote-ip=156.67.10.101
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74A3606A32A;
-	Sat, 31 Oct 2026 13:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04866606A31A;
+	Sat, 31 Oct 2026 13:58:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 04866606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AqCh+Yfp
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 174FB1F00A15;
-	Sat, 31 Oct 2026 13:55:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793454944;
-	bh=zuwM5CVnMPYRTsQ2zk+vWa+3BadmP9dyz74B+bdHmF0=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=AqCh+YfpQCCqL8CrhVxo8BEzEwuwwKIORnVBxN5OOyDPmkOrZypR2Cx75mzGOfEhk
-	 CnxKlI5lgfVuWkoxf3w9GSH3TsVEtuvz3NPDEDPYIbtb56iBSKB9MME1kB9infUPWq
-	 NWNGeTD8/EOyTAApPUVnNg15pQf7rQVcijnvFGUHxeKr/jexuwyMVF5aBkRr65z2Ek
-	 +0LE/V9WFXmn8YeEm1STMDFg4jP8P3qbBdI0CNxeMLQdB5YMoxVhiozytBQgRFPMuy
-	 tKCCXfQ7Q8zFZdAJkhro2+TEcHrLWg190UGI0vnPEJrtVpskpm77A9Wr3vOEEuO0+I
-	 Dv+mcXVWoVu+A==
-Content-Type: multipart/mixed; boundary="===============6180907473628245553=="
+	dkim=pass (1024-bit key, unprotected) header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=isS3ErHr
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KdwwhQ4hmLe2ojysKovryYH2AE4HDI2oZLgU2MxJ0ZM=; b=isS3ErHrsAIzCMLoNHWkaFEAo7
+	YDK0QFMSiHyKxc8ya1zB0lmWd/pAdj5U1Cq+UYbVQIOsC8uSuAYH08Bjyo0b5Zm2g+9RN6QBGMRV4
+	p8BkUQH/AXKoZ8u69b8GcgH30oglb6EBdHEJPZOcMCSntSFt6nhUSX5furwaDQK24Ch4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1xN9au-00DX5Y-MN; Sat, 31 Oct 2026 14:58:04 +0100
+Date: Sat, 31 Oct 2026 14:58:04 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Doug Ledford <doug.ledford@hpe.com>
+Cc: Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	Sandeep Bhoot <sandeep.bhoot@hpe.com>
+Subject: Re: [PATCH 01/23] net: hpe: ss1: add the Cassini headers
+Message-ID: <531c7d63-548f-467e-95df-187214ff344d@lunn.ch>
+References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
+ <20261030-cxi-netdev-submission-v1-1-8c2c391cc283@hpe.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -49,158 +73,46 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Message-Id: <33ce2cfacb0d57a90dfe08484cdf752e0f66d3e620292a0a891c816e29aa21e6@mail.kernel.org>
-In-Reply-To: <20261031130959.23472-11-wanjay@amazon.com>
-References: <20261031130959.23472-11-wanjay@amazon.com>
-Subject: Re: [PATCH bpf-next 10/13] bpf: defer kfunc and struct_ops registrations until first BTF use
-From: bot+bpf-ci@kernel.org
-To: wanjay@amazon.com,bpf@vger.kernel.org,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com
-Cc: ihor.solodrai@linux.dev,almagui@kernel.org,martin.lau@linux.dev,yonghong.song@linux.dev,jolsa@kernel.org,rostedt@goodmis.org,mhiramat@kernel.org,mathieu.desnoyers@efficios.com,linux-trace-kernel@vger.kernel.org,nathan@kernel.org,nsc@kernel.org,linux-kbuild@vger.kernel.org,arnd@arndb.de,linux-arch@vger.kernel.org,x86@kernel.org,linux-doc@vger.kernel.org,linux-kernel@vger.kernel.org,abuehaze@amazon.com,doebel@amazon.de,mpohlack@amazon.de,jay.wang.upstream@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
-Date: Sat, 31 Oct 2026 13:55:44 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261030-cxi-netdev-submission-v1-1-8c2c391cc283@hpe.com>
 
---===============6180907473628245553==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Oct 30, 2026 at 01:58:57PM -0700, Doug Ledford wrote:
+> Start the Cassini core driver (cxi-ss1) with its headers: the register
+> and counter definitions, error definitions, telemetry item tables, and
+> the CXI interface (cxi.h, cxi_prov_hw.h, libcassini.h) through which
+> client drivers use the NIC.
+> 
+> The cassini_* headers are generated from the hardware description and
+> are not meant to be edited by hand, so they carry the generator's
+> formatting.  cassini_user_defs.h is shared byte-for-byte with the user
+> space libraries and is therefore under include/uapi/ethernet.
 
-> bpf: defer kfunc and struct_ops registrations until first BTF use
+You want to keep the UAPI as small as possible, because once this is
+merged, it can never change in ways that break backwards
+compatibility. 
 
-TL;DR:
-- btf_get_fd_by_id() may return an fd for a half-built vmlinux BTF after a
-  failed -ENOMEM parse round, possibly racing with struct_ops table updates
-- a permanent -ENOMEM may be retried forever, with the queue never dropped
-- Co-developed-by lacks a Signed-off-by
-
-> bpf: defer kfunc and struct_ops registrations until first BTF use
->
-> [ ... ]
->
-> Co-developed-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-> TODO-NEEDS-IHOR: Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-> Signed-off-by: Jay Wang <wanjay@amazon.com>
-
-The Co-developed-by: tag is followed by a "TODO-NEEDS-IHOR: Signed-off-by:"
-placeholder instead of a real Signed-off-by: line from the co-developer.
-
-Should the placeholder be resolved, or the Co-developed-by: tag dropped,
-before this is sent?  Documentation/process/submitting-patches.rst expects a
-Co-developed-by: to be followed immediately by that co-author's
-Signed-off-by:.
-
-> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> --- a/kernel/bpf/btf.c
-> +++ b/kernel/bpf/btf.c
-
-[ ... ]
-
-> @@ -6928,33 +6928,70 @@ struct btf *btf_parse_vmlinux(void)
->  struct btf *bpf_get_btf_vmlinux(void)
->  {
-
-[ ... ]
-
-> +	mutex_lock(&btf_vmlinux_lock);
-> +	btf = btf_vmlinux;
-> +	if (!btf) {
-> +		btf = btf_parse_vmlinux();
-> +		if (IS_ENABLED(CONFIG_DEBUG_INFO_BTF_LAZY) && !IS_ERR(btf)) {
-
-[ ... ]
-
-> +		/* a lazy parse that ran out of memory is retried by the next caller */
-> +		if (!IS_ENABLED(CONFIG_DEBUG_INFO_BTF_LAZY) || btf != ERR_PTR(-ENOMEM)) {
-> +			if (IS_ERR(btf))
-> +				btf_drop_all_deferred(PTR_ERR(btf));
->  			/*
->  			 * Order the parsed BTF contents and the globals the
->  			 * parse populated (e.g. bpf_ctx_convert.t) before
->  			 * the pointer publication. Pairs with the acquire
->  			 * on the lockless fast path above.
->  			 */
->  			smp_store_release(&btf_vmlinux, btf);
->  		}
-
-Is every -ENOMEM from btf_parse_vmlinux() really transient here?
-
-btf_vmlinux_data() in kernel/bpf/sysfs_btf.c, from the previous patch in the
-series, also returns -ENOMEM for a permanent failure.  Its comment says
-"ERR_PTR(-ENOMEM) if that cannot be done (now: memory; for good: no copy of
-the compressed BTF)".  If the vmalloc() in btf_vmlinux_keep_zst() fails,
-btf_zst becomes NULL and every later call ends up at:
-
-	if (!btf_zst)
-		return ERR_PTR(btf_vmlinux_broken ? -EINVAL : -ENOMEM);
-
-From then on bpf_get_btf_vmlinux() never reaches btf_drop_all_deferred() and
-never publishes btf_vmlinux.  Every queued built-in registration and its
-kmemdup() copy is kept, no "dropped N deferred BTF registrations" warning is
-printed, and each later caller (verifier, BPF_BTF_GET_FD_BY_ID, the
-CAP_SYS_ADMIN BPF_BTF_GET_NEXT_ID, module BTF parse) takes btf_vmlinux_lock
-again to re-run a parse that cannot succeed.
-
-This also looks different from the commit message, which says "If the vmlinux
-BTF fails for good, the queue is dropped with a warning."
-
-Should btf_vmlinux_data() return a different errno for the permanent case, or
-should this retry test be able to tell the two cases apart?
-
-[ ... ]
-
-> @@ -9300,12 +9337,16 @@ int btf_get_info_by_fd(const struct btf *btf,
->  int btf_get_fd_by_id(u32 id)
->  {
->  	struct btf *btf;
->  	int fd;
->
-> +	/* kernel BTFs get their ids while parsed, before they are published */
-> +	if (IS_ENABLED(CONFIG_DEBUG_INFO_BTF_LAZY))
-> +		bpf_get_btf_vmlinux();
-> +
->  	rcu_read_lock();
->  	btf = idr_find(&btf_idr, id);
->  	if (!btf || !refcount_inc_not_zero(&btf->refcnt))
->  		btf = ERR_PTR(-ENOENT);
->  	rcu_read_unlock();
-
-Can this hand out an fd for a vmlinux BTF that is still being built?
-
-The return value of bpf_get_btf_vmlinux() is dropped here.  If this task's
-own parse round fails with -ENOMEM (the commit message names the case where
-the task is being killed and vmalloc() gives up), btf_vmlinux stays NULL and
-btf_vmlinux_lock is released.  Another task can then take the lock and start
-a new round.
-
-btf_parse_vmlinux() gives that new BTF an id in btf_idr via btf_alloc_id()
-before btf_apply_deferred() runs, so the idr_find() plus
-refcount_inc_not_zero() above can return it while its kfunc and struct_ops
-tables are still being filled in under btf_vmlinux_lock.
-
-That seems to conflict with the commit message ("Nobody else sees btf_vmlinux
-before its kfuncs and struct_ops are in"), and with the assumption in the
-drop path of bpf_get_btf_vmlinux():
-
-	/* nothing saw it: drop it with what was applied to it */
-	bpf_ctx_convert.t = NULL;
-	btf_put(btf);
-
-If the second round also fails with -ENOMEM, that btf_put() takes the
-refcount from 2 to 1.  The BTF is not freed and btf_free_id() is not called,
-so a second, partially applied "vmlinux" BTF stays in btf_idr and can be
-found by BPF_BTF_GET_NEXT_ID and BPF_BTF_GET_FD_BY_ID until that fd is
-closed.
-
-The fd could also be used while the other round is still applying
-registrations.  For example, BPF_PROG_LOAD accepts a kernel BTF fd as
-attach_btf_obj_fd, and for struct_ops programs the verifier then walks
-btf->struct_ops_tab while btf_add_struct_ops() may krealloc() it.
-
-Would returning the error from btf_get_fd_by_id() when bpf_get_btf_vmlinux()
-fails (or at least on -ENOMEM) close this?
+We also strongly discourage APIs that allow user space drivers, which,
+at first glance, such definitions would allow. 
 
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> It
+> provides inline accessors that need errno.h, string.h and size_t,
+> which a standalone UAPI header cannot assume, so this patch excludes
+> it from the UAPI header self-test.
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/41205212136
---===============6180907473628245553==--
+Does any other driver do this? If you are doing something which no
+other driver does, it is probably broken.
+
+> checkpatch --strict (100 columns) still reports the following in this
+> patch.
+
+netdev prefers 80.
+
+> They need coordination with the internal repositories this code
+> is maintained in and will be fixed in V2:
+
+Your internal repos don't matter. Once this is merged it has a life of
+its own.
+
+	Andrew
