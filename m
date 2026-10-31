@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793480538;
-	b=s4dN4jroL6E4Eno8keifQ00q19Rj+pg5q8HWzwq2v0pm7UOiMEuVkakYf99TkZczfKXP
-	 guxDSe9wvVG/IIWBSWIh6Hkm5zzlMyfLnzp+mEXhmFm+l8tETtg+HHphLt90MDKCP6S01
-	 Y14fXIO3hm9q8KtxLQX30Bo91wPJ+AdIFCNiWhlzwdbdjZtfcBPVcKwuR+m151ub5437F
-	 0Opwpyx8ULKyGzw85IkpVx8T7mW7fi5nIYV7CF/9j9zI7DtasrWg1rDqb9YBXPU1WTknr
-	 Ao5mKsTZEtYlutwNwJLTi9IJCKaFAw/YAG+KUG2ZhEdMTnyPGVhfUQKYFnrumteH8eQ==
+	t=1793480539;
+	b=hcW89zfjlfdNOOZkE7w0WmzmcTJeBxMF52X/tHzL5LvzbOcWdoSpA642owXZ6DhBh7D3
+	 thpikS3P+CxRezrW55Eaa0yZa2Zm0Yiw+gMAP9/cnSKuwZs+bbcm5cxBuI+cNOYpl7/++
+	 MD0ZOs/awexTW2jpnoZJQEWPyN7ajvOrOQ0Q03k3o6GiiAcW7Pxdq6TBqAmXVbE0q3C5J
+	 8+bv1jQ8O4DnquzKNAii3yN8lRZQW63ctDVzhMispQwXTf6t9eROeJ3zINIPwf+j4rs7G
+	 +NfU0J1aHzhrC8zncu0/FPigbPGY1+JrF4NZ/7tJ5Epeo+UhjMqkqUgAwKr77Hrya1A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793480538;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793480539;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=5fxkHaKFyvtCD2WljUtoruCL+yJvIzbtm4B6NbbwJ0s=;
-	b=ELykBf+SysKD9agkEbDjA9B3KOS1KSH/BrZ99fg4RwFWcoFKt4IY3sNX0PjvrzU8Il7k
-	 dmsVXFjHVNp7J1tHVL+IW3FRFpFbclY2CUebQmkYYvB+NZlY/47s5JIhahd2KoR3wJXGh
-	 MkifdRj2oSeKQVhc6xh0GWF4JxC86jVsU99MdSyvliWp0biCdtjUYb1w7HkwXHn5RGzcz
-	 kn+oHZeKY17lNmEKaQYLICkxEOGMlKJkRbIAxEW+ZDMBkvtJQoZrccb2LKHuQ9bj5jXx7
-	 MD+N+sdGxwJn3FEjf+o7vG1xYrMBbKtLmb9TjkEonefQH9Caara4Q11yA0xYnfJR/0Q==
+	bh=iHKwq9nI3NFxtpeouD+5YMnOj60hiZOrryjsziFw8O8=;
+	b=WG4ac3mjPOEupA6/3S5yIi3w3iMdSmF6aQ2Y57Pey/0QpPaE2QZOSb3245NYmA81Eg3Q
+	 zAphK5EVKJg3ZL6/LXdj8wtpNWHIc0EMzxv50f4xbB2Urh2C5QSe4rMjkmjD5jMR05d5d
+	 f9eSOL54xrGnxU/QVqmB9FREC1ZfdYA3uHkeBySlJkmQlB5hEU0EfhuEtmTHgVhSJFsi9
+	 SjyTwTgfTcWvqEZAtFClJQv8JnnYz8lFSajKLGza4+eG0aZI9zifAUG6EAFRwoqx77JLj
+	 C1T6fpYKvYg/zzD0uet8azmvauoQ7O6JO/dmAXY1slVaAdWYwm0mCvLYWkvHtR9a67g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=juNxlD0K;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AJFTYxDE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E9E606A31C
-	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D025606A31C
+	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=juNxlD0K
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F121F00919;
-	Sat, 31 Oct 2026 21:02:16 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AJFTYxDE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BA371F00A16;
+	Sat, 31 Oct 2026 21:02:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793480537;
-	bh=5fxkHaKFyvtCD2WljUtoruCL+yJvIzbtm4B6NbbwJ0s=;
+	s=k20260515; t=1793480538;
+	bh=iHKwq9nI3NFxtpeouD+5YMnOj60hiZOrryjsziFw8O8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=juNxlD0K8U4YhL3e3pLpf9RFsDYSpvJRlisSwJNx1/dNA6U/BGGHL/+ROdd06PiR6
-	 1eFzms3bMXQ66iuI1p97ci622i3GqZgr4Vh6FFSzwHsZ99VWICcRBFlx/MyVULyabB
-	 iuc61Ujho4b9gByiDaBW9JetVAD1OcbYQ7Dd2MbPDnWnSYrhowZ0NXvipcSp3iZyUK
-	 V0DLWB7ijzo/o0D9GrGrmSEynv4buW7WFWkYukksFASsngmulYUtyfG9c9avCiPQNZ
-	 hcZNym5dmGvwfzeqljgiv//Mtfx1o5zMMVgx9H5GKK14zwyzp1pnRPlzKqplbaB4n5
-	 el4MP/nL+aZSw==
-Message-ID: <sashiko-outbox-192145@kernel.org>
+	b=AJFTYxDEWM0MnMTSP0ROG7TqNRtIc92mmtheUyhcCtiKblnH+W1anvBcVlLoLZA+S
+	 TmlkXhL398SM6zQQl3SvzEkJdJbADB1kXEwkU3BQnlmQiNZnIA2Njqsq7pSg7S4B5N
+	 Xu6zdqgz+clApSinBNNOc9dNeQHwQN5GP+bffD38tPObtCCZhOcoyn/VSbLMl4gC0n
+	 CzkZvGZjW9MgyuQsk5+NiPiu2rx22w/4BvsW+9PWlWvtBpQWzVG9naLnnwVg4ZMbiV
+	 zYJFBJETM7ZaqAYmro5Xrazais2N5PB7Dq1apsurRlyk0iWu2VhG+hjorcvY8P2tWc
+	 i80ZRWXGm4FFQ==
+Message-ID: <sashiko-outbox-192146@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 18/23] net: hpe: ss1: add the link layer glue
+Subject: Re: [PATCH 19/23] net: hpe: ss1: add SR-IOV support
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingshot-os-team@groups.ext.hpe.com>, "Nathan
  Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Richard
@@ -50,14 +50,13 @@ To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingsh
  Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Sumit
  Semwal" <sumit.semwal@linaro.org>, =?utf-8?b?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Guenter
  Roeck" <linux@roeck-us.net>
-Cc: linux-kbuild@vger.kernel.org, "Sandeep Bhoot" <sandeep.bhoot@hpe.com>, "Mamila
- Santosh" <santosh-kumar.mamila@hpe.com>
-In-Reply-To: <20261030-cxi-netdev-submission-v1-18-8c2c391cc283@hpe.com>
+Cc: linux-kbuild@vger.kernel.org
+In-Reply-To: <20261030-cxi-netdev-submission-v1-19-8c2c391cc283@hpe.com>
 References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030-cxi-netdev-submission-v1-18-8c2c391cc283@hpe.com>
+ <20261030-cxi-netdev-submission-v1-19-8c2c391cc283@hpe.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Oct 2026 21:02:16 +0000
+Date: Sat, 31 Oct 2026 21:02:17 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -69,932 +68,817 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 16 potential issue=
 (s) to consider:
-- [High] net: hpe: ss1: mismatched PHY state and link events in SBL and SL
-- [High] net: hpe: ss1: missing STARTING/STOPPING states in cass_sl_link_up=
-()
-- [High] net: hpe: ss1: broken SerDes match masks in cass_sbl_serdes_config=
-_defaults()
-- [High] net: hpe: ss1: IRQ deadlock on hw->port->lock via cass_sbl_async_a=
-lert()
-- [High] net: hpe: ss1: cass_sl_link_down() returns -EBUSY on -EALREADY
-- [High] net: hpe: ss1: link_state and step_complete races in cass_sl_link_=
-up/down()
-- [Medium] net: hpe: ss1: cass_sbl_reset() uses wrong lock for port state u=
-pdates
-- [Medium] net: hpe: ss1: cass_sbl_mode_set() ignores link_info->speed
-- [Medium] net: hpe: ss1: cass_sl_init() passes monotonic cxi_num to sl_lde=
-v_new()
-- [Medium] net: hpe: ss1: cass_sl_dt_info_get() omits default RX lane mappi=
-ng
-- [Medium] net: hpe: ss1: unserialized shared DMA buffer copy in cass_sl_dm=
-ac_xfer()
-- [Medium] net: hpe: ss1: unlocked concurrent access to cass_dev->sl config=
- structs
-- [Medium] net: hpe: ss1: cass_sl_mode_set() overwrites saved autoneg/LT on=
- loopback
-- [Medium] net: hpe: ss1: uninitialized read data and -1 return in cass_sl_=
-pmi_rd()
-- [Medium] net: hpe: ss1: inconsistent PML recovery state and polarity in S=
-BL and SL
-- [Low] net: hpe: ss1: undocumented module parameters in cass_sbl.c and cas=
-s_sl.c
+- [Critical] net: hpe: ss1: NULL deref and guest cred bypass in pf_get_kvm_=
+task()
+- [Critical] net: hpe: ss1: unauthenticated VF vsock handshake and global p=
+ort binding
+- [Critical] net: hpe: ss1: kthread_stop() UAF on self-exiting SR-IOV kthre=
+ads
+- [Critical] net: hpe: ss1: premature unlocked vf->req_sock clear in pf_vf_=
+msghandler()
+- [Critical] net: hpe: ss1: uncalled __cxi_vf_structure_offset_checks() hid=
+es layout bugs
+- [High] net: hpe: ss1: #warning under CXI_DISABLE_SRIOV breaks CONFIG_WERR=
+OR builds
+- [High] net: hpe: ss1: unlocked driver and vfio_dev->kvm access in pf_get_=
+kvm_task()
+- [High] net: hpe: ss1: missing num_vfs bounds check against C_NUM_VFS in e=
+nable_sriov()
+- [High] net: hpe: ss1: enable_sriov() enables VFs before listener sockets =
+are bound
+- [High] net: hpe: ss1: vf_notif_handler() hardcodes seq 0 and breaks notif=
+ications
+- [High] net: hpe: ss1: missing vsock sk_rcvtimeo and infinite -EINTR retry=
+ loops
+- [High] net: hpe: ss1: broken VF IRQ binary search and num_vfs =3D=3D 1 ch=
+eck in handshake
+- [High] net: hpe: ss1: unvalidated vsock message lengths and uninitialized=
+ stack vars
+- [High] net: hpe: ss1: pf_vf_msghandler() sends stale MAX_VFMSG_SIZE reply=
+ on error
+- [High] net: hpe: ss1: uninitialized vf_cmd_lock when with_vf_support is f=
+alse
+- [Medium] net: hpe: ss1: enable_sriov() error return, offset order, and #w=
+arning build
 --
 
-commit bde39545549e590832e0ff7bfa02d02603cda726
+commit cd0507e8307b6aff215ba76c73aa7b6a9f1e28d5
 Author: Doug Ledford <doug.ledford@hpe.com>
 
-net: hpe: ss1: add the link layer glue
+net: hpe: ss1: add SR-IOV support
 
-This commit adds the glue layer connecting the Cassini core driver with the
-SBL and SL link layers, along with PHY state machine and port helper
-functions.
+This commit adds SR-IOV support for the HPE Cassini driver, including VF
+creation, a vsock-based PF/VF mailbox and notification mechanism, and
+compile-time structure offset checks for VF resource structures.
 
-> diff --git a/drivers/net/ethernet/hpe/ss1/cass_sbl.c b/drivers/net/ethern=
-et/hpe/ss1/cass_sbl.c
+> diff --git a/drivers/net/ethernet/hpe/ss1/cass_sriov.c b/drivers/net/ethe=
+rnet/hpe/ss1/cass_sriov.c
 > new file mode 100644
-> index 0000000000000..3b39e917fd5a4
+> index 0000000000000..5c947372ab9c7
 > --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/ss1/cass_sbl.c
-> @@ -0,0 +1,1706 @@
+> +++ b/drivers/net/ethernet/hpe/ss1/cass_sriov.c
+> @@ -0,0 +1,1274 @@
 
 [ ... ]
 
-> +static unsigned int pml_rec_timeout =3D SBL_DFLT_PML_REC_TIMEOUT;
-> +module_param(pml_rec_timeout, uint, 0644);
-> +MODULE_PARM_DESC(pml_rec_timeout, "PML recovery timeout in ms");
+> +#if defined(CXI_DISABLE_SRIOV)
+> +#warning "SR-IOV support is disabled."
 > +
-> +static unsigned int pml_rec_rl_max_dur =3D SBL_DFLT_PML_REC_RL_MAX_DURAT=
-ION;
-> +module_param(pml_rec_rl_max_dur, uint, 0644);
-> +MODULE_PARM_DESC(pml_rec_rl_max_dur, "PML recovery max time in ms per wi=
-ndow");
-> +
-> +static unsigned int pml_rec_rl_win_size =3D SBL_DFLT_PML_REC_RL_WINDOW_S=
-IZE;
-> +module_param(pml_rec_rl_win_size, uint, 0644);
-> +MODULE_PARM_DESC(pml_rec_rl_win_size, "PML recovery rate limiter window =
-in ms");
-
-[Severity: Low]
-Should these new module parameters in cass_sbl.c (pml_rec_timeout,
-pml_rec_rl_max_dur, and pml_rec_rl_win_size), as well as the corresponding
-ones in cass_sl.c (cass_sl_pml_rec_timeout_ms,
-cass_sl_pml_rec_rate_limit_max_time_ms, and
-cass_sl_pml_rec_rate_limit_win_size_ms), be documented in
-Documentation/admin-guide/kernel-parameters.txt?
-
-[ ... ]
-
-> +void cass_sbl_mode_set(struct cass_dev *hw, const struct cxi_link_info *=
-link_info)
+> +int cass_sriov_configure(struct pci_dev *pdev, int num_vfs)
 > +{
-> +	struct cass_link_attr attrs =3D hw->port->lattr;
-> +
-> +	switch (link_info->flags & LOOPBACK_MODE) {
-> +	case 0:
-> +		attrs.bl.loopback_mode =3D SBL_LOOPBACK_MODE_OFF;
-> +		break;
-> +	case CXI_ETH_PF_INTERNAL_LOOPBACK:
-> +		attrs.bl.loopback_mode =3D SBL_LOOPBACK_MODE_LOCAL;
-> +		break;
-> +	case CXI_ETH_PF_EXTERNAL_LOOPBACK:
-> +		attrs.bl.loopback_mode =3D SBL_LOOPBACK_MODE_REMOTE;
-> +		break;
-> +	default:
-> +		/* Invalid configuration, no change */
-> +		break;
-> +	}
-> +
-> +	if (link_info->flags & CXI_ETH_PF_LLR)
-> +		attrs.bl.llr_mode =3D SBL_LLR_MODE_ON;
-> +	else
-> +		attrs.bl.llr_mode =3D SBL_LLR_MODE_OFF;
-> +
-> +	if (link_info->flags & CXI_ETH_PF_PRECODING)
-> +		attrs.bl.precoding =3D SBL_PRECODING_ON;
-> +	else
-> +		attrs.bl.precoding =3D SBL_PRECODING_OFF;
-> +
-> +	if (link_info->flags & CXI_ETH_PF_IFG_HPC)
-> +		attrs.bl.ifg_config =3D SBL_IFG_CONFIG_HPC;
-> +	else
-> +		attrs.bl.ifg_config =3D SBL_IFG_CONFIG_IEEE_200G;
-> +
-> +	if (link_info->flags & CXI_ETH_PF_PML_REC)
-> +		attrs.bl.options |=3D SBL_DISABLE_PML_RECOVERY;
-> +	else
-> +		attrs.bl.options &=3D ~SBL_DISABLE_PML_RECOVERY;
-> +
-> +	if (attrs.mattr.media !=3D SBL_LINK_MEDIA_OPTICAL) {
-> +		if (link_info->autoneg =3D=3D AUTONEG_DISABLE)
-> +			attrs.bl.pec.an_mode =3D SBL_AN_MODE_OFF;
-> +		else
-> +			attrs.bl.pec.an_mode =3D SBL_AN_MODE_ON;
-> +	}
-> +
-> +	if (!cass_sbl_link_attr_cmp(hw, &attrs))
-> +		hw->link_config_dirty =3D false;
-> +	else
-> +		hw->link_config_dirty =3D true;
-> +
-> +	if (hw->link_config_dirty) {
-> +		hw->port->lattr =3D attrs;
-> +		/* Bounce the link to apply the new config */
-> +		cass_phy_bounce(hw);
-> +	}
+> +	return -EOPNOTSUPP;
 > +}
-
-[Severity: Medium]
-Should cass_sbl_mode_set() also update attrs.bl.link_mode from
-link_info->speed using cass_sbl_link_speed_to_mode()?
-
-When cxi_set_link_ksettings() calls cxi_link_mode_set() with a new
-link_info.speed, cass_sbl_mode_set() never checks link_info->speed, leaving
-requested link speed changes ignored and cass_sbl_link_speed_to_mode() unus=
-ed.
-
 > +
-> +void cass_sbl_pml_recovery_set(struct cass_dev *hw, bool set)
+> +int cass_vf_init(struct cass_dev *hw)
 > +{
-> +	sbl_disable_pml_recovery(hw->sbl, 0, set);
+> +	return -EOPNOTSUPP;
 > +}
-
-[ ... ]
-
-> +static void cass_sbl_async_alert(void *accessor, int port_num, int alert=
-_type,
-> +				 void *alert_data, int size)
-> +{
-> +	struct cass_dev *hw =3D (struct cass_dev *)accessor;
-> +	int down_origin;
-> +
-> +	cxidev_dbg(&hw->cdev, "(sbl): %s alert", sbl_async_alert_str(alert_type=
-));
-> +
-> +	switch (alert_type) {
-> +	case SBL_ASYNC_ALERT_LINK_DOWN:
-> +		cxidev_warn(&hw->cdev, "(sbl): %d: link down alert\n",
-> +			    port_num);
-> +		down_origin =3D (int)(uintptr_t)alert_data;
-> +		cass_sbl_link_down_async_handler(hw, port_num, down_origin);
-> +		break;
 
 [Severity: High]
-Can this cause a spinlock deadlock on hw->port->lock when called from the S=
-BL
-PML recovery timer?
+In cass_core.h, CXI_DISABLE_SRIOV is defined whenever CONFIG_KVM_VFIO is
+not enabled, and CONFIG_HPE_SS1 does not depend on or select
+CONFIG_KVM_VFIO.
 
-In sbl_pml_recovery_init(), recovery->timer is set up with TIMER_IRQSAFE and
-calls:
+When building with CONFIG_KVM_VFIO=3Dn and CONFIG_WERROR=3Dy, will this
+unconditional #warning cause the build to fail with -Werror=3Dcpp?
 
-  sbl_pml_recovery_monitor_fallback_timer()
-    -> sbl_pml_link_down_async_alert()
-      -> sbl_async_alert()
-        -> cass_sbl_async_alert()
-          -> cass_sbl_link_down_async_handler()
-            -> cass_link_async_down()
-
-cass_link_async_down() and its callees (cass_lmon_get_dirn(),
-cass_link_get_down_origin(), and cass_lmon_request_down()) acquire
-hw->port->lock using plain spin_lock(). Because process-context callers such
-as cass_link_get_state(), cass_link_set_state(), cass_link_async_down_wait(=
-),
-and cass_link_sysfs_sprint() also acquire hw->port->lock with plain
-spin_lock() without disabling interrupts or softirqs, if recovery->timer
-fires on a CPU already holding hw->port->lock, the timer handler will spin
-forever on the same lock (and under PREEMPT_RT, acquiring a sleeping
-spinlock_t from a TIMER_IRQSAFE handler is invalid).
+Also, since only pf_get_kvm_task() on the PF side touches vfio_device->kvm,
+does gating the entire file on CXI_DISABLE_SRIOV prevent a guest VM kernel
+built without host CONFIG_KVM_VFIO from probing a Cassini VF via
+cass_vf_init() and cxi_send_msg_to_pf()?
 
 [ ... ]
 
-> +int cass_sbl_power_on(struct cass_dev *hw)
+> +/* Given a PF's pci_dev struct, find the pci_dev of one of its VFs */
+> +static struct pci_dev *get_vf_pdev(struct pci_dev *pdev, int vf_idx)
+> +{
+> +	int devfn =3D pci_iov_virtfn_devfn(pdev, vf_idx);
+> +
+> +	if (devfn < 0)
+> +		return ERR_PTR(devfn);
+> +	return pci_get_slot(pdev->bus, devfn);
+> +}
+> +
+> +/* Identify the KVM task associated with a VF that is bound to a guest V=
+M. */
+> +static struct task_struct *pf_get_kvm_task(struct cass_vf *vf)
+> +{
+> +	struct cass_dev *hw =3D vf->hw;
+> +	struct pci_dev *vf_pdev =3D NULL;
+> +	struct vfio_device *vfio_dev =3D NULL;
+> +	struct task_struct *task =3D NULL;
+> +	struct pid *pid;
+> +
+> +	vf_pdev =3D get_vf_pdev(hw->cdev.pdev, vf->vf_idx);
+> +	if (IS_ERR(vf_pdev)) {
+> +		cxidev_err(&hw->cdev, "vf %d: could not get device", vf->vf_idx);
+> +		return ERR_PTR(PTR_ERR(vf_pdev));
+> +	}
+> +
+> +	cxidev_dbg(&hw->cdev, "vf %d: device at %s", vf->vf_idx, pci_name(vf_pd=
+ev));
+> +
+> +	if (!vf_pdev->driver) {
+> +		task =3D ERR_PTR(-ENODEV);
+> +	} else if (!strncmp(vf_pdev->driver->name, "vfio-pci", strlen("vfio-pci=
+"))) {
+> +		/* VF is under control of VFIO driver, look for KVM task. */
+> +		vfio_dev =3D pci_get_drvdata(vf_pdev);
+> +		if (vfio_dev->kvm) {
+> +			pid =3D find_get_pid(vfio_dev->kvm->userspace_pid);
+> +			task =3D get_pid_task(pid, PIDTYPE_PID);
+> +			put_pid(pid);
+> +		} else {
+> +			task =3D ERR_PTR(-ESRCH);
+> +		}
+
+[Severity: Critical]
+Could pf_get_kvm_task() trigger a NULL pointer dereference or allow a guest
+VM to bypass host credential checks?
+
+First, get_vf_pdev() calls pci_get_slot(pdev->bus, devfn), which only
+searches pdev->bus (missing VFs placed on a virtual bus where
+pci_iov_virtfn_bus(pdev, vf_idx) !=3D pdev->bus->number, or when the VF
+pci_dev has not been created yet or was removed via sysfs) and returns NULL
+when no device is found. Since pf_get_kvm_task() only checks
+IS_ERR(vf_pdev), a NULL return is dereferenced by pci_name(vf_pdev) and
+vf_pdev->driver.
+
+Second, when vf_pdev is bound to vfio-pci and vfio_dev->kvm is set,
+get_pid_task(pid, PIDTYPE_PID) can return NULL if the thread that originally
+called KVM_CREATE_VM (vfio_dev->kvm->userspace_pid) has exited while other
+VMM threads keep the VM alive. In that case pf_get_kvm_task() returns NULL
+instead of an error pointer, and pf_vf_msghandler() treats vf->kvm_task =3D=
+=3D
+NULL as a host-owned VF:
+
+	if (vf->kvm_task) {
+		...
+		uid =3D __kuid_val(cred->uid);
+		gid =3D __kgid_val(cred->gid);
+		rcu_read_unlock();
+	}
+
+Wouldn't that pass the untrusted guest-supplied uid and gid from the vsock
+header directly to hw->msg_relay()?
+
+> +	} else if (!strncmp(vf_pdev->driver->name, KBUILD_MODNAME,
+> +			    strlen(KBUILD_MODNAME))) {
+> +		/* VF is under control of our driver, KVM task is not applicable */
+> +		task =3D NULL;
+> +	} else {
+> +		task =3D ERR_PTR(-EPERM);
+> +	}
+> +	pci_dev_put(vf_pdev);
+> +	return task;
+> +}
+
+[Severity: High]
+What protects vf_pdev->driver, pci_get_drvdata(vf_pdev), and vfio_dev->kvm
+against concurrent driver unbind or VFIO device close in pf_get_kvm_task()?
+
+Without holding device_lock(&vf_pdev->dev) or vfio_dev->dev_set->lock, a
+concurrent sysfs unbind (device_release_driver_internal() ->
+vfio_pci_remove()) can clear vf_pdev->driver and free vfio_dev after the
+!vf_pdev->driver check, or vfio_device_put_kvm() can clear and free
+vfio_dev->kvm while pf_get_kvm_task() dereferences
+vfio_dev->kvm->userspace_pid.
+
+> +
+> +/* Handler thread for incoming messages from the VF driver to the PF. 1 =
+instance
+> + * per active VF.
+> + */
+> +static int pf_vf_msghandler(void *data)
 > +{
 
 [ ... ]
 
-> +	atomic_inc(&hw->sbl_counters[link_up]);
+> +		mutex_lock(&hw->msg_relay_lock);
+> +		if (hw->msg_relay) {
+> +			reply_len =3D MAX_VFMSG_SIZE;
+> +			msg_rc =3D hw->msg_relay(hw->msg_relay_data, vf->vf_idx,
+> +					       vf->request, request_len, uid, gid,
+> +					       vf->reply, &reply_len);
+> +		} else {
+> +			reply_len =3D 0;
+> +			msg_rc =3D -ENODEV;
+> +		}
+> +		mutex_unlock(&hw->msg_relay_lock);
 > +
-> +	/* report success */
-> +out:
-> +	cass_link_set_state(hw, CASS_LINK_STATUS_UP, 0);
-> +	cass_phy_link_up(hw);
+> +		if (reply_len > MAX_VFMSG_SIZE) {
+> +			reply_len =3D 0;
+> +			msg_rc =3D -E2BIG;
+> +		}
 > +
-> +	hw->port->start_time =3D ktime_get_seconds();
-> +
-> +	return 0;
+> +		cxidev_dbg(&hw->cdev, "vf %d: responding with %ld bytes, rc=3D%d",
+> +			   vf->vf_idx, reply_len, msg_rc);
+> +		rc =3D write_message_to_vsock(vf->req_sock, vf->reply, reply_len,
+> +					    msg_rc, seq);
+
+[Severity: High]
+In pf_vf_msghandler(), reply_len is initialized to MAX_VFMSG_SIZE before
+calling hw->msg_relay(). If hw->msg_relay() returns a negative error code
+without setting *reply_len =3D 0, won't write_message_to_vsock() send
+MAX_VFMSG_SIZE (22,452) bytes of stale data from vf->reply to the VF, both
+leaking PF memory and causing read_message_from_vsock() on the VF to fail
+with -EMSGSIZE and shut down the socket?
 
 [ ... ]
 
-> +static int cass_sbl_serdes_config_defaults(struct cass_dev *hw)
+> +err:
+> +	cxidev_dbg(&hw->cdev, "vf %d: handler exiting, rc=3D%d", vf->vf_idx, rc=
+);
+> +
+> +	if (vf->kvm_task)
+> +		put_task_struct(vf->kvm_task);
+> +	kernel_sock_shutdown(vf->req_sock, SHUT_RDWR);
+> +	sock_release(vf->req_sock);
+> +	vf->req_sock =3D NULL;
+> +	mutex_lock(&vf->notif_lock);
+> +	if (vf->notif_sock) {
+> +		kernel_sock_shutdown(vf->notif_sock, SHUT_RDWR);
+> +		sock_release(vf->notif_sock);
+> +		vf->notif_sock =3D NULL;
+> +	}
+> +	mutex_unlock(&vf->notif_lock);
+> +
+> +	vf->kvm_task =3D NULL;
+> +
+> +	cass_ac_phys_free(hw, vf->phys_ac);
+> +	vf->phys_ac =3D 0;
+> +
+> +	return rc;
+> +}
+
+[Severity: Critical]
+Is it safe for pf_vf_msghandler() to clear vf->req_sock =3D NULL without
+locking before releasing vf->notif_sock, clearing vf->kvm_task, and calling
+cass_ac_phys_free(hw, vf->phys_ac)?
+
+Other paths treat vf->req_sock !=3D NULL as the indicator that a VF slot is
+active:
+- In pf_vf_listener(), if vf->req_sock becomes NULL right as SR-IOV is being
+  disabled in cass_remove() -> disable_sriov(), pf_vf_listener() skips
+  kthread_stop(hw->vfs[vf_idx].task), allowing disable_sriov() and
+  cass_remove() to free hw while pf_vf_msghandler() is still running
+  cass_ac_phys_free(hw, vf->phys_ac).
+- In handle_vf_req_conn(), a reconnecting VF can see vf->req_sock =3D=3D NU=
+LL
+  and allocate a new vf->phys_ac and vf->kvm_task, which the exiting
+  pf_vf_msghandler() thread then overwrites and frees.
+- In handle_vf_notif_conn(), checking hw->vfs[i].req_sock without holding
+  vf->notif_lock can race with this teardown and install vf->notif_sock
+  after the notif_lock cleanup block has already run.
+
+> +
+> +/* Probe inactive VFs from range_min to range_max inclusive */
+> +static int pf_probe_vfs(struct cass_dev *hw, struct socket *sock,
+> +			int range_min, int range_max)
 > +{
-> +	struct sbl_sc_values vals =3D { 0 };
-> +	int rc, err;
+> +	int i, rc;
+> +	int magic;
+> +	size_t msg_len =3D sizeof(magic);
+> +	union c_pi_ipd_cfg_pf_vf_irq irqs =3D {
+> +		.irq =3D 0,
+> +	};
 > +
-> +	/* CONFIG 1: 200G and 100G PEC to switch */
-> +	u64 port_mask =3D 0x1;
-> +	u8  serdes_mask =3D 0xf;
-> +	u64 tp_state_mask0 =3D sbl_create_tp_hash0((u8)CASS_SBL_SC_MASKED_IN,
-> +						 (u8)CASS_SBL_SC_MASKED_IN,
-> +						 (u8)CASS_SBL_SC_MASKED_OUT,
-> +						 (u8)CASS_SBL_SC_MASKED_OUT,
-> +						 (u8)CASS_SBL_SC_MASKED_IN,
-> +						 (u16)CASS_SBL_SC_MASKED_OUT);
-> +	u64 tp_state_mask1 =3D sbl_create_tp_hash1(CASS_SBL_SC_MASKED_IN);
-> +	u64 tp_state_match0 =3D sbl_create_tp_hash0(CASS_SBL_SC_LP_SWITCH,
-> +						 CASS_SBL_SC_LBM_ANY,
-> +						 CASS_SBL_SC_NA,
-> +						 CASS_SBL_SC_NA,
-> +						 CASS_SBL_SC_MT_ELEC,
-> +						 CASS_SBL_SC_NA);
-> +	u64 tp_state_match1 =3D sbl_create_tp_hash1(CASS_SBL_SC_NA);
+> +	for (i =3D range_min; i <=3D range_max; i++)
+> +		if (!hw->vfs[i].req_sock) /* Only probe VFs that aren't already active=
+ */
+> +			irqs.irq |=3D 1ULL << i;
+> +	if (!irqs.irq)
+> +		return 0;
+> +
+> +	magic =3D CXI_SRIOV_MAGIC1;
+> +	rc =3D write_message_to_vsock(sock, &magic, sizeof(magic), 0, 0);
+> +	if (rc < 0) {
+> +		cxidev_err(&hw->cdev, "could not send magic to incoming VF: %d", rc);
+> +		return rc;
+> +	}
+> +
+> +	cass_write(hw, C_PI_IPD_CFG_PF_VF_IRQ, &irqs,
+> +		   sizeof(union c_pi_ipd_cfg_pf_vf_irq));
+> +
+> +	msg_len =3D sizeof(magic);
+> +	do {
+> +		rc =3D read_message_from_vsock(sock, &magic, &msg_len, NULL, NULL, NUL=
+L, NULL);
+> +		if (rc =3D=3D -EINTR)
+> +			schedule();
+> +	} while (rc =3D=3D -EINTR);
+> +	if (rc < 0) {
+> +		cxidev_err(&hw->cdev, "could not read magic from incoming VF: %d", rc);
+> +		return rc;
+> +	}
+> +
+> +	return magic;
+> +}
+> +
+> +/* Identify which VF an incoming connection belongs to, by probing the P=
+F-to-VF
+> + * interrupt of VFs that do not have an active connection.
+> + */
+> +static int pf_vf_handshake(struct cass_dev *hw, struct socket *sock)
+> +{
+> +	int range_min =3D 0;
+> +	int range_max =3D hw->num_vfs - 1;
+> +	int range_mid, rc, seq, vf_idx;
+> +	int magic;
+> +
+> +	seq =3D 0; /* Handshake sequence number */
+> +	do {
+> +		magic =3D CXI_SRIOV_MAGIC1 + seq;
+> +		range_mid =3D range_min + (range_max - range_min) / 2;
+> +		if (pf_probe_vfs(hw, sock, range_min, range_mid) =3D=3D magic) {
+> +			seq +=3D 1;
+> +			range_max =3D range_mid;
+> +		} else if (pf_probe_vfs(hw, sock, range_mid + 1, range_max) =3D=3D mag=
+ic) {
+> +			seq +=3D 1;
+> +			range_min =3D range_mid + 1;
+> +		} else {
+> +			break;
+> +		}
+> +	} while (range_max !=3D range_min);
+> +
+> +	if (range_max !=3D range_min) {
+> +		cxidev_err(&hw->cdev, "vf search failed");
+> +		return -ENOENT;
+> +	}
+> +	vf_idx =3D range_min;
+
+[Severity: High]
+How does the binary search in pf_vf_handshake() work when a VF in the upper
+half [range_mid + 1, range_max] connects while at least one VF in the lower
+half [range_min, range_mid] is still inactive?
+
+1. pf_vf_handshake() first calls pf_probe_vfs(hw, sock, range_min,
+   range_mid), which sends CXI_SRIOV_MAGIC1 over sock to the connecting
+   upper-half VF, raises C_PI_IPD_CFG_PF_VF_IRQ only for VFs in
+   [range_min, range_mid], and blocks waiting for a reply on sock.
+2. In cass_vf_init(), the connecting upper-half VF receives
+   CXI_SRIOV_MAGIC1 and enters wait_for_completion_timeout(&hw->pf_to_vf_co=
+mp,
+   CXI_SRIOV_VF_TIMEOUT), waiting for an interrupt that was only sent to the
+   lower half, and aborts after 10 seconds with -ETIMEDOUT.
+3. Meanwhile, any other inactive VFs in [range_min, range_mid] that have
+   already registered pf_to_vf_int_cb() will have hw->pf_to_vf_comp
+   completed prematurely by the probe interrupt.
+4. Also, when hw->num_vfs =3D=3D 1, both range_min and range_max start at 0=
+; if
+   pf_probe_vfs() fails and breaks out of the loop, range_max !=3D range_min
+   is false (0 !=3D 0), so doesn't pf_vf_handshake() still succeed and retu=
+rn
+   vf_idx =3D 0?
 
 [ ... ]
 
-> +	// CONFIG 2: 100G AOC to switch
-> +	// All the same mask/match params, save for the following:
-> +	tp_state_match0 =3D sbl_create_tp_hash0((u8)CASS_SBL_SC_LP_SWITCH,
-> +					      (u8)CASS_SBL_SC_LBM_ANY,
-> +					      (u8)CASS_SBL_SC_NA,
-> +					      (u8)CASS_SBL_SC_LM_100,
-> +					      (u8)CASS_SBL_SC_MT_OPT_ANY,
-> +					      (u16)CASS_SBL_SC_NA);
+> +/* Handle an incoming request connection from a VF */
+> +static void handle_vf_req_conn(struct cass_dev *hw,
+> +			       struct socket *incoming)
+> +{
+> +	struct sockaddr_vm peeraddr;
+> +	struct cass_vf *vf;
+> +	int rc, vf_idx;
+> +
+> +	rc =3D kernel_getpeername(incoming, (struct sockaddr *)&peeraddr);
+> +	if (rc < 0) {
+> +		cxidev_err(&hw->cdev, "could not get peer addr for vf: %d", rc);
+> +		goto close_sock;
+> +	}
+> +
+> +	vf_idx =3D pf_vf_handshake(hw, incoming);
+
+[Severity: Critical]
+What prevents an unprivileged local host user (via vsock_loopback) or an
+unauthorized guest VM from claiming a VF in pf_vf_handshake()?
+
+In enable_sriov(), vsock_loopback is loaded and pf_vf_listener() binds
+CXI_SRIOV_VSOCK_PORT and CXI_SRIOV_VSOCK_NOTIF_PORT to VMADDR_CID_ANY in
+init_net. In pf_probe_vfs(), the PF prompts the peer with CXI_SRIOV_MAGIC1
+and accepts the predictable value CXI_SRIOV_MAGIC1 + seq in reply without
+verifying that the peer actually received the hardware interrupt or
+validating peeraddr.svm_cid in handle_vf_req_conn(). If the VF is bound to
+the host driver (so vf->kvm_task is NULL), a local process can claim the VF
+slot and supply arbitrary uid and gid values (such as 0) in the vsock
+message header.
+
+Also, since pf_vf_listener() binds fixed global ports CXI_SRIOV_VSOCK_PORT
+(0x17db) and CXI_SRIOV_VSOCK_NOTIF_PORT (0x17dc) with VMADDR_CID_ANY, won't
+enabling SR-IOV on a second Cassini PF in the same system fail in
+vsock_create_listen() -> kernel_bind() with -EADDRINUSE?
 
 [ ... ]
 
-> +	err =3D sbl_serdes_add_config(hw->sbl, tp_state_mask0, tp_state_mask1,
-> +				    tp_state_match0, tp_state_match1, port_mask,
-> +				   serdes_mask, &vals, false);
-> +	if ((err =3D=3D 0) || (err =3D=3D -EEXIST))
-> +		rc +=3D 0;
-> +	else
-> +		rc +=3D err;
+> +/* Handle an incoming notification connection from a VF */
+> +static void handle_vf_notif_conn(struct cass_dev *hw,
+> +				 struct socket *incoming)
+> +{
+> +	struct sockaddr_vm peeraddr;
+> +	struct cass_vf *vf;
+> +	int rc, vf_idx, i;
+> +	unsigned int token;
+> +	struct cass_vf_notif_ping ping =3D {
+> +		.op =3D CASS_VF_NOTIF_OP_PING,
+> +	};
+> +	size_t msg_len;
 > +
-> +	// CONFIG 3: 200G AOC to switch
-> +	// All the same mask/match params, save for the following:
-> +	tp_state_match0 =3D sbl_create_tp_hash0((u8)CASS_SBL_SC_LP_SWITCH,
-> +					      (u8)CASS_SBL_SC_LBM_ANY,
-> +					      (u8)CASS_SBL_SC_NA,
-> +					      (u8)CASS_SBL_SC_LM_200,
-> +					      (u8)CASS_SBL_SC_MT_OPT_ANY,
-> +					      (u16)CASS_SBL_SC_NA);
+> +	rc =3D kernel_getpeername(incoming, (struct sockaddr *)&peeraddr);
+> +	if (rc < 0) {
+> +		cxidev_err(&hw->cdev,
+> +			   "could not get peer addr for notification connection: %d", rc);
+> +		goto close_sock;
+> +	}
+> +
+> +	/* Read token to identify which VF this is */
+> +	msg_len =3D sizeof(token);
+> +	do {
+> +		rc =3D read_message_from_vsock(incoming, &token, &msg_len, NULL, NULL,=
+ NULL, NULL);
+> +		if (rc =3D=3D -EINTR)
+> +			schedule();
+> +	} while (rc =3D=3D -EINTR);
 
 [ ... ]
 
-> +	err =3D sbl_serdes_add_config(hw->sbl, tp_state_mask0, tp_state_mask1,
-> +				    tp_state_match0, tp_state_match1, port_mask,
-> +				   serdes_mask, &vals, false);
-> +	if ((err =3D=3D 0) || (err =3D=3D -EEXIST))
-> +		rc +=3D 0;
-> +	else
-> +		rc +=3D err;
+> +	vf->notif_seq =3D 0;
+> +	vf->notif_sock =3D incoming;
+> +	mutex_unlock(&vf->notif_lock);
+> +	cxidev_dbg(&hw->cdev, "vf %d: notification socket connected", vf_idx);
 > +
-> +	if (rc)
-> +		cxidev_err(&hw->cdev, "Failed to update SBL config [%d]\n", rc);
+> +	/* Send test notification */
+> +	msg_len =3D sizeof(ping);
+> +	rc =3D cxi_send_msg_to_vf(&hw->cdev, vf_idx, &ping, msg_len,
+> +				NULL, NULL);
+
+[Severity: High]
+Can an unresponsive peer hang pf_vf_listener() or deadlock vf->notif_lock,
+and can the -EINTR retry loops spin indefinitely?
+
+1. Accepted AF_VSOCK sockets created by kernel_accept() initialize
+   sk->sk_rcvtimeo to MAX_SCHEDULE_TIMEOUT rather than inheriting the
+   listener socket's timeout. In handle_vf_req_conn(),
+   incoming->sk->sk_rcvtimeo is not set before pf_vf_handshake() (it is only
+   set later in pf_vf_msghandler()), and in handle_vf_notif_conn(),
+   sk_rcvtimeo is never set on incoming / vf->notif_sock at all. If a peer
+   connects and sends nothing, pf_vf_listener() blocks forever; similarly,
+   if a VF stops responding to notifications, cxi_send_msg_to_vf() blocks
+   forever in cxi_vsock_send() while holding vf->notif_lock, deadlocking
+   teardown in pf_vf_msghandler() and pf_vf_listener().
+2. In pf_probe_vfs(), handle_vf_notif_conn(), and cass_vf_init(), the loops:
+
+	do {
+		rc =3D read_message_from_vsock(...);
+		if (rc =3D=3D -EINTR)
+			schedule();
+	} while (rc =3D=3D -EINTR);
+
+   do not check kthread_should_stop() or signal_pending(). When a signal or
+   kthread_stop() is pending, kernel_recvmsg() immediately returns -EINTR
+   and schedule() with state TASK_RUNNING returns without sleeping, causing
+   a tight infinite loop.
+
+[ ... ]
+
+> +static int enable_sriov(struct pci_dev *pdev, int num_vfs)
+> +{
+> +	int rc;
+> +	int sriov;
+> +	u16 offset;
+> +	u16 stride;
+> +	union c_pi_cfg_pri_sriov pri_sriov =3D {};
+> +	struct cass_dev *hw =3D pci_get_drvdata(pdev);
+> +
+> +	rc =3D request_module("vsock");
+> +	if (rc) {
+> +		cxidev_err(&hw->cdev, "could not load vsock module");
+> +		goto err_novf;
+> +	}
+> +
+> +	rc =3D request_module("vsock_loopback");
+> +	if (rc) {
+> +		cxidev_err(&hw->cdev, "could not load vsock_loopback module");
+> +		goto err_novf;
+> +	}
+> +
+> +	hw->num_vfs =3D num_vfs;
+> +
+> +	if (!hw->vf_listener)
+> +		hw->vf_listener =3D kthread_run(pf_vf_listener, hw, "cxi_vf_listener");
+> +	if (IS_ERR(hw->vf_listener)) {
+> +		cxidev_err(&hw->cdev, "could not start vf listener thread");
+> +		rc =3D PTR_ERR(hw->vf_listener);
+> +		hw->vf_listener =3D NULL;
+> +		goto err_novf;
+> +	}
+> +
+> +	/* The VF Offset and Stride need to match the SR-IOV configuration. */
+> +	sriov =3D pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
+> +	if (!sriov) {
+> +		cxidev_err(&hw->cdev, "No extended capabilities found\n");
+> +		rc =3D -ENODEV;
+> +		goto err_kill_listener;
+> +	}
+> +
+> +	pci_read_config_word(pdev, sriov + PCI_SRIOV_VF_OFFSET, &offset);
+> +	pci_read_config_word(pdev, sriov + PCI_SRIOV_VF_STRIDE, &stride);
+> +
+> +	pri_sriov.vf_offset =3D offset;
+> +	pri_sriov.vf_stride =3D stride;
+> +
+> +	cass_write(hw, C_PI_CFG_PRI_SRIOV, &pri_sriov,
+> +		   sizeof(union c_pi_cfg_pri_sriov));
+> +
+> +	rc =3D pci_enable_sriov(pdev, num_vfs);
+> +	if (rc) {
+> +		cxidev_err(&hw->cdev, "SRIOV enable failed %d\n", rc);
+> +		goto err_kill_listener;
+> +	}
+> +
+> +	return num_vfs;
+> +
+> +err_kill_listener:
+> +	kthread_stop(hw->vf_listener);
+> +	hw->vf_listener =3D NULL;
+> +err_novf:
+> +	hw->num_vfs =3D 0;
 > +	return rc;
 > +}
 
 [Severity: High]
-Are the state masks in cass_sbl_serdes_config_defaults() inverted or missing
-fields?
+Does enable_sriov() race with pf_vf_listener() when creating the listening
+sockets?
 
-First, tp_state_mask1 is set to sbl_create_tp_hash1(CASS_SBL_SC_MASKED_IN)
-(~0ULL) while tp_state_match1 is sbl_create_tp_hash1(CASS_SBL_SC_NA) (0). In
-sbl_get_serdes_config_values(), an entry matches hash1 only when:
-
-  (((sc->tp_state_mask1 & hash1) & ~(sc->tp_state_mask1 & sc->tp_state_matc=
-h1)) =3D=3D 0)
-
-With tp_state_mask1 =3D ~0ULL and tp_state_match1 =3D 0, this requires hash1
-(which is sbl->link[port_num].mattr.len) to be 0, preventing any cable with=
- a
-non-zero length from matching any of the three configs. Should tp_state_mas=
-k1
-use CASS_SBL_SC_MASKED_OUT instead?
-
-Second, CONFIG 2 (CASS_SBL_SC_LM_100) and CONFIG 3 (CASS_SBL_SC_LM_200) mat=
-ch
-on link_mode in tp_state_match0, but reuse tp_state_mask0 from CONFIG 1 whe=
-re
-the 4th argument (link_mode_mask) is CASS_SBL_SC_MASKED_OUT. Because
-link_mode is masked out, sbl_get_serdes_config_values() ignores link_mode a=
-nd
-CONFIG 3 (inserted at the head of serdes_config_list after CONFIG 2) always
-shadows CONFIG 2.
-
-Finally, accumulating errors via rc +=3D err sums negative errno values if =
-more
-than one sbl_serdes_add_config() call fails, returning a corrupted error co=
-de.
-
-[ ... ]
-
-> +int cass_sbl_reset(struct cass_dev *hw)
-> +{
-> +	int bl_state;
-> +	int err;
-> +
-> +	cxidev_dbg(&hw->cdev, "link: reset (from %s)\n",
-> +		   cass_link_state_str(cass_link_get_state(hw)));
-> +
-> +	atomic_inc(&hw->sbl_counters[link_reset_tries]);
-> +
-> +	cass_link_set_state(hw, CASS_LINK_STATUS_RESETTING, 0);
-> +
-> +	/* reset the base link */
-> +	sbl_base_link_get_status(hw->sbl, 0, &bl_state, NULL, NULL, NULL,
-> +				 NULL, NULL);
-> +
-> +	if (bl_state !=3D SBL_BASE_LINK_STATUS_UNCONFIGURED) {
-> +		err =3D sbl_base_link_reset(hw->sbl, 0);
-> +		if (err)
-> +			cxidev_err(&hw->cdev,
-> +				   "link: reset, base link reset failed [%d]\n",
-> +				   err);
-> +	}
-> +
-> +	spin_lock(&hw->sbl_state_lock);
-> +	hw->port->prev_lstate =3D hw->port->lstate;
-> +	hw->port->lstate =3D CASS_LINK_STATUS_UNCONFIGURED;
-> +	hw->port->lerr =3D 0;
-> +	hw->port->config_state &=3D ~CASS_LINK_CONFIGURED;
-> +	spin_unlock(&hw->sbl_state_lock);
+enable_sriov() starts pf_vf_listener() asynchronously via kthread_run() and
+immediately calls pci_enable_sriov(pdev, num_vfs) without waiting for
+pf_vf_listener() to finish calling vsock_create_listen() for hw->vf_req_sock
+and hw->vf_notif_sock. When sriov_drivers_autoprobe is enabled on the host,
+pci_enable_sriov() synchronously probes VFs (cass_probe() -> cass_vf_init()
+-> kernel_connect()), which can run before pf_vf_listener() has bound
+CXI_SRIOV_VSOCK_PORT. Also, if vsock_create_listen() fails in
+pf_vf_listener(), enable_sriov() will still enable SR-IOV and return
+num_vfs.
 
 [Severity: Medium]
-Should cass_sbl_reset() acquire hw->port->lock (or call cass_link_set_state=
-())
-instead of hw->sbl_state_lock here?
+Are there also a couple of error-handling and ordering issues in
+enable_sriov()?
 
-Every other reader and writer of hw->port->lstate, hw->port->prev_lstate, a=
-nd
-hw->port->lerr (including cass_link_set_state() earlier in cass_sbl_reset())
-synchronizes on hw->port->lock, while hw->sbl_state_lock is not used anywhe=
-re
-else in the driver.
+1. When modprobe fails, request_module() returns a positive wait status
+   (such as 256). Jumping to err_novf returns that positive rc from
+   cass_sriov_configure() to sriov_numvfs_store(), which only treats negati=
+ve
+   values as errors.
+2. PCI_SRIOV_VF_OFFSET and PCI_SRIOV_VF_STRIDE are read and written to
+   C_PI_CFG_PRI_SRIOV before pci_enable_sriov() writes PCI_SRIOV_NUM_VF
+   (which under the PCIe SR-IOV specification can update First VF Offset and
+   VF Stride).
 
-[ ... ]
-
-> diff --git a/drivers/net/ethernet/hpe/ss1/cass_sl.c b/drivers/net/etherne=
-t/hpe/ss1/cass_sl.c
-> new file mode 100644
-> index 0000000000000..72c8724a33276
-> --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/ss1/cass_sl.c
-> @@ -0,0 +1,1524 @@
-
-[ ... ]
-
-> +void cass_sl_mode_set(struct cass_dev *cass_dev, const struct cxi_link_i=
-nfo *link_info)
-> +{
-
-[ ... ]
-
-> +	/* loopback */
-> +	cxidev_dbg(&cass_dev->cdev, "sl mode set (loopback_mode =3D %lu)\n",
-> +		   link_info->flags & LOOPBACK_MODE);
-> +	switch (link_info->flags & LOOPBACK_MODE) {
-> +	case 0:
-> +		if (!(lgrp_config->options & SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE=
-) &&
-> +		    !(link_config->options & SL_LINK_CONFIG_OPT_REMOTE_LOOPBACK_ENABLE=
-))
-> +			break;
-> +		cxidev_dbg(&cass_dev->cdev, "sl mode set loopback to off\n");
-> +		lgrp_config->options &=3D ~SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE;
-> +		link_config->options &=3D ~SL_LINK_CONFIG_OPT_REMOTE_LOOPBACK_ENABLE;
-> +		if (cass_dev->sl.old_an_mode =3D=3D AUTONEG_ENABLE)
-> +			cass_sl_mode_set_autoneg_enable(cass_dev);
-> +		else
-> +			cass_sl_mode_set_autoneg_disable(cass_dev);
-> +		if (cass_dev->sl.old_lt_mode)
-> +			link_config->hpe_map |=3D SL_LINK_CONFIG_HPE_LINKTRAIN;
-> +		else
-> +			link_config->hpe_map &=3D ~SL_LINK_CONFIG_HPE_LINKTRAIN;
-> +		is_mode_changed =3D true;
-> +		break;
-> +	case CXI_ETH_PF_INTERNAL_LOOPBACK:
-> +		if (lgrp_config->options & SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE)
-> +			break;
-> +		cxidev_dbg(&cass_dev->cdev, "sl mode set serdes loopback to on\n");
-> +		lgrp_config->options |=3D SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE;
-> +		cass_sl_mode_set_autoneg_disable(cass_dev);
-> +		link_config->options &=3D ~SL_LINK_CONFIG_OPT_REMOTE_LOOPBACK_ENABLE;
-> +		cass_dev->sl.old_an_mode =3D link_info->autoneg;
-> +		cass_dev->sl.old_lt_mode =3D (link_config->hpe_map & SL_LINK_CONFIG_HP=
-E_LINKTRAIN);
-> +		link_config->hpe_map &=3D ~SL_LINK_CONFIG_HPE_LINKTRAIN;
-> +		is_mode_changed =3D true;
-> +		break;
-> +	case CXI_ETH_PF_EXTERNAL_LOOPBACK:
-> +		if (link_config->options & SL_LINK_CONFIG_OPT_REMOTE_LOOPBACK_ENABLE)
-> +			break;
-> +		cxidev_dbg(&cass_dev->cdev, "sl mode set remote loopback to on\n");
-> +		link_config->options |=3D SL_LINK_CONFIG_OPT_REMOTE_LOOPBACK_ENABLE;
-> +		cass_sl_mode_set_autoneg_disable(cass_dev);
-> +		lgrp_config->options &=3D ~SL_LGRP_CONFIG_OPT_SERDES_LOOPBACK_ENABLE;
-> +		cass_dev->sl.old_an_mode =3D link_info->autoneg;
-> +		cass_dev->sl.old_lt_mode =3D (link_config->hpe_map & SL_LINK_CONFIG_HP=
-E_LINKTRAIN);
-> +		link_config->hpe_map &=3D ~SL_LINK_CONFIG_HPE_LINKTRAIN;
-> +		is_mode_changed =3D true;
-> +		break;
-> +	}
-
-[Severity: Medium]
-If a user switches directly from internal loopback to external loopback (or
-vice versa) without turning loopback off first, won't this overwrite
-cass_dev->sl.old_an_mode and cass_dev->sl.old_lt_mode with the
-loopback-disabled values (AUTONEG_DISABLE and 0), preventing case 0 from
-restoring the original autonegotiation and link-training settings when
-loopback is later disabled?
-
-[ ... ]
-
-> +void cass_sl_pml_recovery_set(struct cass_dev *cass_dev, bool set)
-> +{
-> +	cxidev_dbg(&cass_dev->cdev, "pml recovery set\n");
 > +
-> +	if (set)
-> +		cass_dev->sl.link_config.options |=3D SL_LINK_CONFIG_OPT_PML_REC_ENABL=
-E;
-> +	else
-> +		cass_dev->sl.link_config.options &=3D ~SL_LINK_CONFIG_OPT_PML_REC_ENAB=
-LE;
+> +int cass_sriov_configure(struct pci_dev *pdev, int num_vfs)
+> +{
+> +	if (num_vfs < 0)
+> +		return -EINVAL;
+> +
+> +	if (num_vfs =3D=3D 0) {
+> +		disable_sriov(pdev);
+> +		return 0;
+> +	}
+> +
+> +	return enable_sriov(pdev, num_vfs);
 > +}
 
-[Severity: Medium]
-How are PML recovery state and polarity meant to work across SBL and SL?
+[Severity: High]
+Should cass_sriov_configure() or enable_sriov() validate that num_vfs does
+not exceed C_NUM_VFS (64) before setting hw->num_vfs =3D num_vfs?
 
-1. In cass_sbl_pml_recovery_set(), passing set =3D=3D true calls
-sbl_disable_pml_recovery(hw->sbl, 0, true), which disables PML recovery
-(without updating hw->port->lattr.bl.options). In cass_sl_pml_recovery_set(=
-),
-passing set =3D=3D true sets SL_LINK_CONFIG_OPT_PML_REC_ENABLE, which enabl=
-es PML
-recovery. Both implement the exported cxi_pml_recovery_set() API with oppos=
-ite
-boolean semantics.
-
-2. In cass_sl_config_init(), SL_LINK_CONFIG_OPT_PML_REC_ENABLE is set by
-default, but cass_sl_mode_get() never sets CXI_ETH_PF_PML_REC in
-link_info->flags, and cass_sl_mode_set() never handles CXI_ETH_PF_PML_REC. =
-As
-a result, ethtool private flags always report pml-recovery as off on Cassin=
-i 2,
-and attempting to disable it via ethtool sees no flag change.
-
-3. Neither cass_sl_pml_recovery_set() nor cass_sl_mode_set() calls
-sl_link_config_set() or bounces the link when toggling PML recovery, so cha=
-nges
-to cass_dev->sl.link_config.options are not applied to an active SL link.
+In struct cass_dev, vfs[] has fixed size C_NUM_VFS (64), and pf_probe_vfs()
+evaluates 1ULL << i for i up to hw->num_vfs - 1. If num_vfs > C_NUM_VFS,
+pf_vf_listener(), pf_probe_vfs(), handle_vf_req_conn(),
+handle_vf_notif_conn(), cxi_send_msg_to_vf(), and cass_vf_get_token() can
+shift past 63 bits and index hw->vfs[] out of bounds.
 
 [ ... ]
 
-> +static int cass_sl_dt_info_get(void *dt_accessor, u8 ldev_num, u8 lgrp_n=
-um,
-> +			       struct sl_dt_lgrp_info *info)
+> +/* VF-side handler thread for receiving notifications from PF */
+> +static int vf_notif_handler(void *data)
 > +{
+> +	struct cass_dev *hw =3D (struct cass_dev *)data;
+> +	int rc;
+> +	size_t msg_len, rsp_len;
+> +
+> +	cxidev_dbg(&hw->cdev, "started notification handler");
+> +
+> +	while (!kthread_should_stop()) {
+> +		msg_len =3D MAX_VFMSG_SIZE;
+> +		rc =3D read_message_from_vsock(hw->vf_notif_sock, hw->vf_notif_buf,
+> +					     &msg_len, NULL, NULL, NULL, NULL);
 
 [ ... ]
 
-> +	default:  /* straight */
-> +		info->lane_info[3].tx_source =3D 3;
-> +		info->lane_info[3].tx_invert =3D 0;
-> +		info->lane_info[2].tx_source =3D 2;
-> +		info->lane_info[2].tx_invert =3D 0;
-> +		info->lane_info[1].tx_source =3D 1;
-> +		info->lane_info[1].tx_invert =3D 0;
-> +		info->lane_info[0].tx_source =3D 0;
-> +		info->lane_info[0].tx_invert =3D 0;
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-
-[Severity: Medium]
-In the default straight-mapping case of cass_sl_dt_info_get(), should
-rx_source and rx_invert also be initialized for info->lane_info[0..3]?
-
-Without initializing rx_source in the default branch,
-sl_core_data_lgrp_new() and sl_core_hw_serdes_swizzles() leave all four RX
-lanes mapped to physical lane 0 (or with stale values after SerDes loopback=
-).
-
-[ ... ]
-
-> +static int cass_sl_dmac_xfer(void *dmac_accessor, void *data)
-> +{
-> +	int              rtn;
-> +	struct cass_dev *cass_dev =3D dmac_accessor;
-> +
-> +	cxidev_dbg(&cass_dev->cdev, "sl dmac xfer\n");
-> +
-> +	rtn =3D cxi_dmac_xfer(&cass_dev->cdev, cass_dev->sl.fec.dma_id);
-> +	if (rtn) {
-> +		cxidev_err(&cass_dev->cdev, "Unable to get fec cntrs [%d]\n", rtn);
-> +		return rtn;
-> +	}
-> +
-> +	memcpy(data, cass_dev->sl.fec.cntrs, cass_dev->sl.fec.cntrs_size);
-> +
-> +	return 0;
-> +}
-
-[Severity: Medium]
-Can concurrent callers of cass_sl_dmac_xfer() race on the shared DMA buffer
-cass_dev->sl.fec.cntrs?
-
-cxi_dmac_xfer() releases hw->dmac.lock before returning, so if a sysfs FEC
-counter read (such as ccw_show() or ucw_show()) and the periodic FEC monitor
-work item call sl_core_hw_fec_dmac_xfer() -> cass_sl_dmac_xfer() concurrent=
-ly,
-a second DMA transfer into cass_dev->sl.fec.cntrs can overwrite the buffer
-while the first caller is still running memcpy().
-
-[ ... ]
-
-> +static void cass_sl_callback(void *tag, struct sl_lgrp_notif_msg *msg)
-> +{
-> +	struct cass_dev *cass_dev =3D tag;
-> +
-> +	cxidev_dbg(&cass_dev->cdev, "callback (type =3D 0x%X)\n", msg->type);
-> +
-> +	switch (msg->type) {
-> +	case SL_LGRP_NOTIF_MEDIA_PRESENT:
-> +		cass_dev->sl.media_attr =3D msg->info.media_attr;
-> +		if (msg->info.media_attr.type & SL_MEDIA_TYPE_ACTIVE) {
-> +			cass_dev->sl.link_config.hpe_map &=3D ~SL_LINK_CONFIG_HPE_LINKTRAIN;
-> +			cass_sl_mode_set_autoneg_disable(cass_dev);
-> +		} else {
-> +			cass_dev->sl.link_config.hpe_map |=3D SL_LINK_CONFIG_HPE_LINKTRAIN;
-> +			cass_sl_mode_set_autoneg_enable(cass_dev);
+> +		rsp_len =3D 0;
+> +		rc =3D dispatch_vf_notif(hw, hw->vf_notif_buf, msg_len,
+> +				       hw->vf_notif_rsp_buf, &rsp_len);
+> +		rc =3D write_message_to_vsock(hw->vf_notif_sock, hw->vf_notif_rsp_buf,
+> +					    rsp_len, rc, 0);
+> +		if (rc < 0) {
+> +			cxidev_err(&hw->cdev, "failed to send notification response: %d", rc);
+> +			break;
 > +		}
-> +		cass_dev->sl.has_cable =3D true;
-> +		break;
-> +	case SL_LGRP_NOTIF_MEDIA_NOT_PRESENT:
-> +		memset(&cass_dev->sl.media_attr, 0, sizeof(cass_dev->sl.media_attr));
-> +		cass_dev->sl.has_cable =3D false;
-> +		break;
-
-[Severity: Medium]
-What serializes access to cass_dev->sl.link_config, cass_dev->sl.lgrp_confi=
-g,
-cass_dev->sl.link_policy, and cass_dev->sl.media_attr?
-
-cass_sl_callback() runs on SL's notification workqueue and updates
-media_attr, link_config.hpe_map, link_config.options, and
-lgrp_config.tech_map without locking, while cass_sl_mode_set(),
-cass_sl_mode_get(), cass_sl_pml_recovery_set(), the debugfs handlers in
-cxi_link.c, and cass_sl_link_up() concurrently read and modify those same
-fields.
-
-[ ... ]
-
-> +int cass_sl_init(struct cass_dev *cass_dev)
-> +{
-
-[ ... ]
-
-> +	cass_dev->sl.ldev =3D sl_ldev_new(cass_dev->cdev.cxi_num,
-> +					NULL, &(cass_dev->sl.ldev_config));
-> +	if (IS_ERR(cass_dev->sl.ldev)) {
-> +		rtn =3D PTR_ERR(cass_dev->sl.ldev);
-> +		cxidev_err(&cass_dev->cdev, "sl_ldev_new failed [%d]\n", rtn);
-> +		goto out_kobject_put_port_num;
 > +	}
 
-[Severity: Medium]
-Can passing cass_dev->cdev.cxi_num as ldev_num to sl_ldev_new() cause probe
-failures after 16 device probes?
+[Severity: High]
+In vf_notif_handler(), read_message_from_vsock() passes NULL for seq and
+write_message_to_vsock() hardcodes seq =3D 0 in the reply.
 
-In cass_probe(), hw->cdev.cxi_num is assigned via atomic_inc_return(&cxi_nu=
-m)
-for every PF and VF probe and is never decremented or recycled. However,
-sl_ldev_new() requires ldev_num < SL_ASIC_MAX_LDEVS (16) and returns -EINVAL
-once cxi_num reaches 16 (for example, after enabling SR-IOV VFs or unbinding
-and rebinding PFs).
+Since cxi_send_msg_to_vf() sends notifications via cxi_vsock_send() with
+hw->vfs[vf_num].notif_seq++, and cxi_vsock_send() checks:
+
+	if (rsp_seq !=3D seq) {
+		kernel_sock_shutdown(sock, SHUT_RDWR);
+		cxidev_err(&hw->cdev, "expected response seq %d but got %d",
+			   seq, rsp_seq);
+		return -EPROTO;
+	}
+
+won't every notification after the initial ping (where notif_seq is 0) fail
+with -EPROTO and shut down the notification socket?
 
 [ ... ]
 
-> +int cass_sl_link_up(struct cass_dev *cass_dev)
+> +int cass_vf_init(struct cass_dev *hw)
 > +{
-> +	int          rtn;
-> +	unsigned int timeleft;
-> +
-> +	cxidev_dbg(&cass_dev->cdev, "sl link up\n");
-> +
-> +	if (!cass_dev->sl.has_cable)
+
+[ ... ]
+
+> +	if (!hw->with_vf_support)
 > +		return 0;
 > +
-> +	if (cass_dev->sl.is_canceled)
-> +		return 0;
+> +	init_completion(&hw->pf_to_vf_comp);
 > +
-> +	/* initial delay between attempts */
-> +	msleep(1000);
-> +
-> +	cass_dev->sl.link_state       =3D SL_LINK_STATE_DOWN;
-> +	cass_dev->sl.llr_state        =3D SL_LLR_STATE_OFF;
-> +	cass_dev->sl.link_up_mode     =3D 0;
-> +	cass_dev->sl.link_up_fec_type =3D 0;
+> +	mutex_init(&hw->vf_cmd_lock);
 
 [Severity: High]
-Should cass_sl_link_up() transition hw->port->lstate to
-CASS_LINK_STATUS_STARTING before sleeping, and should cass_sl_link_down() s=
-et
-CASS_LINK_STATUS_STOPPING (matching cass_sbl_power_on() and
-cass_sbl_power_off())?
-
-Because cass_sl_link_up() leaves hw->port->lstate at CASS_LINK_STATUS_DOWN
-throughout link bring-up (which can sleep for tens of seconds across
-msleep(1000), sl_ldev_serdes_init(), sl_link_up(), sl_llr_setup(), and
-sl_llr_start()), any concurrent caller of cass_link_async_down_wait() (such=
- as
-cass_phy_stop(hw, true) during cass_phy_bounce() or cass_remove(), or
-cass_link_headshell_down_no_media() on cable removal) or
-cass_lmon_request_down() sees hw->port->lstate =3D=3D CASS_LINK_STATUS_DOWN=
- and
-returns 0 immediately while cass_sl_link_up() is still running on the lmon
-kthread.
+If hw->with_vf_support is false on a VF, cass_vf_init() returns 0 before
+mutex_init(&hw->vf_cmd_lock). When cass_probe() subsequently calls
+cxi_send_msg_to_pf(), won't mutex_lock(&hw->vf_cmd_lock) operate on an
+uninitialized mutex?
 
 [ ... ]
 
-> +	if (cass_dev->sl.is_canceled)
-> +		goto out_llr_stop;
-> +
-> +	cass_link_set_state(cass_dev, CASS_LINK_STATUS_UP, 0);
-> +
-> +	return 0;
-> +
-> +out_llr_stop:
-> +	sl_llr_stop(cass_dev->sl.llr);
-> +	/* need to stop twice to make sure both setup and start are stopped */
-> +	sl_llr_stop(cass_dev->sl.llr);
-> +
-> +out_mac_rx_stop:
-> +	sl_mac_rx_stop(cass_dev->sl.mac);
-> +
-> +out_mac_tx_stop:
-> +	sl_mac_tx_stop(cass_dev->sl.mac);
-> +
-> +out_link_down:
-> +	reinit_completion(&(cass_dev->sl.step_complete));
-> +	rtn =3D sl_link_down(cass_dev->sl.link);
-> +	switch (rtn) {
-> +	case -EALREADY:
-> +		break;
-> +	case -EINPROGRESS:
-> +		msleep(500);
-> +		break;
-> +	case 0:
-> +		timeleft =3D wait_for_completion_timeout(&(cass_dev->sl.step_complete),
-> +			msecs_to_jiffies(2 * CASS_SL_LINK_DOWN_TIMEOUT_MS));
-> +		if (timeleft =3D=3D 0)
-> +			cxidev_dbg(&cass_dev->cdev, "sl_link_down (link_up) timeout\n");
-> +		break;
-> +	default:
-> +		cxidev_warn(&cass_dev->cdev, "sl_link_down (link_up) failed [%d]\n", r=
-tn);
-> +		break;
-> +	}
-> +
-> +out_no_link:
-> +
-> +	return -ENOLINK;
-> +}
-> +
-> +int cass_sl_link_down(struct cass_dev *cass_dev)
+> +void cass_vf_fini(struct cass_dev *hw)
 > +{
-
-[ ... ]
-
-> +	/* down link */
-> +	if (cass_dev->sl.link_state !=3D SL_LINK_STATE_DOWN) {
-> +		reinit_completion(&(cass_dev->sl.step_complete));
-> +		rtn =3D sl_link_down(cass_dev->sl.link);
-> +		switch (rtn) {
-> +		case -EALREADY:
-> +			break;
-> +		case -EINPROGRESS:
-> +		case 0:
-> +			timeleft =3D wait_for_completion_timeout(&(cass_dev->sl.step_complete=
-),
-> +				msecs_to_jiffies(2 * CASS_SL_LINK_DOWN_TIMEOUT_MS));
-> +			if (timeleft =3D=3D 0) {
-> +				cxidev_err(&cass_dev->cdev,
-> +					   "sl_link_down (link_down) timed out\n");
-> +				return -ETIMEDOUT;
-> +			}
-> +			break;
-> +		default:
-> +			cxidev_warn(&cass_dev->cdev, "sl_link_down (link_down) failed [%d]\n"=
-, rtn);
-> +			return rtn;
-> +		}
-> +		if (cass_dev->sl.link_state !=3D SL_LINK_STATE_DOWN)
-> +			return -EBUSY;
+> +	if (!hw->with_vf_support)
+> +		return;
+> +
+> +	free_irq(hw->pf_vf_vec, hw);
+> +
+> +	if (hw->vf_notif_handler) {
+> +		kthread_stop(hw->vf_notif_handler);
+> +		hw->vf_notif_handler =3D NULL;
 > +	}
-> +
-> +	if (err)
-> +		return err;
-> +
-> +	cass_link_set_state(cass_dev, CASS_LINK_STATUS_DOWN, 0);
-> +
-> +	return 0;
-> +}
 
-[Severity: High]
-Won't cass_sl_link_down() return -EBUSY whenever sl_link_down() returns
--EALREADY, causing cass_sl_link_fini() to abort teardown and leak SL and po=
-rt
-resources?
+[Severity: Critical]
+Can kthread_stop() be called on a task_struct that has already exited and
+been freed in cass_vf_fini(), disable_sriov(), enable_sriov(), and
+pf_vf_listener()?
 
-In cass_sl_init(), memset(&(cass_dev->sl), 0, sizeof(cass_dev->sl)) sets
-cass_dev->sl.link_state to 0 (SL_LINK_STATE_INVALID), whereas sl_link_new()
-initializes the underlying ctrl_link->state to SL_LINK_STATE_DOWN (1). If no
-cable is present (!cass_dev->sl.has_cable), cass_sl_link_up() returns early
-before setting cass_dev->sl.link_state =3D SL_LINK_STATE_DOWN.
-
-When cass_sl_link_fini() then calls cass_sl_link_down(),
-cass_dev->sl.link_state !=3D SL_LINK_STATE_DOWN (0 !=3D 1) is true, so it c=
-alls
-sl_link_down(). Because ctrl_link->state is already SL_LINK_STATE_DOWN,
-sl_link_down() returns -EALREADY without queuing a notification. The
--EALREADY case breaks out of the switch without setting
-cass_dev->sl.link_state =3D SL_LINK_STATE_DOWN, and the check immediately a=
-fter
-the switch returns -EBUSY, aborting cass_sl_link_fini() and leaking ldev,
-lgrp, link, mac, llr, port_num_kobj, port_kobj, and cass_dev->port.
-
-[Severity: High]
-Can cass_dev->sl.link_state and cass_dev->sl.step_complete also get out of
-sync with SL's asynchronous notifications?
-
-1. When an async link-down or fault occurs in SL, ctrl_link->state is set to
-SL_LINK_STATE_DOWN before the notification workqueue runs cass_sl_callback()
-to update cass_dev->sl.link_state. If cass_sl_link_down() runs during that
-window, cass_dev->sl.link_state is still SL_LINK_STATE_UP, sl_link_down()
-returns -EALREADY, and cass_sl_link_down() returns -EBUSY.
-
-2. Conversely, while sl_link_up() is in progress (SL_LINK_STATE_STARTING),
-cass_dev->sl.link_state is SL_LINK_STATE_DOWN, so cass_sl_link_down() sees
-cass_dev->sl.link_state =3D=3D SL_LINK_STATE_DOWN and skips calling
-sl_link_down().
-
-3. Because a single step_complete completion is shared between link
-notifications (SL_LGRP_NOTIF_LINK_*) and LLR notifications
-(SL_LGRP_NOTIF_LLR_*), and out_link_down in cass_sl_link_up() only sleeps
-500ms on -EINPROGRESS instead of waiting for completion, an in-flight
-notification from one step can prematurely satisfy wait_for_completion_time=
-out()
-in a later step.
-
-[Severity: High]
-There also appear to be several mismatches between how SBL, SL, and the PHY
-state machine handle link up/down events:
-
-1. On Cassini 1 (SBL), cass_sbl_power_on() sets CASS_LINK_STATUS_UP and cal=
-ls
-cass_phy_link_up(hw) directly while hw->phy.state is still CASS_PHY_NOLINK.
-When cass_phy_state_machine() runs its next poll, cass_phy_check_link_statu=
-s()
-sees hw->phy.state !=3D CASS_PHY_RUNNING, transitions to CASS_PHY_RUNNING, =
-and
-calls cass_phy_link_up(hw) a second time, emitting a duplicate
-CXI_EVENT_LINK_UP.
-
-2. Once hw->phy.state reaches CASS_PHY_RUNNING, cass_phy_state_machine() in
-cass_phy.c stops rescheduling hw->phy.state_queue:
-
-	new_state =3D hw->phy.state;
-	if (new_state !=3D CASS_PHY_RUNNING)
-		cass_phy_queue_locked(hw, HZ);
-
-On Cassini 2 (SL), cass_sl_link_down() only calls cass_link_set_state() and
-never calls cass_phy_link_down(). When cass_phy_stop() cancels state_queue =
-and
-brings the link down, or when the link goes down while state_queue is not
-polling, cass_phy_link_down() is never called and CXI_EVENT_LINK_DOWN is ne=
-ver
-sent.
-
-3. Unlike cass_sbl_power_on(), cass_sl_link_up() does not check if
-cass_link_get_state(cass_dev) =3D=3D CASS_LINK_STATUS_UP at entry (so calli=
-ng it
-when already up resets cass_dev->sl.link_state to SL_LINK_STATE_DOWN, fails
-sl_link_up() with -EALREADY, and tears the link down in out_link_down), nor
-does it update cass_dev->port->start_time =3D ktime_get_seconds().
+kthread_run() does not take an extra reference on task_struct for the
+caller, so if a kthread returns before kthread_stop() is called, its
+task_struct is freed on exit:
+- In cass_vf_fini(), if the PF already closed the notification socket (or a
+  socket error occurred), vf_notif_handler() breaks out of its loop and
+  returns, leaving hw->vf_notif_handler pointing to a freed task_struct when
+  kthread_stop(hw->vf_notif_handler) is called.
+- In pf_vf_listener(), if vsock_create_listen() or kernel_accept() returns =
+an
+  error, pf_vf_listener() exits immediately, after which enable_sriov() or
+  disable_sriov() calls kthread_stop(hw->vf_listener).
+- In pf_vf_msghandler(), the thread exits whenever a VF disconnects or
+  pf_get_kvm_task() fails (and disable_sriov() calls pci_disable_sriov()
+  before stopping hw->vf_listener), which can race with pf_vf_listener()
+  calling kthread_stop(hw->vfs[vf_idx].task).
 
 [ ... ]
 
-> diff --git a/drivers/net/ethernet/hpe/ss1/cass_sl_io.c b/drivers/net/ethe=
-rnet/hpe/ss1/cass_sl_io.c
+> diff --git a/drivers/net/ethernet/hpe/ss1/cass_vf.c b/drivers/net/etherne=
+t/hpe/ss1/cass_vf.c
 > new file mode 100644
-> index 0000000000000..5eca53cb09691
+> index 0000000000000..fde40d1b491ae
 > --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/ss1/cass_sl_io.c
-> @@ -0,0 +1,368 @@
-
-[ ... ]
-
-> +int cass_sl_sbus_rd(void *sbus_accessor, u32 sbus_addr, u8 reg_addr, u32=
- *rd_data)
+> +++ b/drivers/net/ethernet/hpe/ss1/cass_vf.c
+> @@ -0,0 +1,58 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright 2026 Hewlett Packard Enterprise Development LP */
+> +
+> +#include <linux/hpe/cxi/cxi.h>
+> +#include <linux/dma-mapping.h>
+> +#include "cass_core.h"
+> +#include "cass_vf.h"
+> +
+> +/* Compile-time assertions to ensure VF structures can be safely cast to=
+ their
+> + * corresponding PF structures and vice versa.
+> + * These verify that the common fields are at the same offsets in both s=
+tructures.
+> + */
+> +static inline void __cxi_vf_structure_offset_checks(void)
 > +{
+> +	/* Ensure cxi_lni_priv_vf can be cast to cxi_lni_priv */
+> +	BUILD_BUG_ON(offsetof(struct cxi_lni_priv_vf, dev) !=3D
+> +		     offsetof(struct cxi_lni_priv, dev));
+> +	BUILD_BUG_ON(offsetof(struct cxi_lni_priv_vf, lni) !=3D
+> +		     offsetof(struct cxi_lni_priv, lni));
 
 [ ... ]
 
-> +	mutex_lock(&cass_dev->sl.sbus_lock);
-> +
-> +	rtn =3D cxi_sbus_op(&cass_dev->cdev, &params, rd_data, &result_code, &o=
-verrun);
-> +	if (rtn !=3D 0) {
-> +		cxidev_err(&cass_dev->cdev, "sl sbus rd - cxi_sbus_op failed [%d]\n", =
-rtn);
-> +		goto out;
-> +	}
+> +	/* Ensure cxi_md_priv_vf can be cast to cxi_md_priv */
+> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, lni_priv) !=3D
+> +		     offsetof(struct cxi_md_priv, lni_priv));
+> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, device) !=3D
+> +		     offsetof(struct cxi_md_priv, device));
+> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, md) !=3D
+> +		     offsetof(struct cxi_md_priv, md));
+> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, sgt) !=3D
+> +		     offsetof(struct cxi_md_priv, sgt));
+> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, pages) !=3D
+> +		     offsetof(struct cxi_md_priv, pages));
+> +	BUILD_BUG_ON(offsetof(struct cxi_md_priv_vf, flags) !=3D
+> +		     offsetof(struct cxi_md_priv, flags));
+> +}
+
+[Severity: Critical]
+Because __cxi_vf_structure_offset_checks() is declared static inline and has
+no callers, the compiler discards the function without evaluating any of the
+BUILD_BUG_ON() assertions (unlike static_assert() at file scope).
+
+If these checks are evaluated, three of them fail due to layout mismatches
+between cass_vf.h and cxi_core.h:
+1. struct cxi_lni_priv in cxi_core.h has
+   DECLARE_BITMAP(leased_pids, 1 << MAX_PID_BITS) (64 bytes) between dev and
+   lni, whereas struct cxi_lni_priv_vf in cass_vf.h places lni immediately
+   after dev. When VF code such as cxi_map_sgtable_vf() or
+   cxi_domain_alloc_vf() runs container_of(lni, struct cxi_lni_priv, lni) on
+   a struct cxi_lni_priv_vf allocation, won't the resulting pointer point 64
+   bytes before the allocated object?
+2. In struct cxi_md_priv (cxi_core.h), pages precedes sgt, whereas in
+   struct cxi_md_priv_vf (cass_vf.h), sgt precedes pages, swapping the two
+   pointers when casting between the two structures.
+
+> diff --git a/drivers/net/ethernet/hpe/ss1/cass_vf_notif.c b/drivers/net/e=
+thernet/hpe/ss1/cass_vf_notif.c
+> new file mode 100644
+> index 0000000000000..c46e198698736
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/ss1/cass_vf_notif.c
+> @@ -0,0 +1,51 @@
 
 [ ... ]
 
-> +int cass_sl_pmi_rd(void *pmi_accessor, u8 lgrp_num, u32 addr, u16 *data)
+> +int dispatch_vf_notif(struct cass_dev *hw, const void *req, size_t req_l=
+en,
+> +		      void *rsp, size_t *rsp_len)
 > +{
-> +	int                           rtn;
-> +	struct cass_dev              *cass_dev =3D pmi_accessor;
-> +	int                           x;
-> +	union c2_hni_serdes_pmi_ctl   pmi_ctl;
-> +	union c2_hni_serdes_pmi_data  pmi_data;
+> +	const struct cass_vf_notif_common *common_req =3D req;
+> +	enum cass_vf_notif_ops op;
+> +	const struct cass_vf_notif_info *info;
 > +
-> +	mutex_lock(&cass_dev->sl.pmi_lock);
+> +	op =3D common_req->op;
+> +	if (op <=3D CASS_VF_NOTIF_OP_INVALID || op >=3D CASS_VF_NOTIF_OP_MAX)
+> +		return -EINVAL;
 > +
-> +	/* check ready */
-> +	for (x =3D 0; x < CASS_SL_PMI_RD_READY_MAX_COUNT; ++x) {
-> +		cass_read(cass_dev, C2_HNI_SERDES_PMI_CTL, &pmi_ctl, sizeof(pmi_ctl));
-> +		if (!pmi_ctl.pmi_lp_ack)
-> +			break;
-> +		msleep(CASS_SL_PMI_RD_READY_DELAY_MS);
-> +	}
-> +	if (x >=3D CASS_SL_PMI_RD_READY_MAX_COUNT) {
-> +		cxidev_err(&cass_dev->cdev,
-> +			   "sl pmi rd - ready timeout (ctl =3D 0x%016llX)\n", pmi_ctl.qw);
-> +		rtn =3D -1;
-> +		goto out;
-> +	}
+> +	info =3D &vf_notif_info[op];
+> +	if (!info->handler)
+> +		return -EOPNOTSUPP;
 > +
-> +	/* start */
-> +	pmi_ctl.qw          =3D 0ULL;
-> +	pmi_ctl.pmi_lp_addr =3D addr;
-> +	pmi_ctl.pmi_lp_en   =3D 1;
-> +	cxidev_dbg(&cass_dev->cdev, "sl pmi rd - ctrl 0x%016llX -> 0x%08X\n",
-> +		   pmi_ctl.qw, C2_HNI_SERDES_PMI_CTL);
-> +	cass_write(cass_dev, C2_HNI_SERDES_PMI_CTL, &pmi_ctl, sizeof(pmi_ctl));
-> +
-> +	/* poll for done */
-> +	for (x =3D 0; x < CASS_SL_PMI_RD_MAX_COUNT; ++x) {
-> +		cass_read(cass_dev, C2_HNI_SERDES_PMI_CTL, &pmi_ctl, sizeof(pmi_ctl));
-> +		cxidev_dbg(&cass_dev->cdev, "sl pmi rd - check #%d 0x%08X =3D 0x%016ll=
-X\n",
-> +			   x, C2_HNI_SERDES_PMI_CTL, pmi_ctl.qw);
-> +		if (pmi_ctl.pmi_lp_error) {
-> +			cxidev_err(&cass_dev->cdev, "sl pml rd - error\n");
-> +			rtn =3D -1;
-> +			goto out;
-> +		}
-> +		if (pmi_ctl.pmi_lp_ack)
-> +			break;
-> +		msleep(CASS_SL_PMI_RD_DELAY_MS);
-> +	}
-> +	if (x >=3D CASS_SL_PMI_RD_MAX_COUNT) {
-> +		cxidev_err(&cass_dev->cdev, "sl pmi rd - timeout\n");
-> +		rtn =3D -ETIMEDOUT;
-> +		goto out;
-> +	}
-> +
-> +	/* check valid */
-> +	if (!pmi_ctl.pmi_lp_read_vld) {
-> +		cxidev_err(&cass_dev->cdev, "sl pmi rd - data not valid\n");
-> +		rtn =3D -1;
-> +		goto out;
-> +	}
+> +	if (req_len !=3D info->req_size)
+> +		return -EINVAL;
 
-[Severity: Medium]
-When cass_sl_pmi_rd() or cass_sl_sbus_rd() fails and jumps to out without
-initializing *data or *rd_data, can uninitialized kernel stack memory be
-exposed via sysfs and trace logs?
+[Severity: High]
+What happens when a 0-byte or short message is received over vsock in
+dispatch_vf_notif(), pf_probe_vfs(), cass_vf_init(), or pf_vf_msghandler()?
 
-Callers such as sl_core_hw_serdes_lane_pre1_get() pass uninitialized stack
-variables into SL_CORE_HW_PMI_RD() -> pmi_rd() -> sl_core_pmi_rd() ->
-cass_sl_pmi_op() -> cass_sl_pmi_rd() and SL_CORE_HW_SBUS_FIELD_RD() ->
-sbus_field_rd() -> sl_core_sbus_rd() -> cass_sl_sbus_op() ->
-cass_sl_sbus_rd(). On error, sl_core_pmi_rd(), pmi_rd(), sl_core_sbus_rd(),
-sbus_rd(), and sbus_field_rd() still dereference *data, log it, and store it
-into core_lgrp->pmi.rd.data and core_lgrp->sbus.rd.data, which are readable=
- by
-unprivileged users via 0444 sysfs attributes.
-
-Also, in cass_sl_pmi_rd() and cass_sl_pmi_wr(), should the ready-timeout,
-pmi_lp_error, and !pmi_lp_read_vld error paths return standard negative err=
-no
-codes (-ETIMEDOUT / -EIO) instead of -1 (-EPERM)?
+read_message_from_vsock() accepts any message with hdr.len <=3D *msg_len
+(including hdr.len =3D=3D 0, where it writes nothing to msg and returns
+sizeof(hdr) > 0):
+- In dispatch_vf_notif(), common_req->op is read before checking whether
+  req_len >=3D sizeof(*common_req).
+- In pf_probe_vfs(), magic is set to CXI_SRIOV_MAGIC1 before sending and
+  msg_len =3D=3D sizeof(magic) is not checked after read_message_from_vsock=
+(),
+  so a 0-byte reply leaves magic =3D=3D CXI_SRIOV_MAGIC1 and falsely matches
+  seq =3D=3D 0.
+- In cass_vf_init(), magic and token_resp are uninitialized on the stack,
+  and neither msg_len =3D=3D sizeof(magic) after read_message_from_vsock() =
+nor
+  resp_len =3D=3D sizeof(token_resp) (or rc > 0) after cxi_send_msg_to_pf()=
+ is
+  verified before using them.
+- In pf_vf_msghandler(), if the receive loop exits before invoking
+  hw->msg_relay(), reply_len is uninitialized on the stack when passed to
+  hw->msg_relay(hw->msg_relay_data, vf->vf_idx, NULL, 0, 0, 0, NULL,
+  &reply_len).
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261030-cxi-netdev=
--submission-v1-0-8c2c391cc283@hpe.com?part=3D18
+-submission-v1-0-8c2c391cc283@hpe.com?part=3D19
