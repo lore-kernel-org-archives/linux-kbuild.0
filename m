@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793481032;
-	b=VNmtIxXQ7nV6+i9JqdWuX8ijdL7K/BP5ybJLtayRwdlis8gqJbxCZ0Y2lCmqZIM7F2UJ
-	 88CkoAnDfRB9mG3ce2wu9OfqbKYJaMTyw/n3P8iD9vp/gBeEC311FhZfTJtFKAtIq+CZS
-	 dcdLersR/h8TZd/V+6S7WgNcJCUl7Jix1bArk9L1XDcIzkyx8DA7D83T5zFfs0/IAiP6q
-	 vGhCF5CHHH0jPGyJEilG7oXEuFqvDKeyWS5kaA3EkQOjAd3yaEsdtJgLia/0onyP0TLaR
-	 TrIWrYVF2NhP+jLL3LMW0Gu21RHjuVvomsw7DYdnwH9xuFjnJ0qGk/riyfIpsZh5QXg==
+	t=1793481037;
+	b=UyiyazOh2WRjwHRaq2kVJtQJ6SCL6A4BDjnMQVoMrbASz8lTciFCTyaUpufvt7Skq3BW
+	 GcDkCR9ILWy9IoG4zJjc/5ntscoulgtIjuuUSBp6BJsjsGywLXqSafVHGx798z43pR1a2
+	 Vc17BlchTowziV3hT/nKPm2J+QTiHBxJF6bJzcx1b5fHwvcHmlrGbM+MGKHUSTCY9aV4b
+	 6/K/wzGEJQy+cfNvUG4lXtcyN7R1BKB6ZaVc2Ra9IE12v6cJdJz568zomrCf8OayPT7WH
+	 9PvwoPWh3C8h0eg1PCtztRyzSPXjoOSSPX0l7h7ZBwvW1TCVrpLmWicXtYggT+yR7HA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793481032;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793481037;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=VYn6HO4Ntt0suu764wFEemFVKHyiR2045DMjiOtHR60=;
-	b=gWxqrqYXvTUmSzjN6YQD4n6Krep43hLFj2Ds8nwXcb08E4L6lk/YLdPhx2bPZaET720N
-	 qXl0dvZxNPK/QqEahmark52et1bbkGrFwRKayIi7ER3dcZub3Z6NxkgQkFsH04wtVbIWm
-	 mJIoNLRBMwYXrMgoCfOVrSQyG0jtBLDFoB0v6khYcspEgDmBvlQxM+fqJwYLF5rryx6mH
-	 oS4MNs/AGgzRKNtAurA5oDGmR9j1gxPsCUJNWAjjvzX4bw5AC+Egb5ay0iBb/sFKL98/y
-	 ObBEpcBm8m3HhHWIBCKX/qVQ0Hva01f+NVjq6ryoqFvVZVo6O21reNqtDmYEbN3bU9A==
+	bh=6x3KS81Te4KDKsrtlqBV3wwienvY6Lov0v5ELrnKB/U=;
+	b=IVc2NRjSVMFnOm2WY6CT2C+w4kO9Zj0969TD6PlEzspX3mGaxBzznP2kVLCX8VPz2mCh
+	 nAZm3u/SdhNg+FAvohRrI9T65hisWvK4DV0DzKtUhukV5BZtLtYf/GrnwgadEDMrxGTSB
+	 Jowx0S24o2MhfzR0NPfj1fRXpFoDiSyXGJcHyDo9/Q2iDNPt0n3iO9mVIfyrzaZKzJfiV
+	 oDT1q8UDlEHq35bGDd97ReVxgs7pPR7r13z7p7Gx80YLKLp3HHegGTVufZS6Rcq0+2pSs
+	 /xj37JCHYqatflN+im8Y/dI55pd+mOaMwRBXGX2R+aURGDPhgrCWp21XZ2O1wu6497A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="SOunHr0/";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XTU+82YF;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD05606A31A;
-	Sat, 31 Oct 2026 21:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F371606A31C;
+	Sat, 31 Oct 2026 21:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SOunHr0/
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AED711F00919;
-	Sat, 31 Oct 2026 21:10:30 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XTU+82YF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83F3E1F00919;
+	Sat, 31 Oct 2026 21:10:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793481032;
-	bh=VYn6HO4Ntt0suu764wFEemFVKHyiR2045DMjiOtHR60=;
+	s=k20260515; t=1793481036;
+	bh=6x3KS81Te4KDKsrtlqBV3wwienvY6Lov0v5ELrnKB/U=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=SOunHr0/cxkiGOn6tIpjJWzLqzd19JvjDnglMARUTBMIE+O+bz5L9v2w3Rw0N0dg4
-	 RpvW0VsCTETVaL+zY/6sOxciEmdB/66Z/01EST32BwUFDGsisVSiRYCgoYMkahuFmU
-	 zdYxRT271DLR/kEhFUv124d1OZMwldDyqsEWcXLovTremP4o3HsZ3rvT8OT6Aya0fH
-	 NBCPX04OMiYr9R3Gpoz4Y6rt+SJIn7xAmZWzstdVaW1vb3h0ZZ+etfhKzbydDKha3i
-	 0Voz+koHCfFXFRiCIsaUF+2hfGQuxjbGmilKOPvLuaQZwWPbfkCIQrPsBIDDWL+cNk
-	 OPO53FiFwvpOA==
-Message-ID: <sashiko-outbox-192151@kernel.org>
+	b=XTU+82YFl8ci5g9tdM1tlMrGvwu1LkY3ZrRIdpAdEhdOtJH72xWkM+tjj7jzQOfz3
+	 /oHJI9uB6l7DkXstKdikD00iMHQbXASeXsfXqwd7LUxroZRA7ojoV/TxKIDlmWd1Dy
+	 JysYpvNJJj4arzzEBXnUf/SfPj5DX7d0P6EbeG244UqrSoE14SAzFR2hnkojH1XNSz
+	 FL6pFzADH/StMF0+zszl9cnZPPhtrz94KXUKCwvRTK0rg7govWUsf5tMKzOzxjytMA
+	 ra141yh1rszwOOR+HmmJxJsZJP/gyTrQ20yU+fvj6hEnkTfZuhWlRKocuQb9738LXl
+	 MvUSy8WKoJ3qw==
+Message-ID: <sashiko-outbox-192153@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 2/4] initramfs: add file metadata
+Subject: Re: [PATCH v5 4/4] gen_init_cpio: add support for file metadata
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Danny Hu" <dannyhu@arista.com>, "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian
  Brauner" <brauner@kernel.org>
@@ -51,12 +51,12 @@ Cc: "Mimi Zohar" <zohar@linux.ibm.com>, "Roberto Sassu" <roberto.sassu@huawei.co
  Kondratiuk" <takondra@cisco.com>, "Tianxing Zhang" <zhangtianxing3@huawei.com>, "Zheng
  Zengkai" <zhengzengkai@huawei.com>, zhoushuiqing <zhoushuiqing2@huawei.com>, zhangguangzhi <zhangguangzhi3@huawei.com>, "Jason
  Yan" <yanaijie@huawei.com>, silviu.vlasceanu@huawei.com, hpa@zytor.com, arnd@arndb.de, rob@landley.net, james.w.mcmechan@gmail.com, niveditas98@gmail.com, pierre@arista.com, julien@arista.com, kbharathi@arista.com, erosca@de.adit-jv.com, alexandr.lobakin@intel.com, jim_baxter@mentor.com, linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org, bug-cpio@gnu.org, nathan@kernel.org, nsc@kernel.org
-In-Reply-To: <20261030210944.2143778-3-dannyhu@arista.com>
+In-Reply-To: <20261030210944.2143778-5-dannyhu@arista.com>
 References: <20261030210944.2143778-1-dannyhu@arista.com>
- <20261030210944.2143778-3-dannyhu@arista.com>
+ <20261030210944.2143778-5-dannyhu@arista.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Oct 2026 21:10:30 +0000
+Date: Sat, 31 Oct 2026 21:10:34 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -68,169 +68,106 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] initramfs: pointer arithmetic overflow in do_parse_metadata() boun=
-ds checks
-- [Medium] initramfs: do_setxattrs() rejects POSIX ACLs and skips xattr siz=
-e limits
+- [Medium] initramfs: NULL path passed to llistxattr() in write_xattrs()
+- [Low] initramfs: undefined __packed macro in host tool usr/gen_init_cpio.c
 --
 
-commit a61596ea347667fb16df9d8f6201e38b916f632c
-Author: Mimi Zohar <zohar@linux.vnet.ibm.com>
+commit f793fe8aaa70c6c2c7baf3bf7456e36e56bc7fcf
+Author: Roberto Sassu <roberto.sassu@huawei.com>
 
-initramfs: add file metadata
+gen_init_cpio: add support for file metadata
 
-This commit introduces do_parse_metadata() and do_setxattrs() to parse
-metadata records from a buffer and restore extended attributes onto files
-in the initramfs.
+This commit adds support for including extended attribute (TYPE_XATTR) file
+metadata in initramfs cpio archives as separate METADATA!!! entries when
+configured via CONFIG_INITRAMFS_FILE_METADATA.
 
-> diff --git a/init/initramfs.c b/init/initramfs.c
-> index ebddde9c8f0d9..36254dba78226 100644
-> --- a/init/initramfs.c
-> +++ b/init/initramfs.c
+> diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
+> index b7296edc6626f..f07be54c9219e 100644
+> --- a/usr/gen_init_cpio.c
+> +++ b/usr/gen_init_cpio.c
+> @@ -6,6 +6,7 @@
+>  #include <stdbool.h>
+>  #include <sys/types.h>
+>  #include <sys/stat.h>
+> +#include <sys/xattr.h>
+>  #include <string.h>
+>  #include <unistd.h>
+>  #include <time.h>
+> @@ -13,6 +14,7 @@
+>  #include <errno.h>
+>  #include <ctype.h>
+>  #include <limits.h>
+> +#include "../include/linux/initramfs.h"
 
+[Severity: Low]
+Since usr/gen_init_cpio.c is compiled as a host userspace program with HOST=
+CC
+and standard libc headers, is the kernel __packed macro defined when
+including ../include/linux/initramfs.h?
+
+In include/linux/initramfs.h:
+
+	struct metadata_hdr {
+		char c_size[8];     /* total size including c_size field */
+		char c_version;     /* header version */
+		char c_type;        /* metadata type */
+		char c_metadata[];  /* metadata */
+	} __packed;
+
+Without a definition for __packed, the host compiler leaves struct
+metadata_hdr unpacked and instead parses __packed as a tentative definition
+of a global variable named __packed of type struct metadata_hdr.
+
+Should __packed be defined before including initramfs.h (or compiler_attrib=
+utes.h
+included)?
+
+> @@ -37,12 +39,126 @@ static bool do_file_mtime;
 [ ... ]
-
-> @@ -365,6 +368,90 @@ static int __init maybe_link(void)
->  	return 0;
->  }
-> =20
-> +static int __init do_setxattrs(char *pathname, char *buf, size_t size)
+> +static int write_xattrs(const char *path)
 > +{
-> +	struct path path;
-> +	char *xattr_name, *xattr_value;
-> +	uint32_t xattr_name_size, xattr_value_size;
-> +	int ret;
+> +	struct metadata_hdr hdr =3D { .c_version =3D 1, .c_type =3D TYPE_XATTR =
+};
+> +	char str[sizeof(hdr.c_size) + 1];
+> +	char *xattr_list, *list_ptr;
+> +	char *xattr_value =3D NULL;
+> +	ssize_t list_len, name_len, value_len, len;
+> +	int ret =3D -EINVAL;
 > +
-> +	xattr_name =3D buf;
-> +	xattr_name_size =3D strnlen(xattr_name, size);
-> +	if (xattr_name_size =3D=3D size) {
-> +		error("malformed xattrs");
-> +		return -EINVAL;
-> +	}
-> +
-> +	xattr_value =3D xattr_name + xattr_name_size + 1;
-> +	xattr_value_size =3D buf + size - xattr_value;
-> +
-> +	ret =3D kern_path(pathname, 0, &path);
-> +	if (!ret) {
-> +		ret =3D vfs_setxattr(&nop_mnt_idmap, path.dentry, xattr_name, xattr_va=
-lue,
-> +				   xattr_value_size, 0);
-> +
-> +		path_put(&path);
-> +	}
-
-[Severity: Medium]
-What happens when a metadata record in the initramfs contains POSIX ACL
-extended attributes (system.posix_acl_access or system.posix_acl_default),
-or when xattr_name_size or xattr_value_size exceeds the standard VFS
-limits?
-
-In fs/xattr.c, the normal setxattr path (do_setxattr()) checks
-is_posix_acl_xattr() and dispatches POSIX ACLs to do_set_acl(), whereas
-vfs_setxattr() -> __vfs_setxattr_locked() -> __vfs_setxattr_noperm() ->
-__vfs_setxattr() explicitly rejects them:
-
-    if (is_posix_acl_xattr(name))
-        return -EOPNOTSUPP;
-
-Because gen_init_cpio collects all extended attributes via llistxattr()
-and lgetxattr(), any POSIX ACLs packed into the archive will fail to be
-restored on rootfs (when CONFIG_TMPFS_POSIX_ACL=3Dy) with -EOPNOTSUPP.
-
-In addition, unlike import_xattr_name() and setxattr_copy(), which enforce
-a non-empty name up to XATTR_NAME_MAX (255) and a value up to
-XATTR_SIZE_MAX (65536), do_setxattrs() only checks xattr_name_size =3D=3D s=
-ize
-before calling vfs_setxattr(). On tmpfs/rootfs, shmem_xattr_handler_set() ->
-simple_xattr_set() will allocate and insert oversized names or values into
-the inode xattr list, after which userspace getxattr(2) and removexattr(2)
-calls fail with -E2BIG or -ERANGE.
-
-Should do_setxattrs() validate xattr_name_size (1..XATTR_NAME_MAX) and
-xattr_value_size (<=3D XATTR_SIZE_MAX), and dispatch POSIX ACL xattrs via
-vfs_set_acl() (or use the VFS helper that handles both)?
-
-> +
-> +	pr_debug("%s: %s size: %u (ret: %d)\n", pathname, xattr_name,
-> +		 xattr_value_size, ret);
-> +	print_hex_dump_debug("xattr value: ", DUMP_PREFIX_OFFSET,
-> +			     16, 1, xattr_value, xattr_value_size, false);
-> +
-> +	return ret;
-> +}
-> +
-> +static int __init __maybe_unused do_parse_metadata(char *pathname)
-> +{
-> +	char *buf =3D metadata_buf;
-> +	char *bufend =3D metadata_buf + metadata_len;
-> +	struct metadata_hdr *hdr;
-> +	char str[sizeof(hdr->c_size) + 1];
-> +	uint32_t entry_size;
-> +
-> +	if (!metadata_len)
+> +	if (metadata_fd < 0)
 > +		return 0;
 > +
-> +	str[sizeof(hdr->c_size)] =3D 0;
+> +	if (path =3D=3D metadata_path)
+> +		return 0;
 > +
-> +	while (buf < bufend) {
-> +		int ret;
-> +
-> +		if (buf + sizeof(*hdr) > bufend) {
-> +			error("malformed metadata");
-> +			break;
-> +		}
-> +
-> +		hdr =3D (struct metadata_hdr *)buf;
-> +		if (hdr->c_version !=3D 1) {
-> +			pr_debug("Unsupported header version\n");
-> +			break;
-> +		}
-> +
-> +		memcpy(str, hdr->c_size, sizeof(hdr->c_size));
-> +		ret =3D kstrtou32(str, 16, &entry_size);
-> +		if (ret || buf + entry_size > bufend ||
-> +		    entry_size < sizeof(*hdr)) {
-> +			error("malformed xattrs");
-> +			break;
-> +		}
-> +
-> +		switch (hdr->c_type) {
-> +		case TYPE_XATTR:
-> +			do_setxattrs(pathname, buf + sizeof(*hdr),
-> +				     entry_size - sizeof(*hdr));
-> +			break;
-> +		default:
-> +			pr_debug("Unsupported metadata type\n");
-> +			break;
-> +		}
-> +
-> +		buf +=3D entry_size;
-> +	}
+> +	list_len =3D llistxattr(path, NULL, 0);
 
-[Severity: High]
-Can adding entry_size to buf in do_parse_metadata() overflow pointer
-arithmetic and bypass the bounds check?
+[Severity: Medium]
+Can path be NULL when passed to llistxattr() in write_xattrs()?
 
-kstrtou32(str, 16, &entry_size) parses an 8-character hex value from
-hdr->c_size into a 32-bit unsigned integer up to 0xffffffff. On 32-bit
-architectures (where kernel virtual addresses reside in the upper address
-space, such as >=3D 0xc0000000 or >=3D 0x80000000), or on 64-bit architectu=
-res
-if metadata_buf lies in the top 4 GiB of the address space, adding a large
-entry_size to buf wraps around the address space to an address lower than
-bufend.
+For non-regular cpio list entries (slink, dir, pipe, sock, and nod), the
+source location field is optional and is omitted in standard list files such
+as usr/default_cpio_list. When location is omitted, cpio_mkslink_line(),
+cpio_mkgeneric_line(), and cpio_mknod_line() pass NULL as location:
 
-When that wraparound occurs, both buf + entry_size > bufend and
-entry_size < sizeof(*hdr) evaluate to false, passing a huge out-of-bounds
-length (entry_size - sizeof(*hdr)) to do_setxattrs() for strnlen(),
-vfs_setxattr(), and print_hex_dump_debug(), and then advancing buf to the
-wrapped address below bufend.
+	cpio_mkgeneric_line()
+	  cpio_mkgeneric(name,
+			 nfields =3D=3D 5 ? cpio_replace_env(location) : NULL,
+			 mode, uid, gid)
+	    write_xattrs(location)
 
-Since the loop condition while (buf < bufend) guarantees bufend > buf,
-should the bounds checks compare sizes against bufend - buf instead, i.e.
-bufend - buf < sizeof(*hdr) and entry_size > bufend - buf?
+When gen_init_cpio is invoked with -e xattr, metadata_fd is valid and
+write_xattrs() only checks if (metadata_fd < 0) and if (path =3D=3D metadat=
+a_path)
+before calling llistxattr(NULL, NULL, 0).
+
+Passing a NULL path to llistxattr() violates the glibc nonnull attribute on
+the first parameter (triggering UBSan failures) and can cause a segmentation
+fault under LD_PRELOAD environments such as fakeroot or pseudo that
+dereference the path string in userspace.
+
+Should write_xattrs() also return 0 if !path?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261030210944.2143=
-778-1-dannyhu@arista.com?part=3D2
+778-1-dannyhu@arista.com?part=3D4
