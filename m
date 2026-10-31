@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793480531;
-	b=0IkR43DXrd79rEa0TYdFZeK+0A3KHawCUo13JnTUt71hHQoyUcjw47e/YBwlAqICkafC
-	 VUj0ecc1bDoSvxUVobtBbEI9a1w57wNZFMpS0wp5LuM5FNHEZ9hZjBTdNM7pNmp3JSsgi
-	 Ya2EItHkNwDBEzUOXaMj95gI0yHOZ4fF1W+4YfmOXCTkQJPlbY1b+FqEoohvJnKl++1KC
-	 /DHx0q+Sj8r3KtXP/5ftjYgx8Q9QzC49I1rp/lKSdkMf8sXY1uxudGYV6AGpX/oEoZZ7j
-	 t/1u7lFNc/8r6AgKuDuOR9pIf1C2eUrlqfpFJIaFf4NOOLU7XPH/rqtmNPwc8iYEwSA==
+	t=1793480532;
+	b=t5dBuJP+5UfUw0+BhTW+h7455lhJ6zEFhP/GHIkkwzI2/DcDpIA/FyLcq+/3I3VIhRXI
+	 axDhMPHHZi+iyfQ0I8iQ55+OZVWKm6jMiQZI9cWL5XqluDSOShGxASgcBBFSlcUNW9Mkc
+	 WpRtg/eyl/A0qU/0ujhK6+3Q3XEwsmZW3bfdo6ZWc7cavINAA4IDF6gHNczKIVKcTBdXl
+	 KE/kWqXAl4zyCIzvjBURHPafFsaj/rhy6bmJLokYgQ3M4n4+P44D4x9dLnkO2P43CgwbP
+	 opDimR03RGmNknPMTkDi+Ff9WHUhQqsqUBdwMpAs09aRBrK6y5z6JTPcWOeyZbP9iGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793480531;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793480532;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=PwaTnc4OfkfFqCpF7/s42MPnj9Q3c5xW6s4OEpf0R/Y=;
-	b=m32hRQunJDYzXN/ncq6/tcmU2h3JmuTYUevM8FevDOf7yXQky7NBnDXBzWA45LHTQES0
-	 HQiO6sHilLL20aiSb69D66PtZph157p3tCnxvP9ySHW7FQ+jwvoUL04SdNiWCUS4qWYC8
-	 E7C0KgvuO1jolB9vnTsMlQLYb4UF12XduA4y7znTclFdp5Xf0+joGEK8x3+VkEw8Y270A
-	 3OuS4hrzN8lcWVXVa5seDp/rzlEMXr7fq+xqex5PkPsQHINpZmZZVyxYLdZKqvmPwrKho
-	 sls2qsQxxPzZPq8CiyYgeIQmHX+DF+RsUWrwBR32lEombrNfSS/V+N+faMPTg1iOlbQ==
+	bh=0dEhmjXsL7nPsuwlBtJSYTKnGleVgZrOcdft/ZUzRgA=;
+	b=b7znYcY1O4IzKhjb33D73+Idy/kvp7Bz1xQITfYc0uBSlQJkSA+54K7JT/sDCKdlOqa5
+	 kb1vAoYCTesNIhaeFhCndovsc82x9avLxVsie5UixHOjgbS2PQS4BhsNJHQXSHD1FFCy4
+	 vAdBW9wrTnTH8uUNrMFk54Z7gxcVcB2WQHrDlfbOw0VtYYXEz23SNgapwWWaR7/iWmUpr
+	 PQphp3TrYJ9vrjvkMUrIWOzqnY9+sanHHJM+ByYP1x2sKenCNcJtpWomfZFRW/mPDRgo7
+	 Rm5Lp16iZQlI+IQcV8pVaE6XNdKEQXUbrq5llkECWk+wNDx5Q8P8xTjRh5MdNrl8LXA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TwESMte1;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SRWP6kGo;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39A6606A31C
-	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98584606A31C
+	for <linux-kbuild@vger.kernel.org>; Sat, 31 Oct 2026 21:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TwESMte1
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92FD81F00919;
-	Sat, 31 Oct 2026 21:02:09 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SRWP6kGo
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C4B1F000C1;
+	Sat, 31 Oct 2026 21:02:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793480530;
-	bh=PwaTnc4OfkfFqCpF7/s42MPnj9Q3c5xW6s4OEpf0R/Y=;
+	s=k20260515; t=1793480531;
+	bh=0dEhmjXsL7nPsuwlBtJSYTKnGleVgZrOcdft/ZUzRgA=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=TwESMte1UP1LtifvaqSHHKuf6uoXhegxGpbki7wnoSRK19q1e+kxECbB0e8xYV7av
-	 Z2PBJTm0Pmuwtfg0DWrOHhy/QHltnymRt8fVMWp+FIRWY9Yfiakd/o5is6LQyQ2x29
-	 YszXkDU6ht2V7B4jBcfyBJTMKvK/2MzU9m+BkfpKQkhzcIizXoaOqvey6V9L1Im8hl
-	 SDzB/Ta9lM8PUOczYWIFsher9wIvV8xO+XOCx/e3fNXXssn6F9WP+PZFiv65j4SbjB
-	 QpuUrQ2Y9ESAbwKFg5puWCZ9874MTLCB6qZZKY+4xrl1kr/5RAaOsXPCCxrkRYsiXq
-	 TQnjOXrHSt9kg==
-Message-ID: <sashiko-outbox-192139@kernel.org>
+	b=SRWP6kGo8Svsjq61/juu9uFKFweePZrBojffYu2yRZvL9YOIdptFD3GOYPxWLmMwX
+	 5UrCq+pSY4VhgJsfGU4BIAZYYyJCiM6UtjPna++cGIVSuvWsXdRkEtF0uUgagA+yex
+	 YbyfF71ZkdvhW8x1gqJv0xCcnT/kKBd875AGAzVZ12lotHJuNqTPBt/hbsR1hECFMi
+	 i4S4ajX5yOr77MlatsdZLV0xodMALMDjfQR9mVzh9WyS5BBt82uo9V8jKxp3MgkI0h
+	 0fQYYVJS10T4AQF+JWNpC3Xv55DQK/1QPa4anm8Q7by7+m//RM33OtIPPXLQekoh7l
+	 7JuJd7m+aMtHQ==
+Message-ID: <sashiko-outbox-192140@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 07/23] net: hpe: sbl: add the SBM serial bus layer
+Subject: Re: [PATCH 08/23] net: hpe: sbl: add media, FEC and counter support
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingshot-os-team@groups.ext.hpe.com>, "Nathan
  Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Richard
@@ -50,13 +50,14 @@ To: "Doug Ledford" <doug.ledford@hpe.com>, "Slingshot Open Source Team" <slingsh
  Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Sumit
  Semwal" <sumit.semwal@linaro.org>, =?utf-8?b?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, "Guenter
  Roeck" <linux@roeck-us.net>
-Cc: linux-kbuild@vger.kernel.org
-In-Reply-To: <20261030-cxi-netdev-submission-v1-7-8c2c391cc283@hpe.com>
+Cc: linux-kbuild@vger.kernel.org, "Sandeep Bhoot" <sandeep.bhoot@hpe.com>, "Mamila
+ Santosh" <santosh-kumar.mamila@hpe.com>
+In-Reply-To: <20261030-cxi-netdev-submission-v1-8-8c2c391cc283@hpe.com>
 References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030-cxi-netdev-submission-v1-7-8c2c391cc283@hpe.com>
+ <20261030-cxi-netdev-submission-v1-8-8c2c391cc283@hpe.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Oct 2026 21:02:09 +0000
+Date: Sat, 31 Oct 2026 21:02:10 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -68,406 +69,558 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 5 potential issue(=
 s) to consider:
-- [High] net: hpe: sbl: mask before shift zeroes data in sbl_sbm_spico_int()
-- [High] net: hpe: sbl: clobbered err and uninit result read in sbl_sbus_op=
-_aux()
-- [High] net: hpe: sbl: ABBA lock inversion in sbl_serdes_spico_int() via s=
-pico_reset
-- [Low] net: hpe: sbl: non-static inline helpers in sbl_sbm.h lack prototyp=
-es
-- [Low] net: hpe: sbl: excessive stack buffers in sbus_msg() and sbus_cmd_t=
-o_string()
+- [Medium] net: hpe: sbl: broken FEC warning rate-limiting in sbl_fec_timer=
+_work()
+- [Medium] net: hpe: sbl: sbl_media_get_len_cm() returns 0 on ignored bad l=
+engths
+- [Medium] net: hpe: sbl: missing locking in sbl_media_unconfig() and media=
+ helpers
+- [Low] net: hpe: sbl: commit message inaccurately claims sbl_platform.h up=
+date
+- [Low] net: hpe: sbl: mismatched blstate checks in sbl_fec_sysfs_sprint()
 --
 
-commit 631299f2193252311d8e118f2c871a0e2587bd5a
+commit 4122557cb9b8a2fb1091d55e09aa0cc6a07db9dc
 Author: Doug Ledford <doug.ledford@hpe.com>
 
-net: hpe: sbl: add the SBM serial bus layer
+net: hpe: sbl: add media, FEC and counter support
 
-This commit adds the Serial Bus Master (SBM) layer for accessing SerDes
-and PMI registers along with NIC-specific SerDes address helpers.
+This commit adds link counter management, forward error correction (FEC)
+configuration and rate monitoring, and physical media configuration and loop
+time calculation for the HPE Slingshot Base Link (SBL) driver.
 
-> diff --git a/drivers/net/ethernet/hpe/sbl/sbl_sbm_serdes.c b/drivers/net/=
-ethernet/hpe/sbl/sbl_sbm_serdes.c
+>     net: hpe: sbl: add media, FEC and counter support
+>    =20
+>     Add media detection, FEC (forward error correction) configuration and
+>     the link counters.  sbl_platform.h is updated for the media fields
+>     added here.
+>    =20
+>     checkpatch --strict (100 columns) still reports the following in this
+>     patch. They need coordination with the internal repositories this code
+>     is maintained in and will be fixed in V2:
+>     - WARNING: LONG_LINE (5)
+>     - CHECK: BRACES (16), UNNECESSARY_PARENTHESES (10)
+>    =20
+>     Co-developed-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
+>     Signed-off-by: Sandeep Bhoot <sandeep.bhoot@hpe.com>
+>     Co-developed-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
+>     Signed-off-by: Mamila Santosh <santosh-kumar.mamila@hpe.com>
+>     Signed-off-by: Doug Ledford <doug.ledford@hpe.com>
+
+[Severity: Low]
+This isn't a bug, but the commit message states that sbl_platform.h is
+updated for the media fields added here, whereas this commit does not touch
+sbl_platform.h. Should that sentence be removed from the changelog?
+
+> diff --git a/drivers/net/ethernet/hpe/sbl/sbl_fec.c b/drivers/net/etherne=
+t/hpe/sbl/sbl_fec.c
 > new file mode 100644
-> index 0000000000000..1d1c4d01e1598
+> index 0000000000000..d458ca5e1269d
 > --- /dev/null
-> +++ b/drivers/net/ethernet/hpe/sbl/sbl_sbm_serdes.c
-> @@ -0,0 +1,1114 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +/* Copyright 2025-2026 Hewlett Packard Enterprise Development LP. All Ri=
-ghts Reserved. */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/device.h>
-> +#include <linux/delay.h>
-> +
-> +#include <uapi/ethernet/sbl_sbm_constants.h>
-> +
-> +#include "sbl_sbm_serdes.h"
-> +#include "sbl_serdes_map.h"
-> +#include "sbl_sbm.h"
-
-[Severity: Low]
-In drivers/net/ethernet/hpe/sbl/sbl_sbm.h, the nine inline helper functions
-(sbl_sbm_sbus_op(), sbl_sbm_sbus_op_reset(), sbl_sbm_pml_serdes_op(),
-sbl_sbm_get_sbus_op_timeout_ms(), sbl_sbm_get_sbus_int_timeout(),
-sbl_sbm_get_sbus_int_poll_interval(), sbl_sbm_get_serdes_op_timeout_ms(),
-sbl_sbm_get_sbus_op_flags(), and sbl_sbm_get_serdes_op_flags()) are defined
-with bare inline rather than static inline:
-
-drivers/net/ethernet/hpe/sbl/sbl_sbm.h:
-inline int sbl_sbm_sbus_op(struct sbl_inst *sbl, int ring, u32 req_data,
-			     u8 data_addr, u8 rx_addr, u8 command,
-			     u32 *rsp_data, u8 *result_code, u8 *overrun,
-			     int timeout, u32 flags)
-{
-	return sbl_sbus_op(sbl, ring, req_data, data_addr, rx_addr, command,
-			   rsp_data, result_code, overrun, timeout, flags);
-}
-
-Because the kernel defines inline with __gnu_inline, bare inline functions
-without static or extern have external linkage and emit out-of-line global
-definitions without prior prototypes when sbl_sbm.h is included here.
-
-Should these helpers in sbl_sbm.h be marked static inline to avoid
--Wmissing-prototypes and -Wmissing-declarations warnings (and multiple
-definition errors if sbl_sbm.h is included elsewhere)?
+> +++ b/drivers/net/ethernet/hpe/sbl/sbl_fec.c
 
 [ ... ]
 
-> +static void
-> +sbus_cmd_to_string(u8 command, char *cmd_str)
+> +/* print a few warnings (so we can see how things are changing) about hi=
+gh
+> + * fec lane error rates
+> + */
+> +static void sbl_fec_rates_warnings(struct sbl_inst *sbl, int port_num,
+> +				   int *warning_count)
 > +{
-> +	char str0[SBL_MAX_STR_LEN], str1[SBL_MAX_STR_LEN], str2[SBL_MAX_STR_LEN=
-];
 > +
-> +	switch (command & SBUS_CMD_MODE_MASK) {
-> +	case SBUS_CMD_MODE_CTLR:
-> +		sprintf(str0, "CM_CTLR");
-> +		break;
-> +	case SBUS_CMD_MODE_RCVR:
-> +		sprintf(str0, "CM_RCVR");
-> +		break;
-> +	default:
-> +		sprintf(str0, "CM_UNKNOWN");
-> +		break;
-> +	}
-
-[ ... ]
-
-> +	sprintf(cmd_str, "%s:%s:%s", str0, str1, str2);
-> +}
-
-[ ... ]
-
-> +static void sbus_msg(void *inst, u32 sbus_addr, u32 req_data,
-> +		     u8 reg_addr, u8 command, u32 rsp_data,
-> +		u8 result_code, u8 overrun, int timeout,
-> +		u32 flags, int rc, int severity)
-> +{
-> +	struct sbl_inst *sbl =3D inst;
-> +	char sbus_addr_str[SBL_HALF_MAX_STR_LEN];
-> +	char reg_addr_str[SBL_HALF_MAX_STR_LEN];
-> +	char cmd_str[SBL_HALF_MAX_STR_LEN];
-> +	char rc_str[SBL_HALF_MAX_STR_LEN];
-> +	char message[SBL_MAX_STR_LEN];
+> +	struct sbl_link *link =3D sbl->link + port_num;
+> +	struct fec_data *fec_data =3D link->fec_data;
+> +	struct sbl_fec *fec_prmts =3D fec_data->fec_prmts;
+> +	int fecl_warn;
+> +	int i;
 > +
-> +	if (!sbl)
+> +	spin_lock(&fec_prmts->fec_cw_lock);
+> +	fecl_warn =3D fec_prmts->fecl_warn;
+> +	spin_unlock(&fec_prmts->fec_cw_lock);
+> +
+> +	if (fecl_warn =3D=3D 0) {
+> +		dev_dbg(sbl->dev, "%d: fec ccw warn ignored, threshold is zero", port_=
+num);
+> +
 > +		return;
+> +	}
 > +
-> +	sbus_addr_to_string(sbus_addr, sbus_addr_str);
-> +	sbus_reg_addr_to_string(sbus_addr, reg_addr, reg_addr_str);
-> +	sbus_cmd_to_string(command, cmd_str);
-
-[Severity: Low]
-sbus_msg() allocates four SBL_HALF_MAX_STR_LEN (128-byte) arrays and one
-SBL_MAX_STR_LEN (256-byte) array on the stack (768 bytes total), and its
-single-caller helper sbus_cmd_to_string() allocates another three
-SBL_MAX_STR_LEN (256-byte) arrays (768 bytes) just to copy string literals
-before formatting them into the 128-byte cmd_str buffer.
-
-When sbus_cmd_to_string() is inlined into sbus_msg(), the combined stack
-frame exceeds 1536 bytes (and over 1792 bytes when called via
-sbl_sbm_spico_int()), which triggers -Wframe-larger-than=3D warnings when
-CONFIG_FRAME_WARN is 1024 or 1280.
-
-Could sbus_cmd_to_string() use const char * pointers for str0, str1, and
-str2 instead of stack arrays?
-
-[ ... ]
-
-> +int sbl_sbus_wr(void *inst, u32 sbus_addr, u8 reg_addr,
-> +		u32 sbus_data)
-> +{
-> +	struct sbl_inst *sbl =3D inst;
-> +	u32 unused;
+> +	for (i =3D 0; i < SBL_PCS_NUM_FECL_CNTRS; ++i) {
+> +		if (fec_prmts->fec_rates->fecl[i] > fecl_warn) {
+> +			sbl_link_counters_incr(sbl, port_num, fec_warn);
 > +
-> +	return sbl_sbus_op_aux(sbl, sbus_addr, reg_addr, SBUS_IFACE_DST_CORE |
-> +			       SBUS_CMD_WRITE, sbus_data, &unused);
+> +			if (*warning_count > 0) {
+> +				dev_warn(sbl->dev,
+> +					 "sbl %d: warning, ccw %lld, (%lld %lld %lld %lld %lld %lld %lld %l=
+ld)%s\n",
+> +					 port_num, fec_prmts->fec_rates->ccw,
+> +					 fec_prmts->fec_rates->fecl[0],
+> +					 fec_prmts->fec_rates->fecl[1],
+> +					 fec_prmts->fec_rates->fecl[2],
+> +					 fec_prmts->fec_rates->fecl[3],
+> +					 fec_prmts->fec_rates->fecl[4],
+> +					 fec_prmts->fec_rates->fecl[5],
+> +					 fec_prmts->fec_rates->fecl[6],
+> +					 fec_prmts->fec_rates->fecl[7],
+> +					 (*warning_count =3D=3D 1) ? " - last" : "");
+> +				--*warning_count;
+> +			} else {
+> +				dev_dbg(sbl->dev,
+> +					"sbl %d: warning, ccw %lld, (%lld %lld %lld %lld %lld %lld %lld %ll=
+d)\n",
+> +					port_num, fec_prmts->fec_rates->ccw,
+> +					fec_prmts->fec_rates->fecl[0],
+> +					fec_prmts->fec_rates->fecl[1],
+> +					fec_prmts->fec_rates->fecl[2],
+> +					fec_prmts->fec_rates->fecl[3],
+> +					fec_prmts->fec_rates->fecl[4],
+> +					fec_prmts->fec_rates->fecl[5],
+> +					fec_prmts->fec_rates->fecl[6],
+> +					fec_prmts->fec_rates->fecl[7]);
+> +			}
+> +			return;
+> +		}
+> +	}
 > +}
 
 [ ... ]
 
-> +int sbl_sbus_op_aux(void *inst, u32 sbus_addr, u8 reg_addr,
-> +		    u8 command, u32 sbus_data, u32 *result)
+> +void sbl_fec_timer_work(struct work_struct *work)
 > +{
-> +	struct sbl_inst *sbl =3D inst;
-> +	u8 result_code =3D 0, overrun =3D 0;
-> +	int err =3D -1;
-> +	int retry_cnt =3D 0;
-> +	int retry_limit =3D 5;
-> +	u32 sbus_ring =3D SBUS_RING(sbus_addr);
-> +	u32 rx_addr =3D SBUS_RX_ADDR(sbus_addr);
-> +	bool valid_result =3D false;
-> +	int sbus_op_timeout_ms =3D sbl_sbm_get_sbus_op_timeout_ms(sbl);
-> +	int sbus_op_flags =3D sbl_sbm_get_sbus_op_flags(sbl);
-> +	void *accessor =3D sbl;
+> +	u32 ucw_thresh_adj;
+> +	u32 ccw_thresh_adj;
+> +	int port_num;
+> +	unsigned long irq_flags;
+> +	struct sbl_link *link;
+> +	enum sbl_link_down_origin down_origin =3D SBL_LINK_DOWN_ORIGIN_UNKNOWN;
+> +	struct sbl_fec *fec_prmts;
+> +	int warning_count =3D SBL_MAX_FEC_WARNINGS;
+> +	int err;
+> +	struct fec_data *fec_data =3D container_of(work, struct fec_data, fec_t=
+imer_work);
+> +	struct sbl_inst *sbl =3D fec_data->sbl;
 > +
-> +	if (!sbl->is_hw) {
-> +		*result =3D 0;
-> +		return 0;
-> +	}
-> +	/* Safety check */
-> +	if (!mutex_is_locked(SBUS_RING_MTX(sbl, sbus_ring))) {
-> +		sbus_msg(sbl, sbus_addr, sbus_data, reg_addr, command,
-> +			 0, result_code, overrun, sbus_op_timeout_ms,
-> +			 sbus_op_flags, err, LEVEL_WARN);
-> +		WARN(1, "%s: Unlocked SBUS ring %d!", __func__, sbus_ring);
-> +	}
+> +	port_num =3D fec_data->port_num;
+> +	link =3D sbl->link + port_num;
+> +	fec_prmts =3D fec_data->fec_prmts;
 > +
-> +	/* Perform SBus operation */
-> +	while (retry_cnt++ < retry_limit) {
-> +		err =3D sbl_sbm_sbus_op(accessor, sbus_ring, sbus_data,
-> +				      reg_addr, rx_addr, command, result,
-> +					     &result_code, &overrun,
-> +					     sbus_op_timeout_ms,
-> +					     sbus_op_flags);
-> +		if (err) {
-> +			sbus_msg(sbl, sbus_addr, sbus_data, reg_addr, command,
-> +				 0, result_code, overrun, sbus_op_timeout_ms,
-> +				 sbus_op_flags, err, LEVEL_WARN);
-> +		}
-> +		if (err || overrun) {
-> +			SBL_INFO(sbl->dev, "Resetting SBUS ring %d!", sbus_ring);
-> +			err =3D sbl_sbm_sbus_op_reset(sbl, sbus_ring);
-> +			if (err) {
-> +				SBL_WARN(sbl->dev,
-> +					 "sbl_sbm_sbus_op_reset failed! sbus_ring:%d rc:%d",
-> +					 sbus_ring, err);
-> +				return err;
+> +	if ((link->blstate =3D=3D SBL_BASE_LINK_STATUS_UP) && (sbl_pml_pcs_alig=
+ned(sbl, port_num))) {
+> +		err =3D sbl_fec_rates_update(sbl, port_num, SBL_FEC_MON_PERIOD);
+> +
+> +		if (!err) {
+> +			spin_lock_irqsave(&fec_prmts->fec_cw_lock, irq_flags);
+> +			ucw_thresh_adj =3D fec_prmts->fec_ucw_down_thresh_adj;
+> +			ccw_thresh_adj =3D fec_prmts->fec_ccw_down_thresh_adj;
+> +			spin_unlock_irqrestore(&fec_prmts->fec_cw_lock, irq_flags);
+> +
+> +			if (sbl_fec_ucw_rate_bad(sbl, port_num, ucw_thresh_adj)) {
+> +				/* take the link down */
+> +				down_origin =3D SBL_LINK_DOWN_ORIGIN_UCW;
+> +				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
+> +				return;
 > +			}
-> +		} else {
-> +			break;
+> +
+> +			if (sbl_fec_ccw_rate_bad(sbl, port_num, ccw_thresh_adj, false)) {
+> +				/* take the link down */
+> +				down_origin =3D SBL_LINK_DOWN_ORIGIN_CCW;
+> +				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
+> +				return;
+> +			}
+> +
+> +			if (sbl_fec_txr_rate_bad(sbl, port_num, 0)) {
+> +				/* take the link down */
+> +				down_origin =3D SBL_LINK_DOWN_ORIGIN_LLR_TX_REPLAY;
+> +				sbl_pml_link_down_async_alert(sbl, port_num, down_origin);
+> +				return;
+> +			}
+> +			sbl_fec_rates_warnings(sbl, port_num, &warning_count);
+> +
+> +		}
+> +
+> +	}
+> +	sbl_fec_monitor_rearm(link);
+> +}
+
+[Severity: Medium]
+In sbl_fec_timer_work(), warning_count is a stack-local variable initialized
+to SBL_MAX_FEC_WARNINGS (3) on every work execution and passed to
+sbl_fec_rates_warnings().
+
+Inside sbl_fec_rates_warnings(), when any lane's fec_rates->fecl[i] exceeds
+fecl_warn, it decrements *warning_count once (from 3 to 2) and immediately
+returns. When sbl_fec_timer_work() finishes and rearms fec_timer, the
+decremented warning_count is lost.
+
+Does this cause dev_warn() to be emitted on every 1-second monitoring
+interval without bound while leaving the "*warning_count =3D=3D 1" suffix a=
+nd
+the dev_dbg() fallback branch unreachable? Should warning_count be stored in
+per-link state (such as struct fec_data or struct sbl_link) so that it
+persists across sbl_fec_timer_work() runs?
+
+[ ... ]
+
+> +#ifdef CONFIG_SYSFS
+> +/**
+> + * sbl_fec_sysfs_sprint() - Format FEC parameters status into buffer
+> + * @sbl: A slingshot base link device instance
+> + * @port_num: port number
+> + * @buf: Destination buffer to write the data
+> + * @size: Size of @buf in bytes, the output is truncated to fit
+> + *
+> + * This function formats FEC parameters and writes the result into the
+> + * provided buffer typically for use in sysfs output.
+> + *
+> + * Context: Process context, Acquires lock and release fec_cw_lock <spin=
+_lock>
+> + *
+> + * Return: Number of characters written, at most @size - 1
+> + */
+> +int sbl_fec_sysfs_sprint(struct sbl_inst *sbl, int port_num, char *buf, =
+size_t size)
+> +{
+> +	u64 ucw_thresh;
+> +	u64 ucw_hwm;
+> +	u64 ccw_thresh;
+> +	u64 ccw_hwm;
+> +	u64 llr_tx_replay_thresh;
+> +	u64 llr_tx_replay_hwm;
+> +	u64 fecl_warn;
+> +	int s =3D 0;
+> +	struct sbl_link *link =3D sbl->link + port_num;
+> +	struct fec_data *fec_data =3D link->fec_data;
+> +	struct sbl_fec *fec_prmts =3D fec_data->fec_prmts;
+> +
+> +	spin_lock(&fec_prmts->fec_cw_lock);
+> +	if (link->blstate =3D=3D SBL_BASE_LINK_STATUS_STARTING) {
+> +		ucw_thresh =3D fec_prmts->fec_ucw_thresh * fec_prmts->fec_ucw_up_thres=
+h_adj / 100;
+> +		ccw_thresh =3D fec_prmts->fec_ccw_thresh * fec_prmts->fec_ccw_up_thres=
+h_adj / 100;
+> +	} else {
+> +		ucw_thresh =3D fec_prmts->fec_ucw_thresh * fec_prmts->fec_ucw_down_thr=
+esh_adj / 100;
+> +		ccw_thresh =3D fec_prmts->fec_ccw_thresh * fec_prmts->fec_ccw_down_thr=
+esh_adj / 100;
+> +	}
+> +
+> +	llr_tx_replay_thresh =3D fec_prmts->fec_llr_tx_replay_thresh;
+> +	ucw_hwm =3D fec_prmts->fec_ucw_hwm;
+> +	ccw_hwm =3D fec_prmts->fec_ccw_hwm;
+> +	llr_tx_replay_hwm =3D fec_prmts->fec_llr_tx_replay_hwm;
+> +	fecl_warn =3D fec_prmts->fecl_warn;
+> +	spin_unlock(&fec_prmts->fec_cw_lock);
+> +	if (link->blstate =3D=3D SBL_BASE_LINK_STATUS_UP) {
+
+[Severity: Low]
+In sbl_fec_sysfs_sprint(), ucw_thresh and ccw_thresh are computed with a
+specific branch for link->blstate =3D=3D SBL_BASE_LINK_STATUS_STARTING, but=
+ all
+output formatting immediately below is gated on link->blstate =3D=3D
+SBL_BASE_LINK_STATUS_UP.
+
+When link->blstate is SBL_BASE_LINK_STATUS_STARTING, those calculated
+thresholds are discarded and the function returns 0; conversely, if
+link->blstate transitions from SBL_BASE_LINK_STATUS_STARTING to
+SBL_BASE_LINK_STATUS_UP between the two unlocked checks, the UP output prin=
+ts
+the STARTING thresholds.
+
+Was the second check intended to include SBL_BASE_LINK_STATUS_STARTING as
+well, or should the SBL_BASE_LINK_STATUS_STARTING branch be dropped?
+
+> diff --git a/drivers/net/ethernet/hpe/sbl/sbl_media.c b/drivers/net/ether=
+net/hpe/sbl/sbl_media.c
+> new file mode 100644
+> index 0000000000000..ec2b4574565e8
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hpe/sbl/sbl_media.c
+
+[ ... ]
+
+> +int sbl_media_unconfig(struct sbl_inst *sbl, int port_num)
+> +{
+> +	struct sbl_link *link;
+> +	int err =3D 0;
+> +
+> +	err =3D sbl_validate_instance(sbl);
+> +	if (err)
+> +		return err;
+> +
+> +	sbl_dev_dbg(sbl->dev, "media unconfig\n");
+> +
+> +	err =3D sbl_validate_port_num(sbl, port_num);
+> +	if (err)
+> +		return err;
+> +
+> +	link =3D sbl->link + port_num;
+> +
+> +	spin_lock(&link->lock);
+> +
+> +	if (!(link->blstate & (SBL_BASE_LINK_STATUS_UNCONFIGURED |
+> +			SBL_BASE_LINK_STATUS_DOWN |
+> +			SBL_BASE_LINK_STATUS_STOPPING))) {
+> +
+> +		sbl_dev_err(sbl->dev, "%d: wrong state (%s) to unconfigure media\n", p=
+ort_num,
+> +			    sbl_link_state_str(link->blstate));
+> +		spin_unlock(&link->lock);
+> +		return -EUCLEAN;
+> +	}
+> +
+> +	memset(&link->mattr, 0, sizeof(struct sbl_media_attr));
+> +	link->mconfigured =3D false;
+> +
+> +	link->blstate =3D SBL_BASE_LINK_STATUS_UNCONFIGURED;
+> +
+> +	spin_unlock(&link->lock);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL(sbl_media_unconfig);
+
+[ ... ]
+
+> +bool sbl_media_check_headshell_reset_supported(struct sbl_inst *sbl, int=
+ port_num)
+> +{
+> +	struct sbl_link *link =3D sbl->link + port_num;
+> +
+> +	if (!link->mattr.info) {
+> +		/* We have no info about media */
+> +		sbl_dev_dbg(sbl->dev, "%d: no media info available to check headshell =
+reset supported bit", port_num);
+> +		return false;
+> +	}
+> +
+> +	if (link->mattr.info & SBL_MEDIA_INFO_SUPPORTS_HEADSHELL_RESET)
+> +		return true;
+> +
+> +	return false;
+> +}
+> +EXPORT_SYMBOL(sbl_media_check_headshell_reset_supported);
+> +
+> +static bool sbl_media_check_len_supported(struct sbl_inst *sbl, int port=
+_num, u64 len)
+> +{
+> +	struct sbl_link *link =3D sbl->link + port_num;
+> +
+> +	switch (len) {
+> +	case SBL_LINK_LEN_BACKPLANE:
+
+[ ... ]
+
+> +	case SBL_LINK_LEN_100_000:
+> +		return true;
+> +	default:
+> +		if ((link->blattr.options & SBL_OPT_ALLOW_MEDIA_BAD_LEN) ||
+> +		    sbl_debug_option(sbl, port_num, SBL_DEBUG_ALLOW_MEDIA_BAD_LEN)) {
+> +			sbl_dev_warn(sbl->dev, "%d: unsupported media len (%lld) - ignored", =
+port_num, len);
+> +			return true;
+> +		}
+> +		sbl_dev_err(sbl->dev, "%d: unsupported media len (%lld)", port_num, le=
+n);
+> +		return false;
+> +	}
+> +}
+> +
+> +/* return valid length in cm or 0 */
+> +u32 sbl_media_get_len_cm(struct sbl_inst *sbl, int port_num, u64 len)
+> +{
+> +	if (sbl_media_check_len_supported(sbl, port_num, len)) {
+> +		switch (len) {
+> +		case SBL_LINK_LEN_BACKPLANE: return 25;
+
+[ ... ]
+
+> +		case SBL_LINK_LEN_100_000:   return 10000;
 > +		}
 > +	}
-> +
-> +	/* Validate results */
-> +	if (err || overrun) {
-> +		SBL_WARN(sbl->dev, "roshms_sbus_op failed!");
-> +		return -EIO;
-> +	}
-> +	switch (command & 0x3) {
-> +	case SBUS_CMD_RESET:
-> +		if (result_code =3D=3D SBUS_RC_RESET)
-> +			valid_result =3D true;
-> +
-> +		break;
-> +	case SBUS_CMD_WRITE:
-> +		if (result_code =3D=3D SBUS_RC_WRITE_COMPLETE)
-> +			valid_result =3D true;
-> +
-> +		break;
-> +	case SBUS_CMD_READ:
-> +		if (result_code =3D=3D SBUS_RC_READ_COMPLETE)
-> +			valid_result =3D true;
-> +
-> +		break;
-> +	case SBUS_CMD_READ_RESULT:
-> +		if (result_code =3D=3D SBUS_RC_READ_ALL_COMPLETE)
-> +			valid_result =3D true;
-> +
-> +		break;
-> +	}
-> +
-> +	if (!valid_result) {
-> +		SBL_WARN(sbl->dev, "Unexpected result code (%d) 0x%x!",
-> +			 result_code, command);
-> +		sbus_msg(sbl, sbus_addr, sbus_data, reg_addr, command,
-> +			 *result, result_code, overrun, sbus_op_timeout_ms,
-> +				sbus_op_flags, err, LEVEL_WARN);
-> +		return -ENOMSG;
-> +	}
-> +	sbus_msg(sbl, sbus_addr, sbus_data, reg_addr, command,
-> +		 *result, result_code, overrun, sbus_op_timeout_ms,
-> +			sbus_op_flags, err, LEVEL_DBG);
 > +
 > +	return 0;
 > +}
-
-[Severity: High]
-In sbl_sbus_op_aux(), when sbl_sbm_sbus_op() fails (err !=3D 0), the error
-recovery path overwrites err with the return value of
-sbl_sbm_sbus_op_reset(sbl, sbus_ring).
-
-If sbl_sbm_sbus_op() fails on all 5 retries with overrun =3D=3D 0 while
-sbl_sbm_sbus_op_reset() succeeds (returns 0), the loop terminates with
-err =3D=3D 0 and overrun =3D=3D 0, bypassing the post-loop if (err || overr=
-un)
-check.
-
-Because result_code was initialized to 0 (which equals SBUS_RC_RESET), a
-failed SBUS_CMD_RESET operation (such as in sbl_sbm_firm_upload() and
-sbl_serdes_soft_reset()) will set valid_result =3D true and return 0
-(success), while failed read or write operations will return -ENOMSG
-instead of -EIO.
-
-In addition, sbl_sbus_wr() (as well as sbl_sbm_firm_upload() and
-sbl_serdes_soft_reset()) passes an uninitialized stack variable (u32 unused)
-as result to sbl_sbus_op_aux(), which unconditionally dereferences *result
-when calling sbus_msg() even if sbl_sbm_sbus_op() did not write to *result.
-
-Should sbl_sbm_sbus_op_reset() use a separate return variable so err from
-sbl_sbm_sbus_op() is preserved, and should *result (or unused in callers)
-be initialized to 0 before the operation?
-
+> +
+> +/* calc loop time based on cable length */
+> +int sbl_media_calc_loop_time(struct sbl_inst *sbl, int port_num, u64 *ca=
+lc_loop_time)
+> +{
+> +	struct sbl_link *link;
+> +	u32 len;
+> +	int err;
+> +
+> +	err =3D sbl_validate_instance(sbl);
+> +	if (err)
+> +		return err;
+> +
+> +	err =3D sbl_validate_port_num(sbl, port_num);
+> +	if (err)
+> +		return err;
+> +
+> +	if (!calc_loop_time)
+> +		return -EINVAL;
+> +
+> +	link =3D sbl->link + port_num;
+> +	*calc_loop_time =3D 0;
+> +
+> +	if ((link->blattr.loopback_mode =3D=3D SBL_LOOPBACK_MODE_OFF) ||
+> +	    (link->blattr.loopback_mode =3D=3D SBL_LOOPBACK_MODE_INVALID)) {
+> +		len =3D sbl_media_get_len_cm(sbl, port_num, link->mattr.len);
+> +		if (!len)
+> +			return -EBADRQC;
+> +	} else
+> +		len =3D 0;
+> +
+> +	sbl_dev_dbg(sbl->dev, "%d: len =3D %d, lb =3D %s",
+> +		    port_num, len, sbl_loopback_mode_str(link->blattr.loopback_mode));
+> +
+> +	if (link->mattr.media =3D=3D SBL_LINK_MEDIA_ELECTRICAL)
+> +		*calc_loop_time =3D 2 * len * SBL_MEDIA_NS_PER_M / 100;
+> +	else
+> +		*calc_loop_time =3D (2 * len * SBL_MEDIA_OPTICAL_NS_PER_M / 100) +
+> +			(4 * SBL_MEDIA_OPTICAL_TRANCEIVER_DELAY);
+> +	*calc_loop_time +=3D 2 * (SBL_ASIC_TX_DELAY + SBL_ASIC_RX_DELAY);
+> +
+> +	sbl_dev_dbg(sbl->dev, "%d: calc loop time %lld cm %lld ns",
+> +		    port_num, link->mattr.len, *calc_loop_time);
+> +
+> +	return 0;
+> +}
 > +
 > +/**
-> + * sbl_sbm_spico_int() - spico intilization
-> + * @inst: Generic pointer used by various framework
-> + * @sbus_addr: address describing a serdes ring and rxaddr
-> + * @code: interrupt command
-> + * @data: interrupt data
-> + * @result: location to store result of interrupt
+> + * sbl_media_get_loop_time_ns() - Get loop time in ns
+> + * @sbl: A slingshot base link device instance
+> + * @port_num: port number
+> + * @measurement_only: set to false when reading
 > + *
-> + * Write an interrupt request to a target SBM Spico
+> + * This function returns available loop time. If not and
+> + * 'measurement_only' is true, returns 0 with a warning.
+> + * Otherwise attempts to calculate the loop time.
 > + *
-> + * Return: 0 on success, negative error code on failure
+> + * Return: calculate loop time on success, 0 on failure
 > + */
-> +int sbl_sbm_spico_int(void *inst, u32 sbus_addr, int code, int data,
-> +		      u32 *result)
+> +u64 sbl_media_get_loop_time_ns(struct sbl_inst *sbl, int port_num,
+> +			       bool measurement_only)
 > +{
-> +	struct sbl_inst *sbl =3D inst;
+> +	struct sbl_link *link =3D sbl->link + port_num;
+> +	u64 calc_loop_time;
 > +	int err;
-> +	u32 intr_out;
-> +	u32 intr_in;
-> +	char intr_str[SBL_MAX_STR_LEN];
-> +	int sbus_int_timeout =3D sbl_sbm_get_sbus_int_timeout(sbl);
-> +	int sbus_int_poll_interval =3D sbl_sbm_get_sbus_int_poll_interval(sbl);
-> +	unsigned long last_jiffy;
-> +	u32 sbus_ring =3D SBUS_RING(sbus_addr);
 > +
-> +	if (!sbl->is_hw) {
-> +		*result =3D 0;
+> +	if (!link->mconfigured)
+> +		return 0;
+> +
+> +	if (link->llr_loop_time)
+> +		return link->llr_loop_time;
+> +
+> +	if (measurement_only) {
+> +		sbl_dev_warn(sbl->dev, "%d: measured loop time not found", port_num);
 > +		return 0;
 > +	}
-> +	/* Safety check */
-> +	if (!mutex_is_locked(SBUS_RING_MTX(sbl, sbus_ring))) {
-> +		SBL_WARN(sbl->dev, "%s: Unlocked SBUS ring %d!", __func__, sbus_ring);
-> +		WARN(1, "sbl_sbus_op_aux: Unlocked SBUS ring %d!", sbus_ring);
-> +	}
 > +
-> +	spico_interrupt_to_string(sbus_addr, code, intr_str);
-> +
-> +	/* Inject the interrupt via SBus writes */
-> +	intr_in =3D ((data & SBMS_INTERRUPT_DATA_MASK) << SBMS_INTERRUPT_DATA_O=
-FFSET) |
-> +		((code & SBMS_INTERRUPT_CODE_MASK) << SBMS_INTERRUPT_CODE_OFFSET);
-
-[Severity: High]
-In include/uapi/ethernet/sbl_sbm_constants.h, SBMS_INTERRUPT_DATA_MASK is
-defined as the already-shifted upper 16-bit mask:
-
-#define SBMS_INTERRUPT_DATA_MASK         0xffff0000
-#define SBMS_INTERRUPT_DATA_OFFSET       16
-
-which matches how sbl_sbm_spico_int() extracts the result further down:
-
-	*result =3D (intr_out & SBMS_INTERRUPT_DATA_MASK) >>
-		SBMS_INTERRUPT_DATA_OFFSET;
-
-When packing intr_in above, masking the 32-bit data with 0xffff0000 before
-shifting left by 16 clears bits 15:0 and then shifts bits 31:16 out of the
-32-bit word, so the data portion always evaluates to 0.
-
-Should this shift data before masking with SBMS_INTERRUPT_DATA_MASK:
-
-	intr_in =3D ((data << SBMS_INTERRUPT_DATA_OFFSET) & SBMS_INTERRUPT_DATA_MA=
-SK) |
-		((code << SBMS_INTERRUPT_CODE_OFFSET) & SBMS_INTERRUPT_CODE_MASK);
-
-so that the interrupt data payload is not zeroed out?
-
-[ ... ]
-
-> +int sbl_serdes_spico_int(void *inst, u32 port_num, u32 serdes,
-> +			 int code, int data, u16 *result, u8 result_action)
-> +{
-> +	struct sbl_inst *sbl =3D inst;
-> +	int err;
-> +	char intr_str[SBL_MAX_STR_LEN];
-> +	u16 result_out =3D 0;
-> +	u16 *p_result;
-> +	u32 sbus_addr;
-> +	int serdes_op_timeout_ms =3D sbl_sbm_get_serdes_op_timeout_ms(sbl);
-> +	int serdes_op_flags =3D sbl_sbm_get_serdes_op_flags(sbl);
-> +	void *accessor =3D sbl;
-> +
-> +	if ((result_action =3D=3D SPICO_INT_RETURN_RESULT) && (result =3D=3D NU=
-LL)) {
-> +		SBL_ERR(sbl->dev, "result pointer was NULL!");
-> +		return -1;
-> +	}
-> +	if (result_action !=3D SPICO_INT_RETURN_RESULT)
-> +		p_result =3D &result_out;
-> +	else
-> +		p_result =3D result;
-> +
-> +	if (!sbl->is_hw) {
-> +		*p_result =3D code;
+> +	if (!sbl_media_check_len_supported(sbl, port_num, link->mattr.len))
 > +		return 0;
-> +	}
-> +	/* Make a fake SerDes sbus_addr so spico_interrupt_to_string gives us t=
-he
-> +	   right debug string. This function is only called for CM4 SerDes, so =
-this
-> +	   will always give the correct string. */
-> +	sbl_sbus_addr_get(&sbus_addr);
-> +	spico_interrupt_to_string(sbus_addr, code, intr_str);
 > +
-> +	err =3D sbl_sbm_pml_serdes_op(accessor, port_num, serdes, code,
-> +				    data, p_result, serdes_op_timeout_ms,
-> +					   serdes_op_flags);
+> +	err =3D sbl_media_calc_loop_time(sbl, port_num, &calc_loop_time);
+> +	if (err)
+> +		return 0;
+> +
+> +	return calc_loop_time;
+> +}
+> +EXPORT_SYMBOL(sbl_media_get_loop_time_ns);
 
-[Severity: High]
-Can calling sbl_sbm_pml_serdes_op() here cause an ABBA deadlock between
-sbl->link[port_num].serdes_mtx and SBUS_RING_MTX(sbl, sbus_ring)?
+[Severity: Medium]
+When link->mattr.len is not one of the known SBL_LINK_LEN_* constants and
+either SBL_OPT_ALLOW_MEDIA_BAD_LEN or SBL_DEBUG_ALLOW_MEDIA_BAD_LEN is set,
+sbl_media_check_len_supported() logs a warning and returns true.
 
-In drivers/net/ethernet/hpe/sbl/sbl_serdes_fn.c, sbl_serdes_soft_reset()
-and sbl_serdes_firm_upload() acquire serdes_mtx before sbus_ring_mtx:
+However, sbl_media_get_len_cm() has no default case in its switch(len)
+statement, so it falls through and returns 0, causing
+sbl_media_calc_loop_time() to fail with -EBADRQC on !len. Does that defeat
+the SBL_OPT_ALLOW_MEDIA_BAD_LEN and SBL_DEBUG_ALLOW_MEDIA_BAD_LEN options?
 
-sbl_serdes_soft_reset()
-  mutex_lock(&sbl->link[port_num].serdes_mtx);
-  mutex_lock(SBUS_RING_MTX(sbl, sbus_ring));
+In addition, sbl_media_get_loop_time_ns() calls
+sbl_media_check_len_supported() before calling sbl_media_calc_loop_time():
+- In non-loopback mode, sbl_media_calc_loop_time() immediately calls
+  sbl_media_get_len_cm() -> sbl_media_check_len_supported() a second time,
+  emitting duplicate log messages.
+- In loopback mode, sbl_media_calc_loop_time() sets len =3D 0 without check=
+ing
+  link->mattr.len, whereas sbl_media_get_loop_time_ns() rejects the call and
+  returns 0 if link->mattr.len is unset.
 
-However, sbl_spico_reset() (called from sbl_serdes_stop_internal() and
-sbl_test_serdes_stop()) acquires SBUS_RING_MTX(sbl, sbus_ring) first and
-then calls sbl_serdes_spico_int() -> sbl_sbm_pml_serdes_op() ->
-sbl_pml_serdes_op(), which locks &link->serdes_mtx:
+Finally, at the end of sbl_media_calc_loop_time(), sbl_dev_dbg() prints
+link->mattr.len (the enum sbl_link_len bitmask) with the unit "cm" instead =
+of
+len. Should sbl_media_get_len_cm() provide a default fallback length,
+sbl_media_get_loop_time_ns() drop the redundant
+sbl_media_check_len_supported() check, and sbl_media_calc_loop_time() log l=
+en
+instead of link->mattr.len?
 
-sbl_spico_reset()
-  mutex_lock(SBUS_RING_MTX(sbl, sbus_ring));
-  sbl_serdes_spico_int()
-    sbl_sbm_pml_serdes_op()
-      sbl_pml_serdes_op()
-        mutex_lock_interruptible(&link->serdes_mtx);
+> +
+> +int sbl_media_validate_config(struct sbl_inst *sbl, int port_num)
+> +{
+> +	struct sbl_link *link =3D sbl->link + port_num;
+> +
+> +	if (!(link->mconfigured && link->blconfigured))
+> +		return -EUCLEAN;
+> +
+> +	if ((link->mattr.media =3D=3D SBL_LINK_MEDIA_ELECTRICAL) &&
+> +	    (link->blattr.config_target =3D=3D SBL_BASE_LINK_CONFIG_PEC))
+> +		return 0;
+> +
+> +	if ((link->mattr.media =3D=3D SBL_LINK_MEDIA_OPTICAL) &&
+> +	    (link->blattr.config_target =3D=3D SBL_BASE_LINK_CONFIG_AOC))
+> +		return 0;
+> +
+> +	return -EMEDIUMTYPE;
+> +}
 
-This inverts the lock order to sbus_ring_mtx -> serdes_mtx. Should
-sbl_spico_reset() and its callers follow the serdes_mtx -> sbus_ring_mtx
-lock hierarchy (or release sbus_ring_mtx before invoking
-sbl_serdes_spico_int())?
+[Severity: Medium]
+sbl_media_config() and sbl_media_unconfig() check link->blstate and update
+link->mattr, link->mconfigured, and link->blstate under link->lock without
+acquiring link->busy_mtx. Meanwhile, sbl_base_link_start() and
+sbl_base_link_stop() in drivers/net/ethernet/hpe/sbl/sbl_link.c inspect and
+update link->blstate and validate media configuration under link->busy_mtx
+without holding link->lock:
+
+drivers/net/ethernet/hpe/sbl/sbl_link.c:sbl_base_link_start() {
+    ...
+	if (link->blstate !=3D SBL_BASE_LINK_STATUS_DOWN) {
+		...
+	}
+
+	/* only local loopback is possible without media */
+	if (link->blattr.loopback_mode !=3D SBL_LOOPBACK_MODE_LOCAL) {
+		err =3D sbl_media_validate_config(sbl, port_num);
+		...
+	}
+
+	link->blstate =3D SBL_BASE_LINK_STATUS_STARTING;
+    ...
+}
+
+If sbl_media_unconfig() runs concurrently with sbl_base_link_start() (for
+example during cable removal on attn1_worker() while cass_lmon() is starting
+the link), can sbl_media_unconfig() see SBL_BASE_LINK_STATUS_DOWN, clear
+link->mattr and link->mconfigured, and set SBL_BASE_LINK_STATUS_UNCONFIGURED
+right before sbl_base_link_start() overwrites link->blstate with
+SBL_BASE_LINK_STATUS_STARTING and continues bring-up with zeroed media
+attributes? Similarly, since sbl_media_unconfig() allows
+SBL_BASE_LINK_STATUS_STOPPING, can a concurrent sbl_base_link_stop()
+overwrite link->blstate back to SBL_BASE_LINK_STATUS_DOWN at completion even
+though link->mconfigured is false?
+
+Also, unlike sbl_media_check_mode_supported(), sbl_media_sysfs_sprint(), and
+sbl_media_type_sysfs_sprint() which acquire link->lock,
+sbl_media_check_headshell_reset_supported(), sbl_media_calc_loop_time(),
+sbl_media_get_loop_time_ns(), and sbl_media_validate_config() read
+link->mconfigured and link->mattr without holding link->lock. Should
+link->blstate and link->mattr accesses be synchronized consistently across
+these functions?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261030-cxi-netdev=
--submission-v1-0-8c2c391cc283@hpe.com?part=3D7
+-submission-v1-0-8c2c391cc283@hpe.com?part=3D8
