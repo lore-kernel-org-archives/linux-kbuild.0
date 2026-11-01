@@ -1,100 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=209.85.208.44
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
-	t=1793561696;
-	b=AHkNYf7bL8alt74+ABNYwkUSFsVt8DtjhJHW+TJJF18qNH10JYXmK+GVEZnrGzQlb0C3
-	 MfbauxK83fvc+2IMuaIS9FKPFQN3HqFCifoSqft4bYxTlGYQKYh3+ccyE00/h7MwOSvZ5
-	 ge1quIqytcuGY1OqW3SkbAMzKlt6TtEY5hrccGQjYJClkAQ7V0Gv3GqMgSYayHBdn3QR9
-	 4Sxlg7kzBWqPncs0YD9UtKXOqtfLcEXeI1cLu7urRZF35pdPEr/WrHRiHyF2XQCPflDwp
-	 KVQjbG9Byle26sXgMhRjTZBmW4cNYJKUlfUE6Aswj60ZBpjIFhFjvl/ZTb5VDffVTQA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793561696;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.42
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793563717;
+	b=XuhUEw/ICMhVxPFwjVO78BD7LsBHCjXp6BtADBreHSVayFtvqB9yOdx7uxbZ9afpn7uk
+	 z7vb78CqIeRdLRfcEW4GLA6E8CP/l5DSA0UAdd8gjzrUpmgcE1U2dSR6HHW9qvllUtAz/
+	 p5bU0+d7GXVXH4ZRss9v52Zhq+SY2N7nF3ckB7g/f0oAIJPtemvAa1bbUqYDpjjwEwiIi
+	 UvTj7ekqlP3iHNm6ZD1fgrTpHboBxjcseToZqelQgLPJQdhHuy5EQrKaRd73N+Pco9PBE
+	 Or21iEROnG01HYOo1kuhPCsb0etsdfs2qe8ilPzuH7VE5HSwhfygMrHJKm6SXY2u0eQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793563717;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:MIME-Version:from:In-Reply-To:References:Date:X-Gm-Features:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Received:X-Received:
+	 MIME-Version:From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=wdJlAy0M0lu3nCDv3njq9XZb0WjIsN4409XaMh24jfs=;
-	b=BiRDVHNIf6eqlAKsaPIpRU1aut3Nj+mxXQ5bQfuw9ZpXxgOo4aEcUp+mJrM8htDCtqtb
-	 nO7LwNOAmnE/1a2G//sQkZJCSdduKnfv+iHmFVkw0HwQ4iyBs0tCqn/ltPpUDMVltycxg
-	 bk4g7pfepjybM/waVrRD+FmNscTeO7/6EdeuqPeZF61STHhthivKsl8I4b/Bp+kdzbtt0
-	 gyV1LDLpU3tFc+JQIuD5YkjmHjNhc4WUONcz4NVY+xrynisL+dNKcOSmim3wpstBVGjk0
-	 rhan8MNn9gKTaEPNW5L+31yXb2rfLZ3rK7f6s9NfdTzuJI99HyPurSq22sScqv/9nUw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Lfqcc5GG;
-	arc=fail smtp.remote-ip=209.85.208.44
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	bh=8JMek6FeAuCzJafKmKqSMREjjRsifgf5mY5Tm4bK6cs=;
+	b=FHIyxNg/d4Mvl4AvDmP2ho7ma5RRZ5QM+YMLQGH+Q/huFIvRhBaeVEDW1qUKQyHeOmC6
+	 Yjz7kcM1v4l1aEKo94DX1VDvqQz284NlfNAXcHQu/ydTqGWCF8f8fbTK6386YU2dB8LDU
+	 sVcvC34Tu2deRmujlIKuh2appc3AYsHPNAwznugLc2l2+7VyV1ocLoENdZaewyKbcCvEK
+	 Wm5fixQ2lk0ocAtz6iAyLcJEoqUGRWOBzSlK6c3KOB0UivtdB2W/8WcU3CsSa9uCowh5U
+	 EMJK3ihmrCmErU4IVv6DGSXDSFRT1ffp/f0Yd/4Y5mv7or62bXOYcnb40mICM9gPrUA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=none header.from=linux-foundation.org;
+	spf=pass smtp.mailfrom=linuxfoundation.org;
+	dkim=pass header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=google header.b=DLnXQk6X;
+	arc=none smtp.remote-ip=209.85.218.42
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B571C606A325
-	for <linux-kbuild@vger.kernel.org>; Sun,  1 Nov 2026 19:34:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B571C606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEE4606A324
+	for <linux-kbuild@vger.kernel.org>; Sun,  1 Nov 2026 20:08:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EEE4606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=Lfqcc5GG
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6b4a13789b0so3192933a12.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 01 Nov 2026 11:34:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793561694; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JqaITzXYbiWHjIPAmEd9+BDnzRIbna/UekJZfIzzDpB0h0CJTZ/hGJXTBNcYZV9Uxu
-         xOQVOwr6Ctw5eTZxCTFlTmutYv8RxV/5DU6vmH9Nra4kLjJD91YGTtpIASfkSMYudw/8
-         QAaThkL6H1wShIXKXQFQEDPOeB61RV0h/lDalm2cOjQAX/SCdra+hUqBOP9FQ2FLmz3J
-         eRU+/QywqfK44NZavEONFJVMJ7/Yp5M4+M9HtFEPp7cnnM/LiioCUEOsWSLE99MQlrKC
-         HfjNo7LEMEAZhJPvRBqL5EPfAlE2uajfV4b1/LPVMeq2wPot2kch+swEZ35pgG70HNUf
-         KcTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:references:in-reply-to:from
-         :mime-version:dkim-signature;
-        bh=wdJlAy0M0lu3nCDv3njq9XZb0WjIsN4409XaMh24jfs=;
-        fh=aK+hoC0YW6MLrRjaYcyn2v5vMZJOtdBOH1WUSuge9eg=;
-        b=c9vQwUUhJL2rSPyy//v3iA/vTMSsiVhqraWn1Ohh+a0TP6AtsCmx54gUCXvXL2BgAS
-         5i+1md4FkDc/sMF405QVx1OiMtamwV2EIpnr5d7BkLO4OcAX8y8xTwiapRTz+M6OHsWp
-         9uptaLr94A9wQ8dSYfPjaB2sYP4beCwgd4YeBkowOzwv/3fr5tDZ22Y57eVhApNfDxPP
-         8x6ZYs4KaIQyUwXOb7Yd1PX/1BldlNy2hHJQFmuR0iQZzSrETYpVD7EWRgfrPmvrQaBu
-         eF1AlveACX9pPZ2Qc6rUls1Tew+IUDiDcaF7K83E60MqUrJHKdrYaQnw6YBolgyoKeb3
-         Uayw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key, unprotected) header.d=linux-foundation.org header.i=@linux-foundation.org header.a=rsa-sha256 header.s=google header.b=DLnXQk6X
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c445c95d553so305113566b.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 01 Nov 2026 12:08:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1793561694; x=1794166494; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:references:in-reply-to
-         :from:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=wdJlAy0M0lu3nCDv3njq9XZb0WjIsN4409XaMh24jfs=;
-        b=Lfqcc5GG/SwjR7rhF6i9wN+51zewpGS58ukrmB9LGRdbbpKdip3M+YroJNl6U5AaZ4
-         rF//L/DV6VSxmy/1UQsFeJhmoDWwkPFReDLBiC+oRpU55av1FrMnZVBw20fY7l4UynL3
-         HVfRKiNvpd9FUkbDQyR76hW+g1Owj32N3MUEU=
+        d=linux-foundation.org; s=google; t=1793563714; x=1794168514; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8JMek6FeAuCzJafKmKqSMREjjRsifgf5mY5Tm4bK6cs=;
+        b=DLnXQk6XKZ64IABAAoSw9d1BlXAckM9SQ24EFduZQcitlL+KFnGTjwZ2FGBuTR/TzH
+         uIqJ7o3yaKrc2ox3IyZmJ+AuLaVuATen4B3e1Zw4JNMUmr5VMRoeh06oFsTrryjcB73C
+         o88ClbBATw/RzDRixy9VuFLG0TN7zsvLZB8Zc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793561694; x=1794166494;
-        h=content-type:cc:to:subject:message-id:date:references:in-reply-to
-         :from:mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=wdJlAy0M0lu3nCDv3njq9XZb0WjIsN4409XaMh24jfs=;
-        b=iRxJjGYgrSQXRARQdzOD86N0SD2lYY/HrhUjWIUIOwaATfEaBLKJV9AnJfKXaA07if
-         IoFGyutXCd7yhYn7x6yP/eS3vkMTxw/JU97aovmvHCb64ZQ6LxYIWo5VXFfMos9P0lqw
-         egKJo3ts1k4xzDxmkt+B2kBg7hjHoPjpeiWxi73D7idoA1ytHdhiAibZXSz3AUWJRucN
-         rB2kgiufov5kxC/WTbZgbjz0d+aNTMVT5herW9IE1VFZSMTSJh45Qval2SNretlhnTHV
-         8sjXjfXlJy/2XifxnuXhKYgCpocEC2kqY4QhDp22cHKr/dGk2084ed6xHqt05tqAsXuL
-         mXvw==
-X-Forwarded-Encrypted: i=1; AKwUvBxBLUL6LaCVIUg7WjSr/g6q3mEvIe36vaV/Z5Rs03pHllSTJZGXNymJsc2ZwmPUdZCb6ZS5XkVgRCMXc0g=@vger.kernel.org
-X-Gm-Message-State: APuU4Z88LDUrucraorYTzXmrC39Rgjxo2HfF7Co/ANsMr2FslBOcLA8J
-	OQVOPRKBLZD1oX4xVnZcj/0En1MXKvwaLdJkhqbKuuT4BwPpa0FvSyu8T9wIoDpVYiAW55lr3m7
-	d3osCzCnwIsVPwAr+20mxqVbFrUc+6lFvKdJfnv4a
-X-Gm-Gg: AYBFou1u01td6BpYSkSAMFBY3GvA6sTJ07IdYZcjcQoYfd2O0NAJdC8q7nLvh4ihWxQ
-	mgGi2BMXr722aE9ZkTWAb0KDXT2Oq/9ggUD1UkdH4+HP0hIJADtHaiVGo4WJLDhI/NBPjFg7M35
-	3xS3mp+VcuJNBWpf+CDrnKZFPWvORBxRKBvQBPEStC2vzRNsTTBWw2+rjP4mF3agiuLSbRIgy4N
-	1beVSdWyFuoJqHAqf/bBLizY7fZYTdMUgi9eDMS83XOBhjQdj61iMevgzH5NOE4QZt0/4lyzkRC
-	ovOAO6ieKSgct0kN9Fomd/ksPC3aKOyAvqauBA+2HvIBOGGv8CZek6fJqNRd8ffHzVtxnC3jGv0
-	GurTMtMm93EAaEXwc8NZRa0Qe4293w9lnmXAmyVaZXZLYWkS16a7v+ZpU6RKhgcwqqFrxyAbn
-X-Received: by 2002:aa7:da45:0:b0:6b3:e89b:128f with SMTP id
- 4fb4d7f45d1cf-6b4d4d6d938mr4052419a12.9.1793561694122; Sun, 01 Nov 2026
- 11:34:54 -0800 (PST)
-Received: from 415065739583 named unknown by gmailapi.google.com with
- HTTPREST; Sun, 1 Nov 2026 11:34:51 -0800
-Received: from 415065739583 named unknown by gmailapi.google.com with
- HTTPREST; Sun, 1 Nov 2026 11:34:38 -0800
+        d=1e100.net; s=20260707; t=1793563714; x=1794168514;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8JMek6FeAuCzJafKmKqSMREjjRsifgf5mY5Tm4bK6cs=;
+        b=cvhZRZ/iVgPT3c2YpBe9mcOLYZwvxYSWE+v3wEXSYepL+CAGwizbnPRua9ZvEV9E9q
+         9xjNSN5J3/bwnyyjWMLJx4+nTiUntm5bnwYw47LAXa4t31t2ES8WHS5QTJntRBUAlNDy
+         hg7DrF+V7z9IKjwbBToAujRFh8sOfTCq9229+vpWztz1KOH/ETL34HXldK1lmRkrgCBL
+         LL8nETliCp33sGhnPzy1owoID4u6bGg0W+FP08BufZvi3kdX37bowbLmz4rVCrtoY9Cf
+         4wjmMeTs6CnAoowIBU+unrfy10ws07izQ0UtALbSULZyqzIaE35EPDiPjhw/mDaovjZE
+         Bgfw==
+X-Gm-Message-State: AFq9FYJN8AWD+mBHNqoXiVhJEtfCssinQLDelBee+Ro5reMxplZdo0qn
+	d/8TuqK/jCDL9wTyaxTj8uQOMQ7SZPlgldV7wFJozrYilRu4ELOfJpzoZfPvbnf8L8Kr+bvGFfe
+	YVp2YOL8=
+X-Gm-Gg: AYBFou2GNqfgrCzWaZUAhVCmpPT4G491oYqho8G+hZpSV8PQsm1In5HR3s6IUJ5NPYb
+	Yr4ii/D6ylmbkBU58y69czqVeEIFWUfcMEjepZGeFOYVK2qMQUiuK6tdfaMfCAwu5AtO0SnZ545
+	vngpq+KvAO5rowAxy1c7/2XDeHP0Gp22r1HSLD1wVKUMkfoFBFIxjOoG38IWRaRlKQW6mTxkwgS
+	r7XSrco7WLTBUhairv45V6yDOatE2P92XpR5+6zRIMolLGBdCjPS6y06eRgbfYjG3vxNqo0/6i7
+	CIpZnlDSQj2fBs/aelW4gqcvynX9aKL9L6es8fW9XW4sodCe76o7EIGuiFxcY3/V6MtA9ST1fMj
+	jZKdYIvwWJfaQLvQmfT5AXjxpkU2/Kh68fVmnjxhVrtWuDo9M/tNzunQFPwrun/eeMfnFSOUUsN
+	M85KcjsnBopKktTiKJ13wXFkuKtlBt+p2H/5boiAm5DF0D1Duov8AIGFxR/bIsHj7lk//uLnan1
+	fZOhRaa/aOLs30DL20wxuBp/yQf+UFf2t9zgoky5GiVglECtU+ZyD0mKX2M6qPNhNkq1UnRie/W
+	ASiTm1rflmWNCqoubqoZpL9si4FXheaZxhrMxN8ySrLImdM2LLjPu99ITKnfWpuXqgEQ9BgSQHm
+	kJQ==
+X-Received: by 2002:a17:906:4788:b0:c48:a838:c16d with SMTP id a640c23a62f3a-c4ca7ab3286mr651298166b.30.1793563713501;
+        Sun, 01 Nov 2026 12:08:33 -0800 (PST)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4cb092c042sm279054666b.82.2026.11.01.12.08.32
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 01 Nov 2026 12:08:32 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6ae14eecc64so2982034a12.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 01 Nov 2026 12:08:32 -0800 (PST)
+X-Received: by 2002:a05:6402:1bc1:b0:6b4:5f9a:528b with SMTP id
+ 4fb4d7f45d1cf-6b4d5ce83f4mr4075395a12.36.1793563712541; Sun, 01 Nov 2026
+ 12:08:32 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -104,92 +90,120 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-from: Simon Glass <sjg@chromium.org>
-In-Reply-To: <CAD=FV=Vt6hgGJuYtv1_mBSQztWQBjmDN9CwLtVxrXcyECGx2-A@mail.gmail.com>
-References: <20261020153652.2907186-1-dianders@chromium.org>
- <CAFLszTgzpQ-donjjtcPwy5T3pfWg_u83QMh0GcdpY2JCq_s75w@mail.gmail.com> <CAD=FV=Vt6hgGJuYtv1_mBSQztWQBjmDN9CwLtVxrXcyECGx2-A@mail.gmail.com>
-Date: Sun, 1 Nov 2026 11:34:51 -0800
-X-Gm-Features: AclHuK-OENc2MfogrHTK6nr_VXdYPKQaHTgRVjZY6Us3vAfjaHxM1Qejmm0CbCs
-Message-ID: <CAFLszTh8geCqamVZwO00fx6t8SDfVHCFP1Fx9PnA2x9TosDKqg@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/7] arm64: Add fit images for sc7180-trogdor and google,lga
-To: Doug Anderson <dianders@chromium.org>
-Cc: Devicetree-compiler@vger.kernel.org, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-kbuild@vger.kernel.org, 
-	Brian Norris <briannorris@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Chen-Yu Tsai <wenst@chromium.org>, linux-arm-msm@vger.kernel.org, 
-	Nicolas Schier <nsc@kernel.org>, Peter Griffin <peter.griffin@linaro.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Tudor Ambarus <tudor.ambarus@linaro.org>, Devicetree@vger.kernel.org, 
-	Julius Werner <jwerner@chromium.org>, Saravana Kannan <saravanak@kernel.org>, 
-	Will Deacon <will@kernel.org>, Michal Simek <michal.simek@amd.com>, 
-	=?UTF-8?Q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Bjorn Andersson <andersson@kernel.org>, Breno Leitao <leitao@debian.org>, 
-	David Sterba <dsterba@suse.com>, Gary Guo <gary@garyguo.net>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Luis Augenstein <luis.augenstein@tngtech.com>, 
-	Marco Elver <elver@google.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Nick Terrell <terrelln@fb.com>, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Rong Xu <xur@google.com>, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	cros-qcom-dts-watchers@chromium.org, linux-samsung-soc@vger.kernel.org
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sun, 1 Nov 2026 12:08:15 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wi_GuySe0L-uCAM2+nScCLYGBp5BLi6UUPR1gALmNM_3w@mail.gmail.com>
+X-Gm-Features: AclHuK8ONZxEYl50IOYsDjuY-ouTirbn0Imtlr8QIkehP_x1qvA-yrP0t0sfR2g
+Message-ID: <CAHk-=wi_GuySe0L-uCAM2+nScCLYGBp5BLi6UUPR1gALmNM_3w@mail.gmail.com>
+Subject: Speed up KConfig - fix hashtable confusion
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Julian Braha <julianbraha@gmail.com>, Lorenzo Stoakes <ljs@kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000f84be3065f3c97cd"
+
+--000000000000f84be3065f3c97cd
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Doug,
+So the Kconfig 'expr_lookup()' function is criminally slow and takes
+over 10% of the time of "make oldconfig".
 
-Doug Anderson <dianders@chromium.org> wrote:
+The reason is that it's called just a lot, but it *really* doesn't
+help that the scripting versions of the hashtable functions has not
+understood the subtler issues of the hashing code that it took from
+the kernel side, and in the process got things very very wrong.
 
-> Putting the metadata in the configuration's `description` property came
-> out of discussions with Michal Simek at LPC 2026 (where Xilinx/AMD
-> already uses configuration descriptions for similar board matching).
+The "hash_32()" function is a perfectly fine hashing function - there
+are better ones around, but it's fast and "good enough". But when you
+use it, you need to understand that it puts the significant bits in
+the *high* bits of the result.
 
-Thanks for the background. The Xilinx case is a bit different, though:
-the same project writes the string (the binman .dts) and parses it
-(board.c), so it can change both sides together. Here the kernel would
-write the string and the Pixel bootloader and outside packaging tools
-would parse it. That makes it a cross-project ABI, and I'd rather that
-ABI were typed properties than an unwritten string format.
+The kernel uses a model where you give it the number of bits you want,
+and it will pick out those high bits, which makes it all work right.
 
-> The proposal I've tried to push a few times is that it's OK that
-> different loaders have different types of information available
-> to them, but people don't like that. They want a universal standard,
-> which nobody can come up with.
+But the simplified hashtable code for the host code didn't use those
+high bits of the key. It just did
 
-I agree with you here. We don't need a universal set. I've sent a
-proposed spec change [1] which lets a configuration node hold one or
-more match sub-nodes. Each one names its scheme with a vendor-prefixed
-compatible string and carries the properties that scheme defines, for
-example:
+    (key) % HASH_SIZE(table)
 
-    conf-1 {
-        compatible = "google,lga-...";
-        ...
-        match-1 {
-            compatible = "google,board-id";
-            board-id = <...>;
-            board-rev = <...>;
-            soc-id = <...>;
-            soc-rev = <...>;
-        };
-    };
+to pick the hash table entry, and that's basically pessimal. When
+hashing an address that typically has the low bits clear, the low bits
+of "hash_32()" will *also* be clear. So the hash table ended up being
+mostly empty! So even though the hash table was sized appropriately,
+it wasn't being very efficient. And while making the hash table larger
+mostly hides the problem, it's the wrong solution, because the cache
+footprint gets worse.
 
-Trogdor would use its own scheme (board name as a string, rev and SKU
-as u32), and Michal's loader could do the same. Each loader still gets
-what it needs, the types are explicit, and nobody has to parse
-'description'. Please can you take a look and comment there? If it
-works for you, you can point to it in v2.
+Teach "hash_head()" to use the high bits of the key. Because the users
+don't pass in the number of bits they want, this is pretty hacky:
 
-> Should I give it a shot for v2?
+    #define HASH_KEY(key,size) \
+        (unsigned int)((unsigned int)(key)/(0x100000000ull/(size)))
 
-Yes please. The DTB list already reaches make_fit.py from the Makefile
-through the @file argument, so the new file only has to say which DTBs
-to include and what metadata each one gets. We'll need a simple
-per-platform file next to the .dts files, passed with a new option
-through FIT_EXTRA_ARGS
+but at least this improves on things.
 
-Running fdtfactor can then be another make_fit.py option, like --decompose-dtbs
+I also stopped the expr_lookup() key generation from using XOR of two
+pointers, which I suspect just ended up clearing most of the shared
+bits. I doubt that makes a difference, but XOR of thigns that may have
+shared bits really isn't great.
 
-[1] https://github.com/open-source-firmware/flat-image-tree/pull/66
+The cost of 'expr_lookup()' drops by a about factor of four on my
+machine, and it's no longer the hottest function in all of 'make
+oldconfig'.
 
-Regards,
-Simon
+No, "make oldconfig" still isn't the fastest thing around, but at
+least this removes on particularly stupid reason for it being slower
+than it needs to be.
+
+Somebody needs to double-check this. I don't love my HASH_KEY() macro,
+but it should work for power-of-2 sizes. And as far as I can tell, all
+the hash tables are powers of two.
+
+Comments?
+
+                Linus
+
+--000000000000f84be3065f3c97cd
+Content-Type: text/x-patch; charset="US-ASCII"; name="patch.diff"
+Content-Disposition: attachment; filename="patch.diff"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mvy9gli10>
+X-Attachment-Id: f_mvy9gli10
+
+IHNjcmlwdHMvaW5jbHVkZS9oYXNodGFibGUuaCB8IDQgKysrLQogc2NyaXB0cy9rY29uZmlnL2V4
+cHIuYyAgICAgIHwgNSArKystLQogc2NyaXB0cy9rY29uZmlnL2ludGVybmFsLmggIHwgNCAtLS0t
+CiAzIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYg
+LS1naXQgYS9zY3JpcHRzL2luY2x1ZGUvaGFzaHRhYmxlLmggYi9zY3JpcHRzL2luY2x1ZGUvaGFz
+aHRhYmxlLmgKaW5kZXggNDVhYmNiMTJiZmNlLi5hNjkzMzJjY2ZmY2QgMTAwNjQ0Ci0tLSBhL3Nj
+cmlwdHMvaW5jbHVkZS9oYXNodGFibGUuaAorKysgYi9zY3JpcHRzL2luY2x1ZGUvaGFzaHRhYmxl
+LmgKQEAgLTEzLDcgKzEzLDkgQEAKIAlIQVNIVEFCTEVfREVDTEFSRShuYW1lLCBzaXplKSA9CQkJ
+CQkJXAogCQkJeyBbMCAuLi4gKChzaXplKSAtIDEpXSA9IEhMSVNUX0hFQURfSU5JVCB9CiAKLSNk
+ZWZpbmUgaGFzaF9oZWFkKHRhYmxlLCBrZXkpCQkoJih0YWJsZSlbKGtleSkgJSBIQVNIX1NJWkUo
+dGFibGUpXSkKKyNkZWZpbmUgSEFTSF9LRVkoa2V5LHNpemUpICh1bnNpZ25lZCBpbnQpKCh1bnNp
+Z25lZCBpbnQpKGtleSkvKDB4MTAwMDAwMDAwdWxsLyhzaXplKSkpCisKKyNkZWZpbmUgaGFzaF9o
+ZWFkKHRhYmxlLCBrZXkpCQkoJih0YWJsZSlbSEFTSF9LRVkoa2V5LEhBU0hfU0laRSh0YWJsZSkp
+XSkKIAogc3RhdGljIGlubGluZSB2b2lkIF9faGFzaF9pbml0KHN0cnVjdCBobGlzdF9oZWFkICpo
+dCwgdW5zaWduZWQgaW50IHN6KQogewpkaWZmIC0tZ2l0IGEvc2NyaXB0cy9rY29uZmlnL2V4cHIu
+YyBiL3NjcmlwdHMva2NvbmZpZy9leHByLmMKaW5kZXggMmI5MWQxNmJmMTRmLi4xOWNhMmFkMTA0
+MjUgMTAwNjQ0Ci0tLSBhL3NjcmlwdHMva2NvbmZpZy9leHByLmMKKysrIGIvc2NyaXB0cy9rY29u
+ZmlnL2V4cHIuYwpAQCAtMTYsNyArMTYsOCBAQAogCiAjZGVmaW5lIERFQlVHX0VYUFIJMAogCi1I
+QVNIVEFCTEVfREVGSU5FKGV4cHJfaGFzaHRhYmxlLCBFWFBSX0hBU0hTSVpFKTsKKyNkZWZpbmUg
+RVhQUl9IQVNIU0laRQkJKDFVIDw8IDE0KQorc3RhdGljIEhBU0hUQUJMRV9ERUZJTkUoZXhwcl9o
+YXNodGFibGUsIEVYUFJfSEFTSFNJWkUpOwogCiBzdGF0aWMgc3RydWN0IGV4cHIgKmV4cHJfZWxp
+bWluYXRlX3luKHN0cnVjdCBleHByICplKTsKIApAQCAtMzUsNyArMzYsNyBAQCBzdGF0aWMgc3Ry
+dWN0IGV4cHIgKmV4cHJfbG9va3VwKGVudW0gZXhwcl90eXBlIHR5cGUsIHZvaWQgKmwsIHZvaWQg
+KnIpCiAJc3RydWN0IGV4cHIgKmU7CiAJaW50IGhhc2g7CiAKLQloYXNoID0gaGFzaF8zMigodW5z
+aWduZWQgaW50KXR5cGUgXiBoYXNoX3B0cihsKSBeIGhhc2hfcHRyKHIpKTsKKwloYXNoID0gaGFz
+aF8zMigodW5zaWduZWQgaW50KXR5cGUgKyBoYXNoX3B0cihsKSArIGhhc2hfcHRyKHIpKTsKIAog
+CWhhc2hfZm9yX2VhY2hfcG9zc2libGUoZXhwcl9oYXNodGFibGUsIGUsIG5vZGUsIGhhc2gpIHsK
+IAkJaWYgKGUtPnR5cGUgPT0gdHlwZSAmJiBlLT5sZWZ0Ll9pbml0ZGF0YSA9PSBsICYmCmRpZmYg
+LS1naXQgYS9zY3JpcHRzL2tjb25maWcvaW50ZXJuYWwuaCBiL3NjcmlwdHMva2NvbmZpZy9pbnRl
+cm5hbC5oCmluZGV4IGQwZmZjZTJkZmJiYS4uZjI0NDk1MjQ5NmViIDEwMDY0NAotLS0gYS9zY3Jp
+cHRzL2tjb25maWcvaW50ZXJuYWwuaAorKysgYi9zY3JpcHRzL2tjb25maWcvaW50ZXJuYWwuaApA
+QCAtMTEsMTAgKzExLDYgQEAgZXh0ZXJuIEhBU0hUQUJMRV9ERUNMQVJFKHN5bV9oYXNodGFibGUs
+IFNZTUJPTF9IQVNIU0laRSk7CiAjZGVmaW5lIGZvcl9hbGxfc3ltYm9scyhzeW0pIFwKIAloYXNo
+X2Zvcl9lYWNoKHN5bV9oYXNodGFibGUsIHN5bSwgbm9kZSkKIAotI2RlZmluZSBFWFBSX0hBU0hT
+SVpFCQkoMVUgPDwgMTQpCi0KLWV4dGVybiBIQVNIVEFCTEVfREVDTEFSRShleHByX2hhc2h0YWJs
+ZSwgRVhQUl9IQVNIU0laRSk7Ci0KIHZvaWQgZXhwcl9pbnZhbGlkYXRlX2FsbCh2b2lkKTsKIAog
+c3RydWN0IG1lbnU7Cg==
+--000000000000f84be3065f3c97cd--
