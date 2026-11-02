@@ -1,69 +1,69 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.107.87.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793651006;
-	b=dL5/mohdl4BOnu3cyaDEl+EPtCbYy1BW7XgsmD9rd3scn8sdsphYz33SxJUFSlDpN8lL
-	 +W+oz6VVnWF6WQwBGgzh6eSssAzajHbOloDd3tkN+yNq4clVFVthwqjagEwino3zzFxbP
-	 OoukSdTiwqQ/VYjEnhafpSUqgmMqqGI+OfPamG7uTdXKSIG3TAnnNS1vK4ho25k8HCQgc
-	 3GcfByP22AIl7qfOp+eMe9I7KT9NZb5Y7VSysEkE/K2bn7oSi5XUvmoEwGX/C3buxtMqX
-	 TK5osnFtaFzQtT1HnT65FLRAjy/r44Ekf5nV1xKF2ZrrlNdYS/mtPDZ0j7WbjrJ3iNg==
+	b=wJGF6dUsyfRJb0Cr9/io09VSWQ1lmNbf2uQpaSqxUvydMty6YAzgMpAVa4jPNAv4zwkK
+	 iS3uV+2SrgDyBwbGez8/ksMfyXKesXYgRHhYyh0PC1lQH6NxZEUrAeZWJHD0Bqs4sNZ1m
+	 KaBvet2vDHp5p3nLDPl9jiFV+HlV1CFuMu5UrgCkyUzdfJi1JZ8n3FU7k4W0wVH++/2kz
+	 4jczYAgryGcTN3HuspYDGaBRWPY5Xgv10Y6jrrR8JSg79hhJBy7JK4gEx5DyqWzgav62W
+	 eVRWMcLAedRS6EKxHIts49sy7Pku4konaJni2wZROwF/O87DkHaCFAqjhCDe2trv19Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793651006;
 	h=DMARC-Filter:Received:Received:Received:Received:DKIM-Filter:
 	 DKIM-Signature:X-Virus-Scanned:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=NTTR8/Sm7pb9fAK4a0QT/cN125KZo+xGPT0hTqypPZI=;
-	b=N8UNW75piZ3Kon53/He/1JXGVBPq1sl5UhtCmgE7C3w6MIn/uSivwEj5Pw4Cuzew9UzU
-	 V7czVszfsqFbHg23/L5jDuiUXWAgk60D63oMr9tAFFDIDOQ1UuBXMJNVJb7XH1doFmf/K
-	 0em/65yo+0qqZcurbuS5+MBQSlXvFwKt7nQOM92shsAQq/g1+PXhovVHnmDZfvwUNAO6D
-	 GOrwaAVXQNL2lmiV77rbFftV7+Hxqy1xMrmS/jf6A9n7tMLf80pDJAJ3Ae7X6IXDH+LPK
-	 BdbnuREbRr/TJ4BapEbhnNeY8FgPO4el1IHIVtdmwMcvLl9cXWPEaKRvS+CNZ3MAhSQ==
+	bh=OUNLO4fz787Jyp8M2xnPIWG7D3uZ70V+ftYCxOJ5Ch4=;
+	b=PJf4kgZg6WHeC1rcKZUUVLUHsF7l+gn8/3hXiLU7X6QKH2IWX3SFrpDWxlH587xLBERV
+	 MxJt51zmxMlGM6hahL35l9bi5Z0JQ1vI1VVkGVNsysFtqGa5Zjf9v+xn0ZapBnY4ZgVPQ
+	 b6+hsVG/TIs+hKqvN9xx1NYDMDrdgGnesFDBocfm503c20ekpg1R8jvd/CSMkyK1UvlHx
+	 0sk1Gy/b0swHxQbMk01IYW+8E6ftKciHcuZTdXT6j5AldqCqrL1c7pYCkB4Ytqqt/O9Vu
+	 XWFH/CEf4iFaAhnsnkYsjreOBimHIZz0cYAjSoGXkY2R6atmAEYlhlkmrTww+9WxM6g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=tngtech.com;
 	spf=pass smtp.mailfrom=tngtech.com;
-	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=C4H2Yv+n;
+	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=FXNG9Hz8;
 	arc=none smtp.remote-ip=34.107.87.41
 Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83607606A332;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835DC606A331;
 	Mon,  2 Nov 2026 20:23:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83607606A332
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 835DC606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=C4H2Yv+n
+	dkim=pass (2048-bit key, unprotected) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=FXNG9Hz8
 Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
-	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 8A881403A4;
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 8FE66403D4;
 	Mon,  2 Nov 2026 21:23:17 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 7388A1FBC65;
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 6A16A1FBCEC;
 	Mon,  2 Nov 2026 21:23:17 +0100 (CET)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id 0USiD1SE4qBm; Mon,  2 Nov 2026 21:23:13 +0100 (CET)
+ with ESMTP id fLfLqM5Yc-P2; Mon,  2 Nov 2026 21:23:14 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 475BD1FBC81;
-	Mon,  2 Nov 2026 21:23:13 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 475BD1FBC81
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 60A791FBCCB;
+	Mon,  2 Nov 2026 21:23:14 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 60A791FBCCB
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1793650993;
-	bh=NTTR8/Sm7pb9fAK4a0QT/cN125KZo+xGPT0hTqypPZI=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1793650994;
+	bh=OUNLO4fz787Jyp8M2xnPIWG7D3uZ70V+ftYCxOJ5Ch4=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=C4H2Yv+nmTiW74rYf3SLVB4yjSYDP9A1z28YIcpQXLfuYf+u1G89AAzwfWDz1QRc6
-	 xy0i7DTi1IKliMPirZ00dag64xP7Ude9FbpwhsWw4wUGyl/drTkUPTB1MEZ/1sEu4j
-	 0pPlX1xIWYw2EqFFc1CRdFOPXvVLuFsi56CmnX5OzctnhC2NY2cVwyzXOCHy0zVeHL
-	 mnAC9+/LTFOnvKfpFficYN1nBY6RBCi9GphTeF1ew9sb/LwCG1z1LNZw1NNNABXAvC
-	 COm1xmtiT83Q/9pkaEbWPUJ3hjVRFRTSCU4KKjcD/wWWJjqYiruwTfBZb0O8P4hAOL
-	 5fyOMKjrjIdtQ==
+	b=FXNG9Hz8B97OB7ZU7rGFFGP15TLrGOqTcDAQgm9zTaMr0KKp/bsdvyL5IE1cU/2yU
+	 /0m+W3bAxnFiy78sRQZLGWAd6mnjY3YBSwYrYooejNooOAX/8xwanX6HvisJu/ca7p
+	 Skg73zQeStNSDFH5VVrsgaCb0xHAOhoOzTrHKsmOL9z7Rxop0elAiMsl9uOYSEjSeB
+	 GgeY/8nKsqRtp7C6g+HOKpgmUDT1Vi1Q7HQj5dUYT4RnpipqyIiocnfQJnc6e6dP8K
+	 YMCEWG8PAQBHhZEgyNTCoEUgGsjuAaLgpBNCcA+oh/Q6cwAlquoBQ/Fiydg+S1Ygg5
+	 KCioyNzb02U1g==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id J1eKAeqHWbJW; Mon,  2 Nov 2026 21:23:13 +0100 (CET)
+ with ESMTP id NLsp63xuG5KP; Mon,  2 Nov 2026 21:23:14 +0100 (CET)
 Received: from luis-Precision-5480.. (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id BDBC91FBC65;
-	Mon,  2 Nov 2026 21:23:12 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 027161FBC9F;
+	Mon,  2 Nov 2026 21:23:13 +0100 (CET)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -74,9 +74,9 @@ Cc: linux-kbuild@vger.kernel.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH v4 1/7] scripts/make_fit: limit .cmd file parsing to the savedcmd_ line
-Date: Mon,  2 Nov 2026 21:22:54 +0100
-Message-ID: <20261102202308.3209536-2-luis.augenstein@tngtech.com>
+Subject: [PATCH v4 2/7] kbuild: refactor fixdep to collect dependencies before printing
+Date: Mon,  2 Nov 2026 21:22:55 +0100
+Message-ID: <20261102202308.3209536-3-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261102202308.3209536-1-luis.augenstein@tngtech.com>
 References: <20261102202308.3209536-1-luis.augenstein@tngtech.com>
@@ -91,31 +91,228 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The command is always stored in the first line of the .cmd file. Read
-only the first line, so remaining lines cannot get misparsed once
-.cmd files record additional fields.
+fixdep currently writes the .cmd file content while parsing the .dep
+file. Separate the parsing from the printing: parse_dep_file() now
+collects the source file and all dependencies in a list, and
+print_dep_file() emits the assignments afterwards. No functional
+change intended.
 
 Assisted-by: LLM
 Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
 Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
 ---
- scripts/make_fit.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/basic/fixdep.c | 109 ++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 92 insertions(+), 17 deletions(-)
 
-diff --git a/scripts/make_fit.py b/scripts/make_fit.py
-index 9bd35aa7211..38ef9a95dd3 100755
---- a/scripts/make_fit.py
-+++ b/scripts/make_fit.py
-@@ -288,7 +288,7 @@ def process_dtb(fname, args):
-         path, basename =3D os.path.split(fname)
-         cmd_fname =3D os.path.join(path, f'.{basename}.cmd')
-         with open(cmd_fname, 'r', encoding=3D'ascii') as inf:
--            cmd =3D inf.read()
-+            cmd =3D inf.readline()
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 54063d98044..f514ef606ec 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -114,6 +114,17 @@ struct item {
+ 	char		name[];
+ };
 =20
-         if 'scripts/dtc/fdtoverlay' in cmd:
-             # This depends on the structure of the composite DTB command
++struct dep_item {
++	struct dep_item	*next;
++	char		name[];
++};
++
++struct dep_info {
++	char			*source;
++	struct dep_item		*deps;
++	struct dep_item		*last_dep;
++};
++
+ #define HASHSZ 256
+ static struct item *config_hashtab[HASHSZ], *file_hashtab[HASHSZ];
+=20
+@@ -163,16 +174,42 @@ static bool in_hashtable(const char *name, int len,=
+ struct item *hashtab[])
+ 	return false;
+ }
+=20
++/*
++ * Append a dependency or include/config/<SYM> path to the info linked l=
+ist.
++ */
++static void dep_info_add(struct dep_info *info, const char *name, int le=
+n)
++{
++	struct dep_item *dep =3D xmalloc(sizeof(*dep) + len + 1);
++
++	memcpy(dep->name, name, len);
++	dep->name[len] =3D '\0';
++	dep->next =3D NULL;
++
++	if (info->last_dep)
++		info->last_dep->next =3D dep;
++	else
++		info->deps =3D dep;
++	info->last_dep =3D dep;
++}
++
+ /*
+  * Record the use of a CONFIG_* word.
+  */
+-static void use_config(const char *m, int slen)
++static void use_config(const char *m, int slen, struct dep_info *info)
+ {
+ 	if (in_hashtable(m, slen, config_hashtab))
+ 		return;
+=20
+-	/* Print out a dependency path from a symbol name. */
+-	printf("    $(wildcard include/config/%.*s) \\\n", slen, m);
++	/* Build a dependency path from a symbol name. */
++	static const char config_path[] =3D "include/config/";
++	char *path;
++	int path_len =3D sizeof(config_path) - 1 + slen;
++
++	path =3D xmalloc(path_len);
++	memcpy(path, config_path, sizeof(config_path) - 1);
++	memcpy(path + sizeof(config_path) - 1, m, slen);
++	dep_info_add(info, path, path_len);
++	free(path);
+ }
+=20
+ /* test if s ends in sub */
+@@ -186,7 +223,12 @@ static int str_ends_with(const char *s, int slen, co=
+nst char *sub)
+ 	return !memcmp(s + slen - sublen, sub, sublen);
+ }
+=20
+-static void parse_config_file(const char *p)
++/*
++ * Scan dependency p for CONFIG_ words, map each to an
++ * include/config/ path and append to the dep_info list if not
++ * already included.
++ */
++static void parse_config_file(const char *p, struct dep_info *info)
+ {
+ 	const char *q, *r;
+ 	const char *start =3D p;
+@@ -205,7 +247,7 @@ static void parse_config_file(const char *p)
+ 		else
+ 			r =3D q;
+ 		if (r > p)
+-			use_config(p, r - p);
++			use_config(p, r - p, info);
+ 		p =3D q;
+ 	}
+ }
+@@ -253,13 +295,9 @@ static int is_no_parse_file(const char *s, int len)
+ 	       str_ends_with(s, len, ".so");
+ }
+=20
+-/*
+- * Important: The below generated source_foo.o and deps_foo.o variable
+- * assignments are parsed not only by make, but also by the rather simpl=
+e
+- * parser in scripts/mod/sumversion.c.
+- */
+-static void parse_dep_file(char *p, const char *target)
++static struct dep_info parse_dep_file(char *p)
+ {
++	struct dep_info info =3D {};
+ 	bool saw_any_target =3D false;
+ 	bool is_target =3D true;
+ 	bool is_source =3D false;
+@@ -375,13 +413,12 @@ static void parse_dep_file(char *p, const char *tar=
+get)
+ 			 */
+ 			if (!saw_any_target) {
+ 				saw_any_target =3D true;
+-				printf("source_%s :=3D %s\n\n", target, p);
+-				printf("deps_%s :=3D \\\n", target);
++				info.source =3D xstrdup(p);
+ 				need_parse =3D true;
+ 			}
+ 		} else if (!is_ignored_file(p, q - p) &&
+ 			   !in_hashtable(p, q - p, file_hashtab)) {
+-			printf("  %s \\\n", p);
++			dep_info_add(&info, p, q - p);
+ 			need_parse =3D true;
+ 		}
+=20
+@@ -389,7 +426,7 @@ static void parse_dep_file(char *p, const char *targe=
+t)
+ 			void *buf;
+=20
+ 			buf =3D read_file(p);
+-			parse_config_file(buf);
++			parse_config_file(buf, &info);
+ 			free(buf);
+ 		}
+=20
+@@ -403,6 +440,40 @@ static void parse_dep_file(char *p, const char *targ=
+et)
+ 		exit(1);
+ 	}
+=20
++	return info;
++}
++
++static void free_dep_info(struct dep_info *info)
++{
++	struct dep_item *dep, *next;
++
++	for (dep =3D info->deps; dep; dep =3D next) {
++		next =3D dep->next;
++		free(dep);
++	}
++	free(info->source);
++}
++
++/*
++ * Important: The below generated source_foo.o and deps_foo.o variable
++ * assignments are parsed not only by make, but also by the rather simpl=
+e
++ * parser in scripts/mod/sumversion.c.
++ */
++static void print_dep_file(const char *target, const struct dep_info *in=
+fo)
++{
++	static const char config_path[] =3D "include/config/";
++	const struct dep_item *dep;
++
++	printf("source_%s :=3D %s\n\n", target, info->source);
++	printf("deps_%s :=3D \\\n", target);
++
++	for (dep =3D info->deps; dep; dep =3D dep->next) {
++		if (!strncmp(dep->name, config_path, sizeof(config_path) - 1))
++			printf("    $(wildcard %s) \\\n", dep->name);
++		else
++			printf("  %s \\\n", dep->name);
++	}
++
+ 	printf("\n%s: $(deps_%s)\n\n", target, target);
+ 	printf("$(deps_%s):\n", target);
+ }
+@@ -410,6 +481,7 @@ static void parse_dep_file(char *p, const char *targe=
+t)
+ int main(int argc, char *argv[])
+ {
+ 	const char *depfile, *target, *cmdline;
++	struct dep_info info;
+ 	void *buf;
+=20
+ 	if (argc !=3D 4)
+@@ -419,10 +491,13 @@ int main(int argc, char *argv[])
+ 	target =3D argv[2];
+ 	cmdline =3D argv[3];
+=20
++	buf =3D read_file(depfile);
++	info =3D parse_dep_file(buf);
++
+ 	printf("savedcmd_%s :=3D %s\n\n", target, cmdline);
++	print_dep_file(target, &info);
+=20
+-	buf =3D read_file(depfile);
+-	parse_dep_file(buf, target);
++	free_dep_info(&info);
+ 	free(buf);
+=20
+ 	fflush(stdout);
 --=20
 2.43.0
 
