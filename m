@@ -1,64 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793607718;
-	b=2uqXVRKDNgMlyKMBeskJq9jEduJVj6T7hCOQG/uH7Nl0TNXs/LNEwjINgcXag8G1kH+q
-	 hOTGJhGTqQNoetUFOqyfpTDZAM6LFc7bUGAqt7BFoKwSzq8QuoPtNeCAAQOhhwR23x2ZO
-	 0WJggV76YWLpQez/9ZZ0QbqSthhe4ApqCnKcj/9SwWoz8hrywYMcUTUi7J7BKA29jeJcB
-	 +EW8pYnfGqi6FljnYaXyanUTcCrslvGAFLAG0I1uX3A1YuAHzRgONYiQpwDQQ85KqET65
-	 CWR3WxHdD0xhSENzACPYbFBOX8/2iny8OoMhDncW9cbXQ9sWuZBJlJ9qEZrB0E9+W+Q==
+	t=1793610320;
+	b=jJYjoDYqf5RRC+6lxVSs8BzGxQ27fs1Ib/PgYDSEsuC034dK4eghGbja95ahBzavcQjT
+	 yCmzA2T5kPfQVJXOtHcW/6xUzjDRpR1vCfa7ZR2N8I8FkoI4+MNCGcuiwdDWZxD3c68rm
+	 D74R9wHfs/Y1zPTygACmMoGj1GhDXPMkCmMtic6+cXTovxPrWODBeNTVpXWEUUuGaKIni
+	 aqp1jjeozb/voRNgUcKRNA2Qfzi/uUSW6eAiKXSHJ9+eGRGNkueAzJuoSEIH7pi78uAx5
+	 x884oiSjIdClZH72znJB1fDAlRAoV5bPGQB9fj4LY2iin9lPQhw3rO8n6vuCmhrRouw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793607718;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=pSBrr3W6vsQ8Ghatr4Uc3i27nNZbHbK6ravDLl8PYtw=;
-	b=kDeLze3yFuLfikxVZ9vfsrrWHmtbrrOw3YcVmgQqWobjvtI2uq8w/wvZxwJdHFxIxHtm
-	 /UiQTvmt+F5RGJub52JGU7w9J84cRezb1/XmHXLvG2UBjz3wTG24iKEnRgPLKb9b61ubW
-	 mgkw27jdRpAH1OUiz1ru810tz/FEdtR+wj5/uZ0k8R0c0CG1z2XbiNx+AB4Pl5h/ifhOT
-	 BiAOxD/SBrODLo5tfDdP/DNdQ4S52jTcsQqj3e+58RUzUJQsPrA73nZ+BCB6sjb4viACf
-	 WdztqCBTZz+aSqY6n42Pn5WXv/aifeNUZM8w+hN+xz+8EujeSmmzWnqXza8U1C3TMGg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793610320;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=WP1usr8BMOzRwVfaR8RvJCJhQa+qcbSNnudAIzg05fA=;
+	b=t/Mlz9esydxH03MMm0Ug7F8ubcl1L30UrFLBREYUE64ykH6zydAN5N/EhGa1ASQb0RC9
+	 zPnlX3UZbZSSxwXWI3ALUQmHbmwcZQsKONG91R5e5i8o3Z0UwNTomKMV3vmcCA2xRqyNt
+	 1Fi0M/zQZ2JFDxYKmv3wjMDK4y4PvTGhJ1mDievQ7aKNimooCrXez/SeP4Z4GE72KykGH
+	 FGe3SnLLpslgspGqD+8DpwWyCm3A79JC6+xVULluFaLYn9PoCqfKYkwP9J6V4Ptt/NuPU
+	 gHdDii7x/ZNb68iaAmi/hb2x58j1Y+gapNgjBKr7BFCyoSnoKREhDxkQnAOp2zAs0Kw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HBwU1J4C;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=urMHVQfh;
+	arc=none smtp.remote-ip=209.85.208.43
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 69CB6606A333;
-	Mon,  2 Nov 2026 08:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62587606A326
+	for <linux-kbuild@vger.kernel.org>; Mon,  2 Nov 2026 09:05:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62587606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HBwU1J4C
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 7BA071F000C1;
-	Mon,  2 Nov 2026 08:21:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793607718;
-	bh=pSBrr3W6vsQ8Ghatr4Uc3i27nNZbHbK6ravDLl8PYtw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HBwU1J4CaRUQMbgZL0NugqUMlG83pEO6VfV0qXArpxAYxOl8AUaqM80zI4N5rGpQ+
-	 lTwfAnVerZgW/FqCY40R733ruXA9Y57c2o7jz1U99WQ/VhRrdSR9h/ZFHV8DrAgvTV
-	 etNY8aU359ZhZjDn0FeR+UF5fYnXEv6SdSImtyN/btuWfdamzDJhJ4u2Mpevrfh6Kb
-	 l10CnvVzo5y+WRxxpJ1VTTIGHqvP/DkEWX9ND/zpZzNRcwJvSP2/noUGZVhZuXzpN+
-	 NozZgfKQpBG1c/Jcbb2rWsYbPXkPQ7Fn9AYhVfnXwLP2DewtgL1LVTB9LMds0aCJ//
-	 LuQ3gHxnS3SGQ==
-Date: Mon, 2 Nov 2026 07:53:27 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: Speed up KConfig - fix hashtable confusion
-Message-ID: <augzZ-iDU-WA7rZw@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <CAHk-=wi_GuySe0L-uCAM2+nScCLYGBp5BLi6UUPR1gALmNM_3w@mail.gmail.com>
- <9c21c5f5-355e-4520-b48e-acd355c7fc6d@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=urMHVQfh
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6b2237b596cso547950a12.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Nov 2026 01:05:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793610318; x=1794215118; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WP1usr8BMOzRwVfaR8RvJCJhQa+qcbSNnudAIzg05fA=;
+        b=urMHVQfhj7AM5rUuICeYfQmGtxdx8xLhyGmGc+THepgzOjGPDtbI0XWfSDyrDxdm9k
+         KyAZfXtM42BpKE1gPtld/UqCvN/Hi9YhMY4ObtGfEcJlQBRdMBiZdUJXRmzlra4YxCWo
+         KkWZMAp0LCyRzlgV6UGQvWL7knDdAPRq2lJ2JeI8zbGQYUVPfBFe7tmGUEjy+rA5AgL1
+         3fVgrBM1sjRFX/iW9nZL3STiA/oJveTVHIFGFZEi69DlGEW9IL1eLukU/KCxCuobLlt7
+         kr3N4D342ioMo1KebR2fPOMkMSRPJp/Vtgc/mbOiIaFH4ijlUuoFbvltn1YP74WH4spW
+         BfEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793610318; x=1794215118;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WP1usr8BMOzRwVfaR8RvJCJhQa+qcbSNnudAIzg05fA=;
+        b=IGiEowVUWHN/8Cn33skIdNR3oiCqKHAEEAvE9N7oJpE4Ygu6fFDrQVLHdiOdw0sRP9
+         +KCGcV+ruenFsFxPVHr7+vVFhMqyEbhK2RHKgSbi8khK8WjH5W/0paoxX7RRiEK4gDWG
+         Od0ucaUjXU8kqdij2nJLC8f8EfrDLGhpu3e9NZTNteylhZ+pqnw9kRnVpyzkLrnMXbFM
+         27XOXINj0PZ3DQgz1a7SJAemuwuCOb4zfANRSV4YAdp67DqDP85n8aWtbtNbu1MZkWIN
+         KZHSw8QsbpPPVvyRSD3Frpp/mVryrFo3f1GBM6MwMSOEhB0/MwgdvSn3A0iIqlGdC3uM
+         CwGA==
+X-Gm-Message-State: APuU4Z8TlrOYCBRJEp/HuKTihnWH8fZEqEXPCgh8oMopnhEye934QGqc
+	f/ocrvzIEV6Hzjp+inQVL0iDqiJg6gwwlkvosTxtYQHJCVWkKt4KYxMIraIPR4lKK/s=
+X-Gm-Gg: AYBFou1UnBiXLa3g8vLgXjrTwzbJ6Okb9szzOeAWGLKHrbN3LooXfJp0c5PI28Sl9oh
+	vlqm5YhRxTqOWbadv4jBd8R4tc0435UO1kmrP6nmLXVOmpdeAulrvMN//jjgjfMPCXr3oR0Yn60
+	OrnmJyWf6BHqrMGlXiYA+CbMCKgHxQpBrV0s/Lins50d3H0haG57z16Q2QZ/zcWVZohi6z9I4fM
+	DfsBCybWP4QhJkF75pMtEMAZUUE7qs2CjuTNUVv2jC48zbNCCjmkjbN4ysHedgRXxUwN0bBxeAh
+	jdVnCSQab5J+nvTbsTaCFOOEwfjcUI6uOF5YMRojhzf9Nd/UZMBoR+HkKoxTrdfG+Zqce+fo+nM
+	3mtyDOeKB+EYpq9M8SvtlWGpvv1qfnYVXzfJnL80YH4MLbIyANpUre1ofaIgLFyYWN3pTm1TSKP
+	K1tU1sH0tT5wvRJad6zwpgI8On6eZ5pBE3ja1HsqCVOyCiImL56vrDrCIORt4XTzZc8FF1E9WUl
+	OQTXGkEphhSCxV2AA2IHov46tS4xdNh0sEaXX1kws3MRHN0c5hZSGHbK76dsU6B/+I3bcUiON0I
+	HD96QWkWz8IxVcfwjd5d2tn/YSrjJXg29CD9/uYQ+1HyskMi5OvpaQG/8IjHsih03sjSBxTrtFQ
+	Vwlc/FylCCE2JAUHXQ9VLxw==
+X-Received: by 2002:a05:6402:a50b:10b0:6b4:27a:38f7 with SMTP id 4fb4d7f45d1cf-6b4d46841c0mr4376828a12.22.1793610317411;
+        Mon, 02 Nov 2026 01:05:17 -0800 (PST)
+Received: from localhost.localdomain ([91.242.55.207])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e71b8e5f4sm19372105f8f.40.2026.11.02.01.05.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2026 01:05:17 -0800 (PST)
+From: Ruslan Semchenko <uncleruc2075@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: nathan@kernel.org,
+	nsc@kernel.org,
+	julianbraha@gmail.com,
+	masahiroy@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ruslan Semchenko <uncleruc2075@gmail.com>
+Subject: [PATCH] kconfig: preprocess: fix UAF and SEGV on self-referencing variables
+Date: Mon,  2 Nov 2026 12:05:00 +0300
+Message-ID: <20261102090500.54575-1-uncleruc2075@gmail.com>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -68,106 +97,82 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="O/lgowdIW52wEdIz"
-Content-Disposition: inline
-In-Reply-To: <9c21c5f5-355e-4520-b48e-acd355c7fc6d@gmail.com>
+Content-Transfer-Encoding: 8bit
 
+In variable_add(), when updating an existing simply expanded variable (:=),
+v->value was freed before calling expand_string(value). If the value
+referred to the variable itself (e.g. A := $(A)b), variable_expand()
+accessed the already freed memory, causing a heap-use-after-free.
 
---O/lgowdIW52wEdIz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Furthermore, for a new variable definition, an uninitialized variable
+struct was inserted into variable_list before expanding value. If value
+referred to the variable itself (e.g. B := $(B)x), variable_lookup()
+found the incomplete variable and dereferenced uninitialized v->value,
+causing a segmentation fault.
 
-On Sun, Nov 01, 2026 at 11:44:39PM +0000, Julian Braha wrote:
-> On 11/1/26 20:08, Linus Torvalds wrote:
-> > So the Kconfig 'expr_lookup()' function is criminally slow and takes
-> > over 10% of the time of "make oldconfig".
->=20
-> My own pet peeve is the occasional slowdowns in menuconfig search...
-> >=20
-> > The reason is that it's called just a lot, but it *really* doesn't
-> > help that the scripting versions of the hashtable functions has not
-> > understood the subtler issues of the hashing code that it took from
-> > the kernel side, and in the process got things very very wrong.
-> >=20
-> > The "hash_32()" function is a perfectly fine hashing function - there
-> > are better ones around, but it's fast and "good enough". But when you
-> > use it, you need to understand that it puts the significant bits in
-> > the *high* bits of the result.
-> >=20
-> > The kernel uses a model where you give it the number of bits you want,
-> > and it will pick out those high bits, which makes it all work right.
-> >=20
-> > But the simplified hashtable code for the host code didn't use those
-> > high bits of the key. It just did
-> >=20
-> >     (key) % HASH_SIZE(table)
-> >=20
-> > to pick the hash table entry, and that's basically pessimal. When
-> > hashing an address that typically has the low bits clear, the low bits
-> > of "hash_32()" will *also* be clear. So the hash table ended up being
-> > mostly empty! So even though the hash table was sized appropriately,
-> > it wasn't being very efficient. And while making the hash table larger
-> > mostly hides the problem, it's the wrong solution, because the cache
-> > footprint gets worse.
-> >=20
-> > Teach "hash_head()" to use the high bits of the key. Because the users
-> > don't pass in the number of bits they want, this is pretty hacky:
-> >=20
-> >     #define HASH_KEY(key,size) \
-> >         (unsigned int)((unsigned int)(key)/(0x100000000ull/(size)))
-> >=20
-> > but at least this improves on things.
->=20
-> It would be a bigger change but IMO the host-side implementation should
-> not differ much from the kernel's -- like the rest of the data
-> structures in scripts/include/. In other words I'd prefer to revert some
-> of the "simplifications" that caused this and adjust the callers
-> accordingly.
->=20
-> Nathan or Nicolas, do you feel differently? This is also used by some
-> other tooling outside Kconfig. If not then I'll send out my version.
->=20
+Fix both issues by computing the new value before modifying the existing
+variable or inserting a new one into variable_list.
 
-I have no strong opinion on that, yet.  But probably it's better to take
-a working speed-up fix now and think about the long-term maintenance
-stuff later on.
+Signed-off-by: Ruslan Semchenko <uncleruc2075@gmail.com>
+---
+ scripts/kconfig/preprocess.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-[...]
-> > Somebody needs to double-check this. I don't love my HASH_KEY() macro,
-> > but it should work for power-of-2 sizes. And as far as I can tell, all
-> > the hash tables are powers of two.
-> >=20
-> > Comments?
+diff --git a/scripts/kconfig/preprocess.c b/scripts/kconfig/preprocess.c
+index 783abcaa5..d48791921 100644
+--- a/scripts/kconfig/preprocess.c
++++ b/scripts/kconfig/preprocess.c
+@@ -293,27 +293,35 @@ void variable_add(const char *name, const char *value,
+ 		if (flavor == VAR_APPEND) {
+ 			flavor = v->flavor;
+ 			append = true;
+-		} else {
+-			free(v->value);
+ 		}
+ 	} else {
+ 		/* For undefined variables, += assumes the recursive flavor */
+ 		if (flavor == VAR_APPEND)
+ 			flavor = VAR_RECURSIVE;
++	}
++
++	/*
++	 * Compute the new value before touching the variable. Expanding it may
++	 * refer to the variable itself, which must still see the old value.
++	 */
++	if (flavor == VAR_SIMPLE)
++		new_value = expand_string(value);
++	else
++		new_value = xstrdup(value);
+ 
++	if (!v) {
++		/* A new variable is not visible until it is fully defined. */
+ 		v = xmalloc(sizeof(*v));
+ 		v->name = xstrdup(name);
++		v->value = new_value;
++		v->flavor = flavor;
+ 		v->exp_count = 0;
+ 		list_add_tail(&v->node, &variable_list);
++		return;
+ 	}
+ 
+ 	v->flavor = flavor;
+ 
+-	if (flavor == VAR_SIMPLE)
+-		new_value = expand_string(value);
+-	else
+-		new_value = xstrdup(value);
+-
+ 	if (append) {
+ 		v->value = xrealloc(v->value,
+ 				    strlen(v->value) + strlen(new_value) + 2);
+@@ -321,6 +329,7 @@ void variable_add(const char *name, const char *value,
+ 		strcat(v->value, new_value);
+ 		free(new_value);
+ 	} else {
++		free(v->value);
+ 		v->value = new_value;
+ 	}
+ }
+-- 
+2.47.3
 
-Thanks for spotting!  Patch looks good to me and the use of the hash
-table significantly better distributed.
-
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
-
-Kind regards,
-Nicolas
-
-
---O/lgowdIW52wEdIz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmroM2cACgkQB1IKcBYm
-EmneNBAAyJir/4UIBI6f1U8zm5isTcfVvFy5Cafw5rrchTka5eVSqMIwnpM0lHb2
-KC6+MNS45sd84pEmBzy360+7/Bkt+fRPeBLO+hVVAkBTE9Vi1fLuZNStjOLvX93I
-BOAVct461dtR2+WFDvv6fs4JHYJUo/5Tyfg0EaDphB6syu39Un+HiYH8ZWXV6QxG
-3DNPwIfbB3JZmDTMP/AfBZnHP3PsErvf/Or1tWwoW33Db7MLOD4K9q4bk9VnMe/k
-5hSfnbhIgn3HNPDrO8AVfR8eTKT3ntc/LbpGI+9g/tC1ybdqA0n1yMKRiLlIHHlI
-Ydxn4lZqsUf0IJ/wrRWxNs/YcxOkb3ldbQhdXehBu7N1JT6KgBo1KCAl7+5KFJ1w
-33ANDIaGjsZO9jaDtbGqQiTCFR8VqYB/Mui9jdIa3xZB7EkV899AmEWmCzDaY0k3
-pmGDspbOwJ/LRHpRx+JCrcvtvbqBr9jUXxlprB4XZHH33HmlDpfPCbH0LOz/M/VC
-mZ0kM0MmcDe7baDUnIlxhJdWXiEqkLQDwBhSJIKwh7hEdAuf87UhJ9fFu1nUFsqf
-cFjVapRybs052e7i2AG22p8HotJoi2vMOqQpl9WFuLwU1zXwWO1vACui7Ja9rcpI
-nttymQSmnZwKoIF5ruW5r1nYKdfSy0pRFn7IH0M1eDbHDDmlqow=
-=ugZf
------END PGP SIGNATURE-----
-
---O/lgowdIW52wEdIz--
