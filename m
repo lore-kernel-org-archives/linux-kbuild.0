@@ -1,48 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=159.69.126.157
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793598952;
-	b=2ARHwtZIDUoWjaLHj9YoBOdh5+z3XToyG5CYWAMq+3PVrVcgot8CM9z6gVUmqhXG41re
-	 pzndtaykuCtFb1q1PpOc45cAUozumLVqwcMIsawBC+FIn0XNREFzry1EdqX0Vaanzn8/K
-	 a0J+B9Vhl+3XoyBsvFwUlX+uOGE9Hwu7ij0H6azvIj4ZOE58qmN/fpzZPibpAAMRoYyfn
-	 5BGYDDrEu015Jzujt5ALkaE3956GDFI5Z1pvmS0Q8XkmPHfaYFvN/MgXk3R4NoVq+nN3w
-	 yvZzZgsLHg1BXth45vn2ipmKQFsHsDUURAS7VNpMN/jEH3Io0cumu7v3lDVtLT0RShg==
+	t=1793598964;
+	b=2tBUhz5CfeQYAFby7WfjZcpfmtnUDOThFHZdvB2yaltXqyW9ZewxQF/29Ci8KrdXFZbU
+	 P3wkYt5HNjNky43JlIbnqJEVXfLWjzl7pfD4nzfuzfTLMu/DMQcyMZrq8V4yVu9s2Nyvv
+	 Y91z/X0WdkDt4YHifNbF4BqLFzSLXFjeU2WjDcHWreIx8Ju1bHwvGnSTVUYXjdzXJQa2H
+	 yb7TsDAABkVpmBELl+rhbLV0E8hAmV7Fmvnnxi0j4bE+cCQFYYMe/QUisP+RvhfB+6I5l
+	 ztkVErUDBZg1vHu+z4IsIGHCMlCBx4pM3DukhKI5NL9b9hDi8kBTX6mWaDi+NqVhp0g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793598952;
-	h=DMARC-Filter:DKIM-Signature:From:Date:Subject:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=ofZITKnZHt6OhmIp+/NDLoD0PCymmafa2UY40Z9KkC0=;
-	b=yDgWCxIFFYdPD7WFQedMetkqlRuTclGZ2iHZcOdnYhfxiPPSXPpDs+gMFzQKk7pWgxOP
-	 gY15QwvGwDefTjuIV/AwS/mupK98TaY7pzH9V+QytnhA5K8jbCJcF2rQjEDj3ROGhe6kZ
-	 1rzzC7pxRp/OEmNzg2LtWq+uH8Hqk8J3zJ6q1p17BYs+6WmWG8t99UCtVAEVv7Epawu0T
-	 Mwdn190c94Iu7zcR4U6pDCvLcED3razvl5KWkL/0K2U/gLdSoAitt601HV5+mdPkAmnRe
-	 +oyTVc3rWaXFRmJNR3Kyu0QxddtqWlC3e+ubCqEIpFgJXWcRX0ZdQ2twQp9oohzb2LQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793598964;
+	h=DMARC-Filter:DKIM-Signature:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=6Y1Y+O5kq88tjUCuMA+ieDSab1ccmXhG0I3B4UawGVw=;
+	b=eyO7FObm49YrjPY5JMLaaxcrQq8kQqSz4JAa7fP4TIzw4nyMK+mWTiERSDZFr+2zyhEU
+	 7Is4AhtN7FjkT9FJCIXyvbVPj2X4aip1MmBBgbfP7vUiqPv+7LV0tXnArUfjuS9ESjwFo
+	 cbrmusrMC0YW5ZB+X6t5QQU3LeU0evgqfMNdWMbDdYhaGVW6iZlxGp8LFqrHeQW+cv18Y
+	 jnpbPh+K+WTtXVyvOW8bEa7dOSo8rB1HSbbEDpYj/p5xif1/hEL0Z/XXGeIQBEFzJe5xZ
+	 FGqa/5ABw2q6Kt/RPCChpy3K6v/587HPT7c2OaGDNVQ7ui3PU9eLN1QYY7Iq5RLpuTA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=weissschuh.net;
 	spf=pass smtp.mailfrom=weissschuh.net;
-	dkim=pass header.d=weissschuh.net header.i=@weissschuh.net header.a=rsa-sha256 header.s=mail header.b=pOeKWCiu;
+	dkim=pass header.d=weissschuh.net header.i=@weissschuh.net header.a=rsa-sha256 header.s=mail header.b="YHHBv/ji";
 	arc=none smtp.remote-ip=159.69.126.157
 Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57723606A326;
-	Mon,  2 Nov 2026 05:55:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57723606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20ADD60A260E;
+	Mon,  2 Nov 2026 05:56:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 20ADD60A260E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=weissschuh.net header.i=@weissschuh.net header.a=rsa-sha256 header.s=mail header.b=pOeKWCiu
+	dkim=pass (1024-bit key, unprotected) header.d=weissschuh.net header.i=@weissschuh.net header.a=rsa-sha256 header.s=mail header.b=YHHBv/ji
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1793598949;
-	bh=lm6TXqySjpg6QXUXbUCr8WoZ9qfbbbmvbkIXwpTBuc0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=pOeKWCiuL1g0y9ROHgljmbpHqwbcbzXDTxexbhpCRds/mEi5mxMfUIYlSuqVdYLm3
-	 YUKt7X0NQitwIjqV79Rj1yzZccHMs+W0JeWSA/k5Izyh08QwKxZpjv2IRau6oE/S2j
-	 pFvzORdC8hXafT2/XP400bqt9FzibbmBSxX3zXgM=
+	s=mail; t=1793598962;
+	bh=vVoF722LJ5fA3KYp+P1Y4Z0Icr2joyJfX+6GZOP4pLM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=YHHBv/jie2WXhd+OlD9WhgQJBSFxQeqs4vVOh3tw1aqIGRBDgdR8XHgAPxwIDK782
+	 T5p7u9LbiTXN7GrCzqTAVVSbINHFy2kW1uxA3soyPIf8i9KpWrmIuhc4xaq5kgXnwm
+	 BgXsVrU5AqaYxftUvwUBPhacbIVYJ3faCFZH8fF4=
 From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Mon, 02 Nov 2026 03:14:17 +0000
-Subject: [PATCH 2/3] kbuild: drop the tools/ target
+Subject: [PATCH 0/3] kbuild: don't print DESCEND messages from tools/ build
+Date: Mon, 02 Nov 2026 03:14:15 +0000
+Message-Id: <20261102-kbuild-descend-spam-v1-0-caff4f840cb7@weissschuh.net>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -54,51 +55,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20261102-kbuild-descend-spam-v1-2-caff4f840cb7@weissschuh.net>
-References: <20261102-kbuild-descend-spam-v1-0-caff4f840cb7@weissschuh.net>
-In-Reply-To: <20261102-kbuild-descend-spam-v1-0-caff4f840cb7@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMTQ6CMBBA4auQWTtJ20QEr2JctJ0pjD+VdMSYE
+ O5OleW3eG8B5SKscG4WKPwRlVeusIcG4ujzwChUDc641hrX4z3M8iAk1siZUCf/xBSM9ZRO3Hd
+ HqOVUOMn3f71cd+scbhzfvxWs6wY8MLUqdwAAAA==
+X-Change-ID: 20261029-kbuild-descend-spam-fb01adf7e985
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793589258; l=935;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793589258; l=854;
  i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=lm6TXqySjpg6QXUXbUCr8WoZ9qfbbbmvbkIXwpTBuc0=;
- b=UUnO48NSZOkEfMVcWZk+NRniGzwKDJtdQsCuTa+/LC9O5yW+yqMxZfy8pdqXWRNJl27bTvYYv
- ldIsZS9jmFrC5LiFnXCANtfe2uxQQGPCjOZK2aCPFDmpg9DlCpYXOn0
+ bh=vVoF722LJ5fA3KYp+P1Y4Z0Icr2joyJfX+6GZOP4pLM=;
+ b=SyPdc3dALh/U0YL0TlZISDQvsBNu2BBnt6SWx8XcM41JFuXlqrfiSsEOLtsZW13dBfNvO3UM2
+ f6oOPU5bPC2AyYzLCnYqvdPGOuegyBrnBGn+EnFpGFFs+DPA8gLAVnn
 X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
  pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-The target is unusable as it gets overridden by the $(single-no-ko)
-target. The only thing it would do is to print the help message.
+kbuild itself does not print the directories it descends into, the
+tools/ build however does so. When kbuild executes the tools/ build
+these messages are out of place.
 
-$ make tools/
-Makefile:2218: warning: overriding recipe for target 'tools/'
-Makefile:1639: warning: ignoring old recipe for target 'tools/'
-
-Drop the target.
+Forward kbuild's behavior to the tools/ build:
+Nothing is printed by default, the full command is printed with V=1.
 
 Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 ---
- Makefile | 4 ----
- 1 file changed, 4 deletions(-)
+Thomas Weißschuh (3):
+      tools/build: Deduplicate the descend commands
+      kbuild: drop the tools/ target
+      kbuild: don't print DESCEND messages from tools/ build
 
-diff --git a/Makefile b/Makefile
-index f895752d4b05..d73f2bbd3b93 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1635,10 +1635,6 @@ ifneq ($(wildcard $(bootconfig_O)),)
- 	$(Q)$(MAKE) -sC $(srctree)/tools/bootconfig O=$(bootconfig_O) clean
- endif
- 
--tools/: FORCE
--	$(Q)mkdir -p $(objtree)/tools
--	$(Q)$(MAKE) O=$(abspath $(objtree)) subdir=tools -C $(srctree)/tools/
--
- tools/%: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
- 	$(Q)$(MAKE) O=$(abspath $(objtree)) subdir=tools -C $(srctree)/tools/ $*
+ Makefile                       | 6 +-----
+ tools/scripts/Makefile.include | 7 ++-----
+ 2 files changed, 3 insertions(+), 10 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261029-kbuild-descend-spam-fb01adf7e985
 
--- 
-2.56.0
+Best regards,
+--  
+Thomas Weißschuh <linux@weissschuh.net>
 
