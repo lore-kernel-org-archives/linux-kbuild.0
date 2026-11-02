@@ -1,69 +1,68 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.107.87.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793651006;
-	b=wJGF6dUsyfRJb0Cr9/io09VSWQ1lmNbf2uQpaSqxUvydMty6YAzgMpAVa4jPNAv4zwkK
-	 iS3uV+2SrgDyBwbGez8/ksMfyXKesXYgRHhYyh0PC1lQH6NxZEUrAeZWJHD0Bqs4sNZ1m
-	 KaBvet2vDHp5p3nLDPl9jiFV+HlV1CFuMu5UrgCkyUzdfJi1JZ8n3FU7k4W0wVH++/2kz
-	 4jczYAgryGcTN3HuspYDGaBRWPY5Xgv10Y6jrrR8JSg79hhJBy7JK4gEx5DyqWzgav62W
-	 eVRWMcLAedRS6EKxHIts49sy7Pku4konaJni2wZROwF/O87DkHaCFAqjhCDe2trv19Q==
+	b=G7SJ9Rw/4bclE+FTzLKOngZYz0AvMBQTPymZLCAenZYEkUXA62v1BNaB/XBqU94zzHT6
+	 07ODpRBfoVFcz6PcponxSzGSh9EQ3rD51PflN83lirkedJSnvRrfYtL2rmQx0RABVHT4G
+	 azHkIUMGCCdc07BydS+rRaLgqkPo8r0nU0JHy3/ETeje/NFhL3NuRBkynkxGL9sk95S1C
+	 p6gOTe3IZpAvjOBWQceq11u/XtqA6wUCcmsA9ZiSOlkIaCJ/Fq4DuD+LBTT5eO3VeRWSR
+	 S0QeN3W9CdsxGfR3hKODYPNG8aKUTRNDXGqxpL4Kx4HTGPKQeoTdbx8T5/pLNDinBQQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793651006;
 	h=DMARC-Filter:Received:Received:Received:Received:DKIM-Filter:
 	 DKIM-Signature:X-Virus-Scanned:Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=OUNLO4fz787Jyp8M2xnPIWG7D3uZ70V+ftYCxOJ5Ch4=;
-	b=PJf4kgZg6WHeC1rcKZUUVLUHsF7l+gn8/3hXiLU7X6QKH2IWX3SFrpDWxlH587xLBERV
-	 MxJt51zmxMlGM6hahL35l9bi5Z0JQ1vI1VVkGVNsysFtqGa5Zjf9v+xn0ZapBnY4ZgVPQ
-	 b6+hsVG/TIs+hKqvN9xx1NYDMDrdgGnesFDBocfm503c20ekpg1R8jvd/CSMkyK1UvlHx
-	 0sk1Gy/b0swHxQbMk01IYW+8E6ftKciHcuZTdXT6j5AldqCqrL1c7pYCkB4Ytqqt/O9Vu
-	 XWFH/CEf4iFaAhnsnkYsjreOBimHIZz0cYAjSoGXkY2R6atmAEYlhlkmrTww+9WxM6g==
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=1As8imqM1w9k3j42dQsyALIB89lAPMXDeYgURJtJBI8=;
+	b=i3vooK5OnQi3U9GvuL0dzb06xuUreiL/Ttj4t6RxB6lYeRkTO6z2QGC78pubpflvMaof
+	 hOo2H5ZajI2Pa9vVjIVXjTzlYAh18mtZFrILqYj3EZb/Kv8OwkHM933oTa/WUA+fn9jDf
+	 dbbhcvokU+VihfftWUTXIfpBNyR4Ri3reU5oOY5KKIwX5GmacYVJ/Fbr2d+VOVdY7sio3
+	 MjZlhVGcfkYzsBi/y+EaADJdDP+ooMWPualGtkpXq5o2gexHFArd14ifX49WjIk2Y13A9
+	 +MNaf6xkkBPKcaZ0rwLCrGtBh4Y9xLeTNZ2CWbBVBP2UH38cso/bgAQrpew6DfnF9mQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=tngtech.com;
 	spf=pass smtp.mailfrom=tngtech.com;
-	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=FXNG9Hz8;
+	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=YtOnBj29;
 	arc=none smtp.remote-ip=34.107.87.41
 Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835DC606A331;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83735606A333;
 	Mon,  2 Nov 2026 20:23:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 835DC606A331
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83735606A333
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=FXNG9Hz8
+	dkim=pass (2048-bit key, unprotected) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=YtOnBj29
 Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
-	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 8FE66403D4;
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 9D602403D6;
 	Mon,  2 Nov 2026 21:23:17 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 6A16A1FBCEC;
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 8AFB61FBCCB;
 	Mon,  2 Nov 2026 21:23:17 +0100 (CET)
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
- with ESMTP id fLfLqM5Yc-P2; Mon,  2 Nov 2026 21:23:14 +0100 (CET)
+ with ESMTP id QaHYebkdw37T; Mon,  2 Nov 2026 21:23:12 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 60A791FBCCB;
-	Mon,  2 Nov 2026 21:23:14 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 60A791FBCCB
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id E9FAF1FBBEE;
+	Mon,  2 Nov 2026 21:23:11 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz E9FAF1FBBEE
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
-	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1793650994;
-	bh=OUNLO4fz787Jyp8M2xnPIWG7D3uZ70V+ftYCxOJ5Ch4=;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1793650992;
+	bh=1As8imqM1w9k3j42dQsyALIB89lAPMXDeYgURJtJBI8=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=FXNG9Hz8B97OB7ZU7rGFFGP15TLrGOqTcDAQgm9zTaMr0KKp/bsdvyL5IE1cU/2yU
-	 /0m+W3bAxnFiy78sRQZLGWAd6mnjY3YBSwYrYooejNooOAX/8xwanX6HvisJu/ca7p
-	 Skg73zQeStNSDFH5VVrsgaCb0xHAOhoOzTrHKsmOL9z7Rxop0elAiMsl9uOYSEjSeB
-	 GgeY/8nKsqRtp7C6g+HOKpgmUDT1Vi1Q7HQj5dUYT4RnpipqyIiocnfQJnc6e6dP8K
-	 YMCEWG8PAQBHhZEgyNTCoEUgGsjuAaLgpBNCcA+oh/Q6cwAlquoBQ/Fiydg+S1Ygg5
-	 KCioyNzb02U1g==
+	b=YtOnBj29tg99mdbzX0o4vS3/GlDM6ha6Ej7ktlcTmhMwb8qkHRJs9pzitGzcP1Oq7
+	 kJ4Ha1ZYwZh+kpdAVdDmaCq/bfTOT3sngXNdg/BZmDOoNvlffBvH7hk+gyw4ELhGQz
+	 C7IRIng3qAHRgZzBCyt41a2qHDPy8yZXPsBtjA9NMU6Tv7JvQ0lUCMgkgeCuUXXH3r
+	 5QzqNLr9vqBjEHt0FHPV1ZuaPaPXzGxT6anWrBWnx3mV1kEv6PnFfGbPQ+r+nwg0Iw
+	 Aga8TpWl3+O/epAvOoEfNP2cS8ER6p/T2HaDh2HQMCzXMqTYiyk18uinBQZoAUTsye
+	 bIG+uMn7RR+PQ==
 X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
 Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
  by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
- with ESMTP id NLsp63xuG5KP; Mon,  2 Nov 2026 21:23:14 +0100 (CET)
+ with ESMTP id 8dguYH6Sp08l; Mon,  2 Nov 2026 21:23:11 +0100 (CET)
 Received: from luis-Precision-5480.. (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
-	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 027161FBC9F;
-	Mon,  2 Nov 2026 21:23:13 +0100 (CET)
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 6CD8F1FBB81;
+	Mon,  2 Nov 2026 21:23:11 +0100 (CET)
 From: Luis Augenstein <luis.augenstein@tngtech.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -74,12 +73,10 @@ Cc: linux-kbuild@vger.kernel.org,
 	kstewart@linuxfoundation.org,
 	maximilian.huber@tngtech.com,
 	Luis Augenstein <luis.augenstein@tngtech.com>
-Subject: [PATCH v4 2/7] kbuild: refactor fixdep to collect dependencies before printing
-Date: Mon,  2 Nov 2026 21:22:55 +0100
-Message-ID: <20261102202308.3209536-3-luis.augenstein@tngtech.com>
+Subject: [PATCH v4 0/7] kbuild: record cmd-prereqs in .cmd files
+Date: Mon,  2 Nov 2026 21:22:53 +0100
+Message-ID: <20261102202308.3209536-1-luis.augenstein@tngtech.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261102202308.3209536-1-luis.augenstein@tngtech.com>
-References: <20261102202308.3209536-1-luis.augenstein@tngtech.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -91,228 +88,215 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-fixdep currently writes the .cmd file content while parsing the .dep
-file. Separate the parsing from the printing: parse_dep_file() now
-collects the source file and all dependencies in a list, and
-print_dep_file() emits the assignments afterwards. No functional
-change intended.
+KernelSbom (scripts/sbom/sbom.py) reconstructs the kernel build graph
+from the .cmd files written by Kbuild. For most build outputs,
+KernelSbom must infer the build inputs from the shell command stored in
+savedcmd_*. This requires command-specific parsers, which add
+unnecessary complexity and are difficult to maintain.
 
-Assisted-by: LLM
-Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
-Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
-Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
+Kbuild already knows these inputs as $(real-prereqs), the non-phony
+prerequisites of the Make rule. This series records them in .cmd files
+using a new metadata field:
+
+    make_prereqs_<target> :=3D <prerequisites>
+
+KernelSbom is updated to read the new field instead of parsing the
+shell command, and the obsolete command-specific parsers are removed.
+
+The issue of manually parsing shell commands was originally mentioned
+in https://lore.kernel.org/r/a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngtech=
+.com.
+This series is a proposal to address that.
+
+Cmd writers and consumers
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+The new field should not affect existing behavior.
+Below is a summary of what I checked.
+
+.cmd files are primarily written by cmd_and_savecmd and cmd_and_fixdep.
+Both writers add make_prereqs.
+
+The following rules append information to existing .cmd files.
+None of these is affected by the new field:
+
+- scripts/Makefile.lib: cmd_gen_objtooldep only appends new rule
+  target: $(wildcard ./tools/objtool/objtool)
+- scripts/Makefile.build: gen_symversions only appends comments
+  #SYMVER <name> <crc>
+- scripts/Makefile.lib: cmd_save_c_flags only appends a variable
+  saved_c_flags_<target> :=3D <flags>
+- rust/Makefile: cmd_gendwarfksyms only appends comments
+  #SYMVER <name> <crc>
+- kernel/Makefile: kheaders_data_dep appends a deps_* block
+  deps_<target> :=3D <headers>.
+
+This series updates the following .cmd file consumers:
+
+- scripts/sbom/sbom/cmd_graph/cmd_file.py: CmdFile.create() is
+  rewritten to parse the fields by name, including the new
+  make_prereqs field.
+- scripts/make_fit.py: process_dtb() previously read and split the
+  complete .cmd file to find the fdtoverlay command. It is changed to
+  read only the first line, so it keeps working once the new field is
+  introduced.
+
+The remaining consumers are not affected:
+
+- Kbuild Makefiles: -include reads .cmd files as Makefile fragments. The
+  new field is an ordinary variable assignment not used in any dependency
+  rule.
+- scripts/Makefile.thinlto: the saved_c_flags_* lookup only reads
+  saved_c_flags_<target> :=3D <flags>.
+- scripts/mod/modpost.c: extract_crcs_for_object() only reads comments
+  #SYMVER <name> <crc>.
+- scripts/mod/sumversion.c: parse_source_files() only reads
+  source_<target> :=3D <source> and deps_<target> :=3D <dependencies>.
+- scripts/clang-tools/gen_compile_commands.py: main() only reads the
+  first line containing savedcmd_<target> :=3D <command>.
+- scripts/generate_builtin_ranges.awk and
+  scripts/verify_builtin_ranges.awk: get_module_info() only reads the
+  first line and searches the saved command for DKBUILD_MODFILE or
+  RUST_MODFILE.
+
+Alternative: extending the deps_* field
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+An alternative to the new make_prereqs field is to merge $(real-prereqs)
+into the existing deps_* field for both cmd_and_savecmd and cmd_and_fixde=
+p.
+This would avoid a new field and provide one dependency list. However, it
+would broaden the meaning of deps_* from dependencies discovered through
+generated .d files to include prerequisites already declared to Make.
+This increases the risk of undesired side effects.
+
+The writers listed above would need to ensure that each .cmd file
+contains only one deps_* block. In particular, kheaders_data_dep would
+need to merge its header dependencies into the block written by
+cmd_and_savecmd instead of appending a second deps_* block.
+cmd_and_fixdep, or fixdep.c depending on the implementation, would
+likewise need to merge $(real-prereqs) with the generated dependencies.
+
+Apart from KernelSbom, scripts/mod/sumversion.c is the only consumer
+that explicitly reads deps_*. It uses selected dependency files to
+calculate a module's srcversion. Extending deps_* could change this
+module metadata. Such an unrelated change should probably be avoided.
+
+Kbuild Makefiles also consume deps_* by including .cmd files. This
+should not be an issue though, because $(real-prereqs) are already
+present on the original target rule, so repeating them through deps_*
+should not change rebuild behavior.
+
+SBOM comparison
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+I compared the SBOMs before and after the series for the same kernel
+builds on x86 and arm64 allmodconfig. They are ~99% the same. The
+following files are newly included in the SBOM because the manual
+parsers did not cover them.
+
+- Linker scripts: *.lds.S sources and the generated *.lds scripts.
+  The old tool never extracted -T arguments, so the whole
+  linker-script chain was missing.
+
+- The intermediate vmlinux link steps: vmlinux.o,
+  .vmlinux.export.c/.o, the realmode pasyms.h. Previously vmlinux.a
+  was hardcoded as an input of scripts/link-vmlinux.sh. Now the real
+  chain vmlinux link -> vmlinux.o -> vmlinux.a is included.
+
+- Per-module .mod object lists: the old tool expanded the .mod file
+  contents in place and recorded the objects directly as link inputs,
+  without explicitly including the .mod file in the SBOM.
+
+- Generated headers: the drm/xe and msm register tables, the aic7xxx
+  sequence tables, the x32 syscall header, and module.lds.h. The old
+  tool found a header only where a .c file actually includes it via
+  the dep file; the new tool records the full make view, including
+  headers that are never included at all.
+
+- Config and header archives: kernel/config_data.gz and
+  kernel/kheaders_data.tar.xz. The old tool missed them because their
+  generation commands had no matching parser.
+
+- Devicetree overlay sources: the .dtso files are now recorded as
+  inputs of the dtb/dtbo build steps. The old tool saw only the
+  temporary files those steps produce, never the sources themselves.
+
+The following files are removed:
+
+- dtc preprocessing scratch files: .dts.tmp, .d.pre.tmp,
+  .d.dtc.tmp. The old tool recorded these temporary build by-products
+  as inputs; the new tool records the real .dtso source instead. This
+  is a cleanup, not a loss.
+
+- Host tooling: the rust toolchain .md docs, the gen_smb1/2_mapping
+  perl generators, and the dtc host tool's libfdt headers.
+  Deliberately excluded. The SBOM should track what ends up in the image =
+or
+  modules, not the tooling that produces it.
+
+Changes in v4:
+- fix a bug where excluding src tree dependencies only worked when the
+  object tree was a direct child of the source tree
+- fix a bug where non-normalized paths containing '..' segments bypassed
+  the exclude list.=20
+
+Changes in v3:
+- split the changes into individual patches
+- include the sbom changes directly in this series instead of deferring i=
+t
+- add the SBOM comparison section to the cover letter
+- Assisted-by trailer follows
+  Documentation/process/coding-assistants.rst
+
+Changes in v2:
+- filter depfile entries from make_prereqs in fixdep.c to ensure
+  make_prereqs is consistent between clean and incremental builds.
+  Filtering $(deps_$@) from previous builds is still required to not
+  include deps that got removed in the current depfile.
 ---
- scripts/basic/fixdep.c | 109 ++++++++++++++++++++++++++++++++++-------
- 1 file changed, 92 insertions(+), 17 deletions(-)
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 54063d98044..f514ef606ec 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -114,6 +114,17 @@ struct item {
- 	char		name[];
- };
-=20
-+struct dep_item {
-+	struct dep_item	*next;
-+	char		name[];
-+};
-+
-+struct dep_info {
-+	char			*source;
-+	struct dep_item		*deps;
-+	struct dep_item		*last_dep;
-+};
-+
- #define HASHSZ 256
- static struct item *config_hashtab[HASHSZ], *file_hashtab[HASHSZ];
-=20
-@@ -163,16 +174,42 @@ static bool in_hashtable(const char *name, int len,=
- struct item *hashtab[])
- 	return false;
- }
-=20
-+/*
-+ * Append a dependency or include/config/<SYM> path to the info linked l=
-ist.
-+ */
-+static void dep_info_add(struct dep_info *info, const char *name, int le=
-n)
-+{
-+	struct dep_item *dep =3D xmalloc(sizeof(*dep) + len + 1);
-+
-+	memcpy(dep->name, name, len);
-+	dep->name[len] =3D '\0';
-+	dep->next =3D NULL;
-+
-+	if (info->last_dep)
-+		info->last_dep->next =3D dep;
-+	else
-+		info->deps =3D dep;
-+	info->last_dep =3D dep;
-+}
-+
- /*
-  * Record the use of a CONFIG_* word.
-  */
--static void use_config(const char *m, int slen)
-+static void use_config(const char *m, int slen, struct dep_info *info)
- {
- 	if (in_hashtable(m, slen, config_hashtab))
- 		return;
-=20
--	/* Print out a dependency path from a symbol name. */
--	printf("    $(wildcard include/config/%.*s) \\\n", slen, m);
-+	/* Build a dependency path from a symbol name. */
-+	static const char config_path[] =3D "include/config/";
-+	char *path;
-+	int path_len =3D sizeof(config_path) - 1 + slen;
-+
-+	path =3D xmalloc(path_len);
-+	memcpy(path, config_path, sizeof(config_path) - 1);
-+	memcpy(path + sizeof(config_path) - 1, m, slen);
-+	dep_info_add(info, path, path_len);
-+	free(path);
- }
-=20
- /* test if s ends in sub */
-@@ -186,7 +223,12 @@ static int str_ends_with(const char *s, int slen, co=
-nst char *sub)
- 	return !memcmp(s + slen - sublen, sub, sublen);
- }
-=20
--static void parse_config_file(const char *p)
-+/*
-+ * Scan dependency p for CONFIG_ words, map each to an
-+ * include/config/ path and append to the dep_info list if not
-+ * already included.
-+ */
-+static void parse_config_file(const char *p, struct dep_info *info)
- {
- 	const char *q, *r;
- 	const char *start =3D p;
-@@ -205,7 +247,7 @@ static void parse_config_file(const char *p)
- 		else
- 			r =3D q;
- 		if (r > p)
--			use_config(p, r - p);
-+			use_config(p, r - p, info);
- 		p =3D q;
- 	}
- }
-@@ -253,13 +295,9 @@ static int is_no_parse_file(const char *s, int len)
- 	       str_ends_with(s, len, ".so");
- }
-=20
--/*
-- * Important: The below generated source_foo.o and deps_foo.o variable
-- * assignments are parsed not only by make, but also by the rather simpl=
-e
-- * parser in scripts/mod/sumversion.c.
-- */
--static void parse_dep_file(char *p, const char *target)
-+static struct dep_info parse_dep_file(char *p)
- {
-+	struct dep_info info =3D {};
- 	bool saw_any_target =3D false;
- 	bool is_target =3D true;
- 	bool is_source =3D false;
-@@ -375,13 +413,12 @@ static void parse_dep_file(char *p, const char *tar=
-get)
- 			 */
- 			if (!saw_any_target) {
- 				saw_any_target =3D true;
--				printf("source_%s :=3D %s\n\n", target, p);
--				printf("deps_%s :=3D \\\n", target);
-+				info.source =3D xstrdup(p);
- 				need_parse =3D true;
- 			}
- 		} else if (!is_ignored_file(p, q - p) &&
- 			   !in_hashtable(p, q - p, file_hashtab)) {
--			printf("  %s \\\n", p);
-+			dep_info_add(&info, p, q - p);
- 			need_parse =3D true;
- 		}
-=20
-@@ -389,7 +426,7 @@ static void parse_dep_file(char *p, const char *targe=
-t)
- 			void *buf;
-=20
- 			buf =3D read_file(p);
--			parse_config_file(buf);
-+			parse_config_file(buf, &info);
- 			free(buf);
- 		}
-=20
-@@ -403,6 +440,40 @@ static void parse_dep_file(char *p, const char *targ=
-et)
- 		exit(1);
- 	}
-=20
-+	return info;
-+}
-+
-+static void free_dep_info(struct dep_info *info)
-+{
-+	struct dep_item *dep, *next;
-+
-+	for (dep =3D info->deps; dep; dep =3D next) {
-+		next =3D dep->next;
-+		free(dep);
-+	}
-+	free(info->source);
-+}
-+
-+/*
-+ * Important: The below generated source_foo.o and deps_foo.o variable
-+ * assignments are parsed not only by make, but also by the rather simpl=
-e
-+ * parser in scripts/mod/sumversion.c.
-+ */
-+static void print_dep_file(const char *target, const struct dep_info *in=
-fo)
-+{
-+	static const char config_path[] =3D "include/config/";
-+	const struct dep_item *dep;
-+
-+	printf("source_%s :=3D %s\n\n", target, info->source);
-+	printf("deps_%s :=3D \\\n", target);
-+
-+	for (dep =3D info->deps; dep; dep =3D dep->next) {
-+		if (!strncmp(dep->name, config_path, sizeof(config_path) - 1))
-+			printf("    $(wildcard %s) \\\n", dep->name);
-+		else
-+			printf("  %s \\\n", dep->name);
-+	}
-+
- 	printf("\n%s: $(deps_%s)\n\n", target, target);
- 	printf("$(deps_%s):\n", target);
- }
-@@ -410,6 +481,7 @@ static void parse_dep_file(char *p, const char *targe=
-t)
- int main(int argc, char *argv[])
- {
- 	const char *depfile, *target, *cmdline;
-+	struct dep_info info;
- 	void *buf;
-=20
- 	if (argc !=3D 4)
-@@ -419,10 +491,13 @@ int main(int argc, char *argv[])
- 	target =3D argv[2];
- 	cmdline =3D argv[3];
-=20
-+	buf =3D read_file(depfile);
-+	info =3D parse_dep_file(buf);
-+
- 	printf("savedcmd_%s :=3D %s\n\n", target, cmdline);
-+	print_dep_file(target, &info);
-=20
--	buf =3D read_file(depfile);
--	parse_dep_file(buf, target);
-+	free_dep_info(&info);
- 	free(buf);
-=20
- 	fflush(stdout);
+Luis Augenstein (7):
+  scripts/make_fit: limit .cmd file parsing to the savedcmd_ line
+  kbuild: refactor fixdep to collect dependencies before printing
+  scripts/sbom: skip make_prereqs lines when parsing .cmd files
+  kbuild: record cmd-prereqs in .cmd files
+  scripts/sbom: parse make_prereqs from .cmd files
+  scripts/sbom: use make_prereqs to determine build inputs
+  scripts/sbom: remove the command-specific parsers
+
+ Documentation/tools/sbom/sbom.rst             |  22 +-
+ scripts/Kbuild.include                        |  10 +-
+ scripts/basic/fixdep.c                        | 163 +++++-
+ scripts/make_fit.py                           |   2 +-
+ scripts/sbom/sbom/cmd_graph/cmd_file.py       | 149 ++---
+ scripts/sbom/sbom/cmd_graph/cmd_graph.py      |   6 +-
+ scripts/sbom/sbom/cmd_graph/cmd_graph_node.py |  57 +-
+ .../sbom/sbom/cmd_graph/dependency_filter.py  |  66 +++
+ .../sbom/cmd_graph/hardcoded_dependencies.py  |   1 -
+ .../cmd_graph/savedcmd_parser/__init__.py     |   6 -
+ .../command_parser_registry.py                | 516 ------------------
+ .../savedcmd_parser/command_splitter.py       | 128 -----
+ .../savedcmd_parser/savedcmd_parser.py        |  67 ---
+ .../cmd_graph/savedcmd_parser/tokenizer.py    |  92 ----
+ scripts/sbom/sbom/config.py                   |  14 -
+ scripts/sbom/sbom/spdx_graph/kernel_file.py   |  64 ++-
+ .../tests/cmd_graph/test_savedcmd_parser.py   | 468 ----------------
+ 17 files changed, 334 insertions(+), 1497 deletions(-)
+ create mode 100644 scripts/sbom/sbom/cmd_graph/dependency_filter.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/__init__.=
+py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/command_p=
+arser_registry.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/command_s=
+plitter.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/savedcmd_=
+parser.py
+ delete mode 100644 scripts/sbom/sbom/cmd_graph/savedcmd_parser/tokenizer=
+.py
+ delete mode 100644 scripts/sbom/tests/cmd_graph/test_savedcmd_parser.py
+
 --=20
 2.43.0
 
