@@ -1,77 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793629633;
-	b=Fq7q5XCEhfsxEsb3rmEP+fCJrEQLzuEB7OkJceI3T/Hm2w3lzgKrLsf8j022633OOwOr
-	 NYArzGE/QkkYKGJF/j3yzIWLoDPYBOAx+AoUV/+4bgLJnBd9Pn3cxp5s2oXrJZWQr5GZC
-	 X/w2D+iiAU1zFtD9eQXLWcEChxnJZDB4p6npiMW4qT98b0rdh4i/IMoIrIwZ+SlONzEkT
-	 VqoQTHzqbc4Qb0LepLfL2QXuKwkwmv1KXbojvgAstOSF/zDjgFhVHCAYWUhprWFanRlOC
-	 gTP1Sq7T8WzfbS9uoYDUf+s97DAfKmMhZLQosJLUq/OtE5hhv5OfmVVemQ1Y0GPWDcw==
+	t=1793636446;
+	b=319J75mxZ5jipGZl13RE0zB7ngNHDEoLkGQwnhive2tCiJ2qYmj9ysN/bXbL1PmFrjmw
+	 fB0yaOPiH05AV2fdIZkhT2Uo6Qi5g+QKeJsgE/eMtpUEa53jA+G0DyrD32ocmIcQv8V+/
+	 S6w+AEijnjz5HChvuxNeomWKPp8Hcp8mpJLEo1maL6Y5foLzvrKxdqrtgPLfLsfDYV9+1
+	 09KjV25K5z8W4Uhtw4Gt0K76hnkOm+ipmAgHWEwunHh2fbfe0T4pmsY3sQtEelybkZQ2l
+	 VufQ15OijN3ktYnPleI/LQLotvEgbuo3faJH2VkS3DgfQGlG20qoHPkF61Lsy74sb2Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793629633;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=fGdAAPG3/kgbevcrSXbBGlUJfMVBMU/5Awb3Piy6wyk=;
-	b=iZ2AaLjHmOEnGlfktIgEd8dIQOeS1wspklqRRJYBDV9q24vZjV67zU/QxoCWGIw73cD/
-	 UAKH7CBXsTqcnD+Nl+8DBXLIRk9pgKZqNCebOeqabnLabS8wHYxuYI5qZC8wHEPdplCH7
-	 qJHJ6NSTOvcupjWfQb3pXZK1XSP69FD6lr5G6SZaLlumiu6SqHEnaGnh0Q3gaRMtX7IYa
-	 NxUj9HOx0FogoM1K/iZjQ3NBRtIakPhd+YIddv/ilXEq7l7kTKyrpa88RtWcEOyxK5gty
-	 udwMjcaMmzwCIc2kc6rV1kYR65Joo8VaM7AwIlO8mCxbSD5CLV6qI6xnNkF48uiu/QQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793636446;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=+JNoTlSwRmyB40Pne6BVDBz4S/O3EIyiOba9uuaE8eg=;
+	b=WgNZ62hx6kZeXyW5pcxybht+c4xUqa8r3Nf3stLv/6Fj945TJYxa0Z6uGVvvO9l6pwKE
+	 GVvVyRlY/g8qTNzSowQX6w3S/WS1v2wmNUSFvDFyXK6d92mls18dfwIGHQWIwja1RVDkz
+	 Wb0XZIvhJFJZQiNAaXMDKHUi4BhIfeUcD2MOLtrI49u5IKKkf7LVPUtmW8ICkUHyP2r8p
+	 GjsVvow59jYjZ94NZQa+w9YvKorbJytBYXvCBiYUh9Cazn2ke5e1wuve7ETZsOB0/2pB+
+	 w0/pA/XEI4AhqCz+Mc2TmNrQC+3c91khcTUSO5KkS9clDWJgC1DvEDVmRy5zhlv6bsw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lunn.ch;
-	spf=pass smtp.mailfrom=lunn.ch;
-	dkim=pass header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=32VRT5y7;
-	arc=none smtp.remote-ip=156.67.10.101
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="BuqU/xlQ";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330C560A3802;
-	Mon,  2 Nov 2026 14:27:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 330C560A3802
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB6B6083637;
+	Mon,  2 Nov 2026 16:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=32VRT5y7
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=fGdAAPG3/kgbevcrSXbBGlUJfMVBMU/5Awb3Piy6wyk=; b=32
-	VRT5y7g8A5pbHx3zjUJX9yrQXbqZaTMMT0+mEMXEraa5UH55IHMGKu/inQ8c6Zyug1wcrgam2yxgE
-	RtT8u2JsQBo8WCpxH5wo3AMfLrOsf54aXN1Bkdc9+k0K76ZCc4yeQlhBLw3XtwWI/X1NAXTeh6yk4
-	/Sm1vY5tSk/ST4k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1xNszw-00Do9W-KA; Mon, 02 Nov 2026 15:26:56 +0100
-Date: Mon, 2 Nov 2026 15:26:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Doug Ledford <doug.ledford@hpe.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	Sandeep Bhoot <sandeep.bhoot@hpe.com>,
-	Iraimani P <iraimani.pavadai@hpe.com>,
-	Mamila Santosh <santosh-kumar.mamila@hpe.com>
-Subject: Re: [PATCH 00/23] Subject: [PATCH net-next 00/23] net/hpe: add HPE
- Slingshot NIC drivers
-Message-ID: <e9937650-1354-4d66-95fa-3492e3821823@lunn.ch>
-References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030151121.1f232b50@kernel.org>
- <7d4583c2-e8dc-4ffb-bc45-e2121f824b14@lunn.ch>
- <bde936b5-1b3f-4987-a3e5-36ec5c4710e6@hpe.com>
- <2f831f13-58ff-40ca-a76f-3aca647012b6@lunn.ch>
- <b260f39e-2ac0-4899-90d9-3e9dbadfacc4@hpe.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BuqU/xlQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BA231F00A1A;
+	Mon,  2 Nov 2026 16:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793636445;
+	bh=+JNoTlSwRmyB40Pne6BVDBz4S/O3EIyiOba9uuaE8eg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=BuqU/xlQqdjOdE9xy4RoKknDtjJCSLBNlyN7yRFZsW3JrejOCr+6Tam0LF7FDzivQ
+	 MT+3IY9FX5W3FF4Gv6oVx5UxLrmqmIH9/sbacwEk6RCrdXUXwA1bBz+iYTDWKmhshv
+	 AnjtoBC9S4/e/wBp84/5XlRAWodC1LlKrqqhFwHxtqXs9DQVGyVr0+3to1FpO1u+EO
+	 3JJ21l2KS6jiUmgMtxbdkPnxAiVstTHqVU2G7Nk5goJ22/y/fwVV0wWd5FVhnsExm6
+	 PXGlU0b9Wl/ysC2IO5zl8P80MqWJmxxo1PvXF1mT6J2Vx+R3CIEia1JIBCsGcWA183
+	 0rgiT9B2mpzlQ==
+Message-ID: <25216bda-7e36-4bad-ba7c-1984dbb9dfda@kernel.org>
+Date: Mon, 2 Nov 2026 17:20:40 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -81,82 +51,102 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b260f39e-2ac0-4899-90d9-3e9dbadfacc4@hpe.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 3/3] bpftool: Prefer zlib-rs over zlib when
+ available
+To: Ian Rogers <irogers@google.com>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
+ Adrian Hunter <adrian.hunter@intel.com>, Miguel Ojeda <ojeda@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-perf-users@vger.kernel.org, bpf@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ llvm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20261030202710.3863806-1-irogers@google.com>
+ <20261030202710.3863806-4-irogers@google.com>
+From: Quentin Monnet <qmo@kernel.org>
+Content-Language: en-GB
+In-Reply-To: <20261030202710.3863806-4-irogers@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 01, 2026 at 07:45:24PM -0800, Doug Ledford wrote:
-> On 11/1/26 5:35 PM, Andrew Lunn wrote:
-> >> I'll see how fast I can get that done.  But "the bare minimum" is going
-> >> to be more than you are accustomed to.  This hardware does not receive
-> >> Ethernet packets using MAC address like normal Ethernet hardware.  It
-> >> uses a special portal table entry that filters in the Ethernet packets.
-> >> It has the ability to have different filters that receive different
-> >> Ethernet packets and so sorts them before the driver ever sees them.
-> > 
-> > Can you add a single portal entry which matches everything? Or matches
-> > a single MAC address? KISS.
+Hi Ian, thanks for the v2,
+
+
+2026-10-30 13:27 UTC-0700 ~ Ian Rogers <irogers@google.com>
+> Add zlib-rs and zlib to FEATURE_TESTS and FEATURE_DISPLAY in
+> tools/bpf/bpftool/Makefile and use feature_rust_lib to configure
+> ZLIB_CFLAGS and ZLIB_LIBS when zlib-rs is detected (unless disabled with
+> NO_ZLIB_RS=1), falling back to -lz.
 > 
-> That's a complex question, and one which I need to go talk to one of the
-> hardware engineers about.  It also varies based upon your meaning of
-> "everything".  If, by everything you means essentially promiscuous mode,
-> then that's not a good idea.  On the fabric there is Ethernet traffic,
-> but there is also Slingshot traffic.  They use totally different frame
-> types.  If you truly go for "everything", you'll get Slingshot traffic
-> along with Ethernet traffic and you'll be throwing away tons of garbage
-> and generally wondering what's going on.
+> Decompression of kernel configuration (/proc/config.gz) and compressed
+> ELF/BTF sections (via libbpf, libelf, and libbfd) processes data that
 
-The point is you want a very simple driver which it is possible to
-review.
 
-This is one of those 0, 1, many cases. Just having one portal entry
-means you don't need any allocation algorithm, you don't need recovery
-when it overflows, you don't need to be able to replace it, reference
-counting, etc. It gives you a starting point to expand later in a
-followup patch set which adds all these things.
+Is there any mechanism in place that prevents libbpf, libelf, and libbfd
+to link to different versions of zlib (zlib vs zlib-rs, I mean)? I
+imagine you could have bpftool linking against zlib-rs, but the libs
+installed on the system linking against zlib? Also I think the static
+build with the LLVM disassembler [0] passes -lz -lzstd in LIBS and I'm
+not sure how it would combine with the change, I need to take a closer look.
 
-The network stack is happy to handle promiscuous mode, it does it all
-the time when you use ethtool and put the interface into promisc mode.
-It is clearly not as efficient as having the hardware doing filtering,
-but it works.
 
-> If by "everything" you just
-> mean "all Ethernet traffic on a single portal entry", that's when I have
-> to go talk to the hardware engineers.  They have different lists they
-> use for Ethernet and I can't say for certain that the hardware will
-> allow not using those lists.  For instance, one of the lists might be
-> specifically for packets that have been fragmented and if you don't use
-> that list for those packets it may not receive them at all.
-
-Think about this from the other direction. How does promisc mode work?
-
-> The card has a burned in MAC address.
-
-That is one of the MAC addresses it needs to receive. But when you
-come to implement .ndo_set_rx_mode you are given a list of unicast and
-multicast MAC addresses you are supposed to receive. And if the
-hardware cannot do a perfect match, you do a less perfect match and
-let the stack deal with the rest.
-
-> I did have the AI do a full analysis of what you requested.  A bare
-> minimal driver.  It passed this back (just giving the summary, not the
-> full report):
+> benefits from a memory-safe implementation. Preferring zlib-rs over C
+> zlib provides memory safety and improved decompression performance while
+> keeping bpftool aligned with tools/perf (including sharing libz_rs.a
+> when building bootstrap bpftool for perf BPF skeletons).
 > 
-> Estimated total for a C2-only, PF-only Ethernet series:
+> Signed-off-by: Ian Rogers <irogers@google.com>
+
+Recalling our discussion from v1:
+
+>> Hi Ian, bpftool doesn't make an intensive use of zlib (mostly, it's a
+>> requirement from other dependencies; we may also use it to unzip the
+>> kernel config on the host if necessary for probing BPF features on the
+>> system, but only on some distributions). So I'm struggling to understand
+>> the motivation for your proposal, what do we gain by switching to
+>> zlib-rs when available? I understand this implementation is in Rust, but
+>> I'm not sure the added complexity and feature probing in the build
+>> system is worth it.
 > 
-> ss1 about 19–20k
-> SL about 15–20k
-> headers about 15–20k
-> That gives roughly 50–60k lines, or about 65k if C1 support stays.
+> Hi Quentin,
+> 
+> At my workplace, we are transitioning from zlib to zlib-rs for both
+> security and performance reasons. I'd like to keep upstream tools
+> aligned but they don't have to be, it just seems nice. I agree zlib is
+> of a lower priority to users than, say, zstd. For attackers, like with
+> brotli, it is probably an area of interest. Knowing the implementation
+> is memory safe is at least something in favor of zlib-rs. I sent this
+> series out as an RFC because I obviously have no way to mandate what
+> upstream should or shouldn't be doing. There are things that can make
+> life a little nicer and easier, and this patch series, for me, is one
+> of them.
+I understand you're transitioning to zlib-rs, but the current patch is
+not a full transition, in the sense that it doesn't replace zlib with
+zlib-rs but allows any of the two options; and I don't see support for
+the standard zlib being removed from bpftool anytime soon, which means
+that in practice, we've got to maintain compatibility with the two
+versions going forward. Others may want to chime in, but I'm still not
+convinced this is worth the burden.
 
-How does it define bare minimum.
+You also mention zstd, do you plan to add support for a zstd alternative
+as well in perf and bpftool in the future?
 
-If you have thrown out ethtool, you cannot change or report the link
-speed. If you cannot change the link speed, and you have followed IEEE
-802.3, your PCS will probably just come up when powered on, since the
-standard gives the registers sensible defaults. So all your PCS driver
-needs to do is poll for link. A typical PCS driver is around 2K lines
-of code, and that actually does more.
+(By the way, if you allow me a short digression, you had a patch related
+to the zstd probing for perf and bpftool [0] and I don't see in the
+tree, do you know if it was ever merged?)
 
-    Andrew
+Best regards,
+Quentin
+
+
+[0]
+https://github.com/libbpf/bpftool/blob/main/.github/workflows/static-build.yaml
+[1] https://lore.kernel.org/all/20260909204122.1993010-4-irogers@google.com/
