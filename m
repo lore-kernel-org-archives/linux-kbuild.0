@@ -1,58 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=84.16.66.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793685361;
-	b=T9exLkl+T8bBZKcvzuaLiugtS/IR6uZ+dx2fRLGLyo9PO8s9IRBGH56fTAc3haaS59Mp
-	 uxmvcm9EBr1McF6uMC7ZfFDKqnJHijdeUqGkaz4LzSlA0pNvq0iZAxYIy8OSDouBkbh3f
-	 jIoksd03y3I7nqHGuk5aW0nnecOPC2EzWCs/LlL1ivEpdCIOx7Ep5LxtQ9eggUeMOJuhc
-	 0FCYP1crbppBKs3zxiCE01jIe4s3ahJcDRLyfjeLm0s2mXgmzJ4VdyfWs48mmHOIF3Ow6
-	 mdHK2u0XQ6NiSUj6MGMoC0a2miovwUSz5r6QuewXBmPrY0ITMQD6VFmDcPpnLZmbn4g==
+	t=1793703513;
+	b=fzQoi3tAPWI/fZ1+tEt7km1EYx1cYX464/TPnDh7FAHU97EVuqttNXOOAvb7LqNGuykW
+	 w94b6S5jqMaN3J6AuuKE59GC8mx9AbP5tRCuvRIKZSalFW0HcNDgmR9CywnSjq0S3ZxOp
+	 qIpID/eNsM1r5AVod7n+bvrtrLHWhEcdxucl1YQrz+XkHs8K7NE82rxmGtUBzIdzuG8Wv
+	 1jYsulBUAXBjqvN1cWmqcBqNVsFFskvh/JDoXNiYdtIm/jVbrL33OnrfN0aQxzGHbw4yQ
+	 PjGEUqvRFIxtmEWDLcPrfpUBlQ+FBy5Z0nCdb8hvxEVzmIHJjnMokbPrkVkPEWMsRnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793685361;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=pEF1Gr9NZAzDPLZXlqHvpR6uqdednUOXEnQnTQGMKc4=;
-	b=HDNXxnUAginz5ZWuwmI32p1mO4Iq0MHNckfkbkcYszZUQD0wqchiZegJemWtYUDSQBnf
-	 QNlgBddPBrUJdFyyy+a4zY0TgCUTFqpCzg4lTtiYQJU4Ht5KewBc5XgsL0OTyX29FNKj9
-	 5uu+k1iYJiRDeCqWZjYU9jNdK+s05qtgC5f6fVhWpFK5f4az/Z5XcU4S5rZu7G0K+zGBN
-	 uE4NqfzQv24C1cSQsWCw12dbgYRdVj7KMBtSIYbudQewcwEWYIncMcVB1UNuYQjXExQyO
-	 IT7Aq9PFjcFxJxPVIZyuSOZsyscEqAtBrf5ZU4qVWGV6CeZOw6S7cBECcrUrrIemMkQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793703513;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-Infomaniak-Routing;
+	bh=ma2S+15aObxfKj9bOXcaN0Y4hp4kbhpHNV/D+sINngk=;
+	b=P8kZ5dBjE/EJPJ+GWAV5KGC4ekkjRaHJyBFMjNahx+YIopXAfCBcLVQ14uopu7Qi1hrF
+	 ynViaNr3BwsQQiQrYPGH0DmCV8XZpRJpy6TmtahOf33CMoiXwI/PlnrlfoR3boPyGXgd+
+	 dl/D1u+7fGRRbMQZ54EJp/ak0Ztwumws0VNiQwRYEZGLmMBs5jI+UHkTNuYpzzjyluM51
+	 0dKHKnQ1X8W6tJfFzPlt+gxIAc/E12vKAa52puP6MQSdilK3TGT+D3odsBPPsOLkQAe7B
+	 RjsqPB70kmY0b4G0mViRdGtnYJkL9kdy5q0h9T/KU/MQ4pgVfCQhiIGEK5+xBsRnQ5Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UlSRlLt2;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=none header.from=daylightlinux.ch;
+	spf=none smtp.mailfrom=daylightlinux.ch;
+	arc=none smtp.remote-ip=84.16.66.169
+Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5081C606A324
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 05:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UlSRlLt2
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE0BC1F000C1;
-	Tue,  3 Nov 2026 05:56:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793685361;
-	bh=pEF1Gr9NZAzDPLZXlqHvpR6uqdednUOXEnQnTQGMKc4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=UlSRlLt26I1EfZirClJzUt7UD0XrolHo+HlyHOlCfi7jtONbiniBumEB94dll5ABk
-	 fWBQzST+pNknOgkLkbJDpeYYzeDzv7a7AQ9sDch/uW+Wz8xqvPTqo+FEhj0/PL+p7a
-	 FOkUF2XIlgGSYRDCsRKnCFAtCIUHdrKnpGvad8cV/EJLHDA8EecIebUUuKbOMgaZt3
-	 h5/tgXX2d3pTDXNx81yOZGk19TaP/5fGllkYCFnyMV3BhN9UJqMTFLXYt6TWCV6NcK
-	 KGclyQ8Ck4w5GnLL5uK356sQkz9fasx5qVJJasAddKRoRBdztHskH1nOhC1bi6z04h
-	 w/KPZ0opWurGQ==
-Message-ID: <sashiko-outbox-194603@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/3] kbuild: don't print DESCEND messages from tools/
- build
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, "Nathan
- Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-In-Reply-To: <20261102-kbuild-descend-spam-v1-3-caff4f840cb7@weissschuh.net>
-References: <20261102-kbuild-descend-spam-v1-0-caff4f840cb7@weissschuh.net>
- <20261102-kbuild-descend-spam-v1-3-caff4f840cb7@weissschuh.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Nov 2026 05:56:00 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFD96070096
+	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 10:58:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BEFD96070096
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daylightlinux.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daylightlinux.ch
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jJltG5nzgzyBl;
+	Tue,  3 Nov 2026 11:58:30 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=daylightlinux.ch;
+	s=20261016; t=1793703510;
+	bh=ma2S+15aObxfKj9bOXcaN0Y4hp4kbhpHNV/D+sINngk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SPEGuvtlsbS8LIna8WBPpipobMeb9e05lWJHGBMfGkznBveiZbvtC3mp+2PkRSOFf
+	 8HcDwGbWGAqoIyqnZOvvLfOzi/lb04u12V7wZ7u+8M23BEEdlg9lAVHwCK9kXZGsGW
+	 JpbqnOzloVAyYfhP3y7+cHHifasYaq1I/9iDBcUJ8HwCHwa5L/mcAX3h5eqMKhLefB
+	 SJTUylaa47LjcgAs7Uv6chBlrmX0ggd5DtRBHnJSKPjwh72ZhwjQrPK2ZOtxGx+O65
+	 SB0Ovd+lukS3fleEcEjoLQAQzERMtyQDJpGwdLzUet8el9pWU1Oq3niTVE6J4cHiYF
+	 XTdw+cbV/0vlw==
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4jJltG01TqzKmL;
+	Tue,  3 Nov 2026 11:58:29 +0100 (CET)
+Received: from unknown by raspberrypi with local (Exim 4.96)
+	(envelope-from <info@daylightlinux.ch>)
+	id 1xOCDl-00EwGZ-1d;
+	Tue, 03 Nov 2026 11:58:29 +0100
+From: Hamdy Abou El Anein <info@daylightlinux.ch>
+To: nathan@kernel.org
+Cc: nsc@kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hamdy.aea@protonmail.com
+Subject: [PATCH] scripts: check-function-names: propagate nm failures
+Date: Tue,  3 Nov 2026 11:58:29 +0100
+Message-ID: <20261103105829.10511-1-info@daylightlinux.ch>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -61,64 +67,43 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] kbuild: missing QUIET_DESCEND=3D$(Q) in explicit tools/bootconfig t=
-arget
---
+From: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 
-commit 7691301f76c95de2969936070a6b66297111591a
-Author: Thomas Wei=C3=9Fschuh <linux@weissschuh.net>
+The symbol-name check pipes nm through awk and grep. If nm cannot read
+an object file, its failure status is lost and the script reports
+success without checking any symbols.
 
-kbuild: don't print DESCEND messages from tools/ build
+Capture nm output before filtering it and fail when nm fails. This
+keeps the existing forbidden-name detection unchanged.
 
-This commit passes QUIET_DESCEND=3D$(Q) to the tools/ sub-make invoked by t=
-he
-tools/% pattern rule in the top-level Makefile so that Kbuild suppresses
-the DESCEND messages emitted by the tools/ build system by default.
+Tested with a malformed object (failure), a valid object (success),
+and an object defining startup (failure).
 
-> diff --git a/Makefile b/Makefile
-> index d73f2bbd3b93d..2bfe786bc2843 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1637,7 +1637,7 @@ endif
-> =20
->  tools/%: FORCE
->  	$(Q)mkdir -p $(objtree)/tools
-> -	$(Q)$(MAKE) O=3D$(abspath $(objtree)) subdir=3Dtools -C $(srctree)/tool=
-s/ $*
-> +	$(Q)$(MAKE) O=3D$(abspath $(objtree)) QUIET_DESCEND=3D$(Q) subdir=3Dtoo=
-ls -C $(srctree)/tools/ $*
+Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
+---
+ scripts/check-function-names.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-[Severity: Low]
-Should the explicit tools/bootconfig rule earlier in Makefile also pass
-QUIET_DESCEND=3D$(Q)?
+diff --git a/scripts/check-function-names.sh b/scripts/check-function-names.sh
+index 94883e6..f07a0e1 100755
+--- a/scripts/check-function-names.sh
++++ b/scripts/check-function-names.sh
+@@ -13,7 +13,8 @@ if [ ! -f "$objfile" ]; then
+ 	exit 1
+ fi
+ 
+-bad_symbols=$(${NM:-nm} -p "$objfile" | awk '$2 ~ /^[TtWw]$/ {print $3}' |
++symbols=$(${NM:-nm} -p "$objfile") || exit 1
++bad_symbols=$(printf '%s\n' "$symbols" | awk '$2 ~ /^[TtWw]$/ {print $3}' |
+ 	      grep -E '^(startup|exit|split|unlikely|hot|unknown)(\.|$)')
+ 
+ if [ -n "$bad_symbols" ]; then
 
-Makefile defines a dedicated target for tools/bootconfig that takes
-precedence over the generic tools/% pattern rule when building with
-CONFIG_CMDLINE_FROM_BOOTCONFIG=3Dy (via prepare: tools/bootconfig) or when
-running make tools/bootconfig directly:
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.56.0
 
-Makefile:
-tools/bootconfig: export CC :=3D $(HOSTCC)
-tools/bootconfig: FORCE
-	$(Q)mkdir -p $(objtree)/tools
-	$(Q)$(MAKE) O=3D$(abspath $(objtree)) subdir=3Dtools -C $(srctree)/tools/ \
-		bootconfig CROSS_COMPILE=3D
-
-In tools/Makefile, the bootconfig target uses $(call descend,$@), which
-expands $(QUIET_DESCEND):
-
-tools/Makefile:
-counter dma firewire hv guest bootconfig spi usb virtio mm bpf iio gpio obj=
-tool leds wmi firmware debugging tracing: FORCE
-	$(call descend,$@)
-
-Without QUIET_DESCEND=3D$(Q) on the tools/bootconfig recipe, won't Kbuild
-still print the DESCEND bootconfig message during builds that invoke
-tools/bootconfig?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102-kbuild-des=
-cend-spam-v1-0-caff4f840cb7@weissschuh.net?part=3D3
