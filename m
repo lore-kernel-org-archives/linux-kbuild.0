@@ -1,62 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.157.188.8
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=84.16.66.168
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793724127;
-	b=2LAF7XSbBMEz9dhgPdAguJiufnA6WfOlIdOnRX+q30jsP+e+1fhCs5+MWeLlJMyox6Ad
-	 gSiY5jee6/qBfLLrDVHai+cMcYExqowUrhSvGCGSqA4uY5PlSsYn1CkUmpBaMh/a3+H8U
-	 V0i0CsZcCQMG0sJjHstoyY/GDfQPSOZVJ+uLvSt2AM5IBJj8rVER+ezxe7I+niRbn+7E9
-	 I3hkmJnoCQGuxzEZF5Oj7Q0xSCAMhNIZ1G1oaDFQ+VMVegQwbjG/5WbOtd0Whto22w/PP
-	 QWcEHDW/H52MlhAva/Pl+sUw1QcD5EjTUU0/CaFkilE53NaIKoUbDpuJEHdxPcED75w==
+	t=1793724128;
+	b=vlp3Sbk7rsvOLDixOBXaqsm2LW4MdemAUGGGbIUBHV/+Semorm+++nuyJRxfxtI/Ce8c
+	 VQUzhBQvPNO8IszCoYmFIxv7wVb9Z5lGJrDqJrEz8ALcKt8WL/sOw2LVdss/IWltMyt4V
+	 AaIaGZyk0oSR3jfPWsrPBhb++HXNaKplfuRsWI1mVztJIzw3SYgbXzN9stIFBdsV2bujj
+	 e294K+zToDsTmTTp5wbJV9Uy8qLpKikxuzSvtQWEckdSj/s6q2e4DU4mWc5wClkTty4dr
+	 1r1LGbKzPYB41RXTysNJ4pb5qQTsMfAhx7CqnsRPIXCWtCLtVpK7IlhODSpi500k+BA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793724127;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793724128;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
 	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding:X-Infomaniak-Routing;
-	bh=p/XqnTx0XYfkrhj9RyjTRFalzD96F4yr1muAv7ATL5Q=;
-	b=M1F/2qseGcz0/KcQPJ+Ec0j6iS2RXLMAcQMGk+joHoC5XznvwOWbMumSfkQff492t4n8
-	 Pm5hnyp5uC2tQcagooLckFN27mioSFMWhYyjKlSq2Ydv1Psb1+FHmmyUcHavD4W/PRPl2
-	 V8eHlawLdYpePp7ODCldhhB5kqm/K1wUDoCd4aFKaXa9UeuP7tmJCDTtXMYq4zbt/UeRa
-	 8nKQYLPT2NPflN8gXp0cTb0TzayqWKIRWWSIv30uAqqYZNFDHLyJuBkafJ1OkWGuOAqC8
-	 3GQ7gWvKJIVSnqhuxCGrWm5N9t2+yTRcD1SLxB9QfpiGcVRaOfzimf6LSIJ89PPds7A==
+	bh=S6JfyyvRxL4l1fMHMFvG0I2x91FsQ1UDGLPjBWHtnow=;
+	b=PYhItlIb+FN+dm8OoY7C0VAUQflCuOIH5ewS/hfAqPmNG6uwVts2DCyQ0OSZL+9QA3NJ
+	 +eGdTHb+lFmLyzncNiQnBr3w4s+9+qhBDkCGuX6uUaAZswKsjldcKwEng+X3pUdkAM31Q
+	 BFAnDdWv6t9IjrMvrTOfVnQzzG/jXLjtOB57N2b9Ddu/u43mR2MGoccsoXfpRvJ3eqgVB
+	 AIUO/6BU5nt/cyCUiJ/FFjuv+X0djrB9G5mvk8IYWFXNb/qkgp111H4WoYVAGFs8HMYtA
+	 LFyQtQrJBB8j3jJK08Z82BdJZhASSNFjOgQU/luqOcVJ+Rkb88WHyjjnPx9EPPBP1tQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=daylightlinux.ch;
 	spf=none smtp.mailfrom=daylightlinux.ch;
-	arc=none smtp.remote-ip=45.157.188.8
-Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
+	arc=none smtp.remote-ip=84.16.66.168
+Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [84.16.66.168])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9510660A3819
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 16:42:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9510660A3819
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991B060A3819
+	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 16:42:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 991B060A3819
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daylightlinux.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daylightlinux.ch
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jJvVh4f1QzkdJ
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 17:42:04 +0100 (CET)
+Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jJvVj3qf5zljX;
+	Tue,  3 Nov 2026 17:42:05 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=daylightlinux.ch;
-	s=20261016; t=1793724124;
-	bh=p/XqnTx0XYfkrhj9RyjTRFalzD96F4yr1muAv7ATL5Q=;
+	s=20261016; t=1793724125;
+	bh=S6JfyyvRxL4l1fMHMFvG0I2x91FsQ1UDGLPjBWHtnow=;
 	h=From:To:Cc:Subject:Date:From;
-	b=sl5lqNeJg9iRpchy0AWh7jawRkpCpCp/iYFKuOFE3ZlqmMV6E8KOOC0md4xUijW2T
-	 /bOgjPwtNxa3lxhvlc1lzEilePqsXAgcQ53DmFuDNF4/5QtIX4P9ZK+rRWN4q0u+oN
-	 wDfI1aFl4j83GqNwW2OOMmDiSa1W+gb01/Jw4nwCgXZtoKEvQ0tzJ5uXtAaLesV1DY
-	 pIJGzcdZ8w3qwv0AG4zZM3g/PYRPXGI7zZjoyvo2YEqXZ9YmHAjPF13ccQEH0/ipIK
-	 uu7rgqLE16lyNWnureEa5CpZSTzhxX7dxVMUceznzLHy7jgDhjILi48ECC8cg/7Eqg
-	 t9eCEcWrxACsw==
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jJvVg6hQPz6x6;
-	Tue,  3 Nov 2026 17:42:03 +0100 (CET)
+	b=HdKBytL7t8ouUXDKbGUk6d9tAhEUSDBAIUTmSaKdHjnmmszspRpcxiyxUHfNFwBrP
+	 OTIHi14UR37g9FTai4Dt/W1YJIRpQ79Dfy9d3MeqSWet6Z5zn46El9pc/RhqTMyBRw
+	 rsMGrO1FKJeVokfZJpq/E2j5f98vVlAqt23Isj0erSPvFh0hwmPaihN+mD75M7vXs/
+	 mJXeTBDe2PfWmiXD1AgKWYISxNss1F6GooKWBTbkmInDtp1lvSZxVwMyQtaNW22ziM
+	 XgGjYSJ3XC2HDIyQv5ZkEgJNCwsGoaWPa8Fz/SifJbamm/r0q5mDE5PfOioxwxJiNg
+	 pvfFpveeVPEsA==
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jJvVh5yFlzy6H;
+	Tue,  3 Nov 2026 17:42:04 +0100 (CET)
 Received: from unknown by raspberrypi with local (Exim 4.96)
 	(envelope-from <info@daylightlinux.ch>)
-	id 1xOHaF-00FDbz-1Z;
-	Tue, 03 Nov 2026 17:42:03 +0100
+	id 1xOHaG-00FDcV-1M;
+	Tue, 03 Nov 2026 17:42:04 +0100
 From: Hamdy Abou El Anein <info@daylightlinux.ch>
-To: nathan@kernel.org
+To: kees@kernel.org
 Cc: hamdy.aea@protonmail.com,
-	nsc@kernel.org,
+	linux-hardening@vger.kernel.org,
 	linux-kbuild@vger.kernel.org
-Subject: [PATCH] scripts: checkkconfigsymbols: match complete numeric literals
-Date: Tue,  3 Nov 2026 17:42:03 +0100
-Message-ID: <20261103164203.129644-1-info@daylightlinux.ch>
+Subject: [PATCH] randstruct: stop seed generation when a command fails
+Date: Tue,  3 Nov 2026 17:42:04 +0100
+Message-ID: <20261103164204.129671-1-info@daylightlinux.ch>
 X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -72,35 +72,43 @@ X-Infomaniak-Routing: alpha
 
 From: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 
-REGEX_NUMERIC.match() also accepts the numeric prefix of a symbol such
-as 64BIT_MISSING. The reference is then discarded as a numeric value,
-so a misspelled digit-prefixed Kconfig symbol is not reported.
+The pipeline ending in tr hides an od failure, allowing an empty seed
+and its hash to be written successfully. Similarly, cut masks a failed
+sha256sum, and a failed seed-file write does not stop header generation.
 
-Require the entire token to match the numeric expression.
+Enable errexit and capture od and sha256sum output before formatting it.
+Compute the hash before writing either output, then stop if a write
+fails. The seed format and hash calculation are unchanged.
 
-Tested Kconfig dependencies and conditional defaults containing
-64BIT_MISSING and 32BIT_MISSING, alongside decimal and hexadecimal
-literals. The symbols are retained and the literals remain excluded.
+Tested normal generation against Python hashlib, injected od and
+sha256sum failures, and an invalid seed output path. Failed generation
+now returns nonzero and does not create the hash header.
 
 AI assistance: ChatGPT/Codex identified the issue and prepared the
 change, commit message and executable regression tests.
 
-Fixes: 0bd38ae35522 ("scripts/checkkconfigsymbols.py: support default statements")
+Fixes: 313dd1b62921 ("gcc-plugins: Add the randstruct plugin")
 Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 ---
- scripts/checkkconfigsymbols.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/gen-randstruct-seed.sh | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/checkkconfigsymbols.py b/scripts/checkkconfigsymbols.py
-index 9f7aed98d91..5582e19c007 100755
---- a/scripts/checkkconfigsymbols.py
-+++ b/scripts/checkkconfigsymbols.py
-@@ -459,7 +459,7 @@ def parse_kconfig_file(kfile):
-                 line = line.strip('\n')
-                 symbols.extend(get_symbols_in_line(line))
-             for symbol in set(symbols):
--                if REGEX_NUMERIC.match(symbol):
-+                if REGEX_NUMERIC.fullmatch(symbol):
-                     # ignore numeric values
-                     continue
-                 references.append(symbol)
+diff --git a/scripts/gen-randstruct-seed.sh b/scripts/gen-randstruct-seed.sh
+index 61017b36c46..d3c4c1b59bc 100755
+--- a/scripts/gen-randstruct-seed.sh
++++ b/scripts/gen-randstruct-seed.sh
+@@ -1,7 +1,12 @@
+ #!/bin/sh
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-SEED=$(od -A n -t x8 -N 32 /dev/urandom | tr -d ' \n')
++set -e
++
++SEED=$(od -A n -t x8 -N 32 /dev/urandom)
++SEED=$(printf '%s' "$SEED" | tr -d ' \n')
++HASH=$(printf '%s' "$SEED" | sha256sum)
++HASH=${HASH%% *}
++
+ echo "$SEED" > "$1"
+-HASH=$(echo -n "$SEED" | sha256sum | cut -d" " -f1)
+ echo "#define RANDSTRUCT_HASHED_SEED \"$HASH\"" > "$2"
