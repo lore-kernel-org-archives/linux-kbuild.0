@@ -1,68 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793704530;
-	b=3qGulSMgBd1PpKan8WvkH/Z81Obx2Jir70DGBlMkeW0euRUr05gjPlAGq7qCKPHxCKEc
-	 m1/CnPPVd8PRmgSMblmO5ImbNAl7IyZBWOMxUJwW8XQRZcl5n5rcIzl8KFTwU1YpQ//Tr
-	 xuWVWCMhY7dtQuYvN+M28kO/HIsY9mXJtr7PSs0N0z8Xeaj3Fmy1PtRpryYTD230c8w38
-	 rKWsMhWV3AteH/7IRNfeJJLygbcrkG1lrFiN5fLZhieymsCeXVKeecEBPe1q5XBb+gfDO
-	 PuVxkI4j3DQWuSwe2rVNMLpVfIZnn9jAtfCtQpJhnXQOzCmP+VrllY2ARnyH8QiVSNg==
+	t=1793718532;
+	b=RZ1OnX3p/9wvYDw/9RENjKrEIRuuhxHMi5OGWi2DFjHtuDOs8qUjnnWOFYAR8TrmrOS3
+	 0VHjkghlbui88UBwc3cihmzkcmNFHsdmOWRS3je4l78Uz890cGLcSkUVf/fjfIIZWTSmK
+	 LH2a6u+OBuqcAcqKabNu7vOc8NmvHTLeTjtWO8lzdv1shUyIeu454O/omrW26oa25s76Y
+	 0TPb3jiQvFvO/YGNk6XIyDJTTIl0x+ZSIPCXrSs5U27w+IEg0sNgCszV5195D/+bE6kEy
+	 ECtndDEovlQhDVpNlMkhL/iKHJifSvljKH4Q954rgCLg3nBKSXXkdadmV14PgmdAVGQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793704530;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=nnP+EqYBk6lYiUKwenpEHCdDCJhLnMC1MO+64rkVOHo=;
-	b=g7w+AeKC3eQdVKYOtrjNpjJC+Rr88qRZfWSRrQ7KKE4HP4SF2uXGl+f8kuSKlkDZMiX7
-	 AKLwT/Orl8Eg6Q4JTCQtAVvCVKHFlKR2S7Y5TDKC1jym8WYgccYrFR00IsYaBZCUo0RaQ
-	 8WbC7unA/cydBe+bd3rir+iTyvdyrZplcyW15SFCFO8p1TrvkHNL5or+BwcEaq4Rj6nGF
-	 LFDhCdmK9AHGPyObHKcp/902m1MIq7TDncyA7oGVRLPHEvx9mUbeCriX4Id3rzneoqbhn
-	 QvmSouhWTNp9jqfpN/HboWo1JuyEpeHHD3EihUZWXVZalTi3CVcjEznDM9UOaRq2MJQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793718532;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=ztc4qLkMwN1NoVUWOEPMzFNWuHwPq9rAxrAFP/pyv3k=;
+	b=0G6CjjwaURandoLsbIqymmPQ+Z4/Jl8V4t1tBGYx0r6yxOhykcUlCasW6Un2fMRMx1sL
+	 JlOPZZL2vYJGnUlj7zOBT8uzRChmeI/564mpAwOz0PNBu2sRz2lUMq8Tx1pMiuH7Qa8xh
+	 Oy6ydGXMgVJcth2ZxI5LAA3iInmL6Pl3OmW/LWFK+x4cjz1byI7rSQiQHH99icrernFy0
+	 yP6Uwsv7Y9D2M+9Mm0s8q5JSSB5Ork8wsiQ0j/kNA6M/f6qy+QLABQxl1b/ucV/BtRlkp
+	 PK9wU3VCpnNVe5x8MRnrb/X+7Kid9DuZm1UQoroKUlEevR3Mhkd2Nx7S/Dio6/Qrusg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CYryrmHK;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LPAosJaQ;
+	arc=none smtp.remote-ip=209.85.160.51
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D90A606B13C;
-	Tue,  3 Nov 2026 11:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92AB9606FCC5
+	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 15:08:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 92AB9606FCC5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CYryrmHK
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8123D1F0093A;
-	Tue,  3 Nov 2026 11:15:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793704529;
-	bh=nnP+EqYBk6lYiUKwenpEHCdDCJhLnMC1MO+64rkVOHo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=CYryrmHK7Qu36kCLEvVc4oulo5dqWCJQUhvsy0Xi15KoVlO5aLmvQCh7eewg0vhi+
-	 oMk8jWCpcXtXx9xmyy2qp6b2oYBJC1EBkqPMG1yvsxaRTumUPToPwgKpMG+BcMQpuf
-	 TiaI8gMK8uVRIypCyZ7liiNHmlxMLnn7cdWpqHOQUhoScT9aiRGdf6nMpdIZosOw53
-	 19Ca0x/tJuGiuNiW2TMjA4Z9DpM4kgi9b4U+4yub2lTSACwTvIAW4j7Dv4oveGG5+h
-	 IrZ4urdULMtlAA2QQv5EygpbIAr55hRffAn0mjgTmDxaJYWQLCPI2Vp7imUdJGr33M
-	 kIvGIoUw0sbsA==
-Message-ID: <sashiko-outbox-195133@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v10 4/4] kallsyms: add KUnit tests for lineinfo feature
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sasha Levin" <sashal@kernel.org>, "Andrew Morton" <akpm@linux-foundation.org>, "Masahiro
- Yamada" <masahiroy@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Linus
- Torvalds" <torvalds@linux-foundation.org>, "Richard Weinberger" <richard@nod.at>, "Juergen
- Gross" <jgross@suse.com>, "Geert Uytterhoeven" <geert@linux-m68k.org>, "James
- Bottomley" <James.Bottomley@HansenPartnership.com>
-Cc: "Jonathan Corbet" <corbet@lwn.net>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
- Schier" <nsc@kernel.org>, "Petr Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Aaron
- Tomlin" <atomlin@atomlin.com>, "Greg KH" <gregkh@linuxfoundation.org>, "Petr
- Mladek" <pmladek@suse.com>, "Steven Rostedt" <rostedt@goodmis.org>, "Kees
- Cook" <kees@kernel.org>, "Peter Zijlstra" <peterz@infradead.org>, "Thorsten
- Leemhuis" <linux@leemhuis.info>, "Vlastimil Babka" <vbabka@kernel.org>, "Helge
- Deller" <deller@gmx.de>, "Randy Dunlap" <rdunlap@infradead.org>, "Laurent
- Pinchart" <laurent.pinchart@ideasonboard.com>, "Vivian Wang" <wangruikang@iscas.ac.cn>, "Zhen
- Lei" <thunder.leizhen@huawei.com>, "Sami Tolvanen" <samitolvanen@google.com>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
-In-Reply-To: <20261102111455.919102-5-sashal@kernel.org>
-References: <20261102111455.919102-1-sashal@kernel.org>
- <20261102111455.919102-5-sashal@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Nov 2026 11:15:28 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LPAosJaQ
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-4a85c656c58so2588696fac.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 03 Nov 2026 07:08:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793718530; x=1794323330; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ztc4qLkMwN1NoVUWOEPMzFNWuHwPq9rAxrAFP/pyv3k=;
+        b=LPAosJaQomkk+3IHBdKD17odPMqzTKcRQQntLNNF8saauK6Rh/eeGGF/aRJsr6Pmqf
+         89D2mNvu8k13XA45/c6ZfhELpGbAs/+9ANPLrocgsTrV22jHjbWQ4i72WoBWv07wK/D0
+         XcMkEuouJUjRghaccdaAzKgPsoAt+Vut83CeeKLT7h+wVQ5zx7Go8m80wYT2dYOqM0j2
+         t+sDXay6dzIYWdO9dEGFuCl7Ck4Ut1zOB4adrqQKZAcJY/Z2helMv4nQ9GNGiV8bTCNx
+         nDj4lWBNaWI7CaMz6RV2YcS2jlwNqU4AJaSYjcqfafn6v0pGG7ZB8dmp3U8IjhJgpP0P
+         8rVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793718530; x=1794323330;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ztc4qLkMwN1NoVUWOEPMzFNWuHwPq9rAxrAFP/pyv3k=;
+        b=e1SxIhKj36gBWHu5Cv+olXhYp3Ie0+3ehAVnXM0/yNlhzhe7is8elGBcMynfXB/cRs
+         yQ2lZmHaEPMVFh82FinaQnUpI1f4q33dW5qR+Mr4YaNEgbrMpe7hLPtNbWSzcBdFQEsb
+         FKHBCXLbos9U9JyV8vPCVmYWgrB12h6g8javy0U2ORyeNXGOhh5GxT/JIXHnmQ5PxvRz
+         b1MGPg9yHfQBZfPy1/sQNe/EUubqs8Xy3jdWkkOON1oBF+ptsN5zJKLYiTUI9NKIBto4
+         S1hgPQpT3eqMVylOizGJ7J13i/xw+CUzbGGdBzhhcPvAHRXzmdrOPl9AMRlMBpr/Vxmz
+         Y0NA==
+X-Forwarded-Encrypted: i=1; AKwUvBwjodFAsAPoWOnsKcU64w7eGCrMzDU839BEDMwAubFZlLwbu8hqxWga2k2zOc1//7434cBfJETt5i4ztTY=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8e+6NVVJ179lfRH4/H7KdWaP4DefvCq2DG9CPK7yJ/Dqp+oJ+r
+	13ATD7QelTAfn4OQT9CDa6P4rYNogZrojVm1J5u115O5/yrsuU2Y+m64
+X-Gm-Gg: AYBFou0PDtvs0q9qaNaqWSr2tHWY1y7CWmQIYlHTHtmMNxe9P4obilziZw46fxMcH7G
+	fhmmpU3G184pop0fs6nIa7VQxBWf41ZgV5Ej8FkzGNaevEFUe1HXu+UIiw5c9NWwVCT0ZeFUFQZ
+	uo7Qb/nycnfi5Rb3cJzmkqh5ZMzzwLxbMPPk4TginRlQvyNC062DQNaIdU/bMJHG2dnjn5ADgMv
+	5jWwhU69oYRGEi6grvuBZzmJnDU2vDS/Em3UC7CN9fE/RpUHPuYiUurqeu6vrjE7W3NLYoLici0
+	Ge+JYjzP5mMaJfLXGYu0IZZELG65lw0LGVGyiEuvxfh93OtEZ/TzqJUERMu5TztyrZcD0JemC+O
+	iNKybHB8QIdXV7jJYZ6DXBJ1ElXXAL+D6DKOO3fcVK0RObUsj+KSwWgpy90rP3LGL7HOem57xWg
+	oS+cxcRY+xKHZe9z9q5/xDsqQ00sWx5G+E+klbi1FxGc/EpPsQHzUGkpU+66HqQFLbw0VDTewxP
+	vVAygq99NmyUJSycVYWf6UgwLhzKxF2adN7S7BlXYj/X1o9f+S6/60tlSXgATrMNbYI5MGIKS5U
+	b/tKwbgwg1CiISi3v9xKXOro5Son3INnfVZV6Q==
+X-Received: by 2002:a05:6870:15d5:b0:483:bdb3:a524 with SMTP id 586e51a60fabf-4a9072ccf3fmr7956354fac.4.1793718530479;
+        Tue, 03 Nov 2026 07:08:50 -0800 (PST)
+Received: from penguin.lxd ([2605:3f84:842:3300:216:3eff:fe58:9322])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a95d970b9bsm4730448fac.8.2026.11.03.07.08.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Nov 2026 07:08:49 -0800 (PST)
+From: Matthew Weber <matthew.l.weber@gmail.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-doc@vger.kernel.org,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Thorsten Leemhuis <linux@leemhuis.info>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	kasan-dev@googlegroups.com,
+	Matthew Weber <matthew.l.weber@gmail.com>
+Subject: [PATCH 0/4] Documentation: Add kernel minimization guide
+Date: Tue,  3 Nov 2026 09:08:41 -0600
+Message-Id: <20261103150845.13008-1-matthew.l.weber@gmail.com>
+X-Mailer: git-send-email 2.39.5
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -71,262 +101,101 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 5 potential issue(=
-s) to consider:
-- [Medium] kallsyms: identical bodies in lineinfo_kunit targets allow IPA-I=
-CF folding
-- [Low] kallsyms: unreachable failure path in test_assembly_no_lineinfo()
-- [Low] kallsyms: missing has_lineinfo() assertion in test_many_lines_mid_f=
-unction()
-- [Low] kallsyms: inaccurate lineinfo comments in sprint_with_lineinfo() an=
-d test
-- [Low] kallsyms: test_static_function() duplicates test_short_function()
---
+Hi all,
 
-commit fbb509d58818b09aeb1b086d5f710841ca770e58
-Author: Sasha Levin <sashal@kernel.org>
+This series adds documentation and a script for measuring source lines of
+code (SLOC) in kernel builds, supporting developers and system integrators
+who need to trim a Linux kernel.
 
-kallsyms: add KUnit tests for lineinfo feature
+The Workload analysis section of the admin-guide already describes tracing
+a workload. This series builds on that guidance with a worked example of
+using workload observations to inform kernel minimization and measure the
+resulting configuration. The guide is intended for developers working on
+embedded and safety-critical use cases, including work related to ELISA.
 
-This commit adds a KUnit test module (CONFIG_LINEINFO_KUNIT_TEST) to verify
-kallsyms source file and line annotations in stack traces, and exports
-sprint_backtrace() and sprint_backtrace_build_id() for KUnit testing.
+The series builds on the ELISA Aerospace Working Group's ongoing
+minimization discussions and iterations in
+https://github.com/elisa-tech/wg-aerospace/pull/257. That effort explores a
+generic, newcomer-oriented workflow for tracing a workload, iterating on a
+kernel configuration, measuring kernel metrics, and understanding userspace
+metrics. The ELISA documentation aims to present a complete containerized
+workflow, with analysis steps to guide users through successive iterations.
+This series contributes reusable, general-purpose kernel documentation and
+tooling upstream to support that broader process. Clear upstream guidance can
+also give AI-assisted tools reliable steering context as they help users
+iterate on kernel configurations. One likely early application is producing
+minimized release configurations for Space Grade Linux.
 
-> diff --git a/lib/tests/lineinfo_kunit.c b/lib/tests/lineinfo_kunit.c
-> new file mode 100644
-> index 0000000000000..066f342bd78ae
-> --- /dev/null
-> +++ b/lib/tests/lineinfo_kunit.c
-> @@ -0,0 +1,1110 @@
-[ ... ]
-> +/*
-> + * Format a symbol with lineinfo annotation.  Lineinfo is appended only
-> + * via the sprint_backtrace*() entry points (kernel/kallsyms.c only adds
-> + * the "(file:line)" suffix in stack-trace context =E2=80=94 sprint_symb=
-ol() is
-> + * used by %ps and many existing format strings tack literal "()" after
-> + * %ps, where the annotation would render as "foo (file:line)()").
-> + *
-> + * sprint_backtrace() subtracts 1 from the address to handle tail-call
-> + * return-address corrections; pass @addr + 1 to recover the original.
-> + */
-> +static int sprint_with_lineinfo(char *buf, unsigned long addr)
-> +{
-> +	return sprint_backtrace(buf, addr + 1);
-> +}
+Rendered drafts are available online:
 
-[Severity: Low]
-Is the comment above sprint_with_lineinfo() still accurate?
+  Kernel minimization:
+  https://matthew-l-weber.github.io/linux/admin-guide/kernel-minimization.html
 
-In kernel/kallsyms.c, sprint_symbol() and sprint_symbol_build_id() also pass
-add_lineinfo =3D 1 (backing %pS and %pSb), while sprint_symbol_no_offset() =
-backs
-lowercase %ps and passes add_lineinfo =3D 0.  Later in this file,
-test_sprint_symbol_format() and test_pS_format() also assert that
-sprint_symbol() and %pS include lineinfo.
+  Workload tracing:
+  https://matthew-l-weber.github.io/linux/admin-guide/workload-tracing.html
 
-[ ... ]
-> +static noinline int lineinfo_target_with_arg(int x)
-> +{
-> +	barrier();
-> +	return x + 1;
-> +}
-[ ... ]
-> +static noinline int lineinfo_cross_file_caller(int x)
-> +{
-> +	return lineinfo_header_helper(x);
-> +}
+The series and its review discussion are in PR #1:
+https://github.com/matthew-l-weber/linux/pull/1
 
-[Severity: Medium]
-Can GCC's identical-code folding (IPA-ICF) merge lineinfo_cross_file_caller=
-()
-into lineinfo_target_with_arg() and cause test_cross_file_inline() to fail?
+The patches are:
 
-Unlike the 0-argument target functions which return distinct constants (42,=
- 1,
-99, 10), lineinfo_target_with_arg(), lineinfo_header_helper() in
-lib/tests/lineinfo_kunit.h (inlined into lineinfo_cross_file_caller()), and
-lineinfo_target_second_file() in lib/tests/lineinfo_kunit_second.c all share
-the exact same signature and body:
+  1/4 Documentation: kcov: clarify coverage example
+      Clarify that the saved count bounds the printed entries while KCOV
+      remains enabled until the disable ioctl. Document the relevant
+      config requirements and PC symbolization.
 
-	barrier();
-	return x + 1;
+  2/4 scripts: Add kernel-sloc helper script
+      Add a helper to count source lines from compile_commands.json or
+      estimate distinct source lines represented in a vmlinux DWARF line
+      table.
 
-After __always_inline expansion of lineinfo_header_helper() into
-lineinfo_cross_file_caller(), lineinfo_target_with_arg() and
-lineinfo_cross_file_caller() are two static noinline functions in the same
-translation unit with identical GIMPLE bodies.  When built with GCC at -O2 =
-or
--Os without -fno-optimize-sibling-calls (for example when
-CONFIG_FRAME_POINTER=3Dn), -fipa-icf-functions merges
-lineinfo_cross_file_caller() into lineinfo_target_with_arg() and replaces
-lineinfo_cross_file_caller() with a tail-call thunk whose DWARF .debug_line
-entry only references lib/tests/lineinfo_kunit.c.
+  3/4 Documentation: admin-guide: Add kernel minimization guide
+      Add the guide to the Workload analysis section and add its
+      MAINTAINERS coverage.
 
-When that happens, test_cross_file_inline() finds no address in
-lineinfo_cross_file_caller() resolving to lineinfo_kunit.h and fails.  Would
-giving each function a distinct return expression (such as x + 1, x + 2,
-x + 3) or marking them __noipa prevent the compiler from folding them?
+  4/4 Documentation: admin-guide: Update workload tracing guide
+      Expand workload tracing guidance with ftrace function-graph
+      tracing, syscall tracing under QEMU with the GDB stub, and mapping
+      observations to kernel configuration symbols.
 
-[ ... ]
-> +static void test_static_function(struct kunit *test)
-> +{
-> +	char *buf =3D alloc_sym_buf(test);
-> +	unsigned long addr =3D target_addr(lineinfo_target_short);
-> +
-> +	skip_without_module_lineinfo(test);
-> +
-> +	sprint_with_lineinfo(buf, addr);
-> +	KUNIT_EXPECT_TRUE_MSG(test, has_lineinfo(buf),
-> +			      "No lineinfo in: %s", buf);
-> +}
-[ ... ]
-> +static void test_short_function(struct kunit *test)
-> +{
-> +	char *buf =3D alloc_sym_buf(test);
-> +	unsigned long addr =3D target_addr(lineinfo_target_short);
-> +
-> +	skip_without_module_lineinfo(test);
-> +
-> +	sprint_with_lineinfo(buf, addr);
-> +	KUNIT_EXPECT_TRUE_MSG(test, has_lineinfo(buf),
-> +			      "No lineinfo for short function in: %s", buf);
-> +}
+Tool-use disclosure: I used GitHub Copilot CLI while preparing this series.
+It helped revise the KCOV example, edit parts of the documentation, add
+MAINTAINERS entries, and integrate error-handling revisions to kernel-sloc.
+I reviewed the changes and take responsibility for the series.
 
-[Severity: Low]
-Does test_static_function() duplicate test_short_function()?  Both functions
-resolve target_addr(lineinfo_target_short) with sprint_with_lineinfo(buf, a=
-ddr)
-and check has_lineinfo(buf), and all of the local target functions in
-lib/tests/lineinfo_kunit.c are already static.
+I checked kernel-sloc syntax and help output, and ran
+checkpatch.pl --strict on all four patches. The GitHub Actions htmldocs
+build completed successfully with no warnings from the changed files; the
+published documentation is available at
+https://matthew-l-weber.github.io/linux/admin-guide/index.html#workload-analysis.
+I did not run make htmldocs locally.
 
-[ ... ]
-> +static void test_symbol_start_addr(struct kunit *test)
-> +{
-> +	char *buf =3D alloc_sym_buf(test);
-> +	unsigned long addr =3D target_addr(lineinfo_target_normal);
-> +
-> +	skip_without_module_lineinfo(test);
-> +
-> +	/*
-> +	 * sprint_backtrace() subtracts 1 from the input and reports offset
-> +	 * relative to the (decremented) address, so an exact "+0x0/" can't
-> +	 * be expected here.  Verify the symbol resolves and carries lineinfo.
-> +	 */
-> +	sprint_with_lineinfo(buf, addr);
-> +	KUNIT_EXPECT_TRUE_MSG(test,
-> +			      strnstr(buf, "lineinfo_target_normal",
-> +				      KSYM_SYMBOL_LEN) !=3D NULL,
-> +			      "Didn't resolve to expected function: %s", buf);
-> +	KUNIT_EXPECT_TRUE_MSG(test, has_lineinfo(buf),
-> +			      "No lineinfo at function start: %s", buf);
-> +}
+Any feedback is appreciated.
 
-[Severity: Low]
-In test_symbol_start_addr(), is the comment about how sprint_backtrace()
-computes the offset accurate?
+Thanks,
+Matthew
 
-In __sprint_symbol(), symbol_offset (-1) is added to address for the lookup
-and then subtracted back from offset:
+Matthew Weber (4):
+  Documentation: kcov: clarify coverage example
+  scripts: Add kernel-sloc helper script
+  Documentation: admin-guide: Add kernel minimization guide
+  Documentation: admin-guide: Update workload tracing guide
 
-	address +=3D symbol_offset;
-	len =3D kallsyms_lookup_buildid(address, &size, &offset, &modname, &buildi=
-d,
-				       buffer);
-	...
-	sym_start =3D address - offset;
-	offset -=3D symbol_offset;
+ Documentation/admin-guide/index.rst           |   1 +
+ .../admin-guide/kernel-minimization.rst       | 413 ++++++++++++++++++
+ .../quickly-build-trimmed-linux.rst           |   4 +
+ .../admin-guide/workload-tracing.rst          | 139 +++++-
+ Documentation/dev-tools/kcov.rst              |  44 ++-
+ MAINTAINERS                                   |  13 +
+ scripts/kernel-sloc                           | 299 +++++++++++++
+ 7 files changed, 903 insertions(+), 10 deletions(-)
+ create mode 100644 Documentation/admin-guide/kernel-minimization.rst
+ create mode 100755 scripts/kernel-sloc
 
-Because sprint_with_lineinfo() passes addr + 1 to sprint_backtrace(),
-__sprint_symbol() looks up addr (offset 0) and then adjusts offset to +0x1/
-(the undecremented input offset), whereas calling sprint_symbol(buf, addr)
-directly would report +0x0/ with lineinfo.
 
-[ ... ]
-> +static void test_assembly_no_lineinfo(struct kunit *test)
-> +{
-> +#if IS_BUILTIN(CONFIG_LINEINFO_KUNIT_TEST)
-> +	char *buf =3D alloc_sym_buf(test);
-> +	unsigned long addr =3D (unsigned long)_text;
-> +
-> +	sprint_with_lineinfo(buf, addr);
-> +	/*
-> +	 * _text is typically an asm entry point with no DWARF line info.
-> +	 * If it has lineinfo, it's a C-based entry =E2=80=94 skip in that case.
-> +	 */
-> +	if (has_lineinfo(buf))
-> +		kunit_skip(test, "_text has lineinfo (C entry?): %s", buf);
-> +
-> +	KUNIT_EXPECT_FALSE_MSG(test, has_lineinfo(buf),
-> +			       "Unexpected lineinfo for asm symbol: %s", buf);
-> +#else
-> +	kunit_skip(test, "_text not accessible from modules");
-> +#endif
-> +}
-
-[Severity: Low]
-Can the KUNIT_EXPECT_FALSE_MSG(test, has_lineinfo(buf), ...) assertion in
-test_assembly_no_lineinfo() ever fail?
-
-If has_lineinfo(buf) is true, the preceding if (has_lineinfo(buf)) check ca=
-lls
-kunit_skip(), which aborts the test via kunit_try_catch_throw(), so
-has_lineinfo(buf) is always false when KUNIT_EXPECT_FALSE_MSG() is reached.
-Also, since CONFIG_KALLSYMS_LINEINFO depends on CONFIG_DEBUG_INFO (which pa=
-sses
--g in KBUILD_AFLAGS), assembler .S entry points at _text normally have DWARF
-line info as well, causing this test to always skip.
-
-[ ... ]
-> +static void test_many_lines_mid_function(struct kunit *test)
-> +{
-> +	char *buf =3D alloc_sym_buf(test);
-> +	unsigned long addr =3D target_addr(lineinfo_target_many_lines);
-> +	unsigned int line;
-> +	unsigned long mid_addr;
-> +
-> +	skip_without_module_lineinfo(test);
-> +
-> +	/* Get function size from sprint_with_lineinfo output */
-> +	sprint_with_lineinfo(buf, addr);
-> +	KUNIT_ASSERT_TRUE(test, has_lineinfo(buf));
-> +
-> +	/*
-> +	 * Try an address 8 bytes into the function (past prologue).  Hide
-> +	 * the base from the compiler so this does not become a static
-> +	 * mid-function relocation (sym+8), which objtool flags as a
-> +	 * relocation to !ENDBR with CONFIG_X86_KERNEL_IBT.
-> +	 */
-> +	OPTIMIZER_HIDE_VAR(addr);
-> +	mid_addr =3D addr + 8;
-> +	sprint_with_lineinfo(buf, mid_addr);
-> +
-> +	/*
-> +	 * Should still resolve to lineinfo_target_many_lines.
-> +	 * Lineinfo should be present with a plausible line number.
-> +	 */
-> +	KUNIT_EXPECT_TRUE_MSG(test,
-> +			      strnstr(buf, "lineinfo_target_many_lines",
-> +				      KSYM_SYMBOL_LEN) !=3D NULL,
-> +			      "Mid-function addr resolved to wrong symbol: %s",
-> +			      buf);
-> +	if (has_lineinfo(buf)) {
-> +		line =3D extract_line(buf);
-> +		KUNIT_EXPECT_GE_MSG(test, line, (unsigned int)50,
-> +				    "Line %u too low for mid-function", line);
-> +		KUNIT_EXPECT_LE_MSG(test, line, (unsigned int)700,
-> +				    "Line %u too high for mid-function", line);
-> +	}
-> +}
-
-[Severity: Low]
-In test_many_lines_mid_function(), if sprint_with_lineinfo(buf, mid_addr) f=
-ails
-to produce lineinfo, won't the test silently pass because the line-number
-checks are guarded by if (has_lineinfo(buf)) instead of asserting
-KUNIT_ASSERT_TRUE(test, has_lineinfo(buf))?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102111455.9191=
-02-1-sashal@kernel.org?part=3D4
+base-commit: a592a36e49372172d7c7551ec19ed18184c935e1
+-- 
+2.39.5
