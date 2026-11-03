@@ -1,62 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=84.16.66.168
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.157.188.8
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793724128;
-	b=vlp3Sbk7rsvOLDixOBXaqsm2LW4MdemAUGGGbIUBHV/+Semorm+++nuyJRxfxtI/Ce8c
-	 VQUzhBQvPNO8IszCoYmFIxv7wVb9Z5lGJrDqJrEz8ALcKt8WL/sOw2LVdss/IWltMyt4V
-	 AaIaGZyk0oSR3jfPWsrPBhb++HXNaKplfuRsWI1mVztJIzw3SYgbXzN9stIFBdsV2bujj
-	 e294K+zToDsTmTTp5wbJV9Uy8qLpKikxuzSvtQWEckdSj/s6q2e4DU4mWc5wClkTty4dr
-	 1r1LGbKzPYB41RXTysNJ4pb5qQTsMfAhx7CqnsRPIXCWtCLtVpK7IlhODSpi500k+BA==
+	t=1793724130;
+	b=AMB9TLxBgDTm11vUfmGhei6b/5SK3WZRHkU1dN9VZXUCaI+jahnbyvpw1ibKhtadFufR
+	 0FY6U+8LUwdGnGD7ywXhI+rRdJbubDQ52xHMUDvxkyukoftrUgLa/AvJWyxZEUVp65CkZ
+	 ++wa1gULke22wEywZ0f6jzNYOBZevdmKKzL/Yu7rA+pMYsrVMopYsr0IFis0DJFiv4cEM
+	 zhwKovLxHFj/GoiD+NVs0Dj8UOddriQ2GJQqTGBtbp4Jux7ktTIPVOCU3K1F2HupYVTt0
+	 Rlg42slVIhxrlEJsSvkKmUchcHetrg/w0A6AEP3W2ba+wet4ntelEYROIYNE1B48T4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793724128;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793724130;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
 	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding:X-Infomaniak-Routing;
-	bh=S6JfyyvRxL4l1fMHMFvG0I2x91FsQ1UDGLPjBWHtnow=;
-	b=PYhItlIb+FN+dm8OoY7C0VAUQflCuOIH5ewS/hfAqPmNG6uwVts2DCyQ0OSZL+9QA3NJ
-	 +eGdTHb+lFmLyzncNiQnBr3w4s+9+qhBDkCGuX6uUaAZswKsjldcKwEng+X3pUdkAM31Q
-	 BFAnDdWv6t9IjrMvrTOfVnQzzG/jXLjtOB57N2b9Ddu/u43mR2MGoccsoXfpRvJ3eqgVB
-	 AIUO/6BU5nt/cyCUiJ/FFjuv+X0djrB9G5mvk8IYWFXNb/qkgp111H4WoYVAGFs8HMYtA
-	 LFyQtQrJBB8j3jJK08Z82BdJZhASSNFjOgQU/luqOcVJ+Rkb88WHyjjnPx9EPPBP1tQ==
+	bh=XR3esfciYeAILeLk4M7GhRXSZx24vdDScrjmqr3Tsx4=;
+	b=0xEXF0+esiyCOFXn6/Yi75U2Mdrx8rucl+wCv8M1MfRLYycav0Nz5jX2YLbvCW+h315h
+	 xu3/uVWP0MbJ/jMDg/vtCV1sxsVSmVk2KmFl3GAkIFwxtQBGeiQdZzl6lkmcMqHMPHzfz
+	 prnV+ESympDqBALYs0IfAbju4KyzkWhOen0vNOOt2PFVOlqTCZ1pcsztVr92MJVHql7xa
+	 njvsvioQe3VXtNH78BSRtJMF3zrrbLayqGBMb3rPlKNF+qyDw+rvogRpTbaGebDBTnROY
+	 8rUvOJ52mNCLsefMr0MB/e/iRMT5QLtcGmWXgO4XBdcYcYy9RPTA3i3UoijGbUrd/mQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=daylightlinux.ch;
 	spf=none smtp.mailfrom=daylightlinux.ch;
-	arc=none smtp.remote-ip=84.16.66.168
-Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [84.16.66.168])
+	arc=none smtp.remote-ip=45.157.188.8
+Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991B060A3819
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 16:42:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 991B060A3819
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA8560A263B
+	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 16:42:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8CA8560A263B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daylightlinux.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daylightlinux.ch
-Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6c])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jJvVj3qf5zljX;
-	Tue,  3 Nov 2026 17:42:05 +0100 (CET)
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jJvVl6r1jzlJH;
+	Tue,  3 Nov 2026 17:42:07 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=daylightlinux.ch;
-	s=20261016; t=1793724125;
-	bh=S6JfyyvRxL4l1fMHMFvG0I2x91FsQ1UDGLPjBWHtnow=;
+	s=20261016; t=1793724127;
+	bh=XR3esfciYeAILeLk4M7GhRXSZx24vdDScrjmqr3Tsx4=;
 	h=From:To:Cc:Subject:Date:From;
-	b=HdKBytL7t8ouUXDKbGUk6d9tAhEUSDBAIUTmSaKdHjnmmszspRpcxiyxUHfNFwBrP
-	 OTIHi14UR37g9FTai4Dt/W1YJIRpQ79Dfy9d3MeqSWet6Z5zn46El9pc/RhqTMyBRw
-	 rsMGrO1FKJeVokfZJpq/E2j5f98vVlAqt23Isj0erSPvFh0hwmPaihN+mD75M7vXs/
-	 mJXeTBDe2PfWmiXD1AgKWYISxNss1F6GooKWBTbkmInDtp1lvSZxVwMyQtaNW22ziM
-	 XgGjYSJ3XC2HDIyQv5ZkEgJNCwsGoaWPa8Fz/SifJbamm/r0q5mDE5PfOioxwxJiNg
-	 pvfFpveeVPEsA==
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jJvVh5yFlzy6H;
-	Tue,  3 Nov 2026 17:42:04 +0100 (CET)
+	b=CIRhTR7RkN4qYXCuuTUmIQxa09JKooeFlITVyRGNuxSfOKQ56sDZSGL2f1qKkXxUR
+	 ktsxP2UJNJFFvs7w/jCSgbIrPX8vjz3EFR1wMXtdokGbPstxezVy8pCy5ALUtGENLW
+	 rvCCiQjG6i7wld0cMfu9n0six8fmShOftcbNSVYI3hX5VAmjgwmo11LP8I/cYrh7nk
+	 2Mpz1OdLD7vQ+4S8S6fV2zqUqs3FKoH+KykFnRAu1d30i684rllSvGDLthcehcyGCM
+	 +KiChMLN10j/HlwwZ3CXnRJzF/0N3LcGUCqE+58BuoCL5WlFDOGjorm6ilbI57rDem
+	 1JUhnpGuLzthQ==
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jJvVl35hXz66Q;
+	Tue,  3 Nov 2026 17:42:07 +0100 (CET)
 Received: from unknown by raspberrypi with local (Exim 4.96)
 	(envelope-from <info@daylightlinux.ch>)
-	id 1xOHaG-00FDcV-1M;
-	Tue, 03 Nov 2026 17:42:04 +0100
+	id 1xOHaJ-00FDeQ-0B;
+	Tue, 03 Nov 2026 17:42:07 +0100
 From: Hamdy Abou El Anein <info@daylightlinux.ch>
-To: kees@kernel.org
+To: nathan@kernel.org
 Cc: hamdy.aea@protonmail.com,
-	linux-hardening@vger.kernel.org,
+	nsc@kernel.org,
 	linux-kbuild@vger.kernel.org
-Subject: [PATCH] randstruct: stop seed generation when a command fails
-Date: Tue,  3 Nov 2026 17:42:04 +0100
-Message-ID: <20261103164204.129671-1-info@daylightlinux.ch>
+Subject: [PATCH] scripts: syscall: require a complete ABI name match
+Date: Tue,  3 Nov 2026 17:42:06 +0100
+Message-ID: <20261103164206.129733-1-info@daylightlinux.ch>
 X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -72,43 +72,71 @@ X-Infomaniak-Routing: alpha
 
 From: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 
-The pipeline ending in tr hides an od failure, allowing an empty seed
-and its hash to be written successfully. Similarly, cut masks a failed
-sha256sum, and a failed seed-file write does not stop header generation.
+The --abis expression has no boundary after the ABI alternatives.
+Selecting common also selects common32 in a table containing both,
+which can include unwanted entries and inflate the syscall count.
 
-Enable errexit and capture od and sha256sum output before formatting it.
-Compute the hash before writing either output, then stop if a write
-fails. The seed format and hash calculation are unchanged.
+Require whitespace after an explicitly selected ABI. Leave the
+default expression unchanged so that omitting --abis still selects
+every entry.
 
-Tested normal generation against Python hashlib, injected od and
-sha256sum failures, and an invalid seed output path. Failed generation
-now returns nonzero and does not create the hash header.
+Tested all three generators with a synthetic table containing common,
+common32 and other. Single and multiple selections exclude common32,
+while the default includes it. Generated headers and a syscall table
+also compile with GCC -Wall -Wextra -Werror.
+
+This is a selector-contract test; no current in-tree table with this
+particular prefix collision has been identified.
 
 AI assistance: ChatGPT/Codex identified the issue and prepared the
 change, commit message and executable regression tests.
 
-Fixes: 313dd1b62921 ("gcc-plugins: Add the randstruct plugin")
+Fixes: b9da928abf45 ("scripts: add generic syscallhdr.sh")
+Fixes: 27932b6a2088 ("scripts: add generic syscallnr.sh")
+Fixes: 9df526b03c01 ("scripts: add generic syscalltbl.sh")
 Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 ---
- scripts/gen-randstruct-seed.sh | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ scripts/syscallhdr.sh | 2 +-
+ scripts/syscallnr.sh  | 2 +-
+ scripts/syscalltbl.sh | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/gen-randstruct-seed.sh b/scripts/gen-randstruct-seed.sh
-index 61017b36c46..d3c4c1b59bc 100755
---- a/scripts/gen-randstruct-seed.sh
-+++ b/scripts/gen-randstruct-seed.sh
-@@ -1,7 +1,12 @@
- #!/bin/sh
- # SPDX-License-Identifier: GPL-2.0
- 
--SEED=$(od -A n -t x8 -N 32 /dev/urandom | tr -d ' \n')
-+set -e
-+
-+SEED=$(od -A n -t x8 -N 32 /dev/urandom)
-+SEED=$(printf '%s' "$SEED" | tr -d ' \n')
-+HASH=$(printf '%s' "$SEED" | sha256sum)
-+HASH=${HASH%% *}
-+
- echo "$SEED" > "$1"
--HASH=$(echo -n "$SEED" | sha256sum | cut -d" " -f1)
- echo "#define RANDSTRUCT_HASHED_SEED \"$HASH\"" > "$2"
+diff --git a/scripts/syscallhdr.sh b/scripts/syscallhdr.sh
+index 22e34cd46b9..8703bd1a7c4 100755
+--- a/scripts/syscallhdr.sh
++++ b/scripts/syscallhdr.sh
+@@ -39,7 +39,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis=$(echo "($2)[[:space:]]" | tr ',' '|')
+ 		shift 2;;
+ 	--emit-nr)
+ 		emit_nr=1
+diff --git a/scripts/syscallnr.sh b/scripts/syscallnr.sh
+index 3aa29e0dcc5..900e0c193c4 100755
+--- a/scripts/syscallnr.sh
++++ b/scripts/syscallnr.sh
+@@ -34,7 +34,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis=$(echo "($2)[[:space:]]" | tr ',' '|')
+ 		shift 2;;
+ 	--prefix)
+ 		prefix=$2
+diff --git a/scripts/syscalltbl.sh b/scripts/syscalltbl.sh
+index 6a903b87a7c..46c65e88481 100755
+--- a/scripts/syscalltbl.sh
++++ b/scripts/syscalltbl.sh
+@@ -33,7 +33,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis=$(echo "($2)[[:space:]]" | tr ',' '|')
+ 		shift 2;;
+ 	-*)
+ 		echo "$1: unknown option" >&2
