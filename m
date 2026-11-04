@@ -1,53 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793803754;
-	b=pvEEp7UnRXRTuYawkBy8zaIuQx/MNCzY7ivrOV+s2Lvk2MS9v7uyBOvTh3oOyeJkxXQl
-	 FxReHyQZPv8nAXspUGu184aFDT1KXFgtVI+8nqC4g3iyz6R7ctpeTwTtfIuQ/59TB6RHJ
-	 AvvPSGR+CbmUzC3stnvYLSGdqUDRfBn9h9D6Kl6HcVP6gTIxarzzzpix4f23PyS+lgJ0M
-	 hhHSC42D+7hcP4j3InYTFm9aVQ4n97zY13Ec88AttrWK/98+neai7HxYQ8KBwiorrm84Q
-	 YqtsEWXwI3ArQNJJBAiqJ2v8c6gLXHTJO3SADgxcIjxv+RAMElRBHPkqoVfPPMmAEvA==
+	t=1793804680;
+	b=zllKJ7fj/+9Cf3E11VjPpRKQdAifSTNRV8BlS1GgVvPBYsjyY1qd4Dr+X0F/wqv4uizf
+	 EigfXXeHj7PSDvDLk5vPCmS8s6s0IeruPCycAuDOn+Cnr0LEWMl0gcNhHfZQGyA4rk38c
+	 WS+SMZ4Pz8oGpX99qfKYCgHSfZQWJuRRWjw+YwKfaZU3xBZuKeI1j3+fNLMAxVdE3xwtp
+	 8PnVovbK4ZjP7zP2yh5YMQf1dlFuKyMFHDUc6wvf8rKImME/37CWN+9LYakcRaRatzocy
+	 Cvrt86yUGYDr79YgnXPa9mrrHJou0ZPbfxbWqn9/jWCEsiItl2pUGTPos22lf4Pu8hQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793803754;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To;
-	bh=G6B9uCJhaz/x6XC3vDz3LHbIW6JiHUlC6BCHCVTV+cE=;
-	b=GnqLcrNFubsKptj/REgli76hBwwR+BkhBrCUDgiTlT9E0DTA5vTu685tm24UNjKXWOge
-	 122SxHB5AmzKQ89DeNfqobGsCO+Nd1KmhLCFNHXXFT/RjpK0uPfOdG6E0jSIhr7LqT3Kv
-	 JVL5RAVzFHZHiKyc13IkM/cAZMrrIpDeYFj1uMGqmeRnS3qajJSd6DnRgzo88+kqhN4s9
-	 Ndk3mWCWzxzSLddySwtVsqveieJG7yU07Tc/MCPy6yIdIspbaJirl8i2SjQFca53NNOfm
-	 1MQi1NqCnBOOpZtHL/5bQCuIhTUorjmdnL4F1J3fqg2mSgwCaC8VEr8I99MKyBXwgQA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793804680;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=/kXFui2Y6M4wWVfeKvuvI3OBKJ8D0ABBqlzGf+qKuD4=;
+	b=aJZkStmDjU+TpesuqBGauOE5BoYieQIxowuxKpgiB4np2UN8dLGfO1paXldhMI7tEZ4g
+	 M0cRwxtrM6VK1D90tyLd4JVztJ+ZHT90+dD1bqigY7xJeDOv0jnxgDldWqdjzpfVF5J6T
+	 EJSqfOBAXgHoMq7PM+nHJsuvz2pgArcMm718IAunSWOMoPO32zWgVBIEBzDG1cmMr+7b9
+	 RQjVy7se+RDdDl5/+T2z8VHZYzXsDHncqTyMA+6SKzl5JAOXYCmSiqzT4k/ommMAG36hl
+	 T3osP4gxbvEmvACFJgUURFSwM+0xOEg4cBLTZqbygodrfvT5YN7iPKj5c5tYF3rt9ZA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lunn.ch;
-	spf=pass smtp.mailfrom=lunn.ch;
-	dkim=pass header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b="VD/qdt5w";
-	arc=none smtp.remote-ip=156.67.10.101
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=none header.from=ziepe.ca;
+	spf=pass smtp.mailfrom=ziepe.ca;
+	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=Bbfx10kC;
+	arc=none smtp.remote-ip=209.85.222.182
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2A9606A328;
-	Wed,  4 Nov 2026 14:49:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E2A9606A328
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D62606D810
+	for <linux-kbuild@vger.kernel.org>; Wed,  4 Nov 2026 15:04:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83D62606D810
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=VD/qdt5w
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G6B9uCJhaz/x6XC3vDz3LHbIW6JiHUlC6BCHCVTV+cE=; b=VD/qdt5wbi1+bX0xSrigYbL38R
-	ZhEPk9M24lPed52CccRV86P/Xpg6Ktg+zUgAZFHBLKGW4TyFbjvV9a7LzuwMbd9Roo0Clec8kUfNP
-	SIcKmNjNuW7GjSNplvnRDC7JrXHHj5JOUBJeV8Cz7z1gP+LaHDFyWEKj9yOzQsJbz3xc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1xOcIM-00EKwu-HS; Wed, 04 Nov 2026 15:48:58 +0100
-Date: Wed, 4 Nov 2026 15:48:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Doug Ledford <doug.ledford@hpe.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
+	dkim=pass (2048-bit key, unprotected) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=Bbfx10kC
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-945ae2daa68so83221985a.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 04 Nov 2026 07:04:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1793804678; x=1794409478; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=/kXFui2Y6M4wWVfeKvuvI3OBKJ8D0ABBqlzGf+qKuD4=;
+        b=Bbfx10kCLfB9Uhm6lrt1rASCnob60LxOUXr08+90qVn/ASfAZ7xASqarH1RPSS/b1s
+         /zS4ijokVuFqt0K80Dw0r+/+KRN66qPWpcC97F7iSBe8FKkJ3TrwTnx95Tn1IqIO3CIx
+         giaWBGS0ELPf2iT48QTnJRKhsKsNy7Epp4hs3ZDwjOjckm0vf5qJw+5WvPruFn8JNCSs
+         QnHB+/7zhmCxv/cXfZR44mYrmYAEdrc8SzIM/JyuokKOmkLZEQZuUHqCMsiWa2m0x8/d
+         Vd8gSS7Jum+OqYaPUK2Ba3sxi3zybKpj3aCPRG7j0Yp2pixsIWcHM6UgJ4Lcmp07ZHIW
+         EXCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793804678; x=1794409478;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/kXFui2Y6M4wWVfeKvuvI3OBKJ8D0ABBqlzGf+qKuD4=;
+        b=ziJXgIJXQ3IeHjHQ9kE5odsz8Dm51JQhzzeetOb9nOsGRj5bSJChRplvZnAw6ztrVf
+         GJLIu5tw2ZCQa6hkMZRVk7DNlnneBRMHxFxyYHzQAklNGaV4Ab+vX1ZVWWhQ9u8uh1+B
+         Cyf1lfexP2+74pWXtrxJWBf/aHbIzj2VtCsLU8btZq5JYhSX4F+FDmWJ/AH+0phyVIEQ
+         44PwkqavmaNhfw79a9BioUeumpzJSl/7Ecr3+Vj0LtIkkWC0s+QmLU7raQDR+65bcsta
+         b1WyBG87akzja55AIOgQTO58xhvPlAdIAsHajCncrA9hXlbFLcZXtPImlCAnJMUP3XGI
+         987w==
+X-Forwarded-Encrypted: i=1; AKwUvBzEsFOrHAUoNzTtG6b4yqlRL/CZ0Y4NbZCgU5T3/r18d479JPWYC/nE+36RIrDOigxOPacDaFig8hPmdTo=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8XYYvYPt73L4oyXKnsKF9t5dYEg7x7lfz/Pa+0CmUTWsUQulkI
+	MDfSnxiXmBZ+N3W0BBpk7gjg3S6P1CVounTqd3OhnSUVk95wUFJLnJfVQ3/MiePMjG8=
+X-Gm-Gg: AYBFou3RtmdY5HcdjBW8kTWiRuxovfBo7yqh79YLqrVlRLlEg38+xEiyQYyTYLGktHe
+	5YKL+q30kHzQH24U1dn/rMc6qBayo8zKExzFKSTbKAr1w3gr4Ow4j0wVi0ac5OCzkFLQfY4+2LH
+	Zw/vkREKgqOCWnlYUMJPlJzS6alJuLREES89pzmc7WDOFAOw6yTgPmDOJBnnMsgVvTFR4hDz8kU
+	oJJP/4g8LRXZi7CGyQFW37fv0cXix33xry+B8837StK6QIj+Ol9/GYFEW/zD5loECLjXOmJfUud
+	iGooEnU7vzUn4A6xvdKv4q9gLf+yUxh+FbuzwkF+VxY5zfneCQTIvybjdEYH99lB7lwBASpCbcj
+	CLlxMsb6hM5G6pYSV9msSCYKt2nRx3w1fBr5rP0nduP4s0bK2HE2VPx7E9kdDqGIanTJZiESYM2
+	22n+FttDEECWc+xiXzcfuaqZ5J13gppwXRd48YDoqBVjw2S0gQD2dnssq11ZBZr6qBuNm4noPjP
+	Cn/mZok78BTaL68gVbY/LLqq+OCOx1kdeV1Fp1hrzK3wGekOlbfskAKwpTaBsdUfUNlThl71JKC
+	eR6TwcovGonuAfAzi+LwbIIDQaahc+gyzH3EUHI01IQ9+J8nqkBcGektabiTnsxIj8/0VBIFAHX
+	f0alAHm4yOA==
+X-Received: by 2002:a05:620a:6486:b0:93e:c12d:4ecc with SMTP id af79cd13be357-944134066famr2851022685a.44.1793804678031;
+        Wed, 04 Nov 2026 07:04:38 -0800 (PST)
+Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-945d47e72fbsm219471885a.18.2026.11.04.07.04.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2026 07:04:36 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1xOcXT-0000000GNdO-1REH;
+	Wed, 04 Nov 2026 11:04:35 -0400
+Date: Wed, 4 Nov 2026 11:04:35 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Doug Ledford <doug.ledford@hpe.com>, Jakub Kicinski <kuba@kernel.org>,
 	Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nicolas Schier <nsc@kernel.org>,
@@ -56,16 +96,16 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
 	Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org, linux-kbuild@vger.kernel.org,
 	Sandeep Bhoot <sandeep.bhoot@hpe.com>,
 	Iraimani P <iraimani.pavadai@hpe.com>,
 	Mamila Santosh <santosh-kumar.mamila@hpe.com>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>
+	Leon Romanovsky <leon@kernel.org>
 Subject: Re: [PATCH 00/23] Subject: [PATCH net-next 00/23] net/hpe: add HPE
  Slingshot NIC drivers
-Message-ID: <52b6596b-385e-4ed2-a6c8-d0774b4be127@lunn.ch>
+Message-ID: <20261104150435.GQ3889730@ziepe.ca>
 References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
  <20261030151121.1f232b50@kernel.org>
  <7d4583c2-e8dc-4ffb-bc45-e2121f824b14@lunn.ch>
@@ -74,6 +114,7 @@ References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
  <b260f39e-2ac0-4899-90d9-3e9dbadfacc4@hpe.com>
  <e9937650-1354-4d66-95fa-3492e3821823@lunn.ch>
  <3418b0f9-d053-4be1-81a0-fc938fc5a7ac@hpe.com>
+ <52b6596b-385e-4ed2-a6c8-d0774b4be127@lunn.ch>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -85,47 +126,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3418b0f9-d053-4be1-81a0-fc938fc5a7ac@hpe.com>
+In-Reply-To: <52b6596b-385e-4ed2-a6c8-d0774b4be127@lunn.ch>
 
-> My first request was an answer to the question: Should this driver go
-> through the netdev community or should it go through the rdma community?
+On Wed, Nov 04, 2026 at 03:48:58PM +0100, Andrew Lunn wrote:
 
-Does it actually make a difference? You need a driver which is
-reviewable. Either the netdev community or the RDMA community needs to
-review it. Being more of an embedded person, i don't follow RDMA, so
-don't know its policies. Maybe they will accept much bigger patchsets
-for review than netdev?
+> A bit of an aside. Do you have the complete history of the driver?
+> What did the first 10 patches do? When bringing up new hardware, you
+> start small and get a little piece working. 
 
-But you need to be careful. If you go the RDMA route, you cannot use
-any netdev UAPI APIs except in your thin layer on top. Is that
-possible?
+If you are implementing a driver from a datasheet, sure.
 
-A bit of an aside. Do you have the complete history of the driver?
-What did the first 10 patches do? When bringing up new hardware, you
-start small and get a little piece working. In a traditional Ethernet
-driver, you get a base driver just probing and printing Hello
-World. You then might write an MDIO bus driver, you can see the MDIO
-and MDC signals wiggle on an oscilloscope, and then find the PHY.
+However a device like this was almost certainly co-designed in a chip
+simulator along side the HW and by the time the HW was done they had a
+mostly complete driver ready to go. The actual baked chip probably
+never ran a driver like you are imagining.
 
-I'm assuming you did something similar, small bits of code you could
-somehow test. Those small bits of code, step by step development, are
-generally easy to review.
+> I'm assuming you did something similar, small bits of code you could
+> somehow test. Those small bits of code, step by step development, are
+> generally easy to review.
 
-> The second request, assuming the netdev community decided that this
-> driver could/should go through here, was guidance on the sysfs usage.
+When you are co-designing with a chip simulator things work
+differently, you'd focus on the more risky parts of the IP and do
+partial driver flows and so on to vet things out. Lots of carefully
+orchestrated shortcuts. Then you take that and assemble a complete
+driver to run more complete sim passes. As this progresses the HW is
+changing underneath and the SW is following along.
 
-Generally, none. We just want a plain, boring netdev, which looks the
-same as every other plain boring netdev in the kernel. OS 101, the OS
-is there to abstract over the hardware so all hardware looks the same.
+So it is completely understandable they ended up with a completed
+driver at the end of the process rather than a bunch of logical small
+steps.
 
-Now, if your sysfs is controlling something described in 802.3,
-something which other vendors are likely to implement, them you should
-submit patches which make it an official UAPI, which all vendors can
-use. Extend ethtool etc.
+> Generally, none. We just want a plain, boring netdev, which looks the
+> same as every other plain boring netdev in the kernel. OS 101, the OS
+> is there to abstract over the hardware so all hardware looks the same.
 
-You can use fwctl. But you need to be careful. The netdev policy is
-that it cannot be used in a netdev. You cannot use it for anything
-which is networking, defined in 802.1/802.3 etc. But you can use it in
-your base driver, for anything which is not 802.1/802.3 etc.
+Yeah, this is a reasonable place to start. I also discourage any uAPI
+introduction into any new drivers. Start with the basics then we can
+talk about why it needs new uAPI point by point.
 
-	Andrew
+Jason
