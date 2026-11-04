@@ -1,60 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793744515;
-	b=GdbzIdf+eW3sLJz1zGrdgt37UrzndvtbRZ2iPz0YoT4aE786pztDj5WnyZHH/Fu9lodI
-	 Wgu4Q+/cXr6KbRs8/bwne8gCzbGqUem2wsmYQU9jvUS2dgkky/sXVF1JJtjgI1xEjVinc
-	 hnx65RJL0P7kGVq7woYRhq2i8IttrYf+VxrizUbGZoWZ6fqXwAIqdDfibFpFYH+x5hnwJ
-	 mSN/8f/M5llIfyqRZDYja3oHpmCvQXHDO7k/ypsbAFRRt2VDMfz6Zn9cZOB38L8ruaVd2
-	 nkR6Tmziht4MKa6rhdf/AYtkadhL9dizj/B9F81C8sxejNujkPEn1Fk8p3m5riBx28A==
+	t=1793753350;
+	b=Q11HeTBRS1YeZXXsJ4TI0sBpFA0OzJDW4N7czUV8fzKDgJ6n9a2+56g6veK6HuhylEeM
+	 C3q16/MviuG6lcWnCiE+tKHj95FqWABlw/zRtnSMYXZNytGV5RBfa2pDGaTtdTYfHFvqD
+	 qIhh+Y1pKSgdLz14lIq47LTzPnSp81DDgMJiFeKsok1L5ZIEkR3z7LbH5Q2kDhzBNlCC3
+	 GpFcEwHI0spr/uFP2CYPE5uZiGPCOgO7XsL0Ai7pnvfQJGrDIP66hi2hxWMvnNArN8Mpl
+	 KQW6RAsQMM25O7OCKDd1+Y8KOZEQecG8nZgN1EGJz/218kZEw+EoBO3ZsV52VzROMpA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793744515;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793753350;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=ZzxQ8pRvMhmWdvsmwyUBbHU6F1haB6n94dmB2kelQk4=;
-	b=xC4lMZHW/6qpnRaEkaw+9GdQot31cmIMgDS2IWOwIeCRbVlBRtT7OP18HiPr+5xKE+I+
-	 kfipBelhjgsk4N8nnwUgLBHeEo2N1hgdIsocxEwMd7pUB2pfaJZx9QGv+wK/zsS1XNeus
-	 7RehF4tsqBI8IBzfPxQ6IJ39JgAuzXbue65CWdquggWDt7+KzxTCyHXqe2KAtz9NMX0x6
-	 cvxoNhbmwc4lsP5q/uoy9ZUSL4Cu9Oe9pW5limONGfs0v5DzJsTqJZRfalWvhejQS2Zc2
-	 QbQxKfdMdjbrtWiuYKodq4p6zWDdDgXYsKOvUD5Ao2HbzJnRx1UkFwn9IeMH3jPZ1Ew==
+	bh=+sUJ84Ka0ak0v8/OB1wtWzXzCPWXpeiQ6G3/ZQmSqnU=;
+	b=WZLjAaDwjPvin3FveZ7QwOs1XQppwuES5+DgoRzqr9JwuYvjKndgFABBpqFKTqUbtnFK
+	 KiTyTDsYyfG70BM6H4To8iIKtpT7zrPRdfr3PxGBopgmIJPVfMjCjjUBnviZ7THHgLj8/
+	 FwPFkujYermLefKl8Jg9wWusOq+ujJ3rcQ1SpWC+lk/Y6JliP+HgzHsCRKQ/Ie7ZjcFeg
+	 JE5JWufBBQNKzyYAXCK/chrp3gTmLCN4589N1H73F7+RIQ3cTh0t463zc2QDv8WAGWl4f
+	 DEDHM09GXzoIerDodMkajFovWk/os51q3zcY9Vyuh+hCMXZDASAAxC9coVW9lD/n5uw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=protonmail.com;
-	spf=pass smtp.mailfrom=protonmail.com;
-	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b="ufp/Fplb";
-	arc=none smtp.remote-ip=109.224.244.17
-Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b="yiSDb/TS";
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284EC606A324
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2026 22:21:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 284EC606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B758606A31B;
+	Wed,  4 Nov 2026 00:49:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B758606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=ufp/Fplb
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1793744512; x=1794003712;
-	bh=ZzxQ8pRvMhmWdvsmwyUBbHU6F1haB6n94dmB2kelQk4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=ufp/FplbrkGzzwlJnsZCvnBUlEOzMG91hgs+UvmlJwQLvI41qEPOkKyGRCm8xe0T9
-	 qmTpwhPJ4PSTjt1wK+b8iSXbHDoFMHJk4DdwotYI22zq/AfF5WMksJnSZ3l+I2Tbl0
-	 LLVJp+vGmSCd2/EowphDFM/KzhKIBGsdv5276CBO9j1Jk2DwlL4YQW0VYIotYEK9Vu
-	 kZTHasu1iPtnJe6aGYaZO4z1IFInv0ytI8xUQi1a9gztDv3wfq0FdpXIGl2YdckGqa
-	 gBQVU1jsQhl4cC+hW4iZNb72+/En2VUxDWsg3l6guZQcgh+JA50/QQO7M0ZhecBsPy
-	 WmxLkiRp5B2ng==
-Date: Tue, 03 Nov 2026 22:21:46 +0000
-To: Nicolas Schier <nsc@kernel.org>
-From: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
-Cc: nathan@kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH] kbuild: file-size: propagate ls failures
-Message-ID: <sUI2VEkGvVZAaS9coOZgW5XuXrz9VZ8r8D8D0dl4QKcYE5UcD6ztNP65YqrUDANS-Ok88rfAOg-n5Yy8HBL0c0VjVKIo7qj9fY1G9vb4hBE=@protonmail.com>
-In-Reply-To: <aupKRv-2wbdei-Dg@levanger>
-References: <20261103164204.129681-1-info@daylightlinux.ch> <aupKRv-2wbdei-Dg@levanger>
-Feedback-ID: 330522:user:proton
-X-Pm-Message-ID: d570f38967c6c4f6867a6bce439c2229b3c412e1
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=yiSDb/TS
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=+sUJ84Ka0ak0v8/OB1wtWzXzCPWXpeiQ6G3/ZQmSqnU=; b=yiSDb/TSUvtV2HwSKzUjJWtPuf
+	4r5/XTmbyRXBwSG4zzmoBv63mUIaVkLon7omyVUS5wqtGMEKDV051nPXVp6sMCt9+0p8bykeC0MA5
+	Ddd3AJR+Am8I3oS8ryQXN1lG4+DALTLWaaOd/LY8roYcmWT0NnthT6S30iQJUQgergdpuYyFn3AIR
+	EFO1d5cdppD1LANDi3GvbpVCBkVWgbJdnbwOxOBwEDZwCgsVRnUW5FG1DY7KZHiNXCvZYKf0Gmd9G
+	uT/9r3cxsoUSMPiJ8hyZg4wnxz4GOAYrgf9gRQjs0InyYAIOBSPSyke0k04f+jdOC6AzwsdxiUlAP
+	RqGYUCvw==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xOPBb-000000041FA-1qeR;
+	Wed, 04 Nov 2026 00:49:07 +0000
+Message-ID: <d235a1f4-9bd1-4d28-ad6e-bcf1d4529c5b@infradead.org>
+Date: Tue, 3 Nov 2026 16:49:06 -0800
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -64,83 +58,49 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Documentation: add a history of the Kconfig language
+To: Julian Braha <julianbraha@gmail.com>, nathan@kernel.org, nsc@kernel.org
+Cc: corbet@lwn.net, skhan@linuxfoundation.org, mchehab+huawei@kernel.org,
+ jani.nikula@intel.com, tj@kernel.org, grahamr@qti.qualcomm.com,
+ officialnaumansabir@gmail.com, nico@fluxnic.net,
+ linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20261103190832.3861337-1-julianbraha@gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20261103190832.3861337-1-julianbraha@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Nicolas,
+Hi,
 
-Thank you for the review. I tested the script in isolation but missed the e=
-xpectations of its callers. I understand why this change cannot be applied =
-and will not resend it in this form.
+On 11/3/26 11:08 AM, Julian Braha wrote:
+> +6.18
+> +----
+> +
+> +**Syntax and semantics**:
+> +
+> +- add ``transitional`` to specify that an option should no longer be written to
+> +  the output ``.config`` file. (f9afce4f32e9 and 0902b3cb23ce)
 
-Best regards,
-Hamdy Abou El Anein
+FWIW, this also replaces using
+	depends on OPTION1 {<=, >=} OPTION2
+that has been used/preferred in a few instances.
 
+./fs/cramfs/Kconfig:	depends on CRAMFS && CRAMFS <= MTD
 
+./drivers/acpi/apei/Kconfig:	depends on CXL_BUS && CXL_BUS <= ACPI_APEI_EINJ
+./drivers/net/ethernet/sfc/Kconfig:	depends on SFC && CXL_MEM >= SFC
+./drivers/cxl/Kconfig:	depends on EDAC >= CXL_BUS
 
-
-                                  **Hamdy
-                                  Abou El Anein**
-
-                                  CIO / Senior Linux System Engineer
-
-
-
-
-                                  =C2=A0 info@software-coders.ch
-
-                                  =C2=A0 https://software-coders.ch/
-
-                                  =C2=A0 https://github.com/hamdyaea**
-
-                                  https://www.linkedin.com/in/hamdyaea/
-                                  **
+./security/keys/trusted-keys/Kconfig:	depends on TCG_TPM >= TRUSTED_KEYS
+./security/keys/trusted-keys/Kconfig:	depends on TEE >= TRUSTED_KEYS
+./security/keys/trusted-keys/Kconfig:	depends on CRYPTO_DEV_FSL_CAAM_JR >= TRUSTED_KEYS
+./security/keys/trusted-keys/Kconfig:	depends on CRYPTO_DEV_MXS_DCP >= TRUSTED_KEYS
+./security/keys/trusted-keys/Kconfig:	depends on PSERIES_PLPKS >= TRUSTED_KEYS
 
 
-
-
-
-The
-content of this email is confidential and intended for the recipient
-specified in message only. It is strictly forbidden to share any part of
-this message with any third party, without a written consent of the
-sender. If you received this message by mistake, please reply to this
-message and follow with its deletion, so that we can ensure such a
-mistake does not occur in the future.
-
-Sent from Proton Mail for iOS.
-
--------- Original Message --------
-On Tuesday, 11/03/26 at 21:56 Nicolas Schier <nsc@kernel.org> wrote:
-On Tue, Nov 03, 2026 at 05:42:04PM +0100, Hamdy Abou El Anein wrote:
-> From: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
->
-> When ls fails, set -- succeeds with no arguments and printf emits an
-> empty line with status zero. A missing input is thus reported as a
-> successful size query.
->
-> Capture the listing in a separate assignment under errexit before
-> splitting its fields, so an ls failure stops the script.
->
-> Tested missing and empty files, a 123-byte file with spaces in its name,
-> and a symbolic link. Successful output remains unchanged, including
-> the link's own size.
->
-> AI assistance: ChatGPT/Codex identified the issue and prepared the
-> change, commit message and executable regression tests.
-
-While implementing shell scripts with 'set -e' is a good thing, we
-cannot apply this.
-
-NACK
-
-The reported issue is not reproducible with all usage of file-size.sh
-within the Linux tree.  More important:  if file-size.sh fails with an
-exit code, it even breaks some callers, which expect file-size.sh to
-succeed always.  If you want to investigate, check all findings of
-file-size.sh within the tree.
-
-Kind regards
-Nicolas
-
+-- 
+~Randy
 
