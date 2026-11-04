@@ -1,45 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793775672;
-	b=xvn9bq+dWaJkwNSCT0ub8bx3zBPoWnxqwesk1wg01X9tmkyBS+X2ld1+WXEByuYAJjK8
-	 3v3FSpqFrhyYLdeYv3fJwuRBd4U+Nxe2PqyjhhJ4NB6OkjoTDIqoEc0XC26JJXKJsxAs9
-	 UEO9iRLc4NNsbSk7HmNmI1oxzL592NrA9Vn/2/PMx2CXBynuOHv5+2eJe5IadV/qBZgzL
-	 iCdn2M9gYbMoc2Mbwv6PSL+I/P9HQXLqpeS8hNDY4ZAo30LmH39Diix+aGcP0EL9lghR3
-	 Zm6QRGqfKLQa7C1U5EMUF9qKP8Rt4YIIW9jfzbQWw6TfbMIogh9SxB3gfV9Jg3cK7bg==
+	t=1793776795;
+	b=gz0oFHcN4NHp0a4McyjKenE1pp6Iw0Q+AsP8VInuexP0deh6CQWb1exUwi1dBmra7qXU
+	 XnFVnvm5XMyVUN2J76O0z+wqjDXkMhBhHmmxgEDLBKhFpLzwyAaBn0PPBofd6dzn8sJwv
+	 daT+5aFDXPecBBqGXvuiimE+f7HW3eEW6yv4o9r3/rTGnpv33UUHYJ2LXAxs0YnE1DE5Q
+	 f1kK34IheCgfQw+5Ef1sZOBns2bH68SQq8gTzVnbb6ryf7epv351/NNlGauaPMLF2Ih9C
+	 VMcF57awrP7I4lUACJQ+DM5kN0/xKYCkJh8ZAfz1vpyM5hUA8tnpOPUGF/BWpB7psHg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793775672;
-	h=Received:DKIM-Signature:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
-	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=9PqgmI4vaK8PTHFVjw6T1+vHdmZTRz/ClS5Af2kY2fc=;
-	b=RtZxxDsQ21iODkB+p4KWZ8MbuwTqXQ521/l57bJ4K0xv7NbQgsI1IfoDa2wWkMbkF7y/
-	 oAYZ7S0Fw4WmY2GR00B7GawS8XISGGi0t1KezCVq7h4DLPGhqpgMYbhPiVdvtCbaEtWyz
-	 OVdJnTQoO7KFuZ7GCGEPK4RWpxbGih2fQ21h9sx9NNkiuNomrN6Yl2bycdO3CY+Hn0nPK
-	 c9hlF547GLypoA32MYPhBFpO9Gl/56k8coNuCjhtxYxS8QCNHbLQAN1RpCzHdoiWowBID
-	 UVMtT4swwdd3tcVy4gBVgTKQUB/n8qhU9PAvzOy7Ll4/uk8XlKgQf4DrNnCPUAZX8RA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793776795;
+	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
+	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=uIRkKn6uoWxcDOi5p8SVIeStzCN1wuOBrWkpwdJMI/c=;
+	b=OQ9QyEotH0A1r4gcwNl+7ulrb3W8zL5XnQiqSTqZcdvtti8Qdh2CKdm5atJ3D1u46NGL
+	 gBueVVJubyNf0Kx/VZKg75moRYTL5TgNR/D9cQQ3/7qVp5Ux/CXz0O7r1ZazR97pmIClM
+	 as2cUMk2SyqUILd2RwKDDbj1m4FuoZ4ghNHvRGFgFN4NS2YAY/TtEVD17L5CXUeKf7bag
+	 pkadtb6NoP+5PGaUwldyOISvcfRdBGTUapb9eysQR6znSHRRlENEhPyH4YeWOfs77mLYD
+	 qRT+n+XagbRrY8VkVtI/SEIIw4caheYy2cvEPGNk6BRA8AHgRDL5ihOAJQshXGcRgWA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LFNd9q63;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="H03d/ywy";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D30606A31B;
-	Wed,  4 Nov 2026 07:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D5A606A32D;
+	Wed,  4 Nov 2026 07:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LFNd9q63
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F8A41F000C1;
-	Wed,  4 Nov 2026 07:01:11 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H03d/ywy
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F411F00919;
+	Wed,  4 Nov 2026 07:19:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793775671;
-	bh=9PqgmI4vaK8PTHFVjw6T1+vHdmZTRz/ClS5Af2kY2fc=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=LFNd9q63porHJyx3XjZqUV5gO10lQHx3w9rD1Rn4q5B3e9qansqF6k82JA6+8US4x
-	 E0qe9ulqVjHMKLNVyJWLNH8isFiHTnSp6RZQ6n5UAu2decl2StV+urh328N0/rN2w5
-	 4atcO3w5rzuzI17FkUFmIjOz2tLfvDnYpESoR7Gtq2RvXZ/DnGW9dVkwcOT3pWuTr9
-	 D9m4e3aXXDaWUQaXSM2rSN5KprJ4zQMntm9F3AoXRUrNacvrz7hoAnEGKe5Tf1qxEn
-	 Jqs/7poIdQnJOsp+idMVkRLDlgG7jGATSvLPBEJlvVDcYRTWRUcDbN+zRPrY6oJzvG
-	 zzF5z76UlCJDA==
+	s=k20260515; t=1793776794;
+	bh=uIRkKn6uoWxcDOi5p8SVIeStzCN1wuOBrWkpwdJMI/c=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=H03d/ywyeINYckpmJB5NdEvd2p69fNcO9Q2XxyJ14yeVe7P+OMJB8hu+3+XfflWD2
+	 N8YT0RxW9ZXxsAkU+G+gYyRY0FbcjQYnXfzcXhwEYjjb5rZEWg++oNH/sIbpNxZhAY
+	 Piq+D0kh6XVC/OWBNfO75XPH2/c5JxS8+kw57tcz+wJBSfcsE/cyv+bINfyky3/bvg
+	 NJev4rwbv4W/HXqlM00rVmldlT1iFEjIFQgdisVQ65PcOLuJKqL1nggYGjKxiwrToh
+	 fdShm8QPC0sPhcuJkQKPO2ufSvopXWGZih+3QdD7xmUVUcBYQskdGhKgmr35g7Kha3
+	 ieRCrwkOYCcxg==
+From: Nicolas Schier <nsc@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org, 
+ Mathias Krause <minipli@grsecurity.net>
+Cc: linux-kernel@vger.kernel.org
+In-Reply-To: <20260923123936.2227924-1-minipli@grsecurity.net>
+References: <20260923123936.2227924-1-minipli@grsecurity.net>
+Subject: Re: [PATCH] kbuild: prevent building single targets twice
+Message-Id: <179377654924.66367.8940768399381296629.b4-ty@b4>
+Date: Wed, 04 Nov 2026 08:15:49 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -51,98 +60,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH] kbuild: prevent building single targets twice
-From: Nicolas Schier <nsc@kernel.org>
-To: Mathias Krause <minipli@grsecurity.net>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260923123936.2227924-1-minipli@grsecurity.net>
-References: <20260923123936.2227924-1-minipli@grsecurity.net>
-Date: Wed, 04 Nov 2026 07:56:17 +0100
-Message-Id: <179377537785.66367.14877215103677858550.b4-review@b4>
 X-Mailer: b4 0.17-dev-fde28
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2801; i=nsc@kernel.org;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=728; i=nsc@kernel.org;
  s=20250924; h=from:subject:message-id;
- bh=vgypLRblLZ7jhKE5P9rWjzikOl2ck8JFlM6tCeVbDO0=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBq6tcTH79tlceo4HhSjKaOYGMrAbsajm9DNADu1
- chiLKqIrleJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCaurXEwAKCRAHUgpwFiYS
- aebEEADCfs9XpdlevapJ6ibzel8J0qeIGyPYPDVqndKl9MCGpObBvjlMx/mcWteQywQovh/WDn/
- 0QljDUaK/BYepgJV+WEZFHnWznu3y5URM5rYHoqMuHUWGCS8PwWx3/HSTmJt4Z6evoFzu+clK7N
- cvQ7hsoQikdXc65+f4bUT/PDSMAuFoMD2b3j4HM9ATqFU9Ewk+chaxz6wHcIq1cDoRasYJKUvNi
- qE/iC87mWOWwnbdgqvygjuViLWwuMGodkA5UGMKEyBO+Ql9vNIftI5HGcOCSu/S6nc59+7xsys7
- x4PGkbipxcpWK72opG41vyeG+/MUmQr+XLiZZLnv86yVzzuUdd+VaxBqdfuiSdxNuJnUknO3R+6
- b4hZk3BW7LVn4IhpmBccwWVCBsqFea7uW7yfJxGRCBGfXrI0gHBLbbvA7uPBmwSETLP3sVuiB9T
- fmNH907E3pBdXWmZ3eJPwPcZTY1vQSdwn7/fdJErjcmijsGVPVGKyT+sCztDG3tDsAvmc5qJcEz
- HSPUv/UFnuI2t19WyKRWq3rQa47JLAzL0+PejebnEENLeEDepxYyvE4rnYYc9bBzP985KvSNyzh
- g3eoXEvdjlQnsVVduZF82p6qPxzWzZNUAkrNbQTFNLk8Q9SXosDzNfMbTWiktxI+yPa+xlmV+49
- /9QjxU9znjeg8qQ==
+ bh=TrTzQAk266kLjmg6LbpybPxDMuFphoTLFdvjwRD8zWY=;
+ b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBq6tvKmgglQYMzf8kU6aIqfDl+44sKSIruVduoR
+ EXMkeSozxGJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCaurbygAKCRAHUgpwFiYS
+ aQJCD/96BNYVHifdXqpNEi+pqFwetpOv/CUnPbkicMuidJ53FLrgoYmeaW7c46O4bJCYN3nviqH
+ QulTFCjKMHY54Oc7t4GI44Xp409n0R4VEne7RwyIg10GqlQ1tfUW+LhnJknvCy1VhzFCV+vN9fy
+ 7WlzlBso9PQtBotD0Qsq5l+RygkiyCMVrJRsIcYaDybEMs0Dw89Tqk6VgTUeYpGB6gYvKRMADbH
+ hoLA95r1dMfDLFUyU43T+/3cZBGx+MdmwWP8NtoD0mhuA5K74EuS43iVbnVPZd6xkES6XxeBHIb
+ xJjgRRqb1082r5oxrv609agn1Vhtit3KCt48JnGjrZGMXLPKaZXpu/uA5e15OfrAFn1at2hv4CL
+ c+jukgk8xiPdhXe1WDdgJUKGZ2nQad2hv6QnDtfgv5f/38v1a5RSThYhp8U7qXkp2EMxCWSmwcw
+ eOi4YsCjdRE9mC2SZcYRs6gSfE6rBxDaRfsKSzBzZgvGPy2jWJkG6rtwJ/8LoDlhtFnLbsQ2q+3
+ hOCNPXXEcheuXXJHw3496ddZCASbgWU6EhjU/hWcLjS9n0wUhkI3qHPTuItmTERtjwKm3kLi1IS
+ QcXfV7c1wrAMzJ8xKgMil9KlA1V7BsUcXV9HiDcmUrlqds/yb475gNYO4lD1RQ5cBVRylb4LXh1
+ cXo/fzMl/xIO5rA==
 X-Developer-Key: i=nsc@kernel.org; a=openpgp;
  fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
 
-> When building individual targets via 'make path/to/target.o', target.o
-> may be build multiple times concurrently, leading to build errors like
-> below:
-> 
-> $ make O=~/O/vanilla-7.1/ -j$(nproc) arch/x86/pci/intel_mid.o
-> make[1]: Entering directory '/scratch/minipli/obj/vanilla-7.1'
->   DESCEND objtool
->   DESCEND bpf/resolve_btfids
->   CC      arch/x86/pci/intel_mid.o
->   CC      arch/x86/pci/intel_mid.o
-> fixdep: error opening file: arch/x86/pci/.intel_mid.o.d: No such file or directory
-> make[4]: *** [/scratch/minipli/src/linux/scripts/Makefile.build:290: arch/x86/pci/intel_mid.o] Error 2
-> make[4]: *** Deleting file 'arch/x86/pci/intel_mid.o'
-> make[3]: *** [/scratch/minipli/src/linux/scripts/Makefile.build:551: arch/x86] Error 2
-> make[3]: *** Waiting for unfinished jobs....
-> make[2]: *** [/scratch/minipli/src/linux/Makefile:2229: .] Error 2
-> make[1]: *** [/scratch/minipli/src/linux/Makefile:248: __sub-make] Error 2
-> make[1]: Leaving directory '/scratch/minipli/obj/vanilla-7.1'
-> make: *** [Makefile:248: __sub-make] Error 2
-> 
-> Please note that arch/x86/pci/intel_mid.o gets output twice and, in
-> fact, tried to get built twice, causing the two parallel builds to
-> interfere with each other.
-> 
-> The reason for the double build attempt is that the target can be
-> reached twice, via arch/x86/'s Makefile and via arch/x86/pci/'s which
-> both end up in '$(single-subdirs)' as both fit the prefix match.
-> 
-> Only the latter should be used as it contains a cflags override for
-> CONFIG_PCI_DEBUG=y which would be skipped when using arch/x86/Makefile
-> to build arch/x86/pci/intel_mid.o.
-> 
-> Fix the multi-match issue by using only the deepest match instead of all
-> possible ones, which requires two changes:
-> 1. Limiting 'single-subdirs' to a single match per target and
-> 2. filtering out deeper targets in the recursive make invocation.
-> 
-> Also de-duplicate the list of target subdirectories to simplify the
-> use of '$(single-subdirs)' in filter expressions for multiple targets in
-> the same directory.
-> 
-> Fixes: cc306abd19e8 ("kbuild: fix and refactor single target build")
-> Assisted-by: LLM
-> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-> ---
-> I ran into this quite a few times in the past and only now gave the LLM
-> a try to dig into it. The bug only affects certain targets and only when
-> mentioned on the command line, so regular 'make -j$(nproc)' isn't
-> affected.
-> 
->  scripts/Makefile.build | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
+On Wed, 23 Sep 2026 14:39:36 +0200, Mathias Krause wrote:
+> kbuild: prevent building single targets twice
 
-Thanks a lot for the patch!  I will happily take it for the v7.5 cycle,
-and add a
+Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-Cc: stable@vger.kernel.org
+[1/1] kbuild: prevent building single targets twice
+      https://git.kernel.org/kbuild/c/329d8e7d
 
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers).
 
+Patches applied to a kbuild-*-unstable branch are accepted pending
+wider testing in linux-next and any post-commit review; they will
+generally be moved to the main branch (kbuild-next or kbuild-fixes)
+in about a week if no issues are found.
 
-Reviewed-by: Nicolas Schier <nsc@kernel.org>
-Tested-by: Nicolas Schier <nsc@kernel.org>
-
+Best regards,
 -- 
 Nicolas
+
 
