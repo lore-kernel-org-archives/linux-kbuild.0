@@ -1,49 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793816448;
-	b=zfhKWVmYgK29DNhqsqXU+byXzbYt4sAgEnF+a/dbtnRyqefhvH/0xGGyfjD2g1TXdVmh
-	 ErwNZEA1ByMQUbU0znbbSdsAtJz7YeDatYcZK0+HOFpURq95vwPd0UyBMP6+1Il5wB2eM
-	 6R79M0Hlz0PVEatH6xmWbWkkqxZi7U1KxD42NMpM8TS8JoFo0kbJb+o+1xknYNw8Vk5Tg
-	 tfVFTRC5XPOERd4mDhTvRLQojs5Y373xGBGcLFov9nVPREXrrvdAQUn8QVk5KJCKRhKP9
-	 IcRgqpKBTM1dlOGstix+mup7uwvsblgXP0umMGA5Y/ZgxBH/MZimBfVJqu6FDkbkiBw==
+	t=1793816465;
+	b=UnxRa4D/ZCiZAdtUCX1J+ld3UjoSLokKh/OPJ49++kLofiSgf9bBts/dJsHoUhqquIkx
+	 0Yvttl+2D65JjlNhA5Sv8oXzQ/MZrf8+ra2n0lhP5vkW9SHnASJNEqPY2qd8ahxbmul9u
+	 n9Po3iO3g1OIn5i8wTlQWIzIhIKQ39A3vnFphzyw9Nl2X2u7RcXo3DYNU3Nl2zK0kwAm4
+	 EifAQuWnDig9Jde30ESXsAmCl/3rdalv3hmVDGRZvaScaCQmW1qGq+sN4vkknkKFghxH/
+	 ergwnP8acOBC4SUhvZNVZIBM3qaAgTEcMiwSupaEguTsB2ZKQiuaUSe2WrAoxgXdBuA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793816448;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793816465;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=6g309lbgrjn1xo7S7Qg30lg+sesaJzFdJJRQn0HeciQ=;
-	b=Cb5ZlXuVwWozftY/E1C/DM68ypIw8ad8y5cYMJkqF9U+dQaFuavamGibfmgsz2DHyZZb
-	 WEEt0HykuYvzXbrt6hzxHxVZS67oOp96dlrStmY9QuIvhnNmZn9+DGsIfBIhbQgDt2OU0
-	 S4L7zEN1Tuk+frp3bOpNV119FNGkHTUhsT6j2qnKYf3CuDLsaOoTrjCXW+d8z/OSljWiG
-	 UUqATqPjQ8pnN6Hb/kGGbivFf3GXK9GzpPI4sTW4VP+hoy+l/hIJm/QvIzWn44n8OEEK/
-	 zkMVsDsWJJq+kweJM+40WEnIMWqZHAPS5zgoHixi2M+s6jeWWRMmpwMjYoMVlm9o7yA==
+	bh=k23jnzEAH2UILXVsfgxxO7I2t5cymKKqXKa+Py+jLNQ=;
+	b=I9fxS4B/cybsZeevAagxwpLWqfuE7toInteEblN4fhggVNj91yFnkgRpmvnLaWNOnVYy
+	 /g31d58Zl1vP1rVcqlRLBXGtBjxv6I/N31dofZMUFjfs1fRTXxWC4eTm46RVMqpUhAdlu
+	 UKI+kiembz5VyIqukIyL1DJLqHSq1nX1OqhooqavkEBFMHObmejbCwe+pyAHYCf99Uh/N
+	 SJ4KAyn4jRfHARA+f9ndAQVvkSzZRLq9tkOBxkd6Ug4njLiZ/Q72sWpc15xacMNlNJVUW
+	 2gaywlly8dSZ1Nkc4hGaJrGfx1nz7TXcbAAOo0N0ZNjeEp8kAhBVdNOsOADRc+q79sQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WO9YXiyF;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EKGvCxUn;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399F8606A32C;
-	Wed,  4 Nov 2026 18:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB232606A326;
+	Wed,  4 Nov 2026 18:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WO9YXiyF
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A76651F00919;
-	Wed,  4 Nov 2026 18:20:39 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EKGvCxUn
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB7801F00A16;
+	Wed,  4 Nov 2026 18:20:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793816447;
-	bh=6g309lbgrjn1xo7S7Qg30lg+sesaJzFdJJRQn0HeciQ=;
+	s=k20260515; t=1793816464;
+	bh=k23jnzEAH2UILXVsfgxxO7I2t5cymKKqXKa+Py+jLNQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=WO9YXiyF9tYltRZHW+0ChWCqG/bjdRvuKguJubpmiRX7latYpOeUWOptwFj27nTx8
-	 fz55YXZOftfJnEQgpn7dBv6wZIkqUJSzH3oLHWe7qUvf2SKDO5LRZfS8OrqJQrimnz
-	 AFFXtYmvlb75LMrGD5P4BY+MxVIWRCcgieq3nnzbX+pIwEIsbE5KNW6xRllAxCzk48
-	 WimC62c5uVhpVXcEe9BPNTMIONtBro4tt5eUFuo/G+ZYADpTmTFCnISkVaTdvl2gqS
-	 WorgASYhze7DJcwhX2ciapWrwixqVJozZLrhSj2Q8wLb050Fj+xkrRTnJ3+caYN2gy
-	 sna5x3I1Jt2sA==
+	b=EKGvCxUnpWYjM/xDVbe5TrdjkdrFwalBGkCcDE4pEKVicVzlgiRQQyTg6zNq2v1uB
+	 WnbPljRtNGOWEtnFDnLj4XrbfY986LuIt4fF+rqhT0D2p70XDDTa2bjCz4PTaMAamb
+	 kvq6w4llCVjm/9HK9z08R/wBdpjYPWrxCCSu6QGJaLWMIuhYiwOdXFbxpXD5FVIFnL
+	 qMP+njD6VP09kktsRRhdhqBwx8hLVL5ya8l3AzeKfxhX/eL/eX0w8yAhS3OgiSUzMc
+	 kBe7tE9XlhUuhHb90RJ49objFBmAD0IbVtKVk3IDbLBwxYjk4P5h3tkdYn1ea4eD5/
+	 63JM9OrxmzQNg==
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Date: Wed, 04 Nov 2026 18:20:19 +0000
-Subject: [PATCH v5 01/11] kbuild: calculate list, composite object state
- per object
+Date: Wed, 04 Nov 2026 18:20:21 +0000
+Subject: [PATCH v5 03/11] modpost: cache section relocation mismatch state
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -55,7 +54,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261104-build-speedup-v5-1-0f6018be8dae@kernel.org>
+Message-Id: <20261104-build-speedup-v5-3-0f6018be8dae@kernel.org>
 References: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
 In-Reply-To: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>, 
@@ -79,97 +78,178 @@ To: Linus Torvalds <torvalds@linux-foundation.org>,
 Cc: ljs@kernel.org, linux-kbuild@vger.kernel.org, 
  linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
  linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, Nicolas Schier <n.schier@fritz.com>, 
- Kees Cook <kees@kernel.org>
+ rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3555; i=ljs@kernel.org;
- h=from:subject:message-id; bh=L0mXwIfHKqIgNhyape3/3FrLOaLztN+izspx78XSqYE=;
- b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLJel+dkL7xqJfv/np4m85Qlwt65HIb+vOpcHUnHWNcbr
- fxQfEO7o5SFQYyLQVZMkeX5F/H9QSJh8zov+LvBzGFlAhnCwMUpABOJNWNkmCIgdNh9Wcbl3teZ
- gvliunn+RtqSu6pKJX5MOvCsc91Xf0aGy08dslOXOpxn4FjY+6zul8FGgUjuNwWmyWsMr0/6esO
- cBQA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5220; i=ljs@kernel.org;
+ h=from:subject:message-id; bh=zDINJIogk6QGvycSCwNzQWD05voJbxr9kxI5NtLaVCc=;
+ b=kA0DAAoWz53NioHifxQByyZiAGrrd2yjo0pmOmrqxETitsl+57qve3F/oepdB2idVVeTZ34j2
+ Ih1BAAWCgAdFiEE5/QXv1IUVp6J0E9Gz53NioHifxQFAmrrd2wACgkQz53NioHifxROyAD8D6bA
+ 8au8a5BN9l6h4Pa6FJTK0zT4q8MlxZBEb2oJWgIBAJjrZ60U1zn0ORrNSJdbtnV0VRh7UFRtIAY
+ +Kef9f5cK
 X-Developer-Key: i=ljs@kernel.org; a=openpgp;
  fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
-When each object's command line is expanded, kbuild has to figure out on
-multiple occasions whether it's built-in or part of a module and which
-composite object it belongs to.
+For every relocation modpost invokes check_section_mismatch() to determine
+whether there is any kind of mismatch between the source and destination,
+and if so which classification applies.
 
-This causes the time spent on each directory in the kernel tree to grow
-O(n^2) with its object count, which is especially problematic for instance
-in drivers/gpu/drm/amd/amdgpu with 310 objects.
+Each time it does this it invokes section_mismatch() which iterates
+through the sectioncheck[] array every time it's called.
 
-No-op builds (i.e. make -j $(nproc) when nothing has changed) are
-particularly impacted by this.
+When walked a relocation section the source is fixed and there aren't many
+targets, so the same names are looked up over and over again.
 
-Fix the issue by calculating this data once and looking it up thereafter
-instead of recomputing it over and over again.
+Therefore cache not only mismatch categorisation but also whether a
+mismatch even exists for a given section and look up the sections in the
+cache.
 
-This has a particularly large impact on allmodconfig builds.
+Special indices (undefined, absolute, common) take the uncached path as
+before.
+
+This results in very significant speed ups for allmodconfig incremental
+builds.
+
+modpost is on the serial tail of every build that links vmlinux.
 
 Whole build, 128-thread Threadripper 9980X, best of N runs:
 
                                          before   after     delta
                                          -------------------------------
-  x86 defconfig, no-op make, gcc            1.1s     1.1s    -0.02s (-2%)
-  x86 defconfig, no-op make, clang          1.3s     1.3s    -0.01s (-1%)
-  x86 allmodconfig, no-op make, gcc        15.3s    14.5s    -0.83s (-5%)
-  x86 allmodconfig, no-op make, clang      16.2s    15.5s    -0.65s (-4%)
-  x86 allmodconfig, touch mm/vma.c, gcc    35.0s    34.3s    -0.77s (-2%)
-  x86 allmodconfig, touch mm/vma.c, clang  33.7s    33.2s    -0.51s (-2%)
+  x86 defconfig, touch mm/vma.c, gcc        8.5s     8.3s    -0.14s (-2%)
+  x86 defconfig, touch mm/vma.c, clang      7.7s     7.6s    -0.13s (-2%)
+  x86 allmodconfig, touch mm/vma.c, gcc    33.9s    29.4s     -4.5s (-13%)
+  x86 allmodconfig, touch mm/vma.c, clang  31.9s    27.9s     -4.0s (-13%)
 
-Reviewed-by: Nicolas Schier <n.schier@fritz.com>
-Reviewed-by: Kees Cook <kees@kernel.org>
 Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 ---
- scripts/Makefile.build | 8 ++++++++
- scripts/Makefile.lib   | 7 +++----
- 2 files changed, 11 insertions(+), 4 deletions(-)
+ scripts/mod/modpost.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ scripts/mod/modpost.h |  8 +++++++
+ 2 files changed, 67 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 6127feb970c6..bbe9555c47a8 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -122,6 +122,14 @@ multi-obj-m	:= $(addprefix $(obj)/, $(multi-obj-m))
- subdir-ym	:= $(addprefix $(obj)/, $(subdir-ym))
- endif
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 75374c64b8cc..83caf29b4bf2 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1155,12 +1155,62 @@ static void check_export_symbol(struct module *mod, struct elf_info *elf,
+ 			 name);
+ }
  
-+# Cache which list each object is in and which composite objects it belongs to,
-+# once per object for $(part-of-builtin), $(part-of-module) and $(modname-multi).
-+$(foreach o, $(real-obj-y) $(lib-y), $(eval part-of-builtin_$o := y))
-+$(foreach o, $(real-obj-m), $(eval part-of-module_$o := y))
-+$(foreach m, $(multi-obj-ym), \
-+	$(foreach o, $(call suffix-search, $m, .o, -objs -y -m), \
-+		$(eval modname-multi_$o += $(m:.o=))))
++static void init_mismatch_cache(struct elf_info *elf)
++{
++	elf->mismatch_cache = xcalloc(elf->num_sections,
++				      sizeof(*elf->mismatch_cache));
++}
 +
- ifndef obj
- $(warning kbuild: Makefile.build is included improperly)
- endif
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 19e96b30a122..8936925d4d50 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -2,8 +2,7 @@
++static void reset_mismatch_cache(struct elf_info *elf)
++{
++	memset(elf->mismatch_cache, 0,
++	       elf->num_sections * sizeof(*elf->mismatch_cache));
++}
++
++static void free_mismatch_cache(struct elf_info *elf)
++{
++	free(elf->mismatch_cache);
++	elf->mismatch_cache = NULL;
++}
++
++static const struct sectioncheck
++*cache_mismatch(const struct elf_info *elf, unsigned int to_secndx,
++		const struct sectioncheck *mismatch)
++{
++	if (!mismatch) {
++		elf->mismatch_cache[to_secndx] = -1;
++		return NULL;
++	}
++
++	elf->mismatch_cache[to_secndx] = (mismatch - sectioncheck) + 1;
++	return mismatch;
++}
++
++static const struct sectioncheck *get_section_mismatch(const struct elf_info *elf,
++		const char *fromsec, unsigned int to_secndx)
++{
++	int cached;
++
++	if (to_secndx >= elf->num_sections)
++		return section_mismatch(fromsec, sec_name(elf, to_secndx));
++
++	cached = elf->mismatch_cache[to_secndx];
++	if (cached < 0)
++		return NULL;
++	if (cached > 0)
++		return &sectioncheck[cached - 1];
++
++	return cache_mismatch(elf, to_secndx,
++			      section_mismatch(fromsec, sec_name(elf, to_secndx)));
++}
++
+ static void check_section_mismatch(struct module *mod, struct elf_info *elf,
+ 				   Elf_Sym *sym,
+ 				   unsigned int fsecndx, const char *fromsec,
+ 				   Elf_Addr faddr, Elf_Addr taddr)
+ {
+-	const char *tosec = sec_name(elf, get_secindex(elf, sym));
++	unsigned int to_secndx = get_secindex(elf, sym);
++	const char *tosec = sec_name(elf, to_secndx);
+ 	const struct sectioncheck *mismatch;
  
- # Finds the multi-part object the current object will be linked into.
- # If the object belongs to two or more multi-part objects, list them all.
--modname-multi = $(sort $(foreach m,$(multi-obj-ym),\
--		$(if $(filter $*.o, $(call suffix-search, $m, .o, -objs -y -m)),$(m:.o=))))
-+modname-multi = $(sort $(modname-multi_$*.o))
+ 	if (module_enabled && elf->export_symbol_secndx == fsecndx) {
+@@ -1168,7 +1218,7 @@ static void check_section_mismatch(struct module *mod, struct elf_info *elf,
+ 		return;
+ 	}
  
- __modname = $(or $(modname-multi),$(basetarget))
+-	mismatch = section_mismatch(fromsec, tosec);
++	mismatch = get_section_mismatch(elf, fromsec, to_secndx);
+ 	if (!mismatch)
+ 		return;
  
-@@ -149,8 +148,8 @@ endif
- # If $(is-kernel-object) is 'y', this object will be linked to vmlinux or modules
- is-kernel-object = $(or $(part-of-builtin),$(part-of-module))
+@@ -1445,6 +1495,8 @@ static void check_sec_ref(struct module *mod, struct elf_info *elf)
+ {
+ 	int i;
  
--part-of-builtin = $(if $(filter $(basename $@).o, $(real-obj-y) $(lib-y)),y)
--part-of-module = $(if $(filter $(basename $@).o, $(real-obj-m)),y)
-+part-of-builtin = $(part-of-builtin_$(basename $@).o)
-+part-of-module = $(part-of-module_$(basename $@).o)
- quiet_modtag = $(if $(part-of-module),[M],   )
++	init_mismatch_cache(elf);
++
+ 	/* Walk through all sections */
+ 	for (i = 0; i < elf->num_sections; i++) {
+ 		Elf_Shdr *sechdr = &elf->sechdrs[i];
+@@ -1461,6 +1513,9 @@ static void check_sec_ref(struct module *mod, struct elf_info *elf)
+ 			if (match(secname, section_white_list))
+ 				continue;
  
- modkern_cflags =                                          \
++			/* Reset cache per-section. */
++			reset_mismatch_cache(elf);
++
+ 			start = sym_get_data_by_offset(elf, i, 0);
+ 			stop = start + sechdr->sh_size;
+ 
+@@ -1472,6 +1527,8 @@ static void check_sec_ref(struct module *mod, struct elf_info *elf)
+ 					    start, stop);
+ 		}
+ 	}
++
++	free_mismatch_cache(elf);
+ }
+ 
+ static char *remove_dot(char *s)
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 666beca685e4..7ba64fd894ef 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -160,6 +160,14 @@ struct elf_info {
+ 	Elf32_Word   *symtab_shndx_stop;
+ 
+ 	struct symsearch *symsearch;
++
++	/*
++	 * Section mismatch cache, indexed by destination section:
++	 *   0 - uncached.
++	 *  -1 - no mismatch.
++	 *  >0 - mismatch index + 1.
++	 */
++	int *mismatch_cache;
+ };
+ 
+ /* Accessor for sym->st_shndx, hides ugliness of "64k sections" */
 
 -- 
 2.56.0
