@@ -1,55 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.157.188.9
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793789925;
-	b=lP8sS92QNCs5PJpvYTWCa/oVJW9qbnvguoponZW3Ms+jcWUGPmHGw5NvTDvPNrAAvWbS
-	 7H5d3QOqiaSdIHkrsfbaDvPJg6wKzmiKPnzWVpgXFw6AfHUODdLNMANbeNHOtcBrYBMq2
-	 Qos6gWL7JXzPnZW8DqVDCr1/u1LuaomYOUNCnDGZ41/rD7H5QB/90gGgJuRjOYCLpNt+A
-	 o3l229rXJUcJy3NulhubWrCtkM56roJpIn2F/S6fjR+mGOaHCNSvSAhdsLAkAcIFMpK7D
-	 ML65LNbEytjOGsZd86wdQZjxI5L41oVk9GUGS9C1KbC2jIpdLsFq396CGTII71S3uqA==
+	t=1793793847;
+	b=hNo4oLKwmNamy0y2abp+pL1u/sBj+JycE7Dim5tPQSF7sM08veJSnGWSZYYcY9FQOvN0
+	 mUNbPM2Jn7obFVsVfi3NXJiELSKDE+NJX7j/Q/4ey/m6+GCWEQIdCvZMTtAOcjy44neyN
+	 6WAAnbjLWvboHsji0qGHG0xd6/S156jKVnnxdaSQgGbo9G+KHpQ+iiE9Sc9AoWdGd5LCb
+	 gaFBRPw3gz/hhYHnS0C+gbUjgr2xSmNxwLpuVuq1W7vnpT9gkhRBKAjrVBITZYJgqS4mL
+	 +rb46abIMZzEqwkRQdHpgxHZYlriXRGP8piVf/qhE+orBUZRXEAKqNtHo/R1KveJ9yg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793789925;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=aFc2GklP3bjxGgVfXDwz33q+VHgdgBseGYkS0162pL0=;
-	b=tr0t5VQqQ2xVZClcvWVzhGXpoLkLax4zQpjX3TkPWl3J4zFc9JLeJHOFXSBFEsMhwVtf
-	 WEV0ipEjFxDR0qWuZXT8Q1/sEQJ2Jr9bIG1xCMzaeN8h5duzzHPQ5Zu69GIEuXmnDDPn6
-	 QiqNjtGloG2cnmGMneCfRXk/cDfeYXX/C/cpepcy+BUxhVg1CSA80LCpn3qRqnsXPc/uM
-	 qHTvRnfietj9ke0beeUXnXHYBeLA9O4DSFRy0FbrYhFrmT7BlqhKY6epHr8uKau+RjOPS
-	 7R/yulo/PRLZO20kFSk9woyT5KLQT5Pt/tR+htIdSb34gf68D5lMphqxjARNcpewTYA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793793847;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-Infomaniak-Routing;
+	bh=fmf8afflJW1L1HVT54sgKsVpizIVeO/TZCGyORgi5+A=;
+	b=zmhgDYaqxCajX/Q54jHJbpYZ9j6iGR/aVD6A9v7/iPdYnc7lFWA+r9R3Q/pF06FROjxT
+	 +u0JQdwCQ1qP78zvILtj91eMLDRIaX3M67H979F/Ckcnxjiy9Bci6hEki3/QB72aJgQe4
+	 exPwvU1Xqu0l3QhTBS6udPYilRXUJM1KHPjsWe15I8fOEPqyiS83pOg6lfVfLaRQqXabU
+	 Pn0V/vpshnp1UgvlrVV1MGdN4eqKPaiZA397eFh2aVR0voNhQcTQbHKz9/jZs3NDFx6UW
+	 7KHcrlrIX9RezXUNVCURvWNm6F0TPJ275PoDIN2uXa9pknOlKqo8Km2G8oWLFb79/Pw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YFSbxTh1;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=none header.from=daylightlinux.ch;
+	spf=none smtp.mailfrom=daylightlinux.ch;
+	arc=none smtp.remote-ip=45.157.188.9
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4304D606A32D
-	for <linux-kbuild@vger.kernel.org>; Wed,  4 Nov 2026 10:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YFSbxTh1
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D318C1F000C1;
-	Wed,  4 Nov 2026 10:58:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793789925;
-	bh=aFc2GklP3bjxGgVfXDwz33q+VHgdgBseGYkS0162pL0=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=YFSbxTh1j7qRdqlzRk0ik/9WJ5chD52AZDxff71ZL2lINuIClC9YgpjHK7rmg30Sc
-	 /qiSgWjwgFjZtRDmB6yQbemOU5rr4PSqEwZEHaexQ7/oUBlBcPcKZ9t/p4VKKLO9DT
-	 YGDz8dLz2ho/6miLdgpQw0RqLnYpZWnzUNTyi7XoI42rLU+t3elFSODkxC5xr5aoMB
-	 A6z0WaxuO0vdSOL5dTMxllSTosgkkrYr5pnf9RR/CdSjyokfRKtt9B0eWmDNfItofJ
-	 Q21GrWep+fQxEgsCEpm9R3jJNESChjDma8/x196Yl07EZoyB4h4SP6hGKtDeBBugVD
-	 m/sukYioSu07Q==
-Message-ID: <sashiko-outbox-197134@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] scripts: check-function-names: propagate nm failures
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Hamdy Abou El Anein" <info@daylightlinux.ch>, nathan@kernel.org
-Cc: nsc@kernel.org, linux-kbuild@vger.kernel.org, hamdy.aea@protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E85606A328
+	for <linux-kbuild@vger.kernel.org>; Wed,  4 Nov 2026 12:04:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60E85606A328
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daylightlinux.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daylightlinux.ch
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jKPHM2hrmzFVk;
+	Wed,  4 Nov 2026 13:03:59 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=daylightlinux.ch;
+	s=20261016; t=1793793839;
+	bh=fmf8afflJW1L1HVT54sgKsVpizIVeO/TZCGyORgi5+A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OVSJ7NKfU1vCU2sv1SIi1DguzWwsIVad3RHq8qYHK2Nh0IOkm3xYDWgx+U29esCtX
+	 aYTMT5KUXet13ZC+Olryvi9Olm5WPr5yo8QroEqziO5j6wmnSwYnwXCfPVMXVradi3
+	 p710fPVzQS0tmfaDuK8UgyPS2J0UhHCzJc8CV5BTbd18kS6rALeU8nDSvvsmlQBGE0
+	 LVJ5bDdLq80WWv5MQqIjiedhzTkjsyJx6hBfF+RueP/theKvT3iyEHk/6AdT48Ory3
+	 WWmL+IlxMW/xvtDl9klnL9irrK9n4eIRssDwvrd1B1KYAfWXevscL08S50o/HDeUl3
+	 q0uwjtXGUR0rQ==
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jKPHL1HQYzk2j;
+	Wed,  4 Nov 2026 13:03:58 +0100 (CET)
+Received: from unknown by raspberrypi with local (Exim 4.96)
+	(envelope-from <info@daylightlinux.ch>)
+	id 1xOZif-00Gsem-2S;
+	Wed, 04 Nov 2026 13:03:57 +0100
+From: Hamdy Abou El Anein <info@daylightlinux.ch>
+To: nathan@kernel.org
+Cc: nsc@kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hamdy.aea@protonmail.com
+Subject: [PATCH v2] scripts: check-function-names: propagate nm failures
+Date: Wed,  4 Nov 2026 13:03:57 +0100
+Message-ID: <20261104120357.7007-1-info@daylightlinux.ch>
+X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261103105829.10511-1-info@daylightlinux.ch>
 References: <20261103105829.10511-1-info@daylightlinux.ch>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Nov 2026 10:58:44 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -58,68 +69,46 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] scripts: check-function-names: buffering full vmlinux.o nm outpu=
-t in shell
---
+From: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 
-commit 329efcc5adb68fe0ddbe8ccd5ee716b893c4188e
-Author: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
+The symbol-name check pipes nm through awk and grep. If nm cannot read
+an object file, its failure status is lost and the script reports
+success without checking any symbols.
 
-scripts: check-function-names: propagate nm failures
+Keep nm output streaming while carrying its exit status through the
+filter. This avoids buffering the full vmlinux.o symbol table in a
+shell variable during the serial kernel link.
 
-This commit captures the output of nm in a shell variable before piping it
-to awk and grep so that check-function-names.sh exits with an error if nm
-fails on the input object file.
+Tested with a malformed object (failure), a valid object (success), an
+object defining startup (failure), and a synthetic large nm stream
+(success).
 
-> diff --git a/scripts/check-function-names.sh b/scripts/check-function-nam=
-es.sh
-> index 94883e690627d..f07a0e1cf3394 100755
-> --- a/scripts/check-function-names.sh
-> +++ b/scripts/check-function-names.sh
-> @@ -13,7 +13,8 @@ if [ ! -f "$objfile" ]; then
->  	exit 1
->  fi
-> =20
-> -bad_symbols=3D$(${NM:-nm} -p "$objfile" | awk '$2 ~ /^[TtWw]$/ {print $3=
-}' |
-> +symbols=3D$(${NM:-nm} -p "$objfile") || exit 1
-> +bad_symbols=3D$(printf '%s\n' "$symbols" | awk '$2 ~ /^[TtWw]$/ {print $=
-3}' |
->  	      grep -E '^(startup|exit|split|unlikely|hot|unknown)(\.|$)')
+AI assistance: ChatGPT/Codex identified the issue and prepared the
+change, commit message and executable regression tests.
 
-[Severity: Medium]
-Does capturing the entire nm output into symbols and expanding it into
-printf introduce a build-time performance and memory regression when linking
-vmlinux.o?
+Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
+---
+ scripts/check-function-names.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-In scripts/Makefile.vmlinux_o, rule_ld_vmlinux.o runs this script on
-vmlinux.o in the serial path of the kernel link:
+diff --git a/scripts/check-function-names.sh b/scripts/check-function-names.sh
+index 94883e690627..f07a0e1cf339 100755
+--- a/scripts/check-function-names.sh
++++ b/scripts/check-function-names.sh
+@@ -13,7 +13,8 @@ if [ ! -f "$objfile" ]; then
+ 	exit 1
+ fi
+ 
+-bad_symbols=$(${NM:-nm} -p "$objfile" | awk '$2 ~ /^[TtWw]$/ {print $3}' |
++symbols=$(${NM:-nm} -p "$objfile") || exit 1
++bad_symbols=$(printf '%s\n' "$symbols" | awk '$2 ~ /^[TtWw]$/ {print $3}' |
+ 	      grep -E '^(startup|exit|split|unlikely|hot|unknown)(\.|$)')
+ 
+ if [ -n "$bad_symbols" ]; then
+-- 
+2.56.0
 
-scripts/Makefile.vmlinux_o:
-cmd_check_function_names =3D $(srctree)/scripts/check-function-names.sh $@
-
-define rule_ld_vmlinux.o
-	$(call cmd_and_savecmd,ld_vmlinux.o)
-	$(call cmd,gen_objtooldep)
-	$(call cmd,check_function_names)
-endef
-
-Because vmlinux.o contains the full built-in kernel symbol table (spanning
-many megabytes and hundreds of thousands of symbols, especially on
-allmodconfig or allyesconfig builds), previously nm -p streamed directly
-into awk in parallel and command substitution only buffered the matching
-bad_symbols output (which is empty in the normal case).
-
-With this change, the shell waits for nm to finish while buffering the
-entire multi-megabyte symbol table in the symbols variable, and then forks a
-subshell that expands and copies the entire string as an argument to printf
-before piping it to awk, working against the serial link optimization in
-commit c2970d8b52d1 ("kbuild: do not sort nm output where the order is
-irrelevant").
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261103105829.1051=
-1-1-info@daylightlinux.ch?part=3D1
