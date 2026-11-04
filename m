@@ -1,66 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.157.188.9
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.157.188.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793793847;
-	b=hNo4oLKwmNamy0y2abp+pL1u/sBj+JycE7Dim5tPQSF7sM08veJSnGWSZYYcY9FQOvN0
-	 mUNbPM2Jn7obFVsVfi3NXJiELSKDE+NJX7j/Q/4ey/m6+GCWEQIdCvZMTtAOcjy44neyN
-	 6WAAnbjLWvboHsji0qGHG0xd6/S156jKVnnxdaSQgGbo9G+KHpQ+iiE9Sc9AoWdGd5LCb
-	 gaFBRPw3gz/hhYHnS0C+gbUjgr2xSmNxwLpuVuq1W7vnpT9gkhRBKAjrVBITZYJgqS4mL
-	 +rb46abIMZzEqwkRQdHpgxHZYlriXRGP8piVf/qhE+orBUZRXEAKqNtHo/R1KveJ9yg==
+	t=1793794062;
+	b=Ic7cBEKwKAuXIrdxbTse8b3Sl3/1paqQghNZvfwlBzoWkDOIZ3qO6FP4dzjdt+ld/2dl
+	 OnLWkpGfTOQEjxcEFSJd5k95StG0m5vB1J6DI638GBZv1RTBEr7wWzZNK13X+WGJHkrLE
+	 FSfLNsXbBj8u5eYzqq5xHAJINcWWrYJHil0INRTUNULpa1Pcd7ZQS5ORO/IwTQBrjctNe
+	 0RMHIy+fsovsq/jwdYazBUNh8zBhhaAMJFISCy/h2gb4/NkTDXRzd4Z5kdxVQdASgoiNH
+	 ri7uu84SXh+bhANtzl1aztGq0XrKoN9mysR7gpkSO4xuAWL1ffpvZy7YvzmTS/5OjJw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793793847;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793794062;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
 	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-Infomaniak-Routing;
-	bh=fmf8afflJW1L1HVT54sgKsVpizIVeO/TZCGyORgi5+A=;
-	b=zmhgDYaqxCajX/Q54jHJbpYZ9j6iGR/aVD6A9v7/iPdYnc7lFWA+r9R3Q/pF06FROjxT
-	 +u0JQdwCQ1qP78zvILtj91eMLDRIaX3M67H979F/Ckcnxjiy9Bci6hEki3/QB72aJgQe4
-	 exPwvU1Xqu0l3QhTBS6udPYilRXUJM1KHPjsWe15I8fOEPqyiS83pOg6lfVfLaRQqXabU
-	 Pn0V/vpshnp1UgvlrVV1MGdN4eqKPaiZA397eFh2aVR0voNhQcTQbHKz9/jZs3NDFx6UW
-	 7KHcrlrIX9RezXUNVCURvWNm6F0TPJ275PoDIN2uXa9pknOlKqo8Km2G8oWLFb79/Pw==
+	bh=2XuYXPihSJV5rInteSJnmLXHY6vbrjdvlanCtAK/q74=;
+	b=aNIVgQMBHe7PIrT5PwzrVMJhVHuBUwmW18wicyZ03HH9lzsauvZj9ENS2xpKwJ9cjw+7
+	 nsDNdtv03qkDaZZXzFQ8aWaExEavmJcxxzHLsJiLF+ukMIna50ohzBRGddh1kPcuYovTf
+	 chI57Efn74CXLJ9lXs82A9WGORhU4UoRa9hqfJC06gXbjSEWbgT8ALzOG5kdV5SSq7K2O
+	 GLbYATTYq9cvlty7ZJ2d/N95XlpJ/eD1z7+qylVOqRYei3Jnaconu3LtAM+zVPR9s4uIz
+	 wJR5AldqdNIpsR/DV8JmHPB6YQqdMsFsoSv4w0rz6Et6NGPZ57HUOL16ruhvtBRzAbA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=daylightlinux.ch;
 	spf=none smtp.mailfrom=daylightlinux.ch;
-	arc=none smtp.remote-ip=45.157.188.9
-Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
+	arc=none smtp.remote-ip=45.157.188.14
+Received: from smtp-bc0e.mail.infomaniak.ch (smtp-bc0e.mail.infomaniak.ch [45.157.188.14])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E85606A328
-	for <linux-kbuild@vger.kernel.org>; Wed,  4 Nov 2026 12:04:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60E85606A328
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9C2606A326
+	for <linux-kbuild@vger.kernel.org>; Wed,  4 Nov 2026 12:07:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AC9C2606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daylightlinux.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daylightlinux.ch
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jKPHM2hrmzFVk;
-	Wed,  4 Nov 2026 13:03:59 +0100 (CET)
+Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jKPMV4ZHFzmZr;
+	Wed,  4 Nov 2026 13:07:34 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=daylightlinux.ch;
-	s=20261016; t=1793793839;
-	bh=fmf8afflJW1L1HVT54sgKsVpizIVeO/TZCGyORgi5+A=;
+	s=20261016; t=1793794054;
+	bh=2XuYXPihSJV5rInteSJnmLXHY6vbrjdvlanCtAK/q74=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OVSJ7NKfU1vCU2sv1SIi1DguzWwsIVad3RHq8qYHK2Nh0IOkm3xYDWgx+U29esCtX
-	 aYTMT5KUXet13ZC+Olryvi9Olm5WPr5yo8QroEqziO5j6wmnSwYnwXCfPVMXVradi3
-	 p710fPVzQS0tmfaDuK8UgyPS2J0UhHCzJc8CV5BTbd18kS6rALeU8nDSvvsmlQBGE0
-	 LVJ5bDdLq80WWv5MQqIjiedhzTkjsyJx6hBfF+RueP/theKvT3iyEHk/6AdT48Ory3
-	 WWmL+IlxMW/xvtDl9klnL9irrK9n4eIRssDwvrd1B1KYAfWXevscL08S50o/HDeUl3
-	 q0uwjtXGUR0rQ==
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jKPHL1HQYzk2j;
-	Wed,  4 Nov 2026 13:03:58 +0100 (CET)
+	b=kOuLkqa0hsBlLwehXMM6WhiaIHvfRQIiJ68LnpudJSEsxydwWKYrHXdn7Kzkglc2A
+	 q7khi1FxsppcWNxASytHh4OH7Tz2KIFgYyKVYDouCsDo22vmVcPuq+DKeeM73fuyqC
+	 ryQDeDBqs5B0hLI4M9A0Y4/aNh9uVjbdMPN4mNc8TZg5SiyrcXwocqp0yjR3yBS6HS
+	 MIiDUm5wZX4hwrACE1/+mag2wmH+cYFvW/U0JlJtrNGSwuWEXrTChwmge9OXuLasGx
+	 9L6V1DN/6oMgfbUB3SotoaX4F/PYvJ2amCvoyKMKhRivnucbdxpGSGQImQTBYcdFWp
+	 kx2fI333AqMmA==
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jKPMV0GZ5zsrr;
+	Wed,  4 Nov 2026 13:07:34 +0100 (CET)
 Received: from unknown by raspberrypi with local (Exim 4.96)
 	(envelope-from <info@daylightlinux.ch>)
-	id 1xOZif-00Gsem-2S;
-	Wed, 04 Nov 2026 13:03:57 +0100
+	id 1xOZm9-00GsqB-23;
+	Wed, 04 Nov 2026 13:07:33 +0100
 From: Hamdy Abou El Anein <info@daylightlinux.ch>
 To: nathan@kernel.org
 Cc: nsc@kernel.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	hamdy.aea@protonmail.com
-Subject: [PATCH v2] scripts: check-function-names: propagate nm failures
-Date: Wed,  4 Nov 2026 13:03:57 +0100
-Message-ID: <20261104120357.7007-1-info@daylightlinux.ch>
+Subject: [PATCH v3] scripts: check-function-names: propagate nm failures
+Date: Wed,  4 Nov 2026 13:07:33 +0100
+Message-ID: <20261104120733.7633-1-info@daylightlinux.ch>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261103105829.10511-1-info@daylightlinux.ch>
-References: <20261103105829.10511-1-info@daylightlinux.ch>
+In-Reply-To: <20261104120357.7007-1-info@daylightlinux.ch>
+References: <20261104120357.7007-1-info@daylightlinux.ch>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -81,7 +81,7 @@ success without checking any symbols.
 
 Keep nm output streaming while carrying its exit status through the
 filter. This avoids buffering the full vmlinux.o symbol table in a
-shell variable during the serial kernel link.
+shell variable during the serial kernel link, as the v2 did.
 
 Tested with a malformed object (failure), a valid object (success), an
 object defining startup (failure), and a synthetic large nm stream
@@ -92,23 +92,45 @@ change, commit message and executable regression tests.
 
 Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 ---
- scripts/check-function-names.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/check-function-names.sh | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/check-function-names.sh b/scripts/check-function-names.sh
-index 94883e690627..f07a0e1cf339 100755
+index 94883e690627..b25e630cc594 100755
 --- a/scripts/check-function-names.sh
 +++ b/scripts/check-function-names.sh
-@@ -13,7 +13,8 @@ if [ ! -f "$objfile" ]; then
+@@ -13,9 +13,28 @@ if [ ! -f "$objfile" ]; then
  	exit 1
  fi
  
 -bad_symbols=$(${NM:-nm} -p "$objfile" | awk '$2 ~ /^[TtWw]$/ {print $3}' |
-+symbols=$(${NM:-nm} -p "$objfile") || exit 1
-+bad_symbols=$(printf '%s\n' "$symbols" | awk '$2 ~ /^[TtWw]$/ {print $3}' |
- 	      grep -E '^(startup|exit|split|unlikely|hot|unknown)(\.|$)')
- 
+-	      grep -E '^(startup|exit|split|unlikely|hot|unknown)(\.|$)')
+-
++# Keep nm output streaming while preserving its exit status.
++bad_symbols=$(
++	{
++		${NM:-nm} -p "$objfile"
++		nm_status=$?
++		printf '\n#nm_status %s\n' "$nm_status"
++	} |
++	awk '
++		$1 == "#nm_status" {
++			if ($2 != 0)
++				nm_failed = 1
++			next
++		}
++		$2 ~ /^[TtWw]$/ && $3 ~ /^(startup|exit|split|unlikely|hot|unknown)(\.|$)/ {
++			print $3
++		}
++		END {
++			if (nm_failed)
++				exit 1
++		}
++	'
++) || exit 1
  if [ -n "$bad_symbols" ]; then
+ 	echo "$bad_symbols" | while read -r sym; do
+ 		echo "$objfile: error: $sym() function name creates ambiguity with -ffunction-sections" >&2
 -- 
 2.56.0
 
