@@ -1,64 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793757206;
-	b=d0KbmU4Aj88UoGMFmCT+h2nZxalDeXwixlGJz9NyNNgCyWGIhU4aiZkCzjD8pDdvSuYa
-	 E8HyYMvxjKphkjZy7AW1Fqz2BwKCJxg7KrVXiYMwhuiVSNoZr8B9TA7T8x+GrEbq1tM/E
-	 FodthR4WIkuwyFRUFAfUZ9+oUJ6bTIfHNwpu/dVskevMFFqA/8Ls/+vM4AXdD2apK00ER
-	 5AP7Od8JdYHWO0uZpiFELU3a1WXNYv1R1w7kW/fIBQbhKSAn5jiEdwradgFtCtmtWK0Yu
-	 9EuxFzeHuiIbpT6k8gRcyfNeUEVFpaEyg8mMsuW1lZde5QIweWaXYjisF0l6UxEt1rA==
+	t=1793757208;
+	b=UN+/ktJFFPHdalvqL5C3HOEQ3/M1RHNeiA18u7PRK2/Eqs6Mp7tfp6cqPVS6y7J5BJ+v
+	 28f1SDR8/cS9x064p/1yCrrcVVZYo+BF+YunsR5c/KipvSzljqbNtn05gV4bK9iJFFKZx
+	 4vheYjyNJ+P8bosI0x3pX97bQZ5MdcfqZHuTKPDe8CfkNIJ3XsGzMXSHVOcO+RRqU94EQ
+	 mq2RCpRPObQboqcX698jS6Wa7VRzMwN8to0ECis8tVyM92fo+VcfHJOnnlNIAmOe2xEM3
+	 PQ1zvB3DUFsnDM2lakox2ym7PC56v8X3XqUBT4g4jwJN78D+FIwJAXm8mNBFFcWtKrg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793757206;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793757208;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=sCrEqs1NI3CDLbV1P5Swm4nctk9m1GTHKu2myJ767JY=;
-	b=Eyq1JavlByi36lETbQ9nmubp4lcHRURzDM6S5ww1s2VdkUg2CEBMKjXSACVIjYBcviJp
-	 aDFQDzjjwzVn4WtDpCxu793LIG8DX24gue12fUx2bQumzkcUTz+lQlgEAevswxSHyd9g4
-	 vNnLckck1qUJnWpDTKr/v5FiJtXvYTie0In91WnI4+1f3NxmRvP3Zpem0/msjEl1N19aQ
-	 4tfRwLKW6w02Z89et7jem0Q6Dk9Nlh1JTptJnIN0Gaqz+Bez11z9vugwgcMYvIDHatkQQ
-	 yHR6pek8n47hRfwEr4qwfchp2x1t0m/cG8PsIgCFDYvrhbQahRM7O2yONF788xQ/NlQ==
+	bh=GCR0JcBaw6EXCBL2jmrD+csRtGmyOL33aeP7MmzatSI=;
+	b=0SerBU9cu2zqat00X2Hoeysy7e+P9ou0LssFhXt0/0sS7w5efEyzh0/9RfYsYPRIaWOQ
+	 1l0m37uxYCwom1NhSlmwguX3c6HA8uthXmVoKuSwokGEi9ixVUG0lbHF6eam58zTYaYXY
+	 HGBefGIRjoOwHIdIo+qLw8fyj8g62caIBt5Zc8+gV3RsTOzCC03H9HIVOZAgbgUsyuy0v
+	 4AGaAst2Ry1Gn3wFY9quzFJpp4T1utWIibk6NSRTnTrSv1Ko9NUK0MUtbOVHiLC+odQbx
+	 8xT8qTmqQ3wjTpShxjsMd94lbw2GQSaUfvt66E13F5V+2GQ3/G1EVjUzUaqGfkKltJg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VN9diUc5;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fXEaYR27;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E77F606A31B
-	for <linux-kbuild@vger.kernel.org>; Wed,  4 Nov 2026 01:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D8E606A32D
+	for <linux-kbuild@vger.kernel.org>; Wed,  4 Nov 2026 01:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VN9diUc5
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB9061F000C1;
-	Wed,  4 Nov 2026 01:53:24 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fXEaYR27
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D22501F0093A;
+	Wed,  4 Nov 2026 01:53:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793757205;
-	bh=sCrEqs1NI3CDLbV1P5Swm4nctk9m1GTHKu2myJ767JY=;
+	s=k20260515; t=1793757207;
+	bh=GCR0JcBaw6EXCBL2jmrD+csRtGmyOL33aeP7MmzatSI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VN9diUc5hpbMdMh+ekSVxXn5sfyLrS2WtIG2OJiHpfU6NKZ17QuSVyTQXMzLuzS/L
-	 Kn64pf87xENTxTUbHseHkTZMUZuZPghf6GbO3F33629DU2zTPeVJP3MD6RjV2lbefC
-	 YP80njJQ+u1XIpsjAVhdvVwyLa96TncrUvtFMA7ShPkqiqLh3Twr6efXCkNvXQg6aT
-	 hqIi42WIEDow4EYokxDmV9ZO2EEd3H1gYCU8GZWTuDQzNSUQZhsGMoW4Cvg0Ei0K3W
-	 yi8NwVmbhO6btNaaq+YRcingOfIiF4MdoUaNBMnx7fesn9Vr1vanENeE82RvMK68qe
-	 1VZYlWVn2ds6A==
-Message-ID: <sashiko-outbox-196392@kernel.org>
+	b=fXEaYR27Iwf3GL2hIUwpU7pKafyp4GLKg5E0eOzMfborRLZZn1Kw2LzVGcURnNYQK
+	 a584M1o4OPgeUPxDWUYNMoOdnK8EdEnyXP0/S0BC+5UfhPTk7ovn0OR0ycMup4N16q
+	 FuGLGO+TMSbHr/XS6u9hhLl5JoHeArIcFFWyfV+1smV4Vo5lIzzXa3iW9+Qw6XshZy
+	 FoR8EtoIK4ucCEyRYonQ5iYj7eErFpDOOMznK3IhDXB1eVRKzIQi0WRtD2sRLdWE9u
+	 zMf3tVCTzPeZuYZtuk9wFH0NTNjlaFtBN3aEwjRypnH4ULaoO7cAOwfC57KUZ2b4yg
+	 B2QLjpAsx5QCQ==
+Message-ID: <sashiko-outbox-196404@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 02/20] kbuild: unify static coverage instrumentation
- as COVERAGE_PROFILE
+Subject: Re: [PATCH v2 14/20] coverage: add Clang's source-based code
+ coverage
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sasha Levin" <sashal@kernel.org>
-Cc: "Alexander Potapenko" <glider@google.com>, "Andrew Morton" <akpm@linux-foundation.org>, "Andrey
- Konovalov" <andreyknvl@gmail.com>, "Chuck Wolber" <chuck@wolber.net>, "Dmitry
- Vyukov" <dvyukov@google.com>, "Jonathan Corbet" <corbet@lwn.net>, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, "Marco
+Cc: "Wentao Zhang" <wentaoz5@illinois.edu>, "Alexander Potapenko" <glider@google.com>, "Andrey
+ Konovalov" <andreyknvl@gmail.com>, "Arnd Bergmann" <arnd@arndb.de>, "Bill
+ Wendling" <morbo@google.com>, "Chuck Wolber" <chuck@wolber.net>, "Dmitry
+ Vyukov" <dvyukov@google.com>, "Justin Stitt" <justinstitt@google.com>, kasan-dev@googlegroups.com, linux-kbuild@vger.kernel.org, "Marco
  Elver" <elver@google.com>, "Masami Hiramatsu" <mhiramat@kernel.org>, "Nathan
- Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Peter
- Oberparleiter" <oberpar@linux.ibm.com>, "Peter Zijlstra" <peterz@infradead.org>, "Randy
- Dunlap" <rdunlap@infradead.org>, "Shuah Khan" <skhan@linuxfoundation.org>, "Thomas
- Gleixner" <tglx@kernel.org>, "Konstantin Khorenko" <khorenko@virtuozzo.com>
-In-Reply-To: <20261103015238.3780910-3-sashal@kernel.org>
+ Chancellor" <nathan@kernel.org>, "Nick Desaulniers" <ndesaulniers@google.com>, "Nicolas
+ Schier" <nsc@kernel.org>, "Peter Oberparleiter" <oberpar@linux.ibm.com>, "Peter
+ Zijlstra" <peterz@infradead.org>, "Thomas Gleixner" <tglx@kernel.org>
+In-Reply-To: <20261103015238.3780910-15-sashal@kernel.org>
 References: <20261103015238.3780910-1-sashal@kernel.org>
- <20261103015238.3780910-3-sashal@kernel.org>
+ <20261103015238.3780910-15-sashal@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Nov 2026 01:53:24 +0000
+Date: Wed, 04 Nov 2026 01:53:26 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -70,97 +70,102 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] selftests: rds: enable CONFIG_COVERAGE_NONE when disabling gcov =
-in config.sh
+- [Medium] coverage: LLVM_COV_DATA places non-alloc __llvm_cov* in kernel i=
+mage
 --
 
-commit 971a0caf7cd04a84e0c297870980e1998f44b592
+commit c6db5401d9d9ff31cd5421cd456c7917bf582166
 Author: Sasha Levin <sashal@kernel.org>
 
-kbuild: unify static coverage instrumentation as COVERAGE_PROFILE
+coverage: add Clang's source-based code coverage
 
-This commit converts kernel code coverage instrumentation into a generic
-Kconfig choice block with COVERAGE_KERNEL, COVERAGE_PROFILE_ALL, and
-COVERAGE_PROFILE, while keeping the GCOV_PROFILE_* Kconfig symbols as
-transitional aliases.
+This commit adds support for Clang's Source-based Code Coverage under
+CONFIG_LLVM_COV_KERNEL, exporting raw profile data of the kernel image via
+/sys/kernel/debug/coverage/llvm/profraw and defining the LLVM_COV_DATA
+linker script macro for the associated compiler-emitted sections.
 
-[ ... ]
+Link: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html [1]
+Link: https://lore.kernel.org/lkml/20210407211704.367039-1-morbo@google.com=
+/ [2]
 
-> diff --git a/tools/testing/selftests/net/rds/config.sh b/tools/testing/se=
-lftests/net/rds/config.sh
-> index 2df2226310efe..bb854f49e464d 100755
-> --- a/tools/testing/selftests/net/rds/config.sh
-> +++ b/tools/testing/selftests/net/rds/config.sh
-> @@ -43,13 +43,14 @@ scripts/config "${FLAGS[@]}" --enable CONFIG_RDS_TCP
+> diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmli=
+nux.lds.h
+> index 3eb732942d699..840899b604336 100644
+> --- a/include/asm-generic/vmlinux.lds.h
+> +++ b/include/asm-generic/vmlinux.lds.h
+> @@ -359,6 +359,42 @@
+>  #define THERMAL_TABLE(name)
+>  #endif
 > =20
->  if [ "$GENERATE_GCOV_REPORT" -eq 1 ]; then
->  	# instrument RDS and only RDS
-> +	scripts/config "${FLAGS[@]}" --disable CONFIG_COVERAGE_NONE
->  	scripts/config "${FLAGS[@]}" --enable CONFIG_GCOV_KERNEL
-> -	scripts/config "${FLAGS[@]}" --disable GCOV_PROFILE_ALL
-> -	scripts/config "${FLAGS[@]}" --enable GCOV_PROFILE_RDS
-> +	scripts/config "${FLAGS[@]}" --disable COVERAGE_PROFILE_ALL
-> +	scripts/config "${FLAGS[@]}" --enable COVERAGE_PROFILE_RDS
->  else
->  	scripts/config "${FLAGS[@]}" --disable CONFIG_GCOV_KERNEL
-> -	scripts/config "${FLAGS[@]}" --disable GCOV_PROFILE_ALL
-> -	scripts/config "${FLAGS[@]}" --disable GCOV_PROFILE_RDS
-> +	scripts/config "${FLAGS[@]}" --disable COVERAGE_PROFILE_ALL
-> +	scripts/config "${FLAGS[@]}" --disable COVERAGE_PROFILE_RDS
->  fi
+> +#ifdef CONFIG_LLVM_COV_KERNEL
+> +#define LLVM_COV_DATA							\
+> +	__llvm_prf_data : AT(ADDR(__llvm_prf_data) - LOAD_OFFSET) {	\
+> +		BOUNDED_SECTION_POST_LABEL(__llvm_prf_data,		\
+> +					   __llvm_prf_data,		\
+> +					   _start, _end)		\
+> +	}								\
+> +	__llvm_prf_cnts : AT(ADDR(__llvm_prf_cnts) - LOAD_OFFSET) {	\
+> +		BOUNDED_SECTION_POST_LABEL(__llvm_prf_cnts,		\
+> +					   __llvm_prf_cnts,		\
+> +					   _start, _end)		\
+> +	}								\
+> +	__llvm_prf_names : AT(ADDR(__llvm_prf_names) - LOAD_OFFSET) {	\
+> +		BOUNDED_SECTION_POST_LABEL(__llvm_prf_names,		\
+> +					   __llvm_prf_names,		\
+> +					   _start, _end)		\
+> +	}								\
+> +	__llvm_prf_bits : AT(ADDR(__llvm_prf_bits) - LOAD_OFFSET) {	\
+> +		BOUNDED_SECTION_POST_LABEL(__llvm_prf_bits,		\
+> +					   __llvm_prf_bits,		\
+> +					   _start, _end)		\
+> +	}								\
+> +	__llvm_covfun : AT(ADDR(__llvm_covfun) - LOAD_OFFSET) {		\
+> +		BOUNDED_SECTION_POST_LABEL(__llvm_covfun,		\
+> +					   __llvm_covfun,		\
+> +					   _start, _end)		\
+> +	}								\
+> +	__llvm_covmap : AT(ADDR(__llvm_covmap) - LOAD_OFFSET) {		\
+> +		BOUNDED_SECTION_POST_LABEL(__llvm_covmap,		\
+> +					   __llvm_covmap,		\
+> +					   _start, _end)		\
+> +	}
 
 [Severity: Medium]
-Should the else branch in tools/testing/selftests/net/rds/config.sh also
-enable CONFIG_COVERAGE_NONE when GENERATE_GCOV_REPORT is 0?
+Should __llvm_covfun and __llvm_covmap in LLVM_COV_DATA be placed outside
+the loaded kernel image after _end with a 0 VMA (similar to DWARF_DEBUG,
+ELF_DETAILS, or MODINFO) instead of alongside the runtime __llvm_prf_*
+sections?
 
-With kernel/coverage/Kconfig converting coverage selection into a boolean
-choice block containing COVERAGE_NONE and GCOV_KERNEL, disabling only
-CONFIG_GCOV_KERNEL in the else branch causes a few issues depending on the
-prior state of .config:
+Unlike __llvm_prf_data, __llvm_prf_cnts, __llvm_prf_names, and
+__llvm_prf_bits (which are emitted with SHF_ALLOC and accessed at runtime
+by llvm_cov_serialize_raw_profile() and llvm_cov_reset()), Clang emits
+__llvm_covfun and __llvm_covmap as SHT_PROGBITS sections without SHF_ALLOC
+for offline consumption by the host llvm-cov tool, as noted in
+scripts/mod/modpost.c:
 
-1. In scripts/config, set_var() substitutes existing symbols in place and
-appends newly mentioned symbols at the end of .config:
+    static const char *const section_white_list[] =3D
+    {
+        ...
+        "__llvm_covfun",
+        "__llvm_covmap",
+        ...
+    };
 
-    if test -n "$before" && grep -Eq "$before_re" "$FN"; then
-        txt_append "$before_re" "$new" "$FN"
-    elif grep -Eq "$name_re" "$FN"; then
-        txt_subst "$name_re" "$new" "$FN"
-    else
-        echo "$new" >>"$FN"
-    fi
+When CONFIG_LLVM_COV_KERNEL=3Dy is linked with GNU ld.bfd (since
+CONFIG_LLVM_COV_KERNEL only depends on CC_IS_CLANG, not LD_IS_LLD), placing
+__llvm_covfun and __llvm_covmap inside the kernel image without a 0 VMA
+causes the linker to advance the location counter "." across the offline
+coverage mapping data. This shifts all subsequent kernel sections, inflates
+the reserved kernel virtual address range up to _end by tens of megabytes
+on CONFIG_COVERAGE_PROFILE_ALL=3Dy builds (risking exceeding the
+KERNEL_IMAGE_SIZE link-time assertion on x86_64 when !CONFIG_COMPILE_TEST),
+and creates a zero-filled gap in vmlinux.bin.
 
-If config.sh -g is run on a .config that already contains a
-CONFIG_GCOV_KERNEL entry (or after a prior config.sh run),
-CONFIG_GCOV_KERNEL=3Dy is updated in place earlier in .config and
-"# CONFIG_COVERAGE_NONE is not set" is appended at the end. When config.sh
-is subsequently run without -g, CONFIG_GCOV_KERNEL is changed to
-"# CONFIG_GCOV_KERNEL is not set" in place while
-"# CONFIG_COVERAGE_NONE is not set" stays at the end.
-
-When Kconfig reads .config in conf_read_simple(), each choice member moves
-to the head of choice->choice_members:
-
-    choice =3D sym_get_choice_menu(sym);
-    if (choice)
-        list_move(&sym->choice_link, &choice->choice_members);
-
-This leaves GCOV_KERNEL at the tail of choice->choice_members. In
-sym_calc_choice(), because COVERAGE_NONE has a user value of n, the choice
-default is rejected and list_for_each_entry_reverse() picks GCOV_KERNEL
-from the tail, leaving CONFIG_GCOV_KERNEL=3Dy enabled.
-
-2. Even when "# CONFIG_COVERAGE_NONE is not set" precedes
-"# CONFIG_GCOV_KERNEL is not set" in .config, both symbols remain explicitly
-set to n after running config.sh without -g. Once another coverage choice
-member such as LLVM_COV_KERNEL is added, sym_calc_choice() skips
-COVERAGE_NONE (since it is explicitly n) and selects the visible,
-user-unspecified LLVM_COV_KERNEL instead of disabling coverage.
-
-3. If config.sh is run without -g on a .config that does not yet mention
-CONFIG_COVERAGE_NONE, conf_choice() sees !sym_has_value(child->sym) on
-COVERAGE_NONE, marks the choice as (NEW), and causes oldconfig or
-syncconfig to block waiting for interactive input.
+When linking with ld.lld, ADDR() of these non-SHF_ALLOC sections evaluates
+to 0, so AT(ADDR(...) - LOAD_OFFSET) assigns a bogus LMA of -LOAD_OFFSET,
+and BOUNDED_SECTION_POST_LABEL() also emits unused __llvm_covfun_start/end
+and __llvm_covmap_start/end symbols.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261103015238.3780=
-910-1-sashal@kernel.org?part=3D2
+910-1-sashal@kernel.org?part=3D14
