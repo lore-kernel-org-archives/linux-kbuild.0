@@ -1,164 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.143.35
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793808850;
-	b=XtAL3CrwUTiuFmZQC60Tdi8bxoD+ggfOrXnO0nrQu/g87wV8Gu/klNLctbP444ImB570
-	 aLQTLTh9Qs8yhnjjlN+WwlLVR9g7JhwaPGiqjx2TOgz9DN1ixwZH+sxU3EaqQ4Dcreqcw
-	 RIoeGa2zDJ6MgkZfL/Leuh5ohvAge45KWC6am9CZhfI5SgWAtLnLFFLMkYQjHbVf9gX1c
-	 nw/lzPyAD6tZ37LqcP21SUUW1NsymcJw52uDs26VZqOr1333J62C4ZKAASjYpNHiiAGHs
-	 j7FJmuN42LsVSR7FFJb/YuEK/ru+IO6tTtcEWXi8ZQLFDkMOY9IivM/RqKzN8dqjfHQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793808850;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Received:Message-ID:Date:
-	 User-Agent:Subject:To:CC:References:Content-Language:From:
-	 Organization:In-Reply-To:Content-Type:X-ClientProxiedBy:MIME-Version:
-	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
-	 X-MS-Office365-Filtering-Correlation-Id:X-LD-Processed:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-Exchange-RoutingPolicyChecked:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-GUID:X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
-	 X-HPE-SCL:X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=46CgSXvbPZgFGzTyRN0yMDml58spQ6BDtC9K0WW0qOY=;
-	b=dHg+OXqLEmia18J1kL8q4ZIyoaIlu92EVTpfUoq6Y4zLMKonc1qFwU+d4Ou0beouw19J
-	 mS9wMhVll5qdzVBj3+UWCEv46hutrmTPmYJ9Gzj7etbUCKymaKPnJk9QK2vwMpRRJTbNq
-	 MgVElrjUt6nTRQ+gUExjgIMZ66NxTRzeDlpCbA7fW6cFHLCmKbV++Jijd60l/FXtRA4MT
-	 ivOmgD+ca061edtiQBCXHppWuDl7K15AK3a3Um3xn+A1RAQrFTaUGXBzoDcu/lOgqsal5
-	 f2HACFUoP0CPh4QeJiYlwNa2xplkCZa12s2fhn/3lPG42uiLRHrNhCPOn0tZc0sC9sg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=hpe.com;
-	spf=pass smtp.mailfrom=hpe.com;
-	dkim=pass header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=f0GoOIQF;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.143.35
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793816440;
+	b=rMdG2XcmmhJcGm6smnBvIEstXt4/3KxicvON6uygPcEnykWdd2FnbA74wod/CyMhPRuc
+	 lrKqmULXkznyOBP8eaN4Fn2V+5F/kzyshpHs48QW5PabRxHT+yCnCY/ncL9JSzopl5nm/
+	 N7H9TPgQH6Cok5+9a4ieNt6gSymetMqvBjT6d4IrU4TtNuompc3gAvHcvOyA1/BXKY7CL
+	 3hgzxPptop4tqo1WdbKNL4L6xAQecaVOgYbKpyQ6mQa18pKRdK2ptIw5cZJ7B+Cskhskh
+	 0j2MhyVvNrY+v1BdIOeIIQzCEOYEfKgG+cJZQ5xNXv9HAs9vbXmM4E5JcN3JP+MuXig==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793816440;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=JEy/m56YhdOS3Y/O7Nkenw3p7ZGzdufKxdyDMh3T5LE=;
+	b=qf4rXXvo0jyhNPIY1RpUm4hJjSAtzzS3xNpeLvS7jZa9fuExIcbYXbdiejSyXd4V/E9n
+	 ToZYMwHVjtGZT0GOQ9JSnMUHpJiIM8mkxf7Qh6/tOVmfd7aoj+hI7AXgQRJRjhno2FB//
+	 6yRAnMUqTb+4FXzO5yrcH1ThxsknpjFQfNFKV4AdlfOiUH0o1JNoOxHfrQWyQERb1shT9
+	 tFQPY9sr1dOX4gIkGB2DJsfNO9GXIeVjP+Kj3QP9XgW+3oWSwOLrpc0KTgnr8Gu+53q5R
+	 QF5QeOrhdyABmifnuf3Q78C1y4qch6SV4fCW9YElmvvTtkSQgvylqNarzU7dx1bN9Tw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cn7nJ0s0;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EF4606A330;
-	Wed,  4 Nov 2026 16:14:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0EF4606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA83606A31B;
+	Wed,  4 Nov 2026 18:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=hpe.com header.i=@hpe.com header.a=rsa-sha256 header.s=pps0720 header.b=f0GoOIQF
-Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A4FhXtS1041248;
-	Wed, 4 Nov 2026 16:13:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pps0720; bh=46CgSXvbPZgFGzTyRN0yMDml58
-	spQ6BDtC9K0WW0qOY=; b=f0GoOIQFKCtcDXhKyXgfaSJD9HTL8hlYTSA5QtY+sA
-	OpRjUljAoGGr4LTJWLWm387x8lPeqt14zHch9Pa86PBZuFXg/UBvwxJXuiifUfPu
-	u9ohwOFEI0+Km/A5+XhqC8ttWXCaObOcsReWse6YUeuHFq3F39UgDSZpkic1UoGV
-	Y7IxJOPDEXVDQlFXLtZJQJcNHO1Hg/wVAmaD9X93VxpseycQGVlArIIDmtZIOXkv
-	jIrc1P4gnQlrCtg13WKbnQJJ42XIhD/MbvgXAAm3zGq272vQA+eKErmNVB+tDLgb
-	DeKPwjaXK222NOHq65Ekyk89cSns9elHacFNF0gaHtxQ==
-Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 4hr4w032pe-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 04 Nov 2026 16:13:48 +0000 (GMT)
-Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 7FC54808045;
-	Wed,  4 Nov 2026 16:13:47 +0000 (UTC)
-Received: from p1wg14928.americas.hpqcorp.net (10.119.18.116) by
- p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Wed, 4 Nov 2026 04:13:28 -1200
-Received: from p1wg14927.americas.hpqcorp.net (10.119.18.117) by
- p1wg14928.americas.hpqcorp.net (10.119.18.116) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43; Wed, 4 Nov 2026 04:13:28 -1200
-Received: from p1wg14921.americas.hpqcorp.net (16.230.19.124) by
- p1wg14927.americas.hpqcorp.net (10.119.18.117) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.43 via Frontend Transport; Wed, 4 Nov 2026 04:13:28 -1200
-Received: from CO1PR08CU001.outbound.protection.outlook.com (192.58.206.35) by
- edge.it.hpe.com (16.230.19.124) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.43; Wed, 4 Nov
- 2026 04:13:28 -1200
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kH8gPiTeQzwEMKp8l5G7ceBhmLdxoO2U5InfnrbAZVj8FQpbpLX/NSqURk3hxIilJ+CF3SJYfUvD2j5ewyLoWGGT4XZZhuDLyKymzEvTEAFiV814lM51RymYvenRnTeY7NZMHMFws4feBdKvKbIQA3IwwcdwqvPn++2IOvVGBmhGVH1g8W291KyrYg/uWeSLOeraV3Yv37WcoxVYV8mJpa4Xxxlz13Qjetk9AGODjHwtmQYqM4eHIFtEEO15jKSLQw/RlZbhp85q3bTOwAgPoR/Q9kl+WGrJ9ocPzV8hhhei8rCqLWo2HU+FX9GVlkArFPHBhfMhgqXi3ccV6oQyew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=46CgSXvbPZgFGzTyRN0yMDml58spQ6BDtC9K0WW0qOY=;
- b=PS8eQGRwyFPiA63T43c8jYoHf3+hLO1nKFSXyuoWBjBcmavgzeHH1PzHbIyrjFWGiL5R53uRuSmgtfB2debYRRWEeA8a2Z48IkmKJ8Q5Aw/oAkdzKmLh6cONLuRcy9XzWD0hT4qKW5t8fkp+CkvKjsdiG3MqwzDzktOdNzkYdMMkT3GWOc2Y4+RwEKDyCT6AQBe0hrcOlsnAax/kiUUoj8GCpSbkhFtG6uAqmDj8RsrUnq0VprdO/3cU12VkkaAKo/3WHhkOdLI9zBDFBAoPha+v/pud7WUyS3mMW10GgaN/R4cvBKKzCKMHdkwq/O4aay9JJjBKXSrATIEUDm69vQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hpe.com;
-Received: from DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:225::20)
- by PH8PR84MB3234.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:1c5::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.10; Wed, 4 Nov
- 2026 16:13:25 +0000
-Received: from DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::d136:e75e:53c5:73d8]) by DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::d136:e75e:53c5:73d8%6]) with mapi id 15.21.0592.007; Wed, 4 Nov 2026
- 16:13:25 +0000
-Message-ID: <904a4afd-9090-4e0a-a158-b0d8e8379b50@hpe.com>
-Date: Wed, 4 Nov 2026 08:13:21 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/23] Subject: [PATCH net-next 00/23] net/hpe: add HPE
- Slingshot NIC drivers
-To: Jason Gunthorpe <jgg@ziepe.ca>, Andrew Lunn <andrew@lunn.ch>
-CC: Jakub Kicinski <kuba@kernel.org>,
-        Slingshot Open Source Team
-	<slingshot-os-team@groups.ext.hpe.com>,
-        Nathan Chancellor
-	<nathan@kernel.org>,
-        Nicolas Schier <nsc@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Guenter Roeck
-	<linux@roeck-us.net>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
-        Sandeep Bhoot
-	<sandeep.bhoot@hpe.com>,
-        Iraimani P <iraimani.pavadai@hpe.com>,
-        "Mamila
- Santosh" <santosh-kumar.mamila@hpe.com>,
-        Leon Romanovsky <leon@kernel.org>
-References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030151121.1f232b50@kernel.org>
- <7d4583c2-e8dc-4ffb-bc45-e2121f824b14@lunn.ch>
- <bde936b5-1b3f-4987-a3e5-36ec5c4710e6@hpe.com>
- <2f831f13-58ff-40ca-a76f-3aca647012b6@lunn.ch>
- <b260f39e-2ac0-4899-90d9-3e9dbadfacc4@hpe.com>
- <e9937650-1354-4d66-95fa-3492e3821823@lunn.ch>
- <3418b0f9-d053-4be1-81a0-fc938fc5a7ac@hpe.com>
- <52b6596b-385e-4ed2-a6c8-d0774b4be127@lunn.ch>
- <20261104150435.GQ3889730@ziepe.ca>
-Content-Language: en-US
-From: Doug Ledford <doug.ledford@hpe.com>
-Organization: Hewlett Packard Enterprise
-In-Reply-To: <20261104150435.GQ3889730@ziepe.ca>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------faZlha0xLctKpZXD63AboSAx"
-X-ClientProxiedBy: MW4PR04CA0167.namprd04.prod.outlook.com
- (2603:10b6:303:85::22) To DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
- (2603:10b6:8:225::20)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cn7nJ0s0
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C07D71F000C1;
+	Wed,  4 Nov 2026 18:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793816439;
+	bh=JEy/m56YhdOS3Y/O7Nkenw3p7ZGzdufKxdyDMh3T5LE=;
+	h=From:Subject:Date:To:Cc;
+	b=cn7nJ0s0jrbu4TfxmNkWTwtfeQQNZlO++QJmk5+Im94jd3cPyFt54fQoDVR7Gb2WJ
+	 FIUuYATDA5bELD5i837Tt9kgJh67M5dQNZYC0YdTDrF+xNelDEc4yGt7kvumcxETJN
+	 /uQsrmfT164JeUkfrwSl7mmWbw/nK5v3ftTwyCkIhXEyCHpDs746B+pxt8C17w2SuU
+	 gw6ioBP3ADbD+aIGMUzVXm0M9Qquu/EwDJt0xLQXi9CRdmUt2UA7q6ImLklrbhSPRe
+	 eGpyS2jl5yhN2jXJqJROj0L59vyjJYRowQij9quBW+/0wu5aklNqAZR9+aXjB68upK
+	 rkYLYolpOUdCw==
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: [PATCH v5 00/11] kbuild: significantly speed up kernel builds
+Date: Wed, 04 Nov 2026 18:20:18 +0000
+Message-Id: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -168,215 +53,492 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR84MB3970:EE_|PH8PR84MB3234:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6759db3-3f1c-43ed-0451-08df3a8e8de0
-X-LD-Processed: 105b2061-b669-4b31-92ac-24d304d195dc,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|7416014|376014|366016|1800799024|6133799003|10067099003|22082099003|18002099003|8126099003|5023799004|4143699003|261022105027099003|261022075727099003|261028144727099003|261102123227099003|261026121527099003|261026140227099003|261022115727099003|261021121427099003|261021135927099003|56012099006|261009223027099003;
-X-Microsoft-Antispam-Message-Info: i9+Y6PPPBzGLNvV1wuub85rUeZx7aR4xovO87hpy/SC9qoirgfdc5txM2sPK49nLP6AWf2xIqF3saFwzlPn03yYu9PS2YVGsh25tn6WLdtqXTAcvNqrxY5Lal5aeso3XoZpfSz78J/UO43cbEW8fpREOYpfQfL1M7OZTuakE5y6IfokvPWZGyHiBmKOjsK4ihxJ5TUPyHIOdxcd6PTshHk7MKGIVy3CkqeMWk1VJDC95s42Pm9ozaTZsEnSIABQNplBoAq+7CegHBWQvGHnv/rubM+tDunSnSNHWSRsikwIB2GPX9Jur0BQxPXDKKgD9nMjS+W+meZp3+BXU87RcGpVmrmShYRUzU0rmX/OP2PInZF2HY+13idDxUcF+Qhd6Ofi4zTtU973QhBhZSRIlzrvpQEIqDb1KbsISzLw8WtF23l2aCumo2w/tXG/WFE8rA6azh5YMoye1jS8kF2hamn8BnjUIWi/uTchR3UuFgx6DFZHlkvPG3SLJ1e23IegNh8bZcjX4nUTBUuHVSrsxB19FktZhFIVRa4KHByTCCMEQa3dYUxciITmM5RzISSACrn9N2fn3lbDrcFxWLE8qEIZtqjCcT0arImGoI7rVwuGdFlu5InkQSjTjAIMdY2lRoVlHa32Sfvg7ZUqlzM9/fSGAuO+lMpRq8i9FRE4+TnM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(366016)(1800799024)(6133799003)(10067099003)(22082099003)(18002099003)(8126099003)(5023799004)(4143699003)(261022105027099003)(261022075727099003)(261028144727099003)(261102123227099003)(261026121527099003)(261026140227099003)(261022115727099003)(261021121427099003)(261021135927099003)(56012099006)(261009223027099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eTgvYjFlR1lZS0V0WVIwOVZETGl1SnRRU3dkTjl4TkZRQ0JYaE5IVWpaOUVm?=
- =?utf-8?B?SzhWVnIrb3RzSGdEMmx4dlZiQkFhMzJpR25WN1l5M0dJUWU5ZmVuTnAvakt5?=
- =?utf-8?B?QmFGLzljdnFFdmtVd25SRW1lbUc1enFQNnVOTlRmYVZ4MTgvemRiZ2k1cVhi?=
- =?utf-8?B?V0RNUk5OZmJzWlNCWC96VGswYUkxaFNZSmVtVTJhbnNDcTd0cGxmbmtNWEZM?=
- =?utf-8?B?dml1cloxaStzemRjWmlaRTExOW1wS2NSUW1CY21VK0Z4bE45V3VTdzlmYzRO?=
- =?utf-8?B?NnFSMDlEczArRWNKSVI5Q1lGSittR2J3LzBPSmMzYUlsdGJxejdvYXZ2MklE?=
- =?utf-8?B?aWpkOW43NUY4U3dCVE14RzRZZk1GcFg4UWpEL2MySy91TDFrdy8vRTU5K1Jh?=
- =?utf-8?B?VUg2OU5kR2tMUWJKaisrSlhjS01LbVV4TVVEYXBhanUwdFJ6ZHJDSkFxTGM3?=
- =?utf-8?B?UGNRTlRsMGdUd0VoWXp6c1lFM3hPOTJuTnQrYXdzNEYzMmNqelh0UWNnZTdQ?=
- =?utf-8?B?SGZISjVMcDJQcXBzZ1VKOEpQdXY0MEhGZU4xVWhMVURNQUljZVZ4YUg0ODUv?=
- =?utf-8?B?b2wzZnpwd081SWtrMDM5Mk45SjhObGhjYnQ0Rk41T0xsNDNvZmJJUzMyQ09t?=
- =?utf-8?B?RWxXa21JZDFtT0ZKSkIzWVhPcmlJQk8wMSsxbTR0Y3k3WG5xalBOMTRFMGYz?=
- =?utf-8?B?dEQ0dzV6TEZubDQyenMyMHVjQkFDMG1pelRWVDNlcnNPSkVTd21nL0lCSEl6?=
- =?utf-8?B?Y1MxRUV3NGtvaE9lZmlld0JQSjJkYlh5WjBiN0R5YWZsYjJzMER1MTIzdkFN?=
- =?utf-8?B?WTRyeFgwYzVkaE52S1lvek5YL21YZmZqVmxNdlNiUTNYZnpkT05pb2VlcG4w?=
- =?utf-8?B?ckxzbm1OR1FaL0FVOE1CUlV6QXRMcnlRSFZ1OHdXOW01WStpN1ZKakdxYnQ2?=
- =?utf-8?B?SzA1RDllQnloU0pWZi8wNTIwTjRBM2dpbHpZaWxTbHl4VUExNlNEUmNGVjIw?=
- =?utf-8?B?RHB0dmRPdkZSV2xkbGJnd1NTYWF5K2wzNDRFRWhBNm5TMkM4UUxTbkNTU3Zt?=
- =?utf-8?B?Q0JZR3grNUkvcGRWd3huRDY5ajRERUg0RzJmZ0NUQXJGZ2tDNXdNSWhpcEtF?=
- =?utf-8?B?MGphUnBiL1orTGJUZjJxQzFxbHh6cWprdmdHRkFaaWpxbUZLSUlmQ2FwWkEz?=
- =?utf-8?B?TUU0R2lGckFrWUh4UlZCajJXWEUzbjloRzBwdTJKdExuRWxMWDFkb05vb0Vs?=
- =?utf-8?B?bUdndmhNVFRRM0tLK1JtbzZ6S3RKblRpeFovSUZVMGUvRXBiNUZRbWJjV3hN?=
- =?utf-8?B?T3hScnMydVVlMUhpZk5xdTltN2FENWF0SWdGK2Y5b0dPUjFRZ0RLU3B2czBV?=
- =?utf-8?B?UmJyRVVVL1BkKzJEVnh5aXZCZTYvMWpTb3Iwc3A1UVFiWWJxTlhDZ01QTFdo?=
- =?utf-8?B?Z3ZDZllBcFp3WDFZU1pUbGJUQjIwOUdOTGtDQkgycVQ4OWdHZkJ3amJuSFdU?=
- =?utf-8?B?R0c0QWVFWENEL2ZFaWtxdmVMcWJBdTZsNlpjM2J5N1U0Y2dRZmZNbm54QzVT?=
- =?utf-8?B?ZzJFZ3Mya3MzV0FUeDM2cWRhZ1BUZG5zY1dHQXI5T2NOWW1ZTWZGNllLd29o?=
- =?utf-8?B?MmUwMlliN2RqT2dGKzdsYWkzWGMzOHloaVBqRmNJVUFYZkM1QlNqakxoQ085?=
- =?utf-8?B?UGo4UTZIZVQyRzBpYmw4TVBKSDdsdSt5QUY2US9XVzBncHc3WUdra3dKWFp6?=
- =?utf-8?B?bWF4NGNFb1JsZVdkZmRnVlVnVFlsQ1dPZTA0NDF3akpZN3AvRkdjTUM4eDBq?=
- =?utf-8?B?UnNIUzl2UEk2dU1LeDFWMWQraTBkWjBPdFF6cFRZQmxGVGdtRGFlaEQ2UWk4?=
- =?utf-8?B?VHRZNTcweWZBS0N3TUlMY2VBQ1RqRDhrVGNyRE9nVGtEbUt0NEFzTi9IVFVz?=
- =?utf-8?B?NlNXL3JsanQvVTR5TS9Ja2QzV1lWRS91OEpYTW5Wb09aRHcvZkFnbWlFM0NZ?=
- =?utf-8?B?RHdjaERJdUN5eGlxcjhPL3FidzFFcGFMK09ucDlHL0lHaXhkbUtXeENFUEZH?=
- =?utf-8?B?RXZ5bktUV205YS9sM3Z4Zjlic3doaEdPcjRWM3pGUGFMRFhablNMaWVqSCtY?=
- =?utf-8?B?WXM2dVZjb1M5Y2hFZFU1NnVDQlh4TkdkWlFiVEp5bVhsVGtPQ3ZxamJWdXd6?=
- =?utf-8?B?ZFQ5SkJ6NFFOM0VjWUxuRW1UTUVGR1ZMVTRhTFZ1aExzakhiRTF5anMvcGxx?=
- =?utf-8?B?d3Y0c1ZzMFRJeFNTaHNoZmh0eXQzaGJLdXJLeVUxbTVKZ2cxcUlUTE1IYnNY?=
- =?utf-8?B?VnJxT251WWdDb202dnU0QlRuN2VnUWFzZk5wZWUvZzM2QzVZZWZtUT09?=
-X-Exchange-RoutingPolicyChecked: yAz4WcX26wl59762iGCAO9G3Icy1Q13rdZnakn+Vp90rCh5bKwb0iO8dJxM5CggDurcQ9UurFrjSXwMe9YsXcZUWKp86PcuNAJZ+3LLSp1NKbojnLMBYE8dnjrSdq4RZivJSNMAeNRBDq0nCQV89ckhLDvRYyDRPSZNjLEW1aUOjxzlds4gVYrniphJ9n3OrRh3eLJLW7wCSCgO6HI6+tEndV0V+HfHTIgkJimF8c/fwgqu9tUFekSEerrC4mJlwBF2f8pfasvPeWSL8TtxaGipP8BFr3BpaTAlOM+lofwAOT30zb82UOx7TSVRypXG2IKzhx8nncCaRp5aMcCvyOg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6759db3-3f1c-43ed-0451-08df3a8e8de0
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR84MB3970.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2026 16:13:25.0767
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SvHA3fTB5SsQuBjojeE7FCZjMPgQV2i0D7KUmIiqzGdHFPSlvb+LhCkzynquDHSXQv90sQp1Sovm4oZOPo4U/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR84MB3234
-X-OriginatorOrg: hpe.com
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDA2NCBTYWx0ZWRfXzqoM72TSoOMy
- OdgxWznzeOSfprKEhC/m+wpSROMHTBuf8TWOFmViWik6bPB9eFuq22OIivI39i1B3hnU7t5ajbH
- vijolqHSQeGWcvlbUutLiz1XiCq+P2Y=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDA2NCBTYWx0ZWRfX1JNfRPkAaI3t
- fsKGQYzQbufc5mjXQ/WQjgVRG7DwKPLdcrw014f/TkBP0+Bdu/66kz4ZrjEIJwM4uHE0W8zZKXc
- u4OE5RkPx1MburX1znqbidmb4zQFFIkbBL3/YVMGWAv62X0OVhfteiUK+BmxGn4gNkKarL+gGh/
- n4kndGruIKsTdm4CNkKOw84ocy7WLdAr7yl229aUl9HBrk778+9z1SKoQljPBUPjXfY87otRCsf
- 4QbhUoiBVfNtGVavhJT5bRO7ZXGW4mbjdpJH88FlNdQZEqSg/iuAjajI6NdVZQBnO3xSHtAZQ8x
- m/NbNyP4WkQeJ8+Bo3bCLUPHlmiNjqNrSTvA1xIWfQ69M6fHsVPc0t1YNOugkFjQVKCNGP9Q29Y
- 6tTTiMa1+VQiNubjvOs0Ajah6UTPGBGRqM6KZc7AQda1cWi8iVAMXqj4CHKVxFpsIXkyF8s0f2G
- O8pVJX1jAMPQUaekUUg==
-X-Proofpoint-GUID: JqdhBEobdrcT-21GdFe1Y6omQGx59BzH
-X-Authority-Analysis: v=2.4 cv=O6GsLx9W c=1 sm=1 tr=0 ts=6aeb59bc cx=c_pps
- a=FAnPgvRYq/vnBSvlTDCQOQ==:117 a=FAnPgvRYq/vnBSvlTDCQOQ==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=zJRp6_cAMcgA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=gQcMVamqm3wCPoSYhaRC:22 a=k7r4yCLl9DVLXMiQTbtC:22
- a=MvuuwTCpAAAA:8 a=1HfDXqj56o8Xc-ynThQA:9 a=QEXdDO2ut3YA:10
- a=UQEh7bPfCiVckKZdv5AA:9 a=FfaGCDsud1wA:10
-X-Proofpoint-ORIG-GUID: JqdhBEobdrcT-21GdFe1Y6omQGx59BzH
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-04_05,2026-11-04_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 malwarescore=0 spamscore=0 impostorscore=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 phishscore=0 bulkscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611040064
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2XQzY6DIBQF4FcxrEvDBRTtat5jMgt+ri3TVh1QM
+ pOm716saeLY5U3OdyDnRiIGj5EcihsJmHz0fZePclcQe9LdEal3+Sac8Yo1TFIz+YujcUB000B
+ 5iQCaMSMcI9kMAVv/++z7/FruOJlvtONcMidOPo59+Hs+mGDOvbrrTXcCymjpLGjLoFLcfZwxd
+ HjZ9+FI5vLEVxy2X0s8c9HUoNCWznDxxsWaqy0XmTdoWwmVaFtRvXG54lxsucxcCeB1zRottfz
+ H78s0AX+mvPi47EWMjkhtf7368VAktZc0WMjh+wMagLDcpgEAAA==
+X-Change-ID: 20260904-build-speedup-25e11a00b3d0
+To: Linus Torvalds <torvalds@linux-foundation.org>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Geert Uytterhoeven <geert@linux-m68k.org>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+ Aaron Tomlin <atomlin@atomlin.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+ Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, 
+ Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Tamir Duberstein <tamird@kernel.org>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>
+Cc: ljs@kernel.org, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+ linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, Nicolas Schier <n.schier@fritz.com>, 
+ Kees Cook <kees@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=21728; i=ljs@kernel.org;
+ h=from:subject:message-id; bh=FmtUb65PdbEsqa7OLXXKvEKBT+oLfydGwQ89kEbbijc=;
+ b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLJel2fGxmut/nGc4ev9+/u/fmI7rbtDc+qx0OWbE0yUT
+ sreb2Vz6ihlYRDjYpAVU2R5/kV8f5BI2LzOC/5uMHNYmUCGMHBxCsBEzqYzMnTcWrmhlVF8k3m8
+ RMWKqvLD57dsdhddLPLMIFLk4Qbu958YGe5bOsjXXz9wQ1Sk5ARb2drLjKfvRywvUPWfzWlx59b
+ tFhYA
+X-Developer-Key: i=ljs@kernel.org; a=openpgp;
+ fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
---------------faZlha0xLctKpZXD63AboSAx
-Content-Type: multipart/mixed; boundary="------------ajiC8U4ZG7aDHbD9uli8jFui";
- protected-headers="v1"; hp="clear"
-Message-ID: <904a4afd-9090-4e0a-a158-b0d8e8379b50@hpe.com>
-Date: Wed, 4 Nov 2026 08:13:21 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/23] Subject: [PATCH net-next 00/23] net/hpe: add HPE
- Slingshot NIC drivers
-To: Jason Gunthorpe <jgg@ziepe.ca>, Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Slingshot Open Source Team <slingshot-os-team@groups.ext.hpe.com>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kbuild@vger.kernel.org,
- Sandeep Bhoot <sandeep.bhoot@hpe.com>, Iraimani P
- <iraimani.pavadai@hpe.com>, Mamila Santosh <santosh-kumar.mamila@hpe.com>,
- Leon Romanovsky <leon@kernel.org>
-References: <20261030-cxi-netdev-submission-v1-0-8c2c391cc283@hpe.com>
- <20261030151121.1f232b50@kernel.org>
- <7d4583c2-e8dc-4ffb-bc45-e2121f824b14@lunn.ch>
- <bde936b5-1b3f-4987-a3e5-36ec5c4710e6@hpe.com>
- <2f831f13-58ff-40ca-a76f-3aca647012b6@lunn.ch>
- <b260f39e-2ac0-4899-90d9-3e9dbadfacc4@hpe.com>
- <e9937650-1354-4d66-95fa-3492e3821823@lunn.ch>
- <3418b0f9-d053-4be1-81a0-fc938fc5a7ac@hpe.com>
- <52b6596b-385e-4ed2-a6c8-d0774b4be127@lunn.ch>
- <20261104150435.GQ3889730@ziepe.ca>
-Content-Language: en-US
-From: Doug Ledford <doug.ledford@hpe.com>
-Organization: Hewlett Packard Enterprise
-In-Reply-To: <20261104150435.GQ3889730@ziepe.ca>
+A typical kernel build consists of a frustratingly large amount of time
+spent stuck in single-threaded bottlenecks.
 
---------------ajiC8U4ZG7aDHbD9uli8jFui
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+It turns out that there's a lot we can do about this and doing so
+significantly impacts kernel build times.
 
-On 11/4/26 7:04 AM, Jason Gunthorpe wrote:
-> On Wed, Nov 04, 2026 at 03:48:58PM +0100, Andrew Lunn wrote:
->=20
->> A bit of an aside. Do you have the complete history of the driver?
->> What did the first 10 patches do? When bringing up new hardware, you
->> start small and get a little piece working.=20
->=20
-> If you are implementing a driver from a datasheet, sure.
->=20
-> However a device like this was almost certainly co-designed in a chip
-> simulator along side the HW and by the time the HW was done they had a
-> mostly complete driver ready to go. The actual baked chip probably
-> never ran a driver like you are imagining.
+This series makes allmodconfig builds up to 36% faster, incremental builds
+up to ~70% faster, and noop builds up to ~90% faster.
 
-Jason is correct here.  Something as complex as a Portals 4.0 API device
-does not have 10 small patches to print "Hello world".  It can't.
-They're too complex and there is too much setup just to get to "Hello
-world".  And yes, we have both a chip simulator and a qemu simulator
-where the testing happened.  Using those we already have Cassini3
-software ready to go, but untested until our first hardware arrives.
-That was obviously excluded from this submission.
+Builds are faster across the board on every device I tested.
 
->> I'm assuming you did something similar, small bits of code you could
->> somehow test. Those small bits of code, step by step development, are
->> generally easy to review.
->=20
-> When you are co-designing with a chip simulator things work
-> differently, you'd focus on the more risky parts of the IP and do
-> partial driver flows and so on to vet things out. Lots of carefully
-> orchestrated shortcuts. Then you take that and assemble a complete
-> driver to run more complete sim passes. As this progresses the HW is
-> changing underneath and the SW is following along.
->=20
-> So it is completely understandable they ended up with a completed
-> driver at the end of the process rather than a bunch of logical small
-> steps.
->=20
->> Generally, none. We just want a plain, boring netdev, which looks the
->> same as every other plain boring netdev in the kernel. OS 101, the OS
->> is there to abstract over the hardware so all hardware looks the same.=
+Machines used for perf testing:
 
->=20
-> Yeah, this is a reasonable place to start. I also discourage any uAPI
-> introduction into any new drivers. Start with the basics then we can
-> talk about why it needs new uAPI point by point.
+* Threadripper -   x86, AMD Threadripper 9980X, 64 cores, 128 threads
+* EPYC         -   x86, 2 socket EPYC 9754, 256 cores, 512 threads
+* M2           - arm64, 2022 M2 macbook pro, 8 cores, 8 threads
+                        (4 perf, 4 efficiency)
 
-Yeah, I'd forgotten (in my 6-7 year break) that sysfs is uAPI.  I've got
-it now, thanks for the reminder.
+Cutting to the chase:
 
---=20
-Doug Ledford <doug.ledford@hpe.com>
-    GPG KeyID: B826A3330E572FDD
-    Key fingerprint =3D AE6B 1BDA 122B 23B4 265B  1274 B826 A333 0E57 2FD=
-D
+		== IMPORTANT NOTE on dependencies/build configuration ==
 
---------------ajiC8U4ZG7aDHbD9uli8jFui--
+Performance numbers are based on a build which:
 
---------------faZlha0xLctKpZXD63AboSAx
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+* Is based on v7.4-rc1, which contains the first 11 patches of v4 (see
+  the Patches section).
+* Was measured with these series applied (neither are required, but do
+  shift the numbers by a few seconds):
+	https://lore.kernel.org/linux-modules/20260731-module_ver_remove-v2-0-c9163858f382@linuxfoundation.org/
+	https://lore.kernel.org/all/cover.1788899473.git.jpoimboe@kernel.org/
+* Runs `make KRUSTFLAGS=-Zthreads=8 -j $(nproc) ...`.
+* Runs with the pigz tool installed locally.
 
------BEGIN PGP SIGNATURE-----
+		== allmodconfig FULL build ==
 
-wsF5BAABCAAjFiEErmsb2hIrI7QmWxJ0uCajMw5XL90FAmrrWaEFAwAAAAAACgkQuCajMw5XL93g
-Yg//cBQhzwFZcHmD+p37KvvRKw36NP72qlgXrXlPBFf/gxMsHX5Uxcfd09mhpm/5LDYVrfuAsOIs
-GDfcVZGgRQnRXepYvd99mnIaMmp9aX+mpwEzQ820dZpqX/tds3hRSEucSj0tnJYsVTWvzGsNxVlQ
-gCpKJvqT5H2zxhykt5FMOEQAiT4sZ1B5e5Rzw8UmgPaNp6IcEoASGXYB5umqxa0JCYXWuIjkPhCO
-JVR9mJWmtaeJ9+ce05g2dqrV5mKXr93wUO/sReB4RfWC2/VMxOrH2Qg9Hq2Ic8auP1LOKcOpOHwb
-SuEZG7mqy88LuiyhMCB0JSUBbuwn2bdR3+3zE/uAwgu7voCuS+Ws5iPDR6LTbkXyg1V0cxzBC/CZ
-4FDyCpvNUPEJ3Gxf4p07uZrdqU0Q8n3e8hnuFJQgutA3sO6zsqYjek8KXjbizzTs4Y/ZhmXrVv3e
-dY8JS15nBttXLljdv/Cfka2Se7jUsePu75LYb8tyQwiBGgNq2uisfQWsC1K73riEw3cvRmG5lpV7
-yHR9+3+oSEUkWt7uMlnluAjOmWg5ghTxbsWUbGOgvebJ4AgnescMlCcP/byiXLPp6vJsLo1lBfkz
-cj6cPksRtVxM2ccS2AkGU6EXQHwUR3eAJuS7PnmHY4eokhTMPjdP+XXkTyM/9WY3bqWRmm6eX5dj
-He0=
-=TdyB
------END PGP SIGNATURE-----
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc       344.2s   278.6s    -65.6s (-19%)
+Threadripper, clang     342.6s   266.8s    -75.8s (-22%)
+EPYC, gcc               188.0s   121.1s    -66.9s (-36%)
+EPYC, clang             259.5s   184.6s    -74.9s (-29%)
 
---------------faZlha0xLctKpZXD63AboSAx--
+		== allmodconfig INCREMENTAL build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        40.1s    15.4s    -24.7s (-62%)
+Threadripper, clang      40.3s    15.6s    -24.8s (-61%)
+EPYC, gcc                70.9s    24.3s    -46.6s (-66%)
+EPYC, clang              70.4s    24.3s    -46.1s (-65%)
+
+		== allmodconfig NO-OP build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        15.3s     1.4s    -13.9s (-91%)
+Threadripper, clang      16.2s     1.8s    -14.4s (-89%)
+EPYC, gcc                30.6s     1.5s    -29.1s (-95%)
+EPYC, clang              32.3s     2.2s    -30.1s (-93%)
+
+		== defconfig FULL build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        32.5s    26.3s     -6.1s (-19%)
+Threadripper, clang      34.5s    27.2s     -7.3s (-21%)
+EPYC, gcc                28.7s    20.6s     -8.1s (-28%)
+EPYC, clang              39.8s    32.2s     -7.6s (-19%)
+M2, gcc			564.7s   512.1s    -52.6s (-9%)
+M2, clang		615.1s   564.1s    -51.0s (-8%)
+
+		== defconfig INCREMENTAL build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc        11.2s     6.0s     -5.3s (-47%)
+Threadripper, clang      11.3s     5.4s     -5.9s (-52%)
+EPYC, gcc                18.6s     9.2s     -9.4s (-51%)
+EPYC, clang              19.6s     8.6s    -11.0s (-56%)
+M2, gcc                  18.0s     9.9s     -8.1s (-45%)
+M2, clang                18.1s     8.2s     -9.9s (-55%)
+
+		== defconfig NO-OP build ==
+
+                        before    after     delta
+                      ----------------------------------
+Threadripper, gcc         1.1s    0.60s    -0.50s (-45%)
+Threadripper, clang       1.3s    0.66s    -0.63s (-49%)
+EPYC, gcc                 1.7s    0.66s     -1.0s (-61%)
+EPYC, clang               2.0s    0.80s     -1.2s (-60%)
+M2, gcc                   6.4s     1.7s     -4.7s (-74%)
+M2, clang                 7.1s     1.7s     -5.4s (-76%)
+
+Further performance numbers are provided for each commit giving a sense of
+what each contributes to the final result.
+
+			== Testing ==
+
+Beyond x86, allmodconfig was built with the series for arm64, arm, riscv,
+powerpc64, s390 and loongarch, and for arm64, arm, s390 and loongarch the
+System.map is identical to what the previous shell mksysmap produces for
+the same vmlinux.
+
+Also tested were parisc64 and m68k build as far as mainline lets them
+(a driver's static assertion and an undefined-symbol check on parisc, gcc
+16 internal compiler errors on m68k, none of it from this series).
+
+Kernels for x86, arm64, arm, riscv, loongarch, powerpc64, s390, m68k and
+parisc64 all boot under qemu, every text symbol of System.map is in
+/proc/kallsyms at the relocated address, and a module loads and unloads.
+The s390, arm and loongarch kernels also pass the kallsyms selftest.
+
+An x86 kernel with CONFIG_MODVERSIONS, CONFIG_EXTENDED_MODVERSIONS and
+CONFIG_MODULE_SRCVERSION_ALL boots, loads and unloads modules. External
+modules build against both in-tree and O= builds, and every commit builds
+on x86 defconfig.
+
+Build times are the best of several runs, no unexpected errors or
+warnings were seen.
+
+While some aspects of the build process have been changed, all tooling
+should function identically to before.
+
+			== LLM usage ==
+
+An LLM was used to first determine where the bottlenecks were then to
+figure out how to improve them.
+
+It generated a lot of code, much of it hideous.
+
+I extensively audited and rewrote a lot of it, and heavily edited commit
+messages, the cover letter and comments.
+
+The LLM has also orchestrated build runs, testing, debugging and analysis.
+
+I have manually checked for correctness in both build and running kernels
+generated with this series applied.
+
+Performance improvements were also verified manually.
+
+Since an LLM was used extensively, each commit carries an Assisted-by tag.
+
+			== What was changed? ==
+
+Fundamentally the series improves build times by parallelising
+single-threaded tasks as much as possible and improving the efficiency of
+code used in the build process.
+
+kbuild, kallsyms, modpost, objtool, mksysmap and the rust build system were
+all updated as part of this change.
+
+Nothing too controversial was included. There are further improvements that
+could be made, but they would either by very invasive (large scale C header
+changes) or generate diminishing returns.
+
+                        == Patches ==
+
+Patches marked [upstream] are already in v7.4-rc1.
+
+   kbuild:           [upstream] Make .modinfo an INFO section.
+
+   kallsyms:         [upstream] Some efficiency improvements through use of a
+                     cache.
+
+   sorttable:        [upstream] Parse nm output correctly, for the next patch.
+
+   kbuild:           [upstream] Don't sort nm output unnecessarily, do not
+                     include relocations in the kallsyms trial links.
+
+   elf-parse:        [upstream] Section flags, symbol binding and a read-only
+                     mapping, for the next patch.
+
+   kallsyms:         [upstream] Don't use nm, read the ELF symbol table
+                     directly.
+
+   kbuild (1, 2):    Implement a cache to track objects, check dependency
+                     timestamps more efficiently.
+
+   kbuild:           [upstream] Move the toolchain checks into their own
+                     Kconfig file.
+
+   kbuild:           [upstream] Probe compiler, linker flags once at top of
+                     build.
+
+   modpost (3):      Improve performance through use of a cache.
+
+   modules (4, 5):   Emit module descriptors as assembly (*.mod.S) rather
+                     than C (*.mod.c), reducing CPU seconds taken by 10x to
+                     perform the task. Also shard module finalisation
+                     rather than running 10's of thousands of tiny runs.
+
+   objtool (6-9):    Replace reloc hash with a per-section index, size
+                     the instruction hash to the code rather than hard-code
+                     it, and decode large objects over multiple threads.
+
+   rust (10, 11):    Set correct dependencies and build crates in parallel
+                     with C code, retaining the requirement that rust/
+                     crates are built first.
+
+   kbuild:           [upstream] Default to using a parallel implementation of
+                     gzip (pigz) if available on the system.
+
+---
+v5:
+* Rebased onto v7.4-rc1, which contains the cc-option-str series, so that
+  is no longer a separate prerequisite.
+* Dropped the first 11 patches of v4, taken by Nathan for 7.4-rc1.
+* Dropped the Assisted-by: tags, as the kernel no longer uses them.
+* Updated 3/11 (was 13/22) to keep the section mismatch cache in struct
+  elf_info, alongside the existing symsearch cache, as per Petr.
+* Updated 3/11 (was 13/22) to name the destination section index
+  to_secndx in the cache helpers, as per Petr.
+* Updated 3/11 (was 13/22) to take the elf_info first in
+  get_section_mismatch() like the rest of modpost, as per Petr.
+* Updated 4/11 (was 14/22) to fold the ksymtab string and flag emitters
+  into add_asm_ksymtab(), as per Petr.
+* Updated 4/11 (was 14/22) to inline export_is_kept() at its only call
+  site, as per Petr.
+* Updated 4/11 (was 14/22) to drop a const qualifier on a local, as per
+  Petr.
+* Updated 4/11 (was 14/22) so the extended version name loop uses
+  skip_unversioned() rather than repeating its condition, as per Petr.
+* Updated 4/11 (was 14/22) to shorten the module-offsets.c comment, as per
+  Petr.
+* Updated 4/11 (was 14/22) to remove the now unused MODULE_ARCH_INIT from
+  include/linux/module.h and m68k, as per Petr.
+
+v4:
+* Added tags, thanks everybody!
+* Fixed broken m2 numbers in cover letter as per Linus.
+* Rebased onto 36d4a11b56aa as per Nathan, see
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git/commit/?id=36d4a11b56aa
+* Also rebased onto the cc-option-str series at
+  https://lore.kernel.org/linux-kbuild/20260919005923.i.879-kees@kernel.org/
+  as per Kees (impacts 12/22).
+* Updated cover letter to declare these dependencies.
+* Updated 1/22 to use /dev/null for objcopy output file, as per Kees.
+* Updated 1/22 so the .modinfo dump no longer picks up the arch's image
+  OBJCOPYFLAGS, as per Nicolas.
+* Updated 2/22 to define NR_TOKENS for token count as per Kees.
+* Updated 2/22 to Use ARRAY_SIZE() for token_profit iteration in
+  find_best_token() as per Kees.
+* Updated 2/22 to restore erroneously deleted comments as per Kees.
+* Added 4/22, fixing an already-existing sorttable bug that didn't matter
+  before but which the next patch can trigger in a problematic way, as
+  vaguely kinda-reported by Sashiko (incorrect analysis, but right to query
+  sorttable).
+* Updated 6/22 to add a comment noting that --emit-relocs comes from
+  link-vmlinux.sh, as per Kees.
+* Updated 7/22 to provide elf_open_ro()/elf_close() and struct elf_file, as
+  per Kees.
+* Updated 7/22 to also handle the section 0 overflow case (SHN_XINDEX, zero
+  e_shnum) in elf_open_ro() matching what sorttable does.
+* Updated 8/22 to lay out omit tables one entry per line, resurrecting
+  comments from the old mksysmap script, as per Kees.
+* Updated 8/22 to add sysmap_omit_patterns[] rather than open-coding, as
+  per Kees.
+* Updated 8/22 to check ferror() before closing System.map output,
+  as per Kees.
+* Updated 8/22 to grow the kallsyms table by doubling rather than in fixed
+  steps, as per Kees.
+* Updated 8/22 to use the elf_file helper in elf-parse rather than
+  open-coding it, as per Kees.
+* Updated 9/22 to reword the commit message to say the object state is
+  calculated rather than cached, as per Kees + Nicolas.
+* Updated 10/22 to zero depcheck's dependency entries on allocation, as per
+  Kees.
+* Updated 10/22 to never treat targets in the dependency list as fresh, so
+  that objects including a header regenerated in the same make run are
+  rebuilt in the same run, as per Kees.
+* Updated 10/22 so depcheck is not run for a non-existent directory/one
+  that doesn't have .cmd files. Came up in a private tree kernel robot run
+  for sh allnoconfig, as per kernel robot.
+* Updated 11/22 to put the toolchain Kconfig entries in
+  scripts/Kconfig.toolchain as per Kees, Nathan + Nicolas.
+* Updated 11/22 to add scripts/Kconfig.toolchain to the KCONFIG entry in
+  MAINTAINERS.
+* Updated 12/22 to use Kees's new [cc, ld]-option-str functionality as per
+  Kees and Nathan.
+* Updated 12/22 to check negative options using the positive form, as gcc
+  accepts unknown -Wno-xxx options without complaint, only warning later in
+  the build. Came up in a private tree kernel robot run for arc, parisc
+  randconfig's. As per kernel robot.
+* Updated 14/22 to emit each export's ksymtab entry and CRC in one walk, as
+  per Petr.
+* Updated 14/22 to fold extended version emitters into one function, as per
+  Petr.
+* Updated 14/22 to fold dependency collection into add_asm_depends(), as
+  per Petr.
+* Updated 14/22 to add a weak __this_module symbol to module-common.c so
+  debug info continues to be provided for it, as per Petr.
+* Updated 17/22 to split the DWARF skipping in objtool into its own commit,
+  as per Josh.
+* Updated 17/22 to index out-of-order relocations over a sorted order
+  rather than doing a linear scan, as per Josh.
+* Updated 19/22 to rebuild dropped relocation index under a lock as a
+  belts+braces measure (contention shouldn't actually happen).
+* Updated 21/22 to add rust as a dependency to rustdoc and rusttest, as per
+  kernel robot.
+* Updated 22/22 (was 20/20) to add pigz to scripts/ver_linux as per Manuel
+  (and previously I think Kees suggested it also? :)
+https://lore.kernel.org/r/20260923-build-speedup-v4-0-73128809a4a4@kernel.org
+
+v3:
+* Rebased on Linus's master branch.
+* Fixed link to Josh's series, which was wrongly pointing at a single
+  commit as per Andre (off-list).
+* Fixed typo in 11/20 (+ fixed a couple more), as per John.
+* Hardened depcheck in 9/20 against a .cmd file with an empty name as per
+  Sashiko.
+* Updated 14/20 so only the top-level make instance builds .module-common.o
+  the chunk instances treat it as a plain prerequisite, to prevent a child
+  accidentally building it as per Sashiko.
+* Updated 15/20 to drop the relocation hash altogether, building one
+  section at a time incrementally, falling back to linear scan for anything
+  out of order (not sure that'll ever happen though?) as per Josh, Linus.
+* Updated 17/20 to limit the parallelisation to the --link step only (in
+  practice - objtool's processing of vmlinux.o) + updated commit msg to
+  reflect, as per Kees.
+* Updated the commit message in 14/20 to give clearer rationales for the
+  batching of modfinal instances, as per Kees.
+* Dropped what was 18/21 - the rustc front end threading patch, as the
+  parallel flag name is still uncertain and a user can set
+  KRUSTFLAGS=-Zthreads=8 to get the behaviour without it. Also updated
+  cover letter pre-requisite section to mention this, as per Miguel.
+* Updated 19/20 (was 20/21) so modules_prepare no longer builds rust/
+  when a goal that builds the tree is also given, ensuring duplicate rust/
+  builds do not happen, as per Kees.
+* Updated 20/20 (was 21/21) to remove the reproducible build doc update,
+  as per Kees.
+* Updated 20/20 (was 21/21) to have pigz use the make job server and to
+  define a specific kernel build variable for this - KPGZIP - also fold
+  in a further suggestion which eliminates a wrapper script, as per Kees.
+https://lore.kernel.org/r/20260917-build-speedup-v3-0-9ecf4163ff36@kernel.org
+
+v2:
+* Rebased on Linus's master branch.
+* Removed the first 2 fix patches as they have been taken to upstream in
+  commit 281b61d408d4 ("scripts/mksysmap: drop the MODULE_INFO() symbols
+  from kallsyms") and commit 59351365ac27 ("scripts/mksysmap: fix escape of
+  '$' in the __pi_ pattern") - thanks Nicolas!
+* Fixed patch 3/21 (previously 4/23) to check error on close via ferror()
+  and fclose() as per David Laight.
+* Updated 21/21 to not use threads for modules, only for vmlinux, and
+  updated docs to reflect this.
+* Dropped patches (as was) 13 and 17 as the equivalent work is being
+  performed upstream:
+  https://lore.kernel.org/linux-modules/20260731-module_ver_remove-v2-0-c9163858f382@linuxfoundation.org/
+* Updated the cover letter to mention the dependency on this series for
+  perf numbers.
+* Fixed various typos.
+* Checked all of the hallucinated sashiko reports. Replied inline to emails
+  to keep a record of them but not going to repeat here, unless people want
+  a list.
+* Fixed up 9/21 (was 11/23) to fix the bit of sashiko's report that wasn't
+  hallucinated - check ferror() to bring depcheck in line with fixdep and
+  kallsyms.
+* Fixed up patch 13/21 (was 15/23) to emit the __this_module fields in
+  offset order to handle CONFIG_RANDSTRUCT as per Sashiko.
+* Fixed up patch 19/23 (now 17/21) to resolve various races. Sashiko
+  hallucinated a lot of the report, and missed some stuff thread sanitizer
+  found. Resolve call destinations serially to resolve most of the valid
+  stuff and add a lock around pv_ops, and instruction hash freed
+  properly. Tested and confirmed resolved locally, as per Sashiko.
+* Fixed up patch 20/21 (was 22/23) to only build rust/ when modules_prepare
+  is one of several make goals, rather than the only one. This matches the
+  rest of the Makefile's behaviour on this and ensures rust components are
+  built if multiple build choices are passed to make, as per Sashiko.
+* Fixed up patch 5/21 (was 6/23) to test CONFIG_ARCH_VMLINUX_NEEDS_RELOCS
+  directly in link-vmlinux.sh rather than plumbing a var through, for a far
+  smaller patch as per Nathan.
+* Moved patch 1/21 (was 9/23) to the front of the series and dropped two
+  comments, as per Nathan, so it can go in ahead of the rest.
+* Added patch 10/21 moving the existing toolchain checks out of
+  init/Kconfig into init/Kconfig.toolchain, as per Nathan, with 11/21
+  adding to it.
+* In 11/21 (previously 12/23) Moved -fno-stack-clash-protection back to
+  the Makefile to fix an issue with ppc32 as per Nathan.
+* Updated patch 15/21 (was 18/23) to drop the dead end cache as Josh has
+  one in his noreturn series:
+  https://lore.kernel.org/9d4b8ccfed745ac47a954aa2e1de62a85197122d.1788899473.git.jpoimboe@kernel.org
+* Also updated patch 15/21 (was 18/23) to hash relocation sections objtool
+  creates itself and moved cache-to-hash copy into elf_create_reloc(), as
+  per Josh.
+* Split the instruction hash sizing out of patch 17/21 (was 19/23) into its
+  own patch 16/21, as per Josh.
+* Made the rustc parallel front end opt-in in patch 18/21 (was 20/23) via
+  KBUILD_RUST_THREADS, as its output is not yet reproducible, and dropped
+  the probe for the planned -j flag, as per Björn, Miguel and Nicolas.
+* Tested changes to ensure any flagged issues were resolved and that
+  nothing broke.
+* Did a re-run of profiling numbers to reflect changes and updated cover
+  letter and commit messages.
+https://lore.kernel.org/r/20260914-build-speedup-v2-0-39817ec5db23@kernel.org
+
+v1:
+https://lore.kernel.org/r/20260908-build-speedup-v1-0-5dc1ac01672d@kernel.org
+
+---
+Lorenzo Stoakes (ARM) (11):
+      kbuild: calculate list, composite object state per object
+      kbuild: implement and use depcheck to check dependency timestamps
+      modpost: cache section relocation mismatch state
+      modpost: emit module descriptors as assembly
+      kbuild: batch module finalisation
+      objtool: do not hash DWARF relocations
+      objtool: cache relocations, do less work, eliminate relocation hash
+      objtool: size the instruction hash to the text
+      objtool: decode instructions and resolve branch targets in parallel
+      rust: make exports.o depend on the headers generated for it
+      kbuild: build rust crates in parallel with the rest of the build
+
+ .gitignore                              |   1 +
+ Kbuild                                  |   5 +
+ Makefile                                |  22 +-
+ arch/m68k/include/asm/module.h          |   6 -
+ include/linux/module.h                  |   3 -
+ include/linux/vermagic.h                |   2 +-
+ rust/Makefile                           |   5 +
+ scripts/Makefile.build                  |  28 +-
+ scripts/Makefile.lib                    |   7 +-
+ scripts/Makefile.modfinal               |  40 +-
+ scripts/Makefile.modpost                |   2 +-
+ scripts/basic/.gitignore                |   1 +
+ scripts/basic/Makefile                  |   2 +-
+ scripts/basic/depcheck.c                | 481 ++++++++++++++++++++
+ scripts/mod/.gitignore                  |   1 +
+ scripts/mod/Makefile                    |   8 +
+ scripts/mod/modpost.c                   | 649 ++++++++++++++++++++-------
+ scripts/mod/modpost.h                   |   8 +
+ scripts/mod/module-offsets.c            |  32 ++
+ scripts/module-common.c                 |   3 +
+ scripts/tags.sh                         |   5 +-
+ tools/objtool/Makefile                  |   2 +-
+ tools/objtool/check.c                   | 771 ++++++++++++++++++++++++--------
+ tools/objtool/elf.c                     | 271 +++++++++--
+ tools/objtool/include/objtool/elf.h     |  10 +-
+ tools/objtool/include/objtool/objtool.h |   3 +-
+ tools/objtool/objtool.c                 |  15 +-
+ 27 files changed, 1949 insertions(+), 434 deletions(-)
+---
+base-commit: bc71431221f5ba8bb33918399552636e059c2c45
+change-id: 20260904-build-speedup-25e11a00b3d0
+
+Cheers,
+-- 
+Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
