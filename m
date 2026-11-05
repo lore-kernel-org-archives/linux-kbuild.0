@@ -1,58 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.25.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793863923;
-	b=Ivo7UPFsuDWxIlbATx+rN/tKrByy37WiZ8FxOrs0wHa/X3qG/gJRWDQvOR75ytFTv5J3
-	 KrIJWQ6Na3i5xtm1ZmX8nHeFGTS9y3AYmMFut8KqaFhf5QuXIurF1MGahYAWrhZtkYII7
-	 R/5hz6uGmN0/sYaSFz8MAi0Uwqk4GvEIa1mbTd2Jqr4p1qUupqZQ4lxaWUFGGPbzfnJwV
-	 prjvQxuznywCz3ycLbm9jJOXmo2jvFHM+NcqI1dtwiqLTzKXY6cj3yrnfDAyd7hr658k1
-	 cNYoZW3IQIZnAMsN+nzrX7VPaCsorw3C3gfRwXrQ0rcIPGbYxxLjtJbD5ZNKkxyUovg==
+	t=1793883750;
+	b=PvdLkKWGlku46z83Qi4qPCgjmCB6gU59/bh9xt/qcwQEuykcwljYCNN3t0MHHMz+0sxa
+	 sh24fV9lAlFEhAbpDTjasuqW6/9C7mpZp2Gju1vlwLYM90XPRF6W/h5tHzlXMX3CyaVbk
+	 5JhJTUHEkiTLHhcxnpq6Vtil1RqAYLHgh5pXKf/NLlMXHeQ5oIJlfwYEZNYVFvWoC5xWI
+	 9iKm0bdH16K/pc3xzy0yQ4zlqxInxOwdn2C/X5sQb3Itsu54l/sL1Kp59eO+J8lBRhSdY
+	 q1EBCx83xTOvbVsRVw1cR9JJKbcr6NLL3YOl1ICTVj1wkhVfqZ28fUAkygSEY0fBLdg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793863923;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=qut+o9RNOWx+p3+EgaaMdyh0hql3gy62QI/KJOsjcS8=;
-	b=OMKL++4Sv7wYfD/VGADHttz8t9Al3zQXynBZLd/5ilsOz9zKpI+wpQdMwbSZqau0ahOH
-	 R5ijclSgzKRZ6z4vyDVjoP/7s9h7+u8YIyArhg2PxlILF9Orp1BNOGar4A2VJoabnspsJ
-	 U6E609Ys5otSM/YCprdNJoLX7HiUeZYfz4LkPddnAJro8bHFJyqPVA94iHFrQBXkN/cZl
-	 MohFiZdG3d976IdUpwijJXIYW0rdUV0K6V68H9kK2fPWk6w7Z3hmra6AiTeFtnRGBtRyA
-	 0wc/i4Jg88CSNj6m2zPYDjb4EICbtrVChB0nXG/vb79XryL5qo0N2GqfgEaANGMFjSw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793883750;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-Infomaniak-Routing;
+	bh=Wewkyk9TATizD3Oep/9uIj5UC0OWeev3JfA7KWDoEeA=;
+	b=rC9ne8wq/pHI/2OoCMJ8/1EPTRMRTYYFN1OgJcOyJzZ9BHJ4c8zyWX3M8vscSJq+4WnE
+	 Qf/UjqaPL10ioW1OJfQBS3UN2E1LRjKr2F0Uav0Qkm/Owyyg7XClOw0TykuHwvalYacyZ
+	 rXbhnLHhcuoo24pBTaxAgU2ZkbjoT1hNPlSZGe+pxtTKNP39g5bVRZFBxxGyCkgKaQOQR
+	 kQMcUPxMQ8qYfVNM7qyxqvFhtPriPTVKSwC9UKkYFLMX6BVMdN2YqFWlAJlqPYXSsa81c
+	 OBl3R07WeP1j0fpVIW/Ce8nkQa2LymQ4zlUVJVsPm6VXd7EUzBVjxYwlWxhOLKjapJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TsSmcafP;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=daylightlinux.ch;
+	spf=pass smtp.mailfrom=daylightlinux.ch;
+	dkim=pass header.d=daylightlinux.ch header.i=@daylightlinux.ch header.a=rsa-sha256 header.s=20261016 header.b=IN7vBtZW;
+	arc=none smtp.remote-ip=185.125.25.12
+Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [185.125.25.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C43606A329;
-	Thu,  5 Nov 2026 07:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B770606A328
+	for <linux-kbuild@vger.kernel.org>; Thu,  5 Nov 2026 13:02:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9B770606A328
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=daylightlinux.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daylightlinux.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TsSmcafP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECDA51F000C1;
-	Thu,  5 Nov 2026 07:32:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793863923;
-	bh=qut+o9RNOWx+p3+EgaaMdyh0hql3gy62QI/KJOsjcS8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TsSmcafPn1jxndKLyIKWP2CLnVnLD4GebBHAZtrVu8vpuRXipU7PXQqTF8ATPb6Io
-	 KWCCG44JAWH5DaUjjAoQ1kgnW//OoQa6pk6Wt4nSJcWnyDsoFnQzT1HNdEI+HS+ERc
-	 o58tJEa+Htxa6VqxrnzoPCrtS4Rg/X387DgTAh93oNCUhA0CrUrZZxe6LoNWn8XwG1
-	 qgSfzzIJP3eXGQ9EwxHF4HmiYJKQPtQB/P2aDVYI267xttlUzV2LgjYwrIvUTaNi9o
-	 7Jjv1T9DDWZkvqEcMNtXotzCVgnR2akBwo7YWAO78qn9KXGt6TBm5rXmMTey0++zSe
-	 lxEQkhSu/eB7Q==
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Dmitry Kandybka <d.kandybka@gmail.com>
-Cc: Nicolas Schier <nsc@kernel.org>,
+	dkim=pass (2048-bit key, unprotected) header.d=daylightlinux.ch header.i=@daylightlinux.ch header.a=rsa-sha256 header.s=20261016 header.b=IN7vBtZW
+Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jL2XG38cvzbhf;
+	Thu,  5 Nov 2026 14:02:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=daylightlinux.ch;
+	s=20261016; t=1793883742;
+	bh=Wewkyk9TATizD3Oep/9uIj5UC0OWeev3JfA7KWDoEeA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IN7vBtZWFhtIOcM/pN7dDgzwiNS2rMzvfbprlYQmX6QPSg0mqbYqp+Qy5ClC6ybei
+	 4BA0/dnwLS7ucbVnXtHoBsomzOG25uD7VbyDIB4RAIXGD7w+ROlFWGPrqMjt87maR4
+	 GsmBMMlKUmrabmQr+hiRpfCE7rV7+9D6g7Ut8ya+Fel++NPVTwaoHZWpxGsGsjLfEG
+	 7v3sMM4uDOOub4tAWxzuUXaL2HlawLQrS6gE21pXLuD+5uwT2HJYMr2IxVl/9om0Fe
+	 4IXbDNOl8xBQAFxDVtM1aaQS4wGxnPpwLgwAIkN9Tu8PctlRwPJOfvTuJcFgLat/sd
+	 DmSs+opQUPh1g==
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4jL2XF5SWhzHdS;
+	Thu,  5 Nov 2026 14:02:21 +0100 (CET)
+Received: from unknown by raspberrypi with local (Exim 4.96)
+	(envelope-from <info@daylightlinux.ch>)
+	id 1xOx6j-0005aa-19;
+	Thu, 05 Nov 2026 14:02:21 +0100
+From: Hamdy Abou El Anein <info@daylightlinux.ch>
+To: nathan@kernel.org
+Cc: nsc@kernel.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v3] kbuild: Makefile.lib: fix offsets generation with debug info
-Date: Thu,  5 Nov 2026 08:31:38 +0100
-Message-ID: <179386358248.407677.9715146183925543248.b4-ty@b4>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20261026074733.11777-1-d.kandybka@gmail.com>
-References: <20261026074733.11777-1-d.kandybka@gmail.com>
+	hamdy.aea@protonmail.com
+Subject: Re: [PATCH v3] scripts: check-function-names: propagate nm failures
+Date: Thu,  5 Nov 2026 14:02:20 +0100
+Message-ID: <20261105130220.69772-1-info@daylightlinux.ch>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261104232616.GB3581619@ax162>
+References: <20261104120357.7007-1-info@daylightlinux.ch> <20261104120733.7633-1-info@daylightlinux.ch> <20261104232616.GB3581619@ax162>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -62,38 +73,19 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-On Mon, 26 Oct 2026 10:47:33 +0300, Dmitry Kandybka wrote:
-> When debug information is enabled (e.g. -ggdb3), the assembler
-> output file (e.g. kernel/sched/rq-offsets.s) contains additional
-> directives such as .ascii with offset info and debug metadata.
-> 
-> For example:
-> 
->    .ascii "->RQ_nr_pinned $3048 offsetof(struct rq, nr_pinned)"  #
->    ...
->    .ascii "->func); __data = (it_func_ptr)->data; ((void(*)(void *, pro"
-> 
-> [...]
+Hi Nathan,
 
-Applied to kbuild/linux.git (kbuild-next-unstable), with patch history snipped.
-Thanks!
+Thanks for the review. I checked the vmlinux.o rule and tested with GNU binutils 2.47.
 
-[1/1] kbuild: Makefile.lib: fix offsets generation with debug info
-      https://git.kernel.org/kbuild/c/131d86d0
+A valid object linked successfully with ld -r and was read successfully by nm. For malformed and truncated objects, I could not reproduce nm failing while ld accepted the same input: bad-format and malformed symbol-table objects failed in both tools, while truncated objects were rejected by ld.
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
+I also tested a wrapper that runs nm successfully and then returns an error. That confirms the shell pipeline masks a failing command status, but it does not reproduce a real nm failure on a valid vmlinux.o.
 
-Patches applied to the kbuild-next-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-next branch in about a week if no
-issues are found.
+I have not found the build scenario you asked for, so I am withdrawing this patch.
 
-Best regards,
--- 
-Nicolas
-
+Regards,
+Hamdy
