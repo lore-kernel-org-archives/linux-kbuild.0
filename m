@@ -1,90 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793896322;
-	b=CGGUEuhKOsUJbyXnLXJdfLyPTS9g3+L5JpxzgO28RAOMq9p9iPN2vIPJMs6UJ+EzVjEn
-	 NMgK2vaOc5NOHJO7KwY7fjw5OXOeHU+c4wgXVBD90t0YDGqWEy3p5bjxLH88uMg1E1U1v
-	 ad0TR2bMmLOC0477ZmLn4WlfErCb74TQdsCBBPxt4luCw+nBvlpB6j0HOWDZQEoRzgpsd
-	 3AWyGbQZOhANmrSrjGM21CxmIXdeM8oTVRmWPLiyVKNmkkzq2IedFLOI6ao9qn9h8i8Qo
-	 WpuZIBz8PlZ4tYXlXGwo85LPZeyms63g3XOketh2+Z9uOEM9phvKwj2VJdQ5opjFgWg==
+	t=1793900244;
+	b=SPfjKU5Q19LI2ina25Pth5ebBqpaO3n+kFc8tYg3sNecc9UZzFmoY+pca4P3sayheX0o
+	 IzMMw7WJFV9LE3nbct2IL81Meya1CVNKF1smJ5ysa0k3FauRGwjR0Q9BxrAhXjAydywye
+	 JA4dryGYxwaD62m35+MGvjMa82exs8lXTDPBaK4890KRIgRrSznt8vnNU636F1u1J9Gxd
+	 qVWImvytoLKIKfOuZe2EAcNLvqp0OsNESVsrBW6dJp1Ug3OSMYv4fUe41CuuM4c9KCCE7
+	 ue9GL9JUpog4Gcd7x2J2jQd8EZst2+C2lOPYML00RfTCAlaZn17UhKAtWg0t9gh0Cmw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793896322;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:X-Forwarded-Encrypted:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=5prWUgliJcOAr4R1nMCKAcSyRg6dSeYd31zgPiidQv4=;
-	b=d2cwV/NQlYn8lOEzgxg2GtJC18XflwkDX7IWhpQ3v6Hvm6pEf52TiE73oIT2kuw2YmUS
-	 zUqVtfSqW6UkDMNP7q4XKZmmnBxFIFhDJFU8JAr331+wkz7TZP8gny770QRSF8kxgDr0f
-	 WvqRjWusC6DrSIPgsHAEVjfm8kbs40bEQ2qW40Waf5ZtAZs/ul0KX2vsW+UCAxKYqW8DG
-	 NSkDRXUsyVZfVx3pcFuwqLf85qfUmD1bCC8bblSbNLHzY66cRkDDu0xeXT/qfzLLqAUmR
-	 vTtoC2Ze5dUJhyZTOT4ZlmwiuT9MnRJPeCdBCEK8r8ehE104dabmuhGSaA+ytbLiT0g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793900244;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:From:Content-Language:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-TM-AS-GCONF:
+	 X-Proofpoint-Reinject:X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Spam-Info:X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=daANv2owEleGHEwWXjX7Y1sfpf4L+AqmR3TChu8spLk=;
+	b=0Jp1RBQZJ/+T1ifeDp+KHmKUO1zBrDuDc0Kg46SNzYzoj3bfCs2fpdNWodfGAfGXnDip
+	 nlzo/DvIV2/9QtupH1KWDinkal0CgXmVJF7PlRIvlMfJAH3co5WO9XeaPJNZfn7pxz2JT
+	 pUSjCfYi9VarZOzJopXwG+no17MLw3k9JA6Bn1Ypw2IEOv3fbdh8gWDJ8I5M1uMBc9VCC
+	 YDH1dfSgiYuVoT4Rgd5yr88CnTlZdPAPdndBRJWP93E1OBrzLLK7l57BAxnGCWcErlLTt
+	 tpp2v09JlNmE2RtVAaOyfv5FLvu/nIDDR5UhngpZdfmgmCvPRdoBiSVZpbfgrD7pMBw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=gZvk6KC2;
-	arc=none smtp.remote-ip=209.85.208.181
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=QyBXwjnF;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C67C60726CE
-	for <linux-kbuild@vger.kernel.org>; Thu,  5 Nov 2026 16:32:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2C67C60726CE
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9E9606A326;
+	Thu,  5 Nov 2026 17:37:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE9E9606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=gZvk6KC2
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-3a49a022221so17072501fa.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Nov 2026 08:32:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1793896320; x=1794501120; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=5prWUgliJcOAr4R1nMCKAcSyRg6dSeYd31zgPiidQv4=;
-        b=gZvk6KC2rnZpOIfxKNFcauYUGt4VVht1Tt/Uy7M6JU17l4yjFIm5fGPwFZXu36kSll
-         8omj+AiJ7F65AEbWyteTFa4YDHY556jCTfMUAk70Ij6ZvgTD2ZM8F9MsNNpev9jCOG4L
-         VWTcwcP5ny0vs3syTRCdm2ufqDq/5JOZizj3Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793896320; x=1794501120;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=5prWUgliJcOAr4R1nMCKAcSyRg6dSeYd31zgPiidQv4=;
-        b=k7h7Bh+i+eOydg+EviIEq7uGQzHVQhSKvDr+5UTx/I/Vp0ubKi+l7snPmWV2wQ0uly
-         LaPoCkYaVYOZM5npXxBFBJ67Z6IgQH9mBM2N7iUoJEvU5v6EeXQvvM+CXvGB0myD12+M
-         2qEGqxepcLf21zu0U3umYLAWSuez5MY1scGDPqqyE0nzwlPfwj8Ldrnzq1rF96hcKvD3
-         1wwPKXNcYHat0tqP96A2gx53LOsXb9yAJfKGdJTKwrf33IX5hLS2ZEOr8BLtOFzZaqEQ
-         3DZ1j+hjht5iFdRqT5lZ5loEtiznuDq24uOlEtvaYpNU5mXo5Ow5/9w0dbEIm062D1Uw
-         MlIA==
-X-Forwarded-Encrypted: i=1; AKwUvBw/67y39NQ5jXsqnDo0FxIf+OcbqKEQJh6hCmVJ0HIIq/cuJwY0aJPYHiDgI6V7PxbRG1Nubsd7JMLDRd0=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9ict8S7LU2vWcV/ItJCDbuyQ/cQsMIp6Y+f1nBP2x1UHW8LLi1
-	w+Q9bDiEDo+k0i5kumQU5SXJf4W3myhYs9QCUlw9J0zavz9g+ZoZiaUZeCT5vsQ9UkLg/0M2PpK
-	aaTn/yOOz
-X-Gm-Gg: AYBFou1IqSE3TCezVfc1s+/Ady2XM/PrqeOKhqIFKt40MLXwyCZocb/HEPfm1aUC6oW
-	OiPKWvGQOZMy2DIJHQnU5C2wHzeyf3XjMjddEQknJ9aoo0meISB+/JIa9QtV9IP8Rdp7IefvWs4
-	F+n3WeMke5vJwMh1Fu4L3ly9o+KeQqhF6AUsVOTQ+sIJ0VSQyfdsKm3oEVBiu8GdX4XstqxbXe5
-	HEH/GofF1QppSeRLBbtOzkN4W1A9BSuNOhHVo0ryz1Entw8emRMyidQ+Nujdk/Z5MYG//iPur+k
-	0lIKQo080QN11/R2mSMz0ETO9gliOBt24RXxHIhKSSwjF51ssXo7EIP/5+6IZ+R69pjwx8ACZFJ
-	wvIOBcw60gG3gMShkaySlQUbXQHNpElsvUHNC/p2uqv9RYvChVUq30G9nRHOLCYIjBTZbgJC96m
-	60m5PXMuJDFs9bklwAq95Dv70UmYUoI5QvYEFEYjUdMGOuZL4tY2PUt1lq86OmMUpqwLNcNrOVe
-	UlP9xt3xS+oV5ZfuDj1GMDocg64cBMn7ZIQbluJF75flEoMb3DfE3fy+G/l+kVOEB6k3JxSTIOv
-	8wtowJov0+R283wyJdFzeGkaitFfjRTJGAQGUf0tRgiIeL/RQRixihpebBrjWViH8UC/H4I=
-X-Received: by 2002:a05:651c:154c:b0:3a6:4a45:df84 with SMTP id 38308e7fff4ca-3acb79606d1mr50180661fa.1.1793896320317;
-        Thu, 05 Nov 2026 08:32:00 -0800 (PST)
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com. [209.85.208.176])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3acdc6e3872sm11815161fa.30.2026.11.05.08.31.58
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Nov 2026 08:31:58 -0800 (PST)
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-3ab4c608a6dso25822681fa.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Nov 2026 08:31:58 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBzRuMxSVmUnkKb64i+jFbcJ7Twd2IASq4QsMWN3MY7PWjZdURbHHBVQQYOhdd5bPcafZ88hhP2kN3dkR6Y=@vger.kernel.org
-X-Received: by 2002:a05:600d:a:b0:4ac:aae6:6400 with SMTP id
- 5b1f17b1804b1-4acaae665a6mr332973265e9.13.1793895857514; Thu, 05 Nov 2026
- 08:24:17 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=QyBXwjnF
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A5EiNgG2627463;
+	Thu, 5 Nov 2026 17:36:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=daANv2
+	owEleGHEwWXjX7Y1sfpf4L+AqmR3TChu8spLk=; b=QyBXwjnF75HgfGJXoudRq3
+	+9akNI5kLom/+D98s3fbL/5ZH6th9jH73sTzYCeAaLdUoQp6zh45lWRheSk+nzVq
+	p4hPXqs5jUnjEQKFmTzPhmKI8yGaOy0vs4V1Fzs106tbwBnpcgAFaQyZjyQuKjZB
+	Qo5bdYtgH4MwoSJZrB3KtLlEEI3wZ5rSrNUYbTNdMpxx31wo2XFXsLX+fG2ukF2W
+	VOtk3zac6KAfESs/c9VZTucCjZbEahnRceUUtK+pJcKUv7uMBaF5EnO7297/OHOd
+	XLl6eNBSv89hWve035KHsH2mMA331uh0cn/ZjXdun9f9bVuOrhTew5t9dkPNFtng
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hn6rdkp0f-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 05 Nov 2026 17:36:38 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A5Gou761746203;
+	Thu, 5 Nov 2026 17:36:37 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4hrk9mkg4v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Nov 2026 17:36:37 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A5HaafD26346132
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 5 Nov 2026 17:36:37 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A99845805A;
+	Thu,  5 Nov 2026 17:36:36 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EEA2658056;
+	Thu,  5 Nov 2026 17:36:27 +0000 (GMT)
+Received: from [9.68.10.150] (unknown [9.68.10.150])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  5 Nov 2026 17:36:27 +0000 (GMT)
+Message-ID: <fbfb36b4-1ac7-444b-b898-f509f0b3c273@linux.ibm.com>
+Date: Thu, 5 Nov 2026 18:36:14 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -94,107 +85,125 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261104174554.1.I8556199ea4f1335169ce16e97309aa63ae2e2310@changeid>
- <20261105052401.GA862715@ax162>
-In-Reply-To: <20261105052401.GA862715@ax162>
-From: Doug Anderson <dianders@chromium.org>
-Date: Thu, 5 Nov 2026 08:24:03 -0800
-X-Gmail-Original-Message-ID: <CAD=FV=Vx4gHvF0TegRBwZetTNjP5AsjbBK9+sjNA43OpL1Wjiw@mail.gmail.com>
-X-Gm-Features: AclHuK8NKe2Ice8G3ieACvjOY5cRy1bgQZ2ikhne4c6q9f8t2mnwrvferc3g3-I
-Message-ID: <CAD=FV=Vx4gHvF0TegRBwZetTNjP5AsjbBK9+sjNA43OpL1Wjiw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: AutoFDO: Enable -salvage-stale-profile
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
-	Rong Xu <xur@google.com>, Han Shen <shenhan@google.com>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Han Wang <nesthanwang@google.com>, 
-	Alexandre Courbot <acourbot@nvidia.com>, Alice Ryhl <aliceryhl@google.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Benno Lossin <lossin@kernel.org>, 
-	Bill Wendling <morbo@google.com>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Boqun Feng <boqun@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	Justin Stitt <justinstitt@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Tamir Duberstein <tamird@kernel.org>, Trevor Gross <tmgross@umich.edu>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/20] Unify code coverage and add Clang source-based
+ coverage with MC/DC
+To: Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org
+Cc: Adrian Hunter <adrian.hunter@intel.com>,
+        Alexander Potapenko <glider@google.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrey Konovalov <andreyknvl@gmail.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Segall <bsegall@google.com>,
+        Bill Wendling <morbo@google.com>, Boqun Feng <boqun@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, Chuck Wolber <chuck@wolber.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Frantisek Hrbata <fhrbata@redhat.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>, James Clark <james.clark@linaro.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>, Josh Poimboeuf <jpoimboe@kernel.org>,
+        Julian Braha <julianbraha@gmail.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Justin Stitt <justinstitt@google.com>, kasan-dev@googlegroups.com,
+        K Prateek Nayak <kprateek.nayak@amd.com>, linux-doc@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
+        Marco Elver <elver@google.com>, Mark Rutland <mark.rutland@arm.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mel Gorman <mgorman@suse.de>, Miguel Ojeda <ojeda@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Schier <nsc@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E. McKenney"
+ <paulmck@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Sean Christopherson <seanjc@google.com>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Steven Rostedt
+ <rostedt@goodmis.org>,
+        Thomas Gleixner <tglx@kernel.org>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+        x86@kernel.org, Konstantin Khorenko <khorenko@virtuozzo.com>
+References: <20261103015238.3780910-1-sashal@kernel.org>
+From: Peter Oberparleiter <oberpar@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <20261103015238.3780910-1-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: 8GuvPdtkZT98o2kwnst12PlIYWYluKM0
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA1MDA2OCBTYWx0ZWRfXyQy8yBstwcbM
+ Rkc5xP/dYOg1fgJ+NWjdQN4tVTCYfdKnOtO/mNQOfih1iR+UR2rIx4PUzBiyrdp/D/15qOd1S+o
+ 7IZjnxHupAGDtkaowjEjbpcDPUtbTsI8ybI1rXejxheRgQDgIAGieHRt7+cRQvWxKQ9NzAd+XGG
+ wvLqfJQjTu/uYqe+eJ1U+LoUufrhR9SN4PESkdQUpyVHKRY9nXCI55lmOtuHV7JOr7A9QdIBgzZ
+ 1MXgsu24oErNUM5kwh2EaBpswjBT0mmSDU6TgCmmH2WeVUppSEbeAfMNxVDBG7w9SMwwr+xg5pl
+ I38pfZNQDJfAUYpOaW5jqzTWADH7ovR4dQwk4X5D+A4OjmMnRFV0GPSJ0VVFh0CJ8e3zB8GTK9G
+ EetQPJbvHsM9v29Ud5JKECXRotYWXMk711DpQfJoDP2N66ktbFXYpY+iOwb4q4x4bkcBsCBSokp
+ bW63s937KIzDicIaUCA==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA1MDA2OCBTYWx0ZWRfX0TAlrJrb+pqq
+ PgBa+KAxcOY+XVOz5FBHXV9251G+GkMlFvSTR4ejT+P1SGyL5tXhByO82fHDlGhDTpDMYnp2U6i
+ oYYAX4uXsMKmzah/S4NgVZDPIqwtByE=
+X-Authority-Analysis: v=2.4 cv=QK391QLL c=1 sm=1 tr=0 ts=6aecbea7 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=8BOYBDInhozIBXGn-nEA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: qegOwV1GJ8hxllrcELoypkKbdceA7Ix3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-05_04,2026-11-04_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0
+ impostorscore=0 clxscore=1011 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610300000
+ definitions=main-2611050068
 
-Hi Nathan,
+On 03.11.2026 02:52, Sasha Levin wrote:
+> The previous postings of Clang's source-based code coverage [1][2] drew
+> objections [3][4]: rather than a third coverage implementation with its
+> own interface next to gcov and KCOV, reviewers asked for a unified
+> coverage interface, and for coverage instrumentation to honour noinstr.
+> This series first restructures the existing coverage support into one
+> framework, then adds source-based coverage and MC/DC as part of it.
 
-On Wed, Nov 4, 2026 at 9:24=E2=80=AFPM Nathan Chancellor <nathan@kernel.org=
-> wrote:
->
-> On Wed, Nov 04, 2026 at 05:45:55PM -0800, Douglas Anderson wrote:
-> > From: Han Wang <nesthanwang@google.com>
-> >
-> > AutoFDO profiles are commonly collected on one kernel revision and
-> > reused across subsequent commits or stable merges before a fresh
-> > profile is generated. While AutoFDO uses function-relative line
-> > numbers to tolerate edits above a function, adding or removing lines
-> > inside a function (or an inlined helper) shifts all subsequent
-> > relative line offsets within that function. Without stale profile
-> > salvaging, shifted callsites fail to match their nested inlinee
-> > profiles in SampleProfileLoader (dropping profile-guided inlining for
-> > those callees) and basic block sample counts are misattributed to the
-> > wrong instructions, degrading branch probability estimation and
-> > machine function splitting.
-> >
-> > Enable LLVM stale profile salvaging (-salvage-stale-profile, supported
-> > since LLVM 17) for C, Rust, and ThinLTO builds when
-> > CLANG_AUTOFDO_PROFILE is specified. This instructs SampleProfileMatcher
-> > to use lexical callsite anchors within functions to fuzzy-match and
-> > remap shifted line offsets when querying the profile.
-> >
-> > While -salvage-stale-profile is not enabled by default in LLVM due to
-> > the minor compile-time/memory cost of sequence-matching callsite
-> > anchors (which is unnecessary when profiles are freshly generated on
-> > the exact commit being built) and the heuristic nature of fuzzy
-> > matching on heavily rewritten functions, enabling it makes sense for
-> > the kernel: hardware PMU profiles are rarely regenerated on every
-> > commit, and anchoring on callsite names is strictly more resilient
-> > than blind line-offset lookup when functions are edited.
-> >
-> > As a side benefit, remapping shifted line offsets also avoids feeding
-> > mismatched weights from stale profiles into MIRProfileLoader's flow
-> > inference solver (applyFlowInference), working around a compiler bug
-> > [1] where a small intra-function line shift (such as in
-> > __vm_normal_page() in mm/memory.c) can cause applyFlowInference to
-> > spend 30+ minutes compiling unmap_page_range().
-> >
-> > Link: https://github.com/ClangBuiltLinux/linux/issues/2188 [1]
-> > Signed-off-by: Han Wang <nesthanwang@google.com>
-> > Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> > ---
-> > Much of the commit-message justification here is AI-generated. Sorry!
-> > :( Folks who know better, feel free to call bullshit.
->
-> The justification does not seem wrong to me on initial read but it
-> definitely feels like the first and third paragraphs could be reduced in
-> verbosity since this can basically be summarized by "AutoFDO profiles
-> are often reused, which can be problematic without profile salvaging
-> enabled, which is designed for this exact situation".
+Thanks for driving these improvements to the kernel coverage
+infrastructure! The overall approach taken to unify the different
+backends looks sane to me, and I'm looking forward to seeing this
+integrated!
 
-Happy to reword or happy for upstream maintainers to reword themselves
-when landing. If you want a v2 sent with shorter wording, let me know.
+I successfully tested the gcov-backend on s390 with GCC 16.1.0, GCC
+15.2.0 and latest Clang 24 (git).
 
-FWIW, I actually asked the AI to add some of this text. Specifically,
-I felt it was important to explain why LLVM would not make this the
-default behavior but why it was still the correct behavior for the
-kernel. ;-)
+[...]
 
+> - Runtime interface: /sys/kernel/debug/coverage/, with "backend" naming
+>   the backend and its features, "reset" resetting its data, and the
+>   backend's data files. The existing gcov and kcov entries stay where
+>   they are, for lcov and syzkaller, and are linked from there.
 
-> > Honestly, this patch came about because of AI analysis compiles taking
-> > 30 minutes to run (see the clang bug [1]). It seems to work around the
-> > problem. Obviously, we should fix the compiler. That being said, upon
-> > further analysis it seemed like adding this flag was beneficial
-> > anyway, so I'm posting it upstream. If folks disagree, we can simply
-> > drop this patch.
->
-> I would definitely like to see that issue triaged but like you say, it
-> probably does not need to done before this is merged since it has
-> reasonable justification on its own. I would love to get thoughts from
-> other folks though.
+Just as a FYI - I found a minor incompatibility when using lcov with the
+series applied where it fails to automatically determine the kernel base
+directory due to the changed location of gcov-kernel base code, but
+that's nothing that should affect the kernel series. The issue can be
+worked around by specifying the path manually and I'm planning to
+address this with a corresponding lcov change once the series is integrated.
 
-Sounds good. Thanks for looking. Let's see what others say. :-)
-
--Doug
+-- 
+Peter Oberparleiter
+Linux on IBM Z Development - IBM Germany R&D
