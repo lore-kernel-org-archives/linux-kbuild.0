@@ -1,75 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793902184;
-	b=D7F/4YaoV8V8fc+marWYpVRYG6aCUPEtu81+DMGd4wP6qpijYPTY0xm2H3Td1HD0u7rV
-	 PVnhMzMh31U2CC2iiSip5gEeFseAGz49wG4UzlBdAo7RHd6vYuNtGqbpNMtSUDMfk4jMt
-	 +S/6bQDIc7dysIwbgdIT5pUsq3dDrUP0fF3djzdqtRZRcxwH/uVE6tQ8/2ZkelELEQ0a/
-	 p7DjBzWhHx9AeWaIPkP2TV+UQk3A2RSA4osjDqNJlqoXN/xz+P5DVKXDT3IVCXpH608xK
-	 q7Aa2tBuCDTHibnXEhpVptlREt23NdcLYhiqb4zQ68BO+VgGyTuDujd2v45ttWjur5A==
+	t=1793902942;
+	b=isWSTViiAyWCfkUnV9tw4cmNms9UPlObGCzA8z5MsmQQvE4nl45Vm/qxK4v7CaFU5snN
+	 iVuPtqI4QdxsLqldG6h9IGDZBZ55Ux7ZUT9n0jPJ2OIXyq/rcRHIdNEDoJte6FiaY/ruN
+	 9PentIX/oyyHSNg2rF1uXueGFcTvMW0Rn+6NNU+2iTEof71T8xXY8eZmDUJoRZsarpVBZ
+	 xFemAief5sbBOuJArU/WPkgE+1lH9N+Mvl4lrR9a3qt/Rmxwa512eO3rQ4K3ayWzx3oOS
+	 B0nJixV45kaiXsNDCdBInelyfrh6tw8nz/atcqZ71SVMF6frYg1Ff/hpU/7OUM4Tagw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793902184;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
-	 Content-Type;
-	bh=q9v+ZFLmNtqLPqYVOgg4GzeE1nfWAFRPZItFh8ERzVs=;
-	b=W6cCBasq8guAtDZj6QKmxaVW1f9AovjrSXd1ZSScRcak2yY9GPv5fnydl6N7HyBvQtef
-	 3GP9wiBH6ujxDdhSYYZLxbVklNuOzD68+8W5VRZxTVJvFkw+hByNiLLflJgf/OWA5oHJ9
-	 FLhhSnuCIF9XJPatrzGcdjOM71KiIbMGvWdzjfu5X852EAveNFkatGF17RX04xwYIP8Xm
-	 Jakfe0zuRcHQRXQdd1ZLWQ7D2y6hC3suopr9FQOwLu87CBYblviLoeeNBMro5Ww66q2uM
-	 2WxYkpOU6hQWXELw97u+CoiferXkGxL1Sv6NKJwiYDT1qKNYeWlBv6AdmTl4k6Yg5wA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793902942;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=+9sUIDbNvshIjQqNuwUL4QpX4Yb1SSwe6eGpxFYy7JY=;
+	b=xo724XFCQmy7T2W/CDwvRGfKwn2pwrpi2xQo2YsxuUr4YWNZf9lrgzEZ9kpkyhrYmCdH
+	 ThrypR4D5HTNbqZ79lZHeswghQ9MI+5E0msr+nT38VgKTNidhuEJGUd4r8A7crmsyHJ+a
+	 Q85LI5tTlDW5/fmmRigJ76UzIaToZ6gxpgMWabCVz3A1pUsUWk1JUHxvTgbkiZDvZs6O2
+	 uhmhmdertU6eZQ80lDG1OYhD+4DrVvRpFXzPEmxthkqpqk8HdjMPnSb+zQc5B6nMNPCS6
+	 V801BFmzuWrZGM891pZEG5cYImUVhlF3HW2+f1bg3u1RhI6k2Kn2UQ6LaxO1dGmJaAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--irogers.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=AbQR68x+;
-	arc=none smtp.remote-ip=74.125.82.197
-Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=No8bXYa8;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A292B606A32E
-	for <linux-kbuild@vger.kernel.org>; Thu,  5 Nov 2026 18:09:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A292B606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--irogers.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB994606A32C;
+	Thu,  5 Nov 2026 18:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=AbQR68x+
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-351788121cfso3880805eec.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Nov 2026 10:09:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793902183; x=1794506983; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=q9v+ZFLmNtqLPqYVOgg4GzeE1nfWAFRPZItFh8ERzVs=;
-        b=AbQR68x+I8ic8KNrtaEI58C2ggBWsjX8PIux08LY/t6RHO64onvdWLsyCvGVLvQIGx
-         /rKft08r+pvhd6VuMAkuxunq19OY6mc93bbvDbJUm42bMIUfBaxDz84VlY7Xzqo6fHO9
-         lK7jTrw/NF2U/6gk4RkM4lXqiH1iQXdTMcF+OyORVoCXXVj3j8gugj87hHQYzfyNwkow
-         6+tmT6WN3cVpgTQMBxqJXbxzjPH/bULvJILJCVc9zGa2yjV2EQgAjDSkW02pFlj0niiz
-         v5/0+SrG1qj+XmCcK1oGeyZRReGOoedvosBoqLQm089k4q8RlO7UZDN+8ufoROxO5o4Z
-         U8mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793902183; x=1794506983;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=q9v+ZFLmNtqLPqYVOgg4GzeE1nfWAFRPZItFh8ERzVs=;
-        b=KW06Wde9R+E7EoVTKW2lvT21+0OYLbNdfWpPgCYoOBl4Nvz7PykEFo+zUwLRDfoZVy
-         hQ4lbKtIwPyoQugTD3fWfOQAh2RDcvGJJ/1/XjQ9Sf0wva6f0Z4HWrgVRgJNhrY2ZqV2
-         b//2yAQh+zJghtc9eKkpj38f720qhf5uQRg6t5QkASxnNyR1s74C2teWscl9/ZtRGiro
-         apX1ZsAkblpUPWtPrrlGc7tMlIUHfAUjucDlvhBmxZFZWDcHRICSi6HW7nwvuXbYAb4K
-         fi9qN0xi7tNb/NiuaTRNEVCNyRTqhsnrO9hIW1L10WxxuKxUpUeqol4oMoqIJmtbwjcm
-         gl6Q==
-X-Forwarded-Encrypted: i=1; AKwUvBzEou6MtbjRdYEw3ZH+rvCkTTzqzisXS0MIgdyohadMOfhX7AqgxC93ONjpIobAHtjhhViVX8RwOc0XKsA=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+GBYYMScN5gWVmPSm/in/5Ax/t2nr0jwI8aIzo50gzN5fcEAD/
-	vWzLGBpbU5QP5QZbq99WTD75B/Ky0zKm8vRhz0euReEg/z9uwjT9MMaBzdDffiGjQjtWeIitsBD
-	lKpotbRYJyw==
-X-Received: from dlbqs7.prod.google.com ([2002:a05:7023:d07:b0:19d:e7f1:171c])
- (user=irogers job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:223:b0:144:f089:b189
- with SMTP id a92af1059eb24-1ac5c369250mr41753129c88.36.1793902182332; Thu, 05
- Nov 2026 10:09:42 -0800 (PST)
-Date: Thu,  5 Nov 2026 10:09:23 -0800
-In-Reply-To: <20261105180923.3441359-1-irogers@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=No8bXYa8
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2916C1F000C1;
+	Thu,  5 Nov 2026 18:22:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793902941;
+	bh=+9sUIDbNvshIjQqNuwUL4QpX4Yb1SSwe6eGpxFYy7JY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=No8bXYa8bSpobc76HbXi25IE8BNIKh5igOIIhXUUxQlCHHgcWaje1QvQ+oTivdzcq
+	 1bDi+LXpxsqV2zR9kjWlCYMFC7duLQLbBfumN6HMyOGglT7CpVvnSYIQv2JWrTveBt
+	 OhAmcUsXXnO37VTTxAaiPlUCVXUxFhxLsdvM1SMvtXPDQFUwAyxOm9KbQyVMu8mOht
+	 vlvy42B+mPYCc778hdpMK0Qp+LgYk4uGaJgcVDBdXp+yataOpcZ1GW+7m4T/TbWwW1
+	 xPjyddQofCHJEAk42uk2hzt7SUkuscGKGHR7u739uoy+3U6aFGCOuYTHbMKGEkmb2C
+	 mKFKhUqn2a4Jw==
+Message-ID: <sashiko-outbox-199744@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 02/11] kbuild: implement and use depcheck to check
+ dependency timestamps
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>, "Linus
+ Torvalds" <torvalds@linux-foundation.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
+ Schier" <nsc@kernel.org>, "Nick Desaulniers" <ndesaulniers@google.com>, "Bill
+ Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>, "Geert
+ Uytterhoeven" <geert@linux-m68k.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Petr
+ Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Sami
+ Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>, "Josh
+ Poimboeuf" <jpoimboe@kernel.org>, "Peter Zijlstra" <peterz@infradead.org>, "Miguel
+ Ojeda" <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?b?QmrDtnJuIFJveSBCYXJvbg==?= <bjorn3_gh@protonmail.com>, "Benno
+ Lossin" <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
+ Krummrich" <dakr@kernel.org>, "Daniel Almeida" <daniel.almeida@collabora.com>, "Tamir
+ Duberstein" <tamird@kernel.org>, "Alexandre Courbot" <acourbot@nvidia.com>,
+ =?utf-8?b?T251ciDDlnprYW4=?= <work@onurozkan.dev>
+Cc: linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-modules@vger.kernel.org
+In-Reply-To: <20261104-build-speedup-v5-2-0f6018be8dae@kernel.org>
+References: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
+ <20261104-build-speedup-v5-2-0f6018be8dae@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Nov 2026 18:22:19 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -78,186 +74,211 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-References: <20261105180923.3441359-1-irogers@google.com>
-X-Mailer: git-send-email 2.56.0.455.g6c5a503b38-goog
-Message-ID: <20261105180923.3441359-4-irogers@google.com>
-Subject: [RFC PATCH v3 3/3] bpftool: Prefer zlib-rs over zlib when available
-From: Ian Rogers <irogers@google.com>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Quentin Monnet <qmo@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nsc@kernel.org>
-Cc: Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-perf-users@vger.kernel.org, 
-	bpf@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Add zlib-rs and zlib to FEATURE_TESTS and FEATURE_DISPLAY in
-tools/bpf/bpftool/Makefile and use feature_rust_lib to configure
-ZLIB_CFLAGS and ZLIB_LIBS when zlib-rs is detected (unless disabled with
-NO_ZLIB_RS=1), falling back to -lz. Also replace -lz with $(ZLIB_LIBS)
-in static llvm-config --system-libs.
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+s) to consider:
+- [Medium] kbuild: missing fixdep prerequisite for depcheck in scripts/basi=
+c/Makefile
+- [Medium] kbuild: concurrent Makefile.build runs race on .depcheck.mk.tmp =
+and .depcheck.mk
+- [Low] kbuild: install-extmod-build leaves .depcheck.mk files in packaged =
+trees
+--
 
-Decompression of kernel configuration (/proc/config.gz) and compressed
-ELF/BTF sections (via libbpf, and via libelf/libbfd/libLLVM in static
-builds) processes data that benefits from a memory-safe implementation.
-Preferring zlib-rs over C zlib provides memory safety and improved
-decompression performance while keeping bpftool aligned with tools/perf
-(including sharing libz_rs.a when building bootstrap bpftool for perf
-BPF skeletons).
+commit f2af2ee8757f13fb26fb18de8c51c7a2f612cd46
+Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-Signed-off-by: Ian Rogers <irogers@google.com>
----
- tools/bpf/bpftool/.gitignore |  1 +
- tools/bpf/bpftool/Makefile   | 59 +++++++++++++++++++++++++++++++-----
- 2 files changed, 53 insertions(+), 7 deletions(-)
+kbuild: implement and use depcheck to check dependency timestamps
 
-diff --git a/tools/bpf/bpftool/.gitignore b/tools/bpf/bpftool/.gitignore
-index a736f64dc5dc..ea2222373634 100644
---- a/tools/bpf/bpftool/.gitignore
-+++ b/tools/bpf/bpftool/.gitignore
-@@ -6,5 +6,6 @@ bpftool*.8
- FEATURE-DUMP.bpftool
- feature
- libbpf
-+libz_rs
- /*.skel.h
- /vmlinux.h
-diff --git a/tools/bpf/bpftool/Makefile b/tools/bpf/bpftool/Makefile
-index b0f7168e7943..0b5f3967465f 100644
---- a/tools/bpf/bpftool/Makefile
-+++ b/tools/bpf/bpftool/Makefile
-@@ -16,6 +16,8 @@ else
- endif
- BOOTSTRAP_OUTPUT := $(_OUTPUT)bootstrap/
- 
-+LIBZ_RS_OUTPUT := $(_OUTPUT)libz_rs/
-+
- LIBBPF_OUTPUT := $(_OUTPUT)libbpf/
- LIBBPF_DESTDIR := $(LIBBPF_OUTPUT)
- LIBBPF_INCLUDE := $(LIBBPF_DESTDIR)include
-@@ -38,7 +40,9 @@ $(LIBBPF_OUTPUT) $(BOOTSTRAP_OUTPUT) $(LIBBPF_BOOTSTRAP_OUTPUT) $(LIBBPF_HDRS_DI
- 
- $(LIBBPF): $(wildcard $(BPF_DIR)/*.[ch] $(BPF_DIR)/Makefile) | $(LIBBPF_OUTPUT)
- 	$(Q)$(MAKE) -C $(BPF_DIR) OUTPUT=$(LIBBPF_OUTPUT) \
--		DESTDIR=$(LIBBPF_DESTDIR:/=) prefix= $(LIBBPF) install_headers
-+		DESTDIR=$(LIBBPF_DESTDIR:/=) prefix= \
-+		$(if $(ZLIB_CFLAGS),EXTRA_CFLAGS="$(or $(EXTRA_CFLAGS),-g -O2) $(ZLIB_CFLAGS)") \
-+		$(LIBBPF) install_headers
- 
- $(LIBBPF_INTERNAL_HDRS): $(LIBBPF_HDRS_DIR)/%.h: $(BPF_DIR)/%.h | $(LIBBPF_HDRS_DIR)
- 	$(call QUIET_INSTALL, $@)
-@@ -115,8 +119,20 @@ ifneq ($(SKIP_CRYPTO),1)
-   CRYPTO_LIBS := -lcrypto
- endif
- 
-+ifneq ($(CROSS_COMPILE),)
-+  ifneq ($(MAKECMDGOALS),bootstrap)
-+    ifneq ($(RUST_TARGET_FLAGS_$(ARCH)),)
-+      RUST_FLAGS += --target=$(RUST_TARGET_FLAGS_$(ARCH))
-+    else
-+      NO_ZLIB_RS := 1
-+    endif
-+  else
-+    NO_ZLIB_RS := 1
-+  endif
-+endif
-+
- ifeq ($(MAKECMDGOALS),bootstrap)
--FEATURE_TESTS := libelf-zstd
-+FEATURE_TESTS := libelf-zstd $(if $(NO_ZLIB_RS),,zlib-rs) zlib
- FEATURE_DISPLAY :=
- else
- FEATURE_TESTS := clang-bpf-co-re
-@@ -128,6 +144,10 @@ FEATURE_TESTS += libbfd-liberty-z
- FEATURE_TESTS += disassembler-four-args
- FEATURE_TESTS += disassembler-init-styled
- FEATURE_TESTS += libelf-zstd
-+ifeq ($(NO_ZLIB_RS),)
-+FEATURE_TESTS += zlib-rs
-+endif
-+FEATURE_TESTS += zlib
- 
- FEATURE_DISPLAY := clang-bpf-co-re
- FEATURE_DISPLAY += llvm
-@@ -135,6 +155,10 @@ FEATURE_DISPLAY += libcap
- FEATURE_DISPLAY += libbfd
- FEATURE_DISPLAY += libbfd-liberty
- FEATURE_DISPLAY += libbfd-liberty-z
-+ifeq ($(NO_ZLIB_RS),)
-+FEATURE_DISPLAY += zlib-rs
-+endif
-+FEATURE_DISPLAY += zlib
- endif
- 
- check_feat := 1
-@@ -153,8 +177,29 @@ include $(FEATURES_DUMP)
- endif
- endif
- 
--LIBS = $(LIBBPF) -lelf $(CRYPTO_LIBS) -lz
--LIBS_BOOTSTRAP = $(LIBBPF_BOOTSTRAP) -lelf $(CRYPTO_LIBS) -lz
-+# Prefer zlib-rs over C zlib when detected (libz_rs.a exports the full zlib C
-+# ABI including both gzopen and gzopen64, so it is also compatible with a
-+# pre-built libbpf.a compiled against system <zlib.h> with _FILE_OFFSET_BITS=64).
-+# When cross-compiling, the host bootstrap bpftool still links against the
-+# host's -lz.
-+ZLIB_LIBS := -lz
-+ZLIB_BOOTSTRAP_LIBS := -lz
-+ifeq ($(feature-zlib-rs),1)
-+  ifeq ($(NO_ZLIB_RS),)
-+    $(call feature_rust_lib,zlib-rs)
-+    ZLIB_CFLAGS := $(FEATURE_CFLAGS-zlib-rs)
-+    ZLIB_LIBS := $(FEATURE_LIBS-zlib-rs)
-+    CFLAGS += $(ZLIB_CFLAGS)
-+    ifeq ($(CROSS_COMPILE),)
-+      HOST_CFLAGS += $(ZLIB_CFLAGS)
-+      LIBBPF_BOOTSTRAP_CFLAGS += $(ZLIB_CFLAGS)
-+      ZLIB_BOOTSTRAP_LIBS := $(ZLIB_LIBS)
-+    endif
-+  endif
-+endif
-+
-+LIBS = $(LIBBPF) -lelf $(CRYPTO_LIBS) $(ZLIB_LIBS)
-+LIBS_BOOTSTRAP = $(LIBBPF_BOOTSTRAP) -lelf $(CRYPTO_LIBS) $(ZLIB_BOOTSTRAP_LIBS)
- 
- ifeq ($(feature-libelf-zstd),1)
- LIBS += -lzstd
-@@ -188,7 +233,7 @@ ifeq ($(HAS_LLVM),1)
-   CFLAGS  += $(filter-out -D_GNU_SOURCE,$(shell $(LLVM_CONFIG) --cflags))
-   LIBS    += $(shell $(LLVM_CONFIG) --libs $(LLVM_CONFIG_LIB_COMPONENTS))
-   ifeq ($(shell $(LLVM_CONFIG) --shared-mode),static)
--    LIBS += $(shell $(LLVM_CONFIG) --system-libs $(LLVM_CONFIG_LIB_COMPONENTS))
-+    LIBS += $(patsubst -lz,$(ZLIB_LIBS),$(shell $(LLVM_CONFIG) --system-libs $(LLVM_CONFIG_LIB_COMPONENTS)))
-     LIBS += -lstdc++
-   endif
-   LDFLAGS += $(shell $(LLVM_CONFIG) --ldflags)
-@@ -200,7 +245,7 @@ else
-   else ifeq ($(feature-libbfd-liberty),1)
-     LIBS += -lbfd -ldl -lopcodes -liberty
-   else ifeq ($(feature-libbfd-liberty-z),1)
--    LIBS += -lbfd -ldl -lopcodes -liberty -lz
-+    LIBS += -lbfd -ldl -lopcodes -liberty $(ZLIB_LIBS)
-   endif
- 
-   # If one of the above feature combinations is set, we support libbfd
-@@ -304,7 +349,7 @@ clean: $(LIBBPF)-clean $(LIBBPF_BOOTSTRAP)-clean feature-detect-clean
- 	$(call QUIET_CLEAN, bpftool)
- 	$(Q)$(RM) -- $(OUTPUT)bpftool $(OUTPUT)*.o $(OUTPUT)*.d
- 	$(Q)$(RM) -- $(OUTPUT)*.skel.h $(OUTPUT)vmlinux.h
--	$(Q)$(RM) -r -- $(LIBBPF_OUTPUT) $(BOOTSTRAP_OUTPUT)
-+	$(Q)$(RM) -r -- $(LIBBPF_OUTPUT) $(BOOTSTRAP_OUTPUT) $(LIBZ_RS_OUTPUT)
- 	$(call QUIET_CLEAN, core-gen)
- 	$(Q)$(RM) -- $(OUTPUT)FEATURE-DUMP.bpftool
- 	$(Q)$(RM) -r -- $(OUTPUT)feature/
--- 
-2.56.0.455.g6c5a503b38-goog
+This commit introduces scripts/basic/depcheck to check header dependency
+timestamps in C and emit a condensed .depcheck.mk fragment containing only
+saved command lines for up-to-date targets. scripts/Makefile.build runs
+depcheck before including .cmd files, falling back to the original .cmd
+files if depcheck fails.
 
+> diff --git a/Makefile b/Makefile
+> index f895752d4b05f..d92a5d78b4659 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -2252,6 +2252,7 @@ clean: $(clean-dirs)
+>  	$(call cmd,rmfiles)
+>  	@find . $(RCS_FIND_IGNORE) \
+>  		\( -name '*.[aios]' -o -name '*.rsi' -o -name '*.ko' -o -name '.*.cmd'=
+ \
+> +		-o -name '.depcheck.mk' -o -name '.depcheck.mk.tmp' \
+>  		-o -name '*.ko.*' -o -name '*.o.thinlto.bc' \
+>  		-o -name '*.dtb' -o -name '*.dtbo' \
+>  		-o -name '*.dtb.S' -o -name '*.dtbo.S' \
+
+[Severity: Low]
+While the top-level clean target removes .depcheck.mk and .depcheck.mk.tmp
+alongside .*.cmd, scripts/package/install-extmod-build only deletes .*.cmd
+and *.o after copying and rebuilding scripts/ for external module packaging:
+
+scripts/package/install-extmod-build:
+	find "${destdir}" \( -name '.*.cmd' -o -name '*.o' \) -delete
+
+When modules_prepare or the cross-compilation step in install-extmod-build
+invokes $(MAKE) $(build)=3Dscripts, depcheck generates .depcheck.mk files
+under scripts/. Should scripts/package/install-extmod-build also remove
+.depcheck.mk and .depcheck.mk.tmp so those build artifacts are not left in
+packaged kernel-devel and linux-headers trees?
+
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index bbe9555c47a8b..7b652f169a8fd 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -613,7 +613,20 @@ $(obj)/: $(if $(KBUILD_BUILTIN), $(targets-for-built=
+in)) \
+> =20
+>  existing-targets :=3D $(wildcard $(sort $(targets)))
+> =20
+> --include $(foreach f,$(existing-targets),$(dir $(f)).$(notdir $(f)).cmd)
+> +cmd-files :=3D $(wildcard $(foreach f,$(existing-targets),$(dir $(f)).$(=
+notdir $(f)).cmd))
+> +
+> +# depcheck checks timestamps first and outputs only saved command lines =
+of
+> +# up-to-date targets, falling back to .cmd files if it fails. A directory
+> +# whose targets all lie elsewhere may not exist in the output tree.
+> +depcheck :=3D $(wildcard $(objtree)/scripts/basic/depcheck)
+> +
+> +ifneq ($(and $(depcheck),$(cmd-files),$(wildcard $(obj))),)
+> +ifeq ($(shell $(depcheck) $(obj)/.depcheck.mk $(cmd-files) && echo ok),o=
+k)
+> +cmd-files :=3D $(obj)/.depcheck.mk
+> +endif
+> +endif
+> +
+> +-include $(cmd-files)
+
+[ ... ]
+
+> diff --git a/scripts/basic/Makefile b/scripts/basic/Makefile
+> index fb8e2c38fbc78..ff98780e474d9 100644
+> --- a/scripts/basic/Makefile
+> +++ b/scripts/basic/Makefile
+> @@ -2,7 +2,7 @@
+>  #
+>  # fixdep: used to generate dependency information during build process
+> =20
+> -hostprogs-always-y	+=3D fixdep
+> +hostprogs-always-y	+=3D fixdep depcheck
+
+[Severity: Medium]
+Can a parallel build from a clean tree fail when building depcheck before
+fixdep is ready?
+
+Both fixdep and depcheck are single-file host programs built by the
+host-csingle rule in scripts/Makefile.host:
+
+$(host-csingle): $(obj)/%: $(obj)/%.c FORCE
+	$(call if_changed_dep,host-csingle)
+
+which expands cmd_and_fixdep in scripts/Kbuild.include:
+
+cmd_and_fixdep =3D                                                         =
+    \
+	$(cmd);                                                              \
+	$(objtree)/scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target=
+).cmd;\
+	rm -f $(depfile)
+
+Without an explicit prerequisite ordering $(obj)/depcheck after
+$(obj)/fixdep, make -jN can compile fixdep and depcheck concurrently during
+scripts_basic. If depcheck finishes compiling before fixdep has finished
+linking, cmd_and_fixdep will attempt to execute scripts/basic/fixdep while
+it does not yet exist or is still open for writing.
+
+Should scripts/basic/Makefile declare that $(obj)/depcheck depends on
+$(obj)/fixdep?
+
+> diff --git a/scripts/basic/depcheck.c b/scripts/basic/depcheck.c
+> new file mode 100644
+> index 0000000000000..119075353f3bc
+> --- /dev/null
+> +++ b/scripts/basic/depcheck.c
+
+[ ... ]
+
+> +int main(int argc, char **argv)
+> +{
+> +	char tmp_path[PATH_MAX];
+> +	FILE *out;
+> +	int i;
+> +
+> +	if (argc < 2) {
+> +		fprintf(stderr, "usage: %s <output> <.cmd files...>\n", argv[0]);
+> +		return 1;
+> +	}
+> +
+> +	if (snprintf(tmp_path, sizeof(tmp_path), "%s.tmp", argv[1]) >=3D
+> +	    (int)sizeof(tmp_path)) {
+> +		fprintf(stderr, "%s: path too long\n", argv[1]);
+> +		return 1;
+> +	}
+> +
+> +	out =3D fopen(tmp_path, "w");
+> +	if (!out) {
+> +		perror(tmp_path);
+> +		return 1;
+> +	}
+> +
+> +	for (i =3D 2; i < argc; i++) {
+> +		char target[PATH_MAX];
+> +
+> +		if (target_of(argv[i], target, sizeof(target)))
+> +			add_target(target);
+> +	}
+> +
+> +	for (i =3D 2; i < argc; i++)
+> +		process(out, argv[i]);
+> +
+> +	/* Write errors are latched in the stream, so one check at the end cove=
+rs them all. */
+> +	if (ferror(out) || fclose(out) || rename(tmp_path, argv[1])) {
+> +		perror(argv[1]);
+> +		unlink(tmp_path);
+> +		return 1;
+> +	}
+> +
+> +	return 0;
+> +}
+
+[Severity: Medium]
+What happens if two concurrent sub-makes enter the same directory during a
+parallel build?
+
+For example, when CONFIG_HEADERS_INSTALL=3Dy (such as in allmodconfig), the
+prepare target depends on both prepare0 -> archprepare -> scripts and
+headers -> scripts_unifdef without an ordering dependency between them:
+
+Makefile:
+scripts: scripts_basic scripts_dtc
+	$(Q)$(MAKE) $(build)=3D$(@)
+...
+scripts_unifdef: scripts_basic
+	$(Q)$(MAKE) $(build)=3Dscripts scripts/unifdef
+
+Similarly, on microblaze with CONFIG_OF_EARLY_FLATTREE=3Dy, the default bui=
+ld
+enters arch/microblaze/boot/dts via both vmlinux (with need-builtin=3D1) and
+dtbs (with need-dtbslist=3D1) in parallel.
+
+When both sub-makes parse scripts/Makefile.build for the same $(obj)
+directory concurrently, two depcheck processes open the same
+$(obj)/.depcheck.mk.tmp path with fopen(tmp_path, "w"). One process can
+truncate and overwrite the shared .depcheck.mk.tmp file while the other is
+writing to it, and the first process to finish will rename the truncated or
+interleaved file to $(obj)/.depcheck.mk and return 0 (causing make to
+include a corrupted makefile fragment), while the second process fails in
+rename() with ENOENT and prints an error via perror(argv[1]). In addition,
+when the two sub-makes have different $(targets) sets, one sub-make can
+overwrite $(obj)/.depcheck.mk before the other sub-make includes it.
+
+Could this race corrupt the generated makefile fragment during parallel
+incremental or no-op builds?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261104-build-spee=
+dup-v5-0-0f6018be8dae@kernel.org?part=3D2
