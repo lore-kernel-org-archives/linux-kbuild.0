@@ -1,45 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793920188;
-	b=U9f6gTEX59+qKN+577acvqwWWYGErPaawwmgHb7wDuWGhvKV0+fdhLYmcEc1z+AYXfAM
-	 Pamq5MQ7rMb/0M0gNxft1TNU6TDutfJpF0Hm7NvCR0uH2nVQBgKViWRZMA6NDwgtjnGOg
-	 Y8mUa6K5wlcO1TyiqK4sR/E6azPZsf5VjxjB+DoH+bn8/jR2dP4+KSuZqWtMdcKi4zv6w
-	 i8KKbkpsrQ+v/g2Vvb8PvvF/hM158mkOwkRABtXMycZUfbxJKJrr+6hpxmpDbS17HVe3J
-	 FP14v8FL6fvHX7vyfu2Oh1+3x05V+3KmtClYusppTHqYi15Wd3+IMvfO3xSxecLk4Jg==
+	t=1793920359;
+	b=Lmp3p2ccUyAxr/JaljdRoAf83LbuVfEcDdaOS+l0IabhnxAQdy9H2+HaljX4M/y4lgRN
+	 1YwK+o+CmJLbmVG9ue2RIpRa6JrQP1rd4KrBMlFiR6B6GPWy8wTb1F7MHqvV6nBhRAynh
+	 ar1Mfo+ri0D/TjxX31QYbaE4Vi9ugAfRhg0syZoPldIV0IJN0CCfIiM6rF6ybjABCmJEP
+	 9279NyJ4o2bdvA4ynqRyQ9bMMfSvcEy6nKazLp+bIekuIH9tzWb3w9UUJ0kexjXMAWSds
+	 zh2k6+OceUmplPQE36CIOfZM2Ye7LUCUtJZtMM+lg/vMesdvXhUDLDLnnu1KWvvsymg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793920188;
-	h=Received:DKIM-Signature:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
-	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=SFi/9514lpyW9UumdIrGJf68gDgaQBEfNBDXQ60K0Vo=;
-	b=wqsTiHpiG1Sng4S14yDoGCVEsI+5P4uf5krVtW4ebopNGb0qdNekmuIMe+JKiDtemF6f
-	 NvMVn8zgj0pByMQcUmw3I1WQhUtp8/MTGPiC7f7nJPQ/XVBz1efHQxrO+CZzPUObC2VNc
-	 xg1v11BAGNJmZDQqfOqEHejfeyqI2IWQPWes3OWPDbSz6CWUD/toAReadpFHxmNMIbN50
-	 w1dOkr8hVIvDNGZQ+OiDEeBcA287+DkGMrW0ZMdl+bU74Ozp/67XevEs0kiWj/hkTF++i
-	 4SAQT7668p/b1sPEjt26ViIHm/fKTBb5tObg0ofxZCAgLdEd1wtPUh02xfG5U4yhn/w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793920359;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=FZlN4iHbDXpMMqj+PQLfEInqStv2KX2ANmZPpiwXjEg=;
+	b=iOrofuw5MfTpEUn5qSB4hQ1LHWwPrfhawn09Sak6hfHEGc0tgeqIOiGxvU77X3jBtw6B
+	 HeJof2hn3lmfMsBs3FvNjY9c8agaXdVyeWi2R0MjsI5J6JuvTT4jHBlvAdIp7Dv75hvGq
+	 mDwR1YrjUR/vL0oT3H8okdERPYr0VaAa8InDA+PJcnRM6pjvyvKEpxAlQwu3MKfLZ/zb/
+	 aQOHp/KShq7fgCvELHkcfoDxGS6fiirC29xMxIQkVdjWQr2rYRwzuotyyf9+aSfuwS0ZS
+	 3aVH868sQl9vXfKfzOlgaPi48X5ZSI0HqzSv/WQkF3KK+mQEc6pVcTFIF3fo1oGVeew==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8JhxHLx;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=GPyWKVmX;
+	arc=none smtp.remote-ip=74.125.82.49
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2797E606A326;
-	Thu,  5 Nov 2026 23:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA35606A32C
+	for <linux-kbuild@vger.kernel.org>; Thu,  5 Nov 2026 23:12:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1EA35606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8JhxHLx
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E906C1F0089F;
-	Thu,  5 Nov 2026 23:09:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793920188;
-	bh=SFi/9514lpyW9UumdIrGJf68gDgaQBEfNBDXQ60K0Vo=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=k8JhxHLxNSFThvj/1zq9kfFboXP/SEz/ozn/IdP66Cvs2dtC/eEHexxSnNCwIHYJA
-	 3J99Wr058Fy6v1faKScBFr3TAc5c/FKciFFr4H83iLZ/NPF3N0yGOTjOxEfwdJYA+K
-	 NVxV80pkOo62cvoGFX1QeeGdLDQVPZmvYD+WBCloLdxLkegSK7zRFbjQSuyamCehx+
-	 TNOr2H+qffZGonoWk5JMnhOdPVliG0ruQVLS3tciivcp732SfLzH4fTSniiB7Y+ZN/
-	 JYroG6oIJ0AbL/mQE2wHbujJufddH0YSjtSRQDlXG9w9Wj+DWYWy22TYsQq+zrLayt
-	 asW+bRqAEvVfg==
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=GPyWKVmX
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-1a3c08d6928so191025c88.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Nov 2026 15:12:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1793920358; x=1794525158; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=FZlN4iHbDXpMMqj+PQLfEInqStv2KX2ANmZPpiwXjEg=;
+        b=GPyWKVmXbRnHFHyAlQNZfvqo0xBU3poeqVkh6j0bhZztW1KrN3eCJPerMSo1gDtO8c
+         6JpfreadEoFpRXdnLzNopzlCLOHXCQN3whZcr9fISD2NsgfstmVO1YWJrPvV3g+TutE0
+         VtHd5nvVbO8rWPla6m0WZpDaMDYdRk68NSnk8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793920358; x=1794525158;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=FZlN4iHbDXpMMqj+PQLfEInqStv2KX2ANmZPpiwXjEg=;
+        b=Mi1kFE7JNdIFn5GQayHjF2dAdi9R+0jYsr8tnWFz3mIq3ZkFA+XY7gQOoCLu3Hh9xM
+         3x3tZi41msVOLoUZm2xDZqZgTL+Mgn/mHUICmURglQo6gyNtO57y+6aiov1XBPOfzWr0
+         8/qCU5Er3Rcp/JVxXZZmtSm/ugqhOYU79GHe2fETJHz2jhmxFozTE34MGHhgbbOwnH7G
+         SYAzKBbUcMX7Wi5mEtlKpNOG6YmCzBdhyklk6NSjy2AGuNNun6adgI0Q71RVqWOZnZGA
+         7wFzvxwdZWSQG4N4FPQi8WFDIzXOCbZGwROgNg69wwQy54Xhp4X3SySdZAOKPhxTOHXJ
+         hAiQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxisy4F0EILu8qFka3kxdVb/PDHdXFqFEoBrGXI+z8FOfAjO0FzPoKqL6QVBJoK9WHXMgFQPbbYYh/js6c=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/MTu4Gu4wic4JWX7iOTI4hZvloZMFCMx0OhVuhheQM3i01Zxgy
+	k/Pgw+bC71YCrg5mjbE2gkvbeGMPST4Nrz88dV8mJx8pUu0DWw1RwewMg30xnn7eUw==
+X-Gm-Gg: AYBFou07jQsbxf9MO5ssnzGOqbhvOdw1Ckb7U4mps9RxwCu1ffgQrKCv6Vmzfm6UgIA
+	dpz22ctsZURR+z9U3p6JWsnzaNDT70VEv1fiYZkhgO1+qFj+dV1RZAojhxrLtHAfY4Ag9c83sKJ
+	F+mtXa0uZ1qQDF6CdZJ0HUWfEheEqyGSLh/IBZEBXrEPYHQICxTHvOi/qTZqvpWlh5JAPec+2lb
+	yg75bjhsEMPe9FR83k6cHgPZ7bshADN+pOBBX9OeuAgiq1C+J1u1KhPAFonwsxUdxLH9oxGIVSs
+	j/ICWa4wvJbV7HEsjMivm4Yd3LDse8tRs0huNgXm2Itf4/AAwYq6ZtP17aOMQ0Xc7ytrGokdATo
+	s/genZSXlprZAKcHOLJ/EAdbeu98hYad4thpZN6MeQvmc2fsqlhoHm2dgfdraI6gSy9kVSv/abG
+	cm9GYBiqs+CIyd7ITbqWJs02TLl7fzcZwIg5+8h0uezfLeefTVgfSm6x1Uc/vros7Ad9bdfm7jx
+	zXv32/Sa9FmUNZMZ0AU6s0d4ydlam0ONnOkPMynS3ntld+hZipJBhQR215Wvgvu/iJehivdYqJJ
+	yRnZH4SH5K3d/WCePwUnC4mAZjpPeDejcNqgNKLxua8k0WneMRAPi32JBatyqNnQcjr4Jrstrqi
+	c7SogGAR1Av57UA==
+X-Received: by 2002:a05:701b:2905:b0:151:2e62:fe4b with SMTP id a92af1059eb24-1b25d338dddmr562194c88.23.1793920358113;
+        Thu, 05 Nov 2026 15:12:38 -0800 (PST)
+Received: from dianders.sjc.corp.google.com ([2a00:79e0:2e7c:8:57b2:a393:143e:afa7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36faa5afffasm312961eec.25.2026.11.05.15.12.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Nov 2026 15:12:37 -0800 (PST)
+From: Douglas Anderson <dianders@chromium.org>
+To: llvm@lists.linux.dev,
+	linux-kbuild@vger.kernel.org,
+	Rong Xu <xur@google.com>,
+	Han Shen <shenhan@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>
+Cc: Han Wang <nesthanwang@google.com>,
+	Snehasish Kumar <snehasishk@google.com>,
+	Nilanjana Basu <nilanjana.basu87@gmail.com>,
+	Yabin Cui <yabinc@google.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	stable@vger.kernel.org,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] kbuild: AutoFDO: Disable Profi (-fno-sample-profile-use-profi)
+Date: Thu,  5 Nov 2026 15:12:00 -0800
+Message-ID: <20261105151159.1.I0b27923381ef34cc99cdf8b65fea2e1bafce6370@changeid>
+X-Mailer: git-send-email 2.56.0.455.g6c5a503b38-goog
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -49,114 +106,59 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] kbuild: depmod: fallback to
- /boot/System.map-KERNELRELEASE
-From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <n.schier@fritz.com>
-Cc: =?utf-8?q?Adri=C3=A1n_Garc=C3=ADa_Casado?= <adriangarciacasado42@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20261016-lyrical-original-woodlouse-3cfb2c@l-nschier-aarch64>
-References: <20261016111106.221542-1-adriangarciacasado42@gmail.com>
- <20261016-lyrical-original-woodlouse-3cfb2c@l-nschier-aarch64>
-Date: Thu, 05 Nov 2026 16:09:42 -0700
-Message-Id: <179392018201.309869.11526061626002654500.b4-reply@b4>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3428; i=nathan@kernel.org;
- h=from:subject:message-id; bh=CkdP0q0YRWAymP0WCs5uruWG0xQDJ9HonGRg+VqVcow=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFlvebZZ6x/ROcoV+omxwVPXnq1i2+nwC8czV9xkkCx55
- nswb1lNRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZjI/eWMDBP/WL/dNvGgiNtT
- Kfvc3GPfVGufN12w9zh0WEqjJvbW/zSGfzaaV+8qfDxwXfLBmr9i+txa77nXNv6c+DtyzkS2z6W
- hLFwA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On 2026-10-16 16:22 +0200, Nicolas Schier wrote:
-> On Fri, Oct 16, 2026 at 01:11:06PM +0200, Adrián García Casado wrote:
-> > When installing external modules (M=...) against packaged kernel headers
-> > such as linux-headers built via 'make bindeb-pkg', ${objtree}/System.map
-> > is absent because System.map is located in:
-> > /boot/System.map-${KERNELRELEASE}
-> > 
-> > Currently, scripts/depmod.sh only checks ${objtree}/System.map and skips
-> > running depmod with a warning, leaving newly installed out-of-tree
-> > modules unindexed in modules.dep.
-> > 
-> > Fall back to ${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE} when
-> > ${objtree}/System.map is not readable so that depmod runs properly
-> > during external module installation.
-> > 
-> > Signed-off-by: Adrián García Casado <adriangarciacasado42@gmail.com>
-> > ---
-> >  scripts/depmod.sh | 13 +++++++++----
-> >  1 file changed, 9 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/scripts/depmod.sh b/scripts/depmod.sh
-> > index 3c34fecac..d6d1b9547 100755
-> > --- a/scripts/depmod.sh
-> > +++ b/scripts/depmod.sh
-> > @@ -12,9 +12,14 @@ KERNELRELEASE=$1
-> >  
-> >  : ${DEPMOD:=depmod}
-> >  
-> > -if ! test -r "${objtree}/System.map" ; then
-> > -	echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
-> > -	exit 0
-> > +system_map="${objtree}/System.map"
-> > +if ! test -r "${system_map}" ; then
-> > +	if test -r "${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}" ; then
-> > +		system_map="${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}"
-> > +	else
-> > +		echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
-> > +		exit 0
-> > +	fi
-> >  fi
-> >  
-> >  # legacy behavior: "depmod" in /sbin, no /sbin in PATH
-> > @@ -25,7 +30,7 @@ if [ -z $(command -v $DEPMOD) ]; then
-> >  	exit 0
-> >  fi
-> >  
-> > -set -- -ae -F "${objtree}/System.map"
-> > +set -- -ae -F "${system_map}"
-> >  if test -n "$INSTALL_MOD_PATH"; then
-> >  	set -- "$@" -b "$INSTALL_MOD_PATH"
-> >  fi
-> > -- 
-> > 2.39.5
-> > 
-> 
-> Thanks for report and patch.
-> 
-> For the record, this is what I can find in Debian's Linux packages:
-> 
-> Debian puts a dummy System.map to /lib/modules/$(KERNELVER)/System.map 
-> (linux-image-$(KVER)-$(DEBVER)-$(ARCH).deb) and the real System.map is 
-> only available in linux-image-$(KVER)-$(DEBVER)-$(ARCH)-dbg package 
-> at /usr/lib/debug/lib/modules/$(KVER)-$(ARCH)/System.map.
-> 
-> So, do we need a valid System.map for out-of-tree modules?
+Starting in Clang 21 (LLVM commit 2fc4a4a9d3a8 ("[Driver][SamplePGO]
+Enable -fsample-profile-use-profi (#146795)") [1]), the Clang driver
+automatically passes -mllvm -sample-profile-use-profi whenever
+-fprofile-sample-use is specified, enabling LLVM's flow-based profile
+inference algorithm (Profi) by default.
 
-Yeah, how does this work for the main Debian packages? Do they just not
-expecte modules.dep to be generated for external modules if System.map
-is not in a standard location? Or maybe nobody cares?
+However, as Rong Xu noted [2], the kernel's AutoFDO implementation uses
+flow-sensitive discriminators (FS-AFDO), and Profi has known issues with
+FS-AFDO that degrade runtime performance compared to LLVM's original
+profile propagation algorithm. In addition, Profi's min-cost max-flow
+solver (applyFlowInference) can hit pathological compile times (30+
+minutes or hangs) on certain kernel control-flow graphs when profiles
+drift slightly or when combined with GCOV [3].
 
-> At a first glance, you patch looks good to me.  But lets way some days 
-> for other feedback.
+Pass -fno-sample-profile-use-profi to disable Profi and restore the
+original profile propagation behavior that kernel AutoFDO was tested
+with. Guard the flag with clang-min-version 210000 since it was
+introduced in Clang 21 alongside the default change, whereas
+CONFIG_AUTOFDO_CLANG supports Clang 17+. Note that cc-option cannot be
+used to probe for the flag because cc-option invokes Clang with -Werror
+but without -fprofile-sample-use, causing Clang to fail the probe with
+-Werror,-Wunused-command-line-argument.
 
-I don't have a particular opinion on this patch other than maybe this is
-being patched in the wrong place? Perhaps we should be fixing this in
-scripts/package/install-extmod-build? scripts/package/PKGBUILD copies
-System.map to its external module build folder already.
-scripts/package/kernel.spec copies it to /lib/modules/<rel>, not
-/lib/modules/<rel>/build. Unifying those in in install-extmod-build
-would avoid having to change it here (since /boot/System.map-<rel> seems
-like a Debian-ism that we are hard coding here). I trust your judgement
-though.
+RUSTFLAGS_AUTOFDO_CLANG and KBUILD_LDFLAGS do not need changes because
+SampleProfileUseProfi remains false by default in the LLVM backend and
+is only enabled by the Clang driver.
 
+Cc: stable@vger.kernel.org
+Fixes: 315ad8780a12 ("kbuild: Add AutoFDO support for Clang build")
+Suggested-by: Rong Xu <xur@google.com>
+Link: https://github.com/llvm/llvm-project/commit/2fc4a4a9d3a87a9e11c48ef25522aa17c2a71003 [1]
+Link: https://lore.kernel.org/r/CAF1bQ=S52KWHopqxksctbBirFEr5Mz1dKKMAoWh-dqLHii3Nig@mail.gmail.com [2]
+Link: https://github.com/ClangBuiltLinux/linux/issues/2188 [3]
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
+
+ scripts/Makefile.autofdo | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scripts/Makefile.autofdo b/scripts/Makefile.autofdo
+index 57a3aba6ffc2..8754b60ad2ab 100644
+--- a/scripts/Makefile.autofdo
++++ b/scripts/Makefile.autofdo
+@@ -13,6 +13,7 @@ endif
+ ifdef CLANG_AUTOFDO_PROFILE
+   CFLAGS_AUTOFDO_CLANG += -fprofile-sample-use=$(CLANG_AUTOFDO_PROFILE) -ffunction-sections
+   CFLAGS_AUTOFDO_CLANG += -fsplit-machine-functions
++  CFLAGS_AUTOFDO_CLANG += $(if $(call clang-min-version,210000),-fno-sample-profile-use-profi)
+   RUSTFLAGS_AUTOFDO_CLANG += -Zprofile-sample-use=$(CLANG_AUTOFDO_PROFILE) -Zfunction-sections=y
+   RUSTFLAGS_AUTOFDO_CLANG += -Cllvm-args=-split-machine-functions
+ endif
 -- 
-Cheers,
-Nathan
+2.56.0.455.g6c5a503b38-goog
 
