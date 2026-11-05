@@ -1,102 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.45
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793918274;
-	b=xIza5fNja87EHBo/2tmPMbTvZzcv9dnBoCHyfN+NivlZQkapdimolxS0GKGhaodWnINn
-	 4pjnub0j+yRRo9A491SR785nzvhhJgT/gmeWGszY3zEhMkqdS7Vt4KEloC5U146Vo306R
-	 9aHd39CDuq/Azw39ikmjxejp/Mcx5IVycB1Rr61up7dZKbEOJOP6HzQsL7mMsJOwVnfkm
-	 SA0uWXe70n9ekbretSsshpAuUT4neTwLkCpTftBvVkmlHB0kCiWI+qmZQo0Y3w+pYQcbN
-	 XJ25fmyjwQ5OShw49734d86OaaaPnJ5dMNH29/YrhgEcdIO9nbsmqcSQbQTeh1iwL0Q==
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=209.85.221.52
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
+	t=1793918452;
+	b=4JO/ccwZrdpyr7TaWoDTmxIncTO+P9FZqA6HTGbqK2qfMUv11avPpb82TKBs987ar7+/
+	 inKG5FPMWzhjkYTvQvI137que8NcF7NpZ5Pddno40R57es8vefFZ4BxZFuL7pOqHHuTyH
+	 Tp4lOKeJCvlr8ZIwxdiEHCAIJI3QkrqRSIvmLDUsLu1Ux84XY5t89JmSTLIAW1gnqfi3s
+	 UA+fHjanX6K6q8oYrBTwitvMHeogY2VhJWNUwJM9yE+CCGk+Eemfo6Ei0FsytmzpHHr3v
+	 kTSBIpy0cuwupxRSn85CMwCvRXZzDclI7q7arhJOKwHP5ZQm4z1Jx1IvgUwl3qQ2QKg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793918274;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793918452;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=mBrXFKwhti0it+UCB6DEQ73OqL5QC614KYotSTfrY7s=;
-	b=Vi33EGojdnxY6o9vW1zht0/faC5Wcah9v2MBGeMDMYCuAH0X4N4GcqQUqqWzCoMEe+93
-	 5awGv/0E2dSXMZj9ZhQ/a88JmUQsYqKqBUy1BXThpiIbRw5nbChaHnlNoF4cm0wSzilie
-	 abofq2f/Cq2bfZG200M8H4O+4UT9o8ESk7GnGvbdHqPYqoC0JHVS41KNOEaEjvLnK8wMC
-	 ShNbFJWubUF9yEXznp4SRXwp4QwUmMVW3CKH5d0mAJpiztWWGICjuMqfyaZRFZaPQqvOA
-	 lMvJMHEMs/5ubt7ihSRaDtwO1yCzTOGVc7C07iLxHSSzwDxMbjzYxWe+Kltv1F9Ev/A==
+	bh=asv4QJYvubkejzKdluXiY+GI6RaigE/KTwLx8Jj692M=;
+	b=fkjjnKeNinVP5HEgg+cQdfxhHsppJbu4nivICsLfh7YSnovZj1m/jHh42ZF3K6xcEHsb
+	 EsqEIPhiUqfxS8fBhhvdo+P8SmrNoSjuK4lIntImSpZT9v1NyN0ubHlGCb5P5S0/YLKk/
+	 xqKLqp98flUOYRGkzVXTN5oKH8jEK+JXW7hfov58UofY0yIxVnJg8ZISAP8NNrOfQ6acN
+	 hZTRSDQBL/Mm0WXiVCRGRpPOenfUEUkp+zO8bJUJMZOs+gEwNOxO6IyxOjKE6NEclcb9X
+	 6JmgFhJQrBO8TNJACCRwnepQxTMxH0CDRZBE2oLVzSDUE+Y+kTNE1j4mrJuDrgZtmiA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=opHuLUG2;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.45
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=RgLRNkQL;
+	arc=fail smtp.remote-ip=209.85.221.52
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526D4606A31B
-	for <linux-kbuild@vger.kernel.org>; Thu,  5 Nov 2026 22:37:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 526D4606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F75606A329
+	for <linux-kbuild@vger.kernel.org>; Thu,  5 Nov 2026 22:40:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C3F75606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=opHuLUG2
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-490d59c3f0aso27992f8f.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Nov 2026 14:37:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793918273; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=RgLRNkQL
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-48df4f540ebso34035f8f.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Nov 2026 14:40:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1793918450; cv=none;
         d=google.com; s=arc-20260327;
-        b=i8JG0QxDJhi/0E9vASdhsIaeRdGtWFgwA2duuhOGscptdPsyaYKdwVffNUveUd4qj8
-         yIYO1QVlbobxhlonBsN4nestfc8PDjX/pm7wQw10xe4Y9ptH8qoIYLoYjHpRc8ZgU2cN
-         kXRw4EYLpUXikndiP1hoTbDGAGRaR9yYFtZakYYEEr5AH3ckrcgQn3M9eAMAsAnkF753
-         0urq6S7fyzhpAXPA2Md7WgsVnx3Pod0TNnT8/Xir7wGGNmGhlI15wBW4pbo/KRQO56VJ
-         gxhsjZMcbkBY6MqCoGqJI5V9AOsWkNnnJFW8Cl9YiSgK1p+6FiMjWqNtWGYEWxWqq/Pa
-         WRPA==
+        b=NFpHJRC9Dy+w+YzUkvCL8zuMn05egEI0MsPPIznVz/4wRvzZ7IPzOGtbPGGOtwyGG8
+         fvi+7Wh1LjLkpT0I2FArc3EZDtWT6f3Dn13MFrZh/PGDD8XIWI9XHcZ1ECjBqp5g0czJ
+         8T3QLLyiAfxRNkgAXhuyBE2YOr04RgVkbZjBxsVF2yQL+Phhld/PmA31pA1wIfeMbNSk
+         3naKoDhJR4EZ+VsAhekFSp5USmj/hvTUaUFt8DDvuBhw10opviAaRJZp86uFgfK4Gukp
+         mxH/T/8mKd/54GI68VZHYwNz18KmZgjhlYdVEQAiB3vBzdXZWn+6fG4bZ+FYMUpsMpgZ
+         7iag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=mBrXFKwhti0it+UCB6DEQ73OqL5QC614KYotSTfrY7s=;
-        fh=K8YM8JAoSuZbMQHozVHuLlzywIJdsjLZH4tzLxuGDLM=;
-        b=elN/DFwt6ANFZehNqhiZJV+SY7Pm2yJlzoL9pzmCdAOAL61V1w0CvvONtvr6MVlmAC
-         iumMlnPZ8m5XyGrIFDijqjJbqyVznKYVnUryprfm7v9KZ3DAAn+t5FUH60xCDntmwKdf
-         UweZzhYikfocRsv2PPvD5BmI//1y15LHrrtd5LqxhSBYyxT79fyR2/B4U5oNEkNHxmc+
-         nfE9GZRuq0u7CZoFq+SoFS9tO0MkvL0eBjJ/BrVNBy4ndQvk4Rhn7sflrtgwLyFN6rjP
-         RcEFwAFSVfgVykJpI4CmOYRYTlLPdac/SuhUAYUToMGoJcvws55dJa2ogL8G3OK2wOdz
-         MmgA==;
+        bh=asv4QJYvubkejzKdluXiY+GI6RaigE/KTwLx8Jj692M=;
+        fh=biI61PU8G9cuv/3ZNCWlVCxJ5gb2kVlFcS/kA52vKlM=;
+        b=HpdiRQ/dix28mFvJDc+reuy97+YSo2hOOCwnET/Ygiz7O5pAm9NZ/2IURke3wSqoYM
+         y7B3p4CyIE5mDijOFXPlpVYrJ3xAU4a0AbzxhoRxa7eKFC1xy2dCgFKsNiat+nVExVY7
+         7Jnb106eg1jdBR7+tgZXKbN2+ZH4ix7WV8HbHQJ3D01CjS+KK8J3ZIovlZFYryUFCyhY
+         vmYRnIAOmaNhSwZwHnAvsQD0AJzLNjFqEeiZ4O9eqoAAWu1g7sJl1tNMkqg4uQVxjYfQ
+         7n8iXtRyUePSU/kpJFISVcqFj3M0d1c9eqQk+AH+tjBvwmNkx5Ziw0uPmPhQHrEGEiCX
+         A8UA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793918273; x=1794523073; darn=vger.kernel.org;
+        d=google.com; s=20260707; t=1793918450; x=1794523250; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=mBrXFKwhti0it+UCB6DEQ73OqL5QC614KYotSTfrY7s=;
-        b=opHuLUG2Ypj1WDXfEVKbren+oLeZ7tTP2atdz9P8ZLVMn5bWP98aqZ2tqSEJI3N2DB
-         nuBkm5KX/67E4qBhrw6fnCpA5G1RGMwR0qeTPW7RyVab9S2tsa/I1UBK5nMljn1rMAiz
-         XOt13rzEPcGx5qnVaycMfqu98U5KOuu6ltfT6v/2zVzVjuLqtZsfv5An2j9NqccasfY3
-         +RTHJYMgNiNMaoUv6HCBIECQuBQzbBkdoRoOoTSc7zjezrVMPd+ax0NUn9lZeT4uE2YL
-         6v9CJoYMMnbZH5MEDHwYgIcfLYNHONdgxYICT3NUUtSOaGe1cht0K8hkNmy5Hza0PbOz
-         YKng==
+        bh=asv4QJYvubkejzKdluXiY+GI6RaigE/KTwLx8Jj692M=;
+        b=RgLRNkQLo0+/Ugi8UZpgCB1l8VFl7ffRroxPbtHZ4YNEaKqjtzdw7GXwpZ1DXMUZDd
+         FRDGAJf01FCLY2PbU1tVMy/K3opwjWIfrABgQrTz/H2e2O3L+5KxKMH8RUCCXT1VWgqT
+         fUE9YKkZE25MM7dhJkEVEvn/hvChYgKruV+t4R5688c/h7bue49V3bjhP3vk5/VKhqYr
+         OG0Uo42RD11B7RfTJN7AkVa6Jh/9MB74t+PGjKFy3Y/CSzhdMvL81tSxt3YnMscfprrM
+         EdfMixRG/B6d76i+GAjV2xzW9bHlMrNTFMx/HBn4rH17iBxMGSeQBhzc7bhHA/NL3rfV
+         oEjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793918273; x=1794523073;
+        d=1e100.net; s=20260707; t=1793918450; x=1794523250;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=mBrXFKwhti0it+UCB6DEQ73OqL5QC614KYotSTfrY7s=;
-        b=w00OQ7Pe1EF0PuWAbu94yBJVoE8JoIzlDgP7kyYEP/oJJyDwf0WoQvK7Yp/jQ8mpHK
-         3LIjHiwCgg5OEyF2xdvopSBnAYISvIVIKb01C2+Tt26VTDPwC4uFLCN/VCOALqaQtgfC
-         th2yx2OCecxViKUnDueNHlyvaL7Kyu1Dq1OTsfxkNfT5A+zM13AUrJBL6jUeSu9nSy48
-         2S3fBnVzPW1rjq0G+f8U3BZ7kdfBNmBMH1yE78WZSEU6JtbWcRqOy21Gu038JXJ22iUd
-         CAQbTbPM6RwnO/TBPP+EY6ah+wdJg04lODjGXZ25yyl3cROOZ1CctIfa2vRonapNsyMD
-         VSHA==
-X-Forwarded-Encrypted: i=1; AKwUvBymtSCLMw8uC9Iq1wlIHgaDdKAV5OZ0QlWTGJWKkYKBDFjyzBP4KXZn+b7b3vuzma2ZdVmY3Jdaky/f7cU=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+z8lnIdCISoZb+JOPuh+4lQvAYoZQ+WvE2Z7+VH0vF3sWp6Hkn
-	NMZRB8s3NfLktghwGgkEWwi3ek1QN4hmNJkxkrPhcGwMC1rYESPofx5KKRpKOFAb+KkNWVBxjYL
-	KDayeJiRH+5y6MOcWxQETn4CQFTVoHz5Nmf+lH1Tw
-X-Gm-Gg: AYBFou08oyKwrmykFcWtwj0npxgvbArrO3ySEoerUldGzSD4M8UBeWKsnZUGlDbHuqV
-	t0U9r3bw7IVQ//KgMYmKvTcP2e0TnThT71SPzjDC4X+jh2nrLX0TePFGorybsMbUGf7kAnICaWz
-	rqM3LLjkoFs6TFJ2l9R47mFPZfGbgQBcErLtxr9gJvwOi5ccfAhALYzGA1QY9ru8zhMIjdD94gm
-	1SPgsFq1bqtD1ExdeBUX9el1H8YLyf4hDQ4gxmwc5qYjpM2IzNRUBWKc6lVuUo3L6+SOjmxpJC8
-	9pzGBPircSQs3hzTkkdoNRwv70+gWFTJs2urA9D+xc2x3Z6Qs2RtyRXVlqDHkqCRp69j3XGTU3l
-	VhY2z44h2iSWvzviyUDJ6vL7FYmVpUx2pLsLXIxmmS2LypgRod3MEi6vqWtWjqTnFG4TBvwhYmK
-	+m8wowObWkNMvQfgKmfpgwljOTJiRoxGPwKEqkHFZcI2pO15SDQMGiJj4gHq0Gj/Tc+HtC1isg7
-	Tzrb3rSTsD0gSaogwpxX5BX7IWwpC+9GdgF
-X-Received: by 2002:a05:6000:25ea:b0:48d:f39b:83de with SMTP id
- ffacd0b85a97d-492732dc7edmr1852328f8f.3.1793918272221; Thu, 05 Nov 2026
- 14:37:52 -0800 (PST)
+        bh=asv4QJYvubkejzKdluXiY+GI6RaigE/KTwLx8Jj692M=;
+        b=dHdZn6jZ4dLXpwImVhA8Hc8yeyc++F3hGUHb0KUb9pIdMmWAISb94stJ44djcAcxnu
+         +KNlUWY/X386iJFihv0SULPxWAlpR9GGoriWvxUnR2tjbe7Yk5tJlWZt0rbO6+H/2/T3
+         ryAujlArOd7vuJxRtiAaZOquLrMXKTsxtNF+fbF774ZWtBu3HUi489J1VxYF7j8OyPZB
+         omuOLDiUcHByRbigQ+sM6DcGwApmpiKJD3OLspgz+u3X45ihMzhnHP5IulpkOp36C1EN
+         XJA5weef7M0SPO2odntooyaXqP/TFJ4p/tBcwBc42XJ2KXqIWAKjLgPoIGTt0tbAUSgr
+         F6ug==
+X-Forwarded-Encrypted: i=1; AKwUvBwC/4UNEYb+Zomr7Tz+lPcelHgc0QRcXnSZbPKepXLY37ySRJHR4PmEHjhzdaHvfd+oOWWHdXQruB9eqa8=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9vBJ9uX9bwaP7wx6J5Y5DAPrcTgwragStSUnCKHFtKoy53Wsgo
+	yn+UeHXLx58RwppVALRTTKLpwz+HB6PmaNLainKTYNBzppcN7igViapLZHjWD4OsrlYc51+NUps
+	vBJlcd7p80K2lKusOrZWRZ0w7yn7kn7Js5fb/V9EN
+X-Gm-Gg: AYBFou2egy/fRd7/d3bzrFCcbLeJ3ATnss9rFJUWCRI8rM7gzAv0Nj4JcoFYk2pVHEW
+	TFzAYjGGLOtZMuUGETySbkdFsIAWou6a54FH6IVfsS1rzV56nfcnCa1RehGAPyLaEQVEZuY8Yg9
+	ZNYJS0ctMX5rGf7qG2CBt0vuR9ymbpHLjTZOeO4Ctmx2j5pD1x6g5FHxXyU90i/Q/4ynDE+FolS
+	6FOSzoR4491jXAZohDWi2wwgbl+5j3q7Sx4ze3qC4npqadg8r5+8dnxbk3N+FMtIa9ZuShRJnPQ
+	nZspvVmopFKN0006zFdpoFY7SSRAwYxG/Rfk9qZSOSs/kkuHqbOWJsd9Iw146qPrXW+YiEpycc8
+	4E3nus3WJ9ziTqCfFFFqW6xt0Su7atoba58Xp1k2eF54I+GFHbIkIj+Vu/scHXz8E3I9bfOo98j
+	edQPjlCokZTxNFJllipS6MNd3SnkC8/1UCJVXgqovZFCyX1CsAs/rMICEb57Zs17Q0tPAB9B8cT
+	9WffriAm/0a6st/PLkudiwmgf038Ke3LjbCAYY5tNObL3YVvTy/Qz1iww==
+X-Received: by 2002:a05:6000:2892:b0:48e:d27:bef2 with SMTP id
+ ffacd0b85a97d-49276a6e26fmr1759258f8f.21.1793918449566; Thu, 05 Nov 2026
+ 14:40:49 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -111,9 +111,9 @@ References: <20261104174554.1.I8556199ea4f1335169ce16e97309aa63ae2e2310@changeid
  <CAF1bQ=S52KWHopqxksctbBirFEr5Mz1dKKMAoWh-dqLHii3Nig@mail.gmail.com> <CAD=FV=XE+KuTDCa3cLOsHPfQ9ngFOXrokFbxr=jDm_UFwKdQDQ@mail.gmail.com>
 In-Reply-To: <CAD=FV=XE+KuTDCa3cLOsHPfQ9ngFOXrokFbxr=jDm_UFwKdQDQ@mail.gmail.com>
 From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 5 Nov 2026 14:37:41 -0800
-X-Gm-Features: AclHuK8wUx6mjaq5nmDzGyrOyknjILFX8cjQ_WCJLMf8UUGbwiTYmUffT-QGEo8
-Message-ID: <CAKwvOdkRAB7QUApoYyKU456GF3bY67PKqQRfbtmW1gcFbpAFGQ@mail.gmail.com>
+Date: Thu, 5 Nov 2026 14:40:38 -0800
+X-Gm-Features: AclHuK8nvrGQbL7-Xvq-JpHEYtxPKFX5Sm9KyXUfS9U3lydEUDZDAqeaU6dAk_8
+Message-ID: <CAKwvOdkNvYz7mSmfQzWuFd7FZEUyZkH0L2tfPSbouE0J2w=b1g@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: AutoFDO: Enable -salvage-stale-profile
 To: Doug Anderson <dianders@chromium.org>
 Cc: Rong Xu <xur@google.com>, Nathan Chancellor <nathan@kernel.org>, llvm@lists.linux.dev, 
@@ -127,7 +127,7 @@ Cc: Rong Xu <xur@google.com>, Nathan Chancellor <nathan@kernel.org>, llvm@lists.
 	Justin Stitt <justinstitt@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
 	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
 	Tamir Duberstein <tamird@kernel.org>, Trevor Gross <tmgross@umich.edu>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, Yi Kong <yikong@google.com>
+	rust-for-linux@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -138,29 +138,29 @@ On Thu, Nov 5, 2026 at 1:30=E2=80=AFPM Doug Anderson <dianders@chromium.org=
 >
 > On Thu, Nov 5, 2026 at 10:23=E2=80=AFAM Rong Xu <xur@google.com> wrote:
 > >
-> > 2.  The recommended usage model for kernel AutoFDO (as documented) is
-> > to use the same source. While it might help in an iterative build
-> > model, I don't see a strong reason to use it if there is no source
-> > drift.
+> > The issue you mentioned regarding excessive time in applyFlowInference
+> > comes from Profi.
+> >
+> > The AutoFDO implementation used in the kernel is FS-AFDO (which uses
+> > FS discriminators). There are known issues when using Profi with
+> > FS-AFDO; enabling Profi actually degrades performance compared to
+> > original profile propagation. When we tested and worked on AutoFDO for
+> > the kernel, we did not enable Profi.
+> >
+> > While I haven't looked into this specific bug yet and am unsure if it
+> > is unique to FS-AFDO, I recommend using -fno-sample-profile-use-profi
+> > to disable Profi for now.
 >
-> Hmmm. I guess in the purist sense we'd want the AudoFDO profile to be
-> for the exact source. ...but from my experience, that's not what
-> happens in reality. If nothing else, developers locally working on the
+> Interesting. I can suggest that to the team digging into it and see if
+> it solves the problem. My AI agent says it will though. It claims that
+> the default flipped recently and "-fno-sample-profile-use-profi" will
 
-Right. Rong's recommendation makes sense from a google3 perspective
-(who I suspect is continuously regenerating profile data), but isn't
-feasible for Android or ChromeOS (who are not).
+I wonder who flipped the default? Perhaps they're not aware of _all_
+of the existing users of AutoFDO, such as the Linux kernel.
 
-> kernel still want to keep the AutoFDO optimizations so they're testing
-> as close to what's in the field as possible. However, the act of
-> working on the kernel will touch _some_ of the source. Keeping AFDO
-> working as much as possible seems nice to me. Of course, I'm by no
-> means an AutoFDO expert and mostly just got dragged into this issue,
-> so happy to defer to the experts. ;-)
+> restore the old (tested) behavior.
 >
-> -Doug
-
-
+> Should I send a patch adding that flag?
 
 --=20
 Thanks,
