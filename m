@@ -1,62 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793956807;
-	b=yIeKwIkvPmsQ6riIniUjXFZlNxWxzNdT4XfeGcUUP04sasA8BAeUeT2omplkLlzmVEIH
-	 nflt2x7v76yibL6QQNJqplxsLpS3qDx2TKXAH9U2FX6IE0OuHsvR3zTXCn0jvPKZIR7Pu
-	 als/IUIBPng7draJJsDn0qqss/f5w8vOHl6HBHwXEKH5kCOTrOrN+MATyLWRw51r4Z+jS
-	 FMUdrSBk4yN1ZD8OQMLaphr4mxbEFk61LMTNcr7+m8ggRwN/3Qc3mZqKNYuOX3O2h70Uq
-	 3PjccubQl6dlKLOfWfQ3t1+mHeqAMsDycWtOTV29j+U7GgC2EM7XUHKRcKNPNhpae9g==
+	t=1793956803;
+	b=wu+yu+Q+debC8aS04SXd36DeaGUCnehtT/ZiAsj3+I0f8NWlm1wQk5Xpq2uMET/Psk3W
+	 5B/0Hsz0mK/E116dJPL+sGL4FM4J6DqrSyjbawWXcmPkdVNnxmdg9DfPENafRq3xsK68V
+	 W5lv7R16ZpPhizoei6HJqnocx8hhB6pfPBUgkLfNJ9pjcr0jIQRS4Y0W60s5EIXTpuF+Q
+	 sC8bMcOZ7eNv+KbtZBNn1MVVNJVzdsz7eUOWksHS0cr3PK39H4EUQ2jvRtLyVQQzS9yJy
+	 Khq19HQOed0SBWDvcrRqfN7aYGbzmbjrHrNUILJi3CLYSWT6lgt6ZOQ4t3/gx4Wxz/w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793956807;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793956803;
 	h=DMARC-Filter:From:DKIM-Signature:DKIM-Signature:To:Cc:Subject:Date:
 	 Message-ID:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=X+RIYSJuCkjGJWvn9kpp/Ob8ans1MXDZ31RXyzn2feM=;
-	b=Ke9BxN6liCc1AnA8c5jS60RJFMe+yLVdTENLJCksrRx5HZ/WzCN4LnVp9Jc1kGsyAs2E
-	 nPtw/T0Cw87E14zoyN5QqMN7iDsD0V5UTBPazG5PeBX4hPnIcxc20ri6dxOlzUv6czDU6
-	 sLRbm27pElqVisWuJHeT2mutOgYwz1/c4ZfSvq61RNlsG3UlVyDDpAQqkAGXXBn+BseG7
-	 0A0GYagKlBdnmJlQLNYZ5hTpZ9PcP2pCr57GiXV6r9nGJ6uWOyEE2Fl0Br3cnAQHELOhg
-	 kuXCfJaldZy5fkpm/vbqRxoRM/NU76xVcr0/8ZI2OB0BAD4Jelvpf9YiSJw9HioDr9A==
+	bh=cieHxXYoFdvsDAnH4UZMQYIUTVvb5arMKcEfb2knAhY=;
+	b=3ozDiuM3RscIP82+A6NY50hydu0fLEjgOOlU68aQEuDPvoqy7EvtPJn1ETBT+uLmzPTW
+	 vNQncxUs6/v2UWd7iJpN/P4b3Qh5CXGmQp3XPXfI5+CYlHwuRhC+DCXLc+feglDMScR9j
+	 SW8Jnak16WtoK6pbIK1zv9xlaNzpu0lgizuFK/Z0nv1SdBxbu9Mxy9lYgrXvxUF0CzxqL
+	 30MCQ9a/b2LmeOdAmcjk/Eyj5pAPehvk67HWAdoYW2RZxVy176SySVgHy0KbHUmaKU+IQ
+	 mGXn6Ei4+IARMw4aFxV8R7jc7r/4hxCIZ07D+1YJaBrf7JxUFDKfoJnV5aN4ekzyC5w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linutronix.de;
 	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b="F5D8LVl/";
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="h2n+I6g/";
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=fKLMx54w;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="qwHET7/t";
 	arc=none smtp.remote-ip=193.142.43.55
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE83606D83C;
-	Fri,  6 Nov 2026 09:20:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9CE83606D83C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FA1606A33D;
+	Fri,  6 Nov 2026 09:20:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C0FA1606A33D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=F5D8LVl/;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=h2n+I6g/
+	dkim=pass (2048-bit key, unprotected) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=fKLMx54w;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=qwHET7/t
 From: "Ahmed S. Darwish" <darwi@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1793956804;
+	s=2020; t=1793956800;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X+RIYSJuCkjGJWvn9kpp/Ob8ans1MXDZ31RXyzn2feM=;
-	b=F5D8LVl/3SApjCCnn7gjsfFA3kDUgE5L18DqzS+K0mebjCevbonA5Ed9fnS2fbiP8gUg9/
-	q5XKv9obqayddERdq3P4Nkbg8mH8zmGyK11IhRogQfwERJi7WsZUQqGs2IsMQ6lW+j+u//
-	9aau22bSMxKR8LbV6qaU3tR9+WR467+aE2sAyBCvPty6k42ozCg1uZEfVrJQLEBLNPggyl
-	tUwuvRwb3dB2sIMgx681lxEyR3qxZ/U9+uBqUluR9oozFgyy/YA+zE+CDP25bZSsNSWPVz
-	NZKjkf7Vn4iZ+wHFwQ1ocVjwn8PkHOgkxAYSmZcSeWIvr9blKY9wIPaCcMYQfw==
+	bh=cieHxXYoFdvsDAnH4UZMQYIUTVvb5arMKcEfb2knAhY=;
+	b=fKLMx54whJvpxEHRcjpGttIXBvx/EvgJqj38ppJB4rSa6YMkur7iVThvZSy4sppNnZYcfd
+	JiM3HC6JBQUwF/QmMs+5lpyQJf76ptF7b7ImDb+lQdAKnjzflX21d9SzfoUVXQbYaXaeV8
+	KrO5TjIgry4nsmTYdK69vuSh9Hb7flBSWHM/O+I150EwuWOm12ZehEV89UIRTX7iq4Qix1
+	q+UFO0ctsO0bqpG0FvjOfefl3hVuWfBAFojydfnt5pIRSUdu1MlD8lQNvKs06gw0rZdAKS
+	ElywcB+PRT9EL+Ed3HWJNY5oGefB5rewF8jBPVB2FjeR3AvQM2fa0OEy7pFM+g==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1793956804;
+	s=2020e; t=1793956800;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X+RIYSJuCkjGJWvn9kpp/Ob8ans1MXDZ31RXyzn2feM=;
-	b=h2n+I6g/N7m/SKZ26rk/pwtV7u20l/d0Lbu6WlZpHB6YwrerHWYj84m1uiXKAOgA21Hawb
-	RBBpuHxGBFzOiMAQ==
+	bh=cieHxXYoFdvsDAnH4UZMQYIUTVvb5arMKcEfb2knAhY=;
+	b=qwHET7/tjAbHU1i/ljh7YgwRvwlfdnJYgcbzZ/0mJeJDKyWQ4tClFhh8qGUC3QO0LrzRyM
+	oRX6y5kc+XbE7LAA==
 To: Clark Williams <clrkwllms@kernel.org>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -77,9 +77,9 @@ Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Ahmed S. Darwish" <darwi@linutronix.de>
-Subject: [PATCH v1 09/10] Documentation: Describe kconfig-checker overlays
-Date: Fri,  6 Nov 2026 10:19:21 +0100
-Message-ID: <20261106091922.7560-10-darwi@linutronix.de>
+Subject: [PATCH v1 08/10] kconfig-checker: Add support for rule overlays
+Date: Fri,  6 Nov 2026 10:19:20 +0100
+Message-ID: <20261106091922.7560-9-darwi@linutronix.de>
 In-Reply-To: <20261106091922.7560-1-darwi@linutronix.de>
 References: <20261106091922.7560-1-darwi@linutronix.de>
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -93,83 +93,163 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
+An kconfig-checker overlay is a YAML file applied on top of an existing
+rules file.
+
+Overlays are intended for distribution kernel packaging scripts, CI
+environments, and board support packages; where the base rules may need
+local adjustments.  Overlays may override any rule's field.  They may
+also update the documentation URL or introduce totally new rules.
+
+Add support for such an overlay mechanism at the kconfig checker.
+
 Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
 ---
- Documentation/tools/kconfig_checker.rst | 57 +++++++++++++++++++++++--
- 1 file changed, 54 insertions(+), 3 deletions(-)
+ tools/kconfig-checker/check.py | 89 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 88 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/tools/kconfig_checker.rst b/Documentation/tools/kconfig_checker.rst
-index 73717ac56ea9..152bc0c634ea 100644
---- a/Documentation/tools/kconfig_checker.rst
-+++ b/Documentation/tools/kconfig_checker.rst
-@@ -18,8 +18,12 @@ The checker can be invoked from anywhere in the file system::
+diff --git a/tools/kconfig-checker/check.py b/tools/kconfig-checker/check.py
+index 4f79ec487da7..38ae4ed32817 100755
+--- a/tools/kconfig-checker/check.py
++++ b/tools/kconfig-checker/check.py
+@@ -7,7 +7,7 @@
+ # Main usage:
+ #
+ #     $ check.py list-rules
+-#     $ check.py check -c path/to/linux/.config -r preempt_rt
++#     $ check.py check -c path/to/linux/.config -r preempt_rt [-o path/to/overlay.yml]
+ #
+ # Notes:
+ #
+@@ -225,6 +225,48 @@ class Rule:
+         if self.docs_hint:
+             self.docs_hint = '#' + self.docs_hint
  
-    check.py check -c path/to/.config -r preempt_rt
++    def overlay(self, overlay: YamlDict) -> None:
++        """Overlay passed yaml structure over existing data"""
++        if 'expected' in overlay:
++            self.expected = ExpectedValue[overlay['expected']]
++
++        if 'severity' in overlay:
++            self.severity = Severity[overlay['severity']]
++
++        if 'rationale' in overlay:
++            self.rationale = overlay['rationale']
++
++        if 'docs_hint' in overlay:
++            self.docs_hint = overlay['docs_hint']
++            self._normalize_docs_hint()
++
++    @staticmethod
++    def _ensure_required_fields(rule: YamlDict, rule_id: str) -> None:
++        """Ensure that passed rule has all required fields"""
++
++        # Normal rule files require every rule to define both 'expected'
++        # and 'severity'.
++        #
++        # Overlay files are different: an overlay may update only selected
++        # fields of an existing rule, so the overlay schema permits these
++        # fields to be omitted.
++        #
++        # However, an overlay may also introduce a completely new rule,
++        # where such a rule has no existing base rule to inherit from.
++        # Manually check all required fields existence in that case.
++
++        if 'expected' not in rule:
++            error(
++                f'Required field `expected` is missing from {rule_id}',
++                os.EX_DATAERR
++            )
++
++        if 'severity' not in rule:
++            error(
++                f'Required field `severity` is missing from {rule_id}',
++                os.EX_DATAERR
++            )
++
+ class SymbolRule(Rule):
+     """Rule entry for one .config symbol"""
  
--As described in Documentation/admin-guide/README.rst, it is also used by
--``make checkconfig``.
-+An optional overlay may be supplied with ``-o``::
-+
-+   check.py check -c path/to/.config -r preempt_rt -o path/to/overlay.yml
-+
-+As described in Documentation/admin-guide/README.rst, the checker is also
-+used by ``make checkconfig``.
+@@ -232,6 +274,8 @@ class SymbolRule(Rule):
  
- External dependencies
- =====================
-@@ -47,4 +51,51 @@ The checker's rule files are written in YAML, and are stored in::
+     def __init__(self, rule: YamlDict):
+         self.symbol = rule['name']
++
++        super()._ensure_required_fields(rule, f'symbol {self.symbol}')
+         super().__init__(rule)
  
- The schema for these files is fully documented in::
+     def _normalize_docs_hint(self) -> None:
+@@ -253,6 +297,7 @@ class PatternRule(Rule):
+         except re.error as e:
+             error(f'Invalid symbol regex {regex}: {e}', os.EX_DATAERR)
  
--   tools/kconfig-checker/schema.yml
-+   tools/kconfig-checker/base.yml
-+   tools/kconfig-checker/rules.yml
++        super()._ensure_required_fields(rule, f'pattern {regex}')
+         super().__init__(rule)
+ 
+ @dataclass
+@@ -333,6 +378,36 @@ class Issue:
+     severity: Severity
+     rationale: Optional[str]
+ 
++class OverlayFile:
++    """YAML overlay file access"""
 +
-+Overlays
-+========
++    overlays: YamlDict
 +
-+An overlay is a YAML file applied on top of an existing mainline rule
-+profile.  Overlays are intended for local policy, distribution kernel
-+packaging, CI environments, and board support packages.
++    def __init__(self, overlay_f: Path, schema: Schema):
++        self.overlays = Helpers.load_yaml(overlay_f)
++        Helpers.validate_yaml(self.overlays, schema.validator, overlay_f.name)
 +
-+An overlay may override fields of an existing rule.  For example, if the
-+mainline PREEMPT_RT profile contains these rules:
++    def apply(self, rules: Rules) -> Rules:
++        if 'docs_url' in self.overlays:
++            rules.docs_url = self.overlays['docs_url']
 +
-+.. code-block:: yaml
++        for overlay in self.overlays.get('rules', []):
++            if 'name' in overlay:
++                if rule := rules.get_symbol_rule(overlay['name']):
++                    rule.overlay(overlay)
++                else:
++                    rules.add_rule(SymbolRule(overlay))
++                continue
 +
-+   rules:
++            if 'name_pattern' in overlay:
++                if prule := rules.get_pattern_rule(overlay['name_pattern']):
++                    prule.overlay(overlay)
++                else:
++                    rules.add_rule(PatternRule(overlay))
++                continue
 +
-+     - name: CONFIG_DRM
-+       expected: n
-+       severity: info
-+       docs_hint: config
++        return rules
 +
-+     - name: CONFIG_EFI_DISABLE_RUNTIME
-+       expected: y
-+       severity: medium
-+       docs_hint: config
+ @dataclass
+ class SymbolIssue(Issue):
+     """Checker issue concerning a single .config symbol"""
+@@ -563,6 +638,14 @@ def parse_args(rules: list[str]) -> argparse.Namespace:
+         help='rules file to check against',
+     )
+ 
++    check_parser.add_argument(
++        '-o',
++        '--overlay',
++        metavar='OVERLAY_FILE',
++        type=Path,
++        help='file overlay over picked rules',
++    )
 +
-+A board support package may override such rules with an overlay like:
+     return parser.parse_args()
+ 
+ def main() -> None:
+@@ -586,6 +669,10 @@ def main() -> None:
+     rules_f = rules_dir / f'{args.rules}.yml'
+     rules = RulesFile(rules_f, schema).parse()
+ 
++    if args.overlay:
++        schema = Schema(schema_dir / 'overlay.yml')
++        rules = OverlayFile(args.overlay, schema).apply(rules)
 +
-+.. code-block:: yaml
-+
-+   rules:
-+
-+     - name: CONFIG_DRM
-+       expected: allowed
-+       rationale:
-+         This product requires a display controller and accepts the latency
-+         cost.
-+
-+     - name: CONFIG_EFI_DISABLE_RUNTIME
-+       expected: n
-+       rationale:
-+         The efi_runtime workqueue is pinned to housekeeping CPU#0.
-+
-+.. note::
-+
-+   If a rule is generally useful to kernel users, please submit it to the
-+   mainline profile instead of carrying it as a local overlay.
+     checker = Checker(kconfig, rules)
+     report = checker.find_issues()
+ 
 -- 
 2.56.0
 
