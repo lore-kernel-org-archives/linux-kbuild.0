@@ -1,102 +1,116 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.44
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793989034;
-	b=n+aN0fMM5w4DhTck2mkqFpv5hSYvf3N7mP5INnYxIypi21QFWQN9k8WRmcQn7/uFx8D6
-	 JyJ9pOt7YgDN5P8NzMv3cDFxAAHbTVvvcQq1Tq9WM0FKf5R0QfkGcZIzyaCNvIAMszfjg
-	 gbd9PkyPGhVx+U9cvbbcnoI9wohWpzF8zCgHopvVVT4D7t2IwwVWtoC60uRrdyrEJcs/F
-	 hD2zkacK9SUvC8G+yVfb5Nut9/6Qbxqz0lPOMX1USZ496/Xbh0fGt5GVx4zb44pTsjbv5
-	 1rcNiexo1ZKRXhv2f8KZMm0mi00k+0WT32L5J5fJOPeqmalBiqt04QwBd8KtidivtLQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793989034;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.176
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793993934;
+	b=lZqUYHfH1cZ/kabKw48pqKVeS7xDps2NshpMHtryDRkiRj/p1gxXFpqD81vjN3EmWYrj
+	 INRSfMR/z2T+sqPGEJ+7XT9xk6M9iNaPq/kJn7FpjN3Hd9dAshBt1XDIwr+hfdaB9u1Qj
+	 Fby55DxeR5ed68KKTn4CdoKT4wopMHridj8dlC6ChsEORCvqzxlN0NYryP8BvTAAVHSj4
+	 g5wHqQ6tB0ZITWQKo959AUhlBxuUUrI2jGEGWnZBvAy/d00utgFRgI2U2Bcb9LzfKR4lA
+	 6N55RbFWdt6sPdXwqePvedlM6dudg9UOuoBLBbU4TWicRDSbq+2r+WOwaY8spCo+nAA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793993934;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=iO2JEAydHDgBReyWjoaKwK3iFfajRHjkVPraMabJC1Y=;
-	b=QJW7cc/U6EiNDeg4D/k+gaK42ySGc/Hen72wONSk4p1S1P/GzQwoX7eY89L6qJglcwQI
-	 mxzbpsw4sy9/9ddOr/B0bg5BklLlpIoJyc0REtvWFwq5i/0EUEuoYs+gx7bVOz20CoM8l
-	 9tiGopAMOyiNCyqlKOpQgPNCQXYnwJXtkRGiVA2110daIGwXf+B5ElqZBrZowZ3GTVaXz
-	 Og2urim/qyeh5xZLrwjO5Fsvn+QuW8TElRrgr5OXbWRJqEqnIFv3hF4ybpkEEHXjRbCuJ
-	 Hmly2U+7tupKouzwoeYmfh9UIIG/5mdGmfOSJQuF980rvna4Y1QwId5Azc38p235CiQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Dv+v6Zg9;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.44
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=iQl8YGiFsFcU441hb/5cUGvukVssclT4Jhbsc8PIwH8=;
+	b=K7wA4tKcybUpEFRXnsq9d2fL/nZBB0ZoQOPYHeqk79eHqCjpm9j8aXwZBC/spwjVK2OR
+	 YSvr9RV4ayS6Lb0do3QvSkxTWkB95dTdzIiudumVUR6nhhx/e9a1tlNvaiglbW4H1rjF5
+	 D2b66zvKrNW6BU04jM1vjMq3A0fQV14LYb7JlPCuAEdzRXt8Cw3EWfvTB+mDAGZWFGnHO
+	 02TiS2FvhK9kpztTcCRLS1MOJxiGNvoKXpU9lnoTEZbgNIbAOq2o9Lr+taAwSVPbJpATD
+	 HlqXw/vFdAPKlI9OB78ZcgLyJQJdFFi7+wdA6nXaP9bGr7lVYvyTaJLBpvBd6qc4d4g==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=chromium.org;
+	spf=pass smtp.mailfrom=chromium.org;
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=kAB6s67+;
+	arc=none smtp.remote-ip=74.125.82.176
+Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0C0606A326
-	for <linux-kbuild@vger.kernel.org>; Fri,  6 Nov 2026 18:17:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B0C0606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10B0606A326
+	for <linux-kbuild@vger.kernel.org>; Fri,  6 Nov 2026 19:38:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F10B0606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Dv+v6Zg9
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-48e4831c028so978672f8f.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 06 Nov 2026 10:17:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793989032; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Wf97D+3dsosvQsILdDy8GqiCJzP4P2jx54BEvjof2hoX+Q8To9LE/Z8luJPNzos9zQ
-         VMj+gVO9ZopeFrVSMHih1lqjqfkAE3u+Zef7XB79R+qYrzEixnInP9M9gpo4oELGoZHv
-         G2YDkUxxKKbfeA7hqIfWRIjtd5zwQ6FTlcpVzkzVJUTkAZ0OTLji4MBEAbfsfu/EzaXr
-         yTAdqK7tnS7oTEdkiJxC9xahic+y3n4DRG8wCmjgR5K+yj0WXF08mfFyia8FCoWq9PR5
-         hoGACNEfbhrs0FhDrZ6pNl+OkhU8+sDdUpVoz+lp4cvuMtF9GvWdzXIuCYrjIj+owFBQ
-         kX9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=iO2JEAydHDgBReyWjoaKwK3iFfajRHjkVPraMabJC1Y=;
-        fh=ObZfvdsFrNLp+bNe7Fy55L80UcBYgGBYztLv1QSIwbM=;
-        b=DUmXQ/fk8qg0UxHwNhJWy/YyaQM9gl0ltLxM9Z09aGufoindlj+gpI2ADfyw7qfDbM
-         KAPQSBQQj1/nZQIHwQ4qf7VIiQGceY5hJRFigwzUnec6z4bQLL/077eOfprLnV1XEgmy
-         K0v8X48Qys5tmFf+pq1iutYHtSCeO4F6MNuwiL1uDGx5PKO3qDQu3qxFNKB38amShVxE
-         a97QXI2KqWHu2+UA/KQ95Mll4Jokpof3JocF3nfl2O1Cg17Mq8GEuJ7PQWbXuTdU1XDt
-         zO6GkE3/ATmIpfaVNCnEwtJQ8OgKx0BycJFbfRCyow4gi5i3ZO3oEGjkpmHVOzGB17ZO
-         De+Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=kAB6s67+
+Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-37071c0f42aso1075370eec.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 06 Nov 2026 11:38:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793989032; x=1794593832; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=iO2JEAydHDgBReyWjoaKwK3iFfajRHjkVPraMabJC1Y=;
-        b=Dv+v6Zg99UqcGdUbBKIP2EUBV/hqcwAN+w/VtCw6nSc1ol7nBmVa87Yz27QCn8Z1hj
-         VMhyEjyvCJqw01Mb1VwcqwPLFlHTN849J6pS/XVmqKAt5Yg0qOadOWN6djYCQMCsFtYr
-         S+LjhNcFZ5pOiMllseM5lYHHJuHYAeCt5LhuVhh9hycajomSzlr/GeTGmbmVZe9E/k1G
-         honjrTkqHAx3UUKSmNxHaQ3vJaQzW7i0k4gILWLcLxPOXBK4ZWUGmJSjK93SpOYn1WPg
-         taW+nhs9O0pDWuur28yxFYrBQSGx2mmtXbSD388n9obfFaCPUmD0Eg0sAT7x+nxSayTy
-         N35w==
+        d=chromium.org; s=google; t=1793993933; x=1794598733; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=iQl8YGiFsFcU441hb/5cUGvukVssclT4Jhbsc8PIwH8=;
+        b=kAB6s67+ZWFGloz0/fsmsPCRV4nic5sD+Uf2lhfDSYSNL4SzzLMrHSy6EpEaldojVF
+         wIYmFjeJZeVlq/dNwymHGYiQw8MkfGpYYCmnvLIIWBxYCLk5mIoX7g00DDNgOJVmMa3b
+         PmhHCiNB1kITt/GvsFzYXKMzWBgLZxuIvWUYk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793989032; x=1794593832;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iO2JEAydHDgBReyWjoaKwK3iFfajRHjkVPraMabJC1Y=;
-        b=e5vnQPls2pxYJfIQ/KGt2492vAOAZ6AR6JRXoq/j6RpI4ZiIgUQDwOtTsL3XrRzl0Y
-         JLFLmwHS674Z8FSZxGTyaJgez6qmKjjuS7D1QVMh2uQ/7GZS0F7gEMfM7/tFlJnR215P
-         C2+yT3Wbeo1R2ard0FXDZbYqf/79W3LB4YEmXWC1oIzRH93m2DukfUCw7jeSsM+CyYVD
-         hO53ME+BUadhKLntOf3hOflopj98s4iUH1UQb6qpVkHLg/MJ3Qnb8KuyXxueZh8soqiq
-         /syg/x3uQBBvCFzSMa7wSm/pkGgeX4hneehsZtQCMR2HecxQNlvHCXkSw8q77FfHfxGN
-         6BOQ==
-X-Forwarded-Encrypted: i=1; AL+hErHhtkYVmL8BTaekCvcirCpuq6mZy/sVN88jC1DKxujs2CNFZnoRZjldX5qZqUd/axeLsmlEwisKiQ5Z67Q=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8S1Y+CuRooOgxY+91kNagGay3XIcWCSSWSgxv4nq1nddeilW17
-	7ytAln/vK2M5kw9VH7y3/iGeebSfo5uWdorl8dq0m7CXrPP8R7LT1AxfPClH1DcxuC8kYJADrpz
-	wHzDRIaFdp2ur/kmBndkcWqW3qsd7Daz1Ur4uUvoG
-X-Gm-Gg: AYBFou3IDiO4eXlblPaKav8/4Xrf51tNTwpp0bxceGsAx0MIRipxCZslN9r5HKWpNWD
-	VEjnxbaDVd+ZdUDQt35fqXIkNECYl8jLMrIPCBk9+QV6Btow5LgG1JgoKX/dmkZ2UwC7spJuk3P
-	TKK3CVkUod2aMZVOXE1UkrZRtLy8qjlW3CvBimbRQgcsUY2nviV74Sw27T1YikIojmTrZXwIv/s
-	X4XdpGJHHrC5Tkdbp9jw52IKhYkekx73j6cuUcNCX2IFrxt/jij735DJN/eY6ss6MjCwCTXgz4t
-	0eyDuPTmdW2vUcHy+6UUPHYH5upjHfhccm48+DpBxhjgc+o5HCyoFhCcNKwYCWNws+UlZx1gGZ9
-	pALcOYJZdoUbStW3v5UOT1tHBV9BtFigf9bvt1n7UmW1GQ0rxgQLSYuLs0yx00w9lvhRPz7ua+G
-	77hEmV04lMlFK8ZbwG47JUkbPVQsBwqAUy0caclkusoCSXs5UrQDzqcZxow3yWdhOfm/6aTL6tY
-	xEiFKTrM733isIz6CoK9hSkvIX2Y7AX0/B/74VriwMQpTJbAW4Lhbi05p0=
-X-Received: by 2002:a05:6000:2892:b0:48d:c186:dcc6 with SMTP id
- ffacd0b85a97d-492777dbb54mr6867359f8f.57.1793989031973; Fri, 06 Nov 2026
- 10:17:11 -0800 (PST)
+        d=1e100.net; s=20260707; t=1793993933; x=1794598733;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iQl8YGiFsFcU441hb/5cUGvukVssclT4Jhbsc8PIwH8=;
+        b=an6r7Mx4bp5haqbLGh11foPsomxx0h2m6RYg+0QebpNQtCS5YDOAAk1cxl3qnU4k6o
+         YiBJPC8LZLoCrP1YaOoHzPC5yYBF0O+b8ccEWtokZ3EeQuMsaAeOYRByImLCbljYr8xP
+         oysU0fzNcmXcpxcugh0szNI3dJcK3e/r8/GFpiTGxvCAFrfK3i5FK3Z1SEvr5niwPV5G
+         MbSzKPgFz5NdXKVt80bU8pkUGBNDP4YaXEEqo63bd2Qi9YhoeRB3m/a2216Z0pTknfGR
+         MCLkBdPI5nU2+8OD9jbP55CQC4JzEHPUfI8PNTgngaqXbMBiQGVp0y1KKQZk27ZMc6wT
+         6Q9g==
+X-Forwarded-Encrypted: i=1; AL+hErEhfn+PeOH0rROq87501cCCBc7w1eM1aCiq25dZlnstGkMKye5Klhl8qF2+6gWaM31AMsNf29sVhF4EExg=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9wZV+WNHBQLTLaP6kIRgO901phk5vu4DtJ0RjweV88mD+YFRt7
+	eXnDiYM23+DIht8iR0Jp+Oj1vhErOMxyHfQn1b5scfFvLRyMFdaPqxG/mV20SDZ5rQ==
+X-Gm-Gg: AYBFou2tbb21QAC8G8/Xk0wOt1q9XjLLLw598VyZBSqNMwYdCuNcpRP8f4kdU34OrzP
+	X5zagJZf4k91IdCMyD2ZmYmpV9wB0Vz1n6Ki3fhkQyWEsoE/CmLkggomzqEFl2az0m5fK5uLEOX
+	A0wOxT4i/ba6NkuH1tr1aWi07hhZhKQYr6nwr+0FytsE3JmzuiuGZMmzcWS+GuBOn/8SJNarmIc
+	SYKqMxtfEDn2nu9elshlSHgc+St60CwmqI8iyAmieez98AZTxdFwRP2KjhIVpsMWe0xwNUcm+j5
+	VAj2/fIGWBTKZd3Yni2IJlfcxFPXXHecCgcHnpE9VasHEEsFXvThR5JQgwgdwde+fHqe0kdgK6n
+	R0eXQP3bamOw7S5csVKXeCBeq3LTMjB+bl9AiWvbMIV0aK07NX16eJevRaOhiq1YVS8p/hTAI1S
+	hm++XTGgWuNXuR6eNkazLNY6Lie25npnwVNVnzkUcQ6X+Bnb6I6cdhNeZyRVHQ7Ga8RF8OygP4S
+	fv72WwJfw/NoaEdD8F6KbzgLl61Ho3isJu0wubmWoO9p5H7j9L9+7PElNvbhIL8LWHW0nBl1+xD
+	5xtaX2Lrh1zbcw+IeX7L7IOwVh6IJo8iNyxrSG1mcvsb0zJQuXWGlCLUiYZYBHoKggi4Ch7ZVJ8
+	hcFtlDZqZhxFnqw==
+X-Received: by 2002:a05:7301:fc83:b0:36c:b1a9:542 with SMTP id 5a478bee46e88-36f75d21bd8mr4376444eec.29.1793993933018;
+        Fri, 06 Nov 2026 11:38:53 -0800 (PST)
+Received: from dianders.sjc.corp.google.com ([2a00:79e0:2e7c:8:57b2:a393:143e:afa7])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36fa651c57asm9045755eec.2.2026.11.06.11.38.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2026 11:38:52 -0800 (PST)
+From: Douglas Anderson <dianders@chromium.org>
+To: llvm@lists.linux.dev,
+	linux-kbuild@vger.kernel.org,
+	Rong Xu <xur@google.com>,
+	Han Shen <shenhan@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>
+Cc: Yabin Cui <yabinc@google.com>,
+	Han Wang <nesthanwang@google.com>,
+	Nilanjana Basu <nilanjana.basu87@gmail.com>,
+	Snehasish Kumar <snehasishk@google.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	stable@vger.kernel.org,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Benno Lossin <lossin@kernel.org>,
+	Bill Wendling <morbo@google.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Boqun Feng <boqun@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	Justin Stitt <justinstitt@google.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Trevor Gross <tmgross@umich.edu>,
+	linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: [PATCH v2] kbuild: AutoFDO: Disable Profi (-fno-sample-profile-use-profi)
+Date: Fri,  6 Nov 2026 11:38:01 -0800
+Message-ID: <20261106113800.v2.1.I0b27923381ef34cc99cdf8b65fea2e1bafce6370@changeid>
+X-Mailer: git-send-email 2.56.0.455.g6c5a503b38-goog
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -106,66 +120,82 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261105151159.1.I0b27923381ef34cc99cdf8b65fea2e1bafce6370@changeid>
- <CAF1bQ=QkGntJu8G67ssH2dS3Sn200_JuYitjtAfNPBu_hn0fZA@mail.gmail.com>
- <CAF1bQ=QiP4fb-+Kn8wzEH7wqjAjZaagxUd3sYpv2SkwDcnFPWQ@mail.gmail.com>
- <CAD=FV=WGKOnDoY1W7CuZw=s3e8f3jrXzkJ5_Qp_Y4WfT0XwXDg@mail.gmail.com> <CAF1bQ=TWZ=u1h92Nt9NgGcaDNTo=BOHmUp1DCWEeUMfwBb3WhQ@mail.gmail.com>
-In-Reply-To: <CAF1bQ=TWZ=u1h92Nt9NgGcaDNTo=BOHmUp1DCWEeUMfwBb3WhQ@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 6 Nov 2026 10:17:00 -0800
-X-Gm-Features: AclHuK9SWyCEYtuJGMl-fJhTBaGxGHpWXefZx7LtX8R0YzDCJePA2Pf99_IEKbE
-Message-ID: <CAKwvOdmTaMQf4Wyk_sygaushmMd9dRR3xPZ6K9rbKYB25uz7jg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: AutoFDO: Disable Profi (-fno-sample-profile-use-profi)
-To: Rong Xu <xur@google.com>, Doug Anderson <dianders@chromium.org>
-Cc: llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
-	Han Shen <shenhan@google.com>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Han Wang <nesthanwang@google.com>, Snehasish Kumar <snehasishk@google.com>, 
-	Nilanjana Basu <nilanjana.basu87@gmail.com>, Yabin Cui <yabinc@google.com>, stable@vger.kernel.org, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 6, 2026 at 10:13=E2=80=AFAM Rong Xu <xur@google.com> wrote:
->
-> As far as I know, Profi is enabled in the Clang front-end initially. I
-> remember reviewing a patch that enabled Profi for the Rust front-end,
-> though it's possible that has already been merged.
->
-> It seems strange that these flags diverge between C and Rust. Could we
-> add a comment to indicate that Profi is currently not enabled in Rust?
->
-> Rong
->
-> On Fri, Nov 6, 2026 at 10:06=E2=80=AFAM Doug Anderson <dianders@chromium.=
-org> wrote:
-> >
-> > Hi,
-> >
-> > On Fri, Nov 6, 2026 at 9:43=E2=80=AFAM Rong Xu <xur@google.com> wrote:
-> > >
-> > > Just one thing: I think we should also have this flag for Rust so Rus=
-t
-> > > and c are consistent.
-> >
-> > Please see the commit message, which says:
-> >
-> > > RUSTFLAGS_AUTOFDO_CLANG and KBUILD_LDFLAGS do not need changes becaus=
-e
-> > > SampleProfileUseProfi remains false by default in the LLVM backend an=
-d
-> > > is only enabled by the Clang driver.
-> >
-> > Is that incorrect?
+Starting in Clang 21 (LLVM commit 2fc4a4a9d3a8 ("[Driver][SamplePGO]
+Enable -fsample-profile-use-profi (#146795)") [1]), the Clang driver
+automatically passes -mllvm -sample-profile-use-profi whenever
+-fprofile-sample-use is specified, enabling LLVM's flow-based profile
+inference algorithm (Profi) by default.
 
-Probably better to be explicit, rather than rely on the implicit
-default value, which sounds like it may be changing over time.
+However, as Rong Xu noted [2], the kernel's AutoFDO implementation uses
+flow-sensitive discriminators (FS-AFDO), and Profi has known issues with
+FS-AFDO that degrade runtime performance compared to LLVM's original
+profile propagation algorithm. In addition, Profi's min-cost max-flow
+solver (applyFlowInference) can hit pathological compile times (30+
+minutes or hangs) on certain kernel control-flow graphs when profiles
+drift slightly or when combined with GCOV [3].
 
-> >
-> > -Doug
+Pass -fno-sample-profile-use-profi to disable Profi and restore the
+original profile propagation behavior that kernel AutoFDO was tested
+with. Guard the flag with clang-min-version 210000 since it was
+introduced in Clang 21 alongside the default change, whereas
+CONFIG_AUTOFDO_CLANG supports Clang 17+. Note that cc-option cannot be
+used to probe for the flag because cc-option invokes Clang with -Werror
+but without -fprofile-sample-use, causing Clang to fail the probe with
+-Werror,-Wunused-command-line-argument.
 
+Although SampleProfileUseProfi currently defaults to false in the LLVM
+backend and is only enabled by the Clang driver, explicitly pass
+-Cllvm-args=-sample-profile-use-profi=false in RUSTFLAGS_AUTOFDO_CLANG
+and --mllvm=-sample-profile-use-profi=false in KBUILD_LDFLAGS as well so
+that C, Rust, and ThinLTO flags remain consistent even if rustc or LLVM
+defaults change in the future. Unlike the Clang driver flag
+-fno-sample-profile-use-profi (added in Clang 21), the underlying LLVM
+-sample-profile-use-profi option was introduced in LLVM 14, which
+predates the LLVM 17+ requirement of CONFIG_AUTOFDO_CLANG, so no version
+checks are needed for the Rust or linker flags.
 
+Cc: stable@vger.kernel.org
+Fixes: 315ad8780a12 ("kbuild: Add AutoFDO support for Clang build")
+Suggested-by: Rong Xu <xur@google.com>
+Reviewed-by: Rong Xu <xur@google.com>
+Reviewed-by: Snehasish Kumar <snehasishk@google.com>
+Link: https://github.com/llvm/llvm-project/commit/2fc4a4a9d3a87a9e11c48ef25522aa17c2a71003 [1]
+Link: https://lore.kernel.org/r/CAF1bQ=S52KWHopqxksctbBirFEr5Mz1dKKMAoWh-dqLHii3Nig@mail.gmail.com [2]
+Link: https://github.com/ClangBuiltLinux/linux/issues/2188 [3]
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
+v1: https://lore.kernel.org/r/20261105151159.1.I0b27923381ef34cc99cdf8b65fea2e1bafce6370@changeid
 
---=20
-Thanks,
-~Nick Desaulniers
+Changes in v2:
+- Explicitly disable Profi in RUSTFLAGS_AUTOFDO_CLANG and KBUILD_LDFLAGS
+  as well (Rong Xu, Nick Desaulniers)
+
+ scripts/Makefile.autofdo | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/scripts/Makefile.autofdo b/scripts/Makefile.autofdo
+index 57a3aba6ffc2..55fda66ad960 100644
+--- a/scripts/Makefile.autofdo
++++ b/scripts/Makefile.autofdo
+@@ -13,13 +13,16 @@ endif
+ ifdef CLANG_AUTOFDO_PROFILE
+   CFLAGS_AUTOFDO_CLANG += -fprofile-sample-use=$(CLANG_AUTOFDO_PROFILE) -ffunction-sections
+   CFLAGS_AUTOFDO_CLANG += -fsplit-machine-functions
++  CFLAGS_AUTOFDO_CLANG += $(if $(call clang-min-version,210000),-fno-sample-profile-use-profi)
+   RUSTFLAGS_AUTOFDO_CLANG += -Zprofile-sample-use=$(CLANG_AUTOFDO_PROFILE) -Zfunction-sections=y
+   RUSTFLAGS_AUTOFDO_CLANG += -Cllvm-args=-split-machine-functions
++  RUSTFLAGS_AUTOFDO_CLANG += -Cllvm-args=-sample-profile-use-profi=false
+ endif
+ 
+ ifdef CONFIG_LTO_CLANG_THIN
+   ifdef CLANG_AUTOFDO_PROFILE
+     KBUILD_LDFLAGS += --lto-sample-profile=$(CLANG_AUTOFDO_PROFILE)
++    KBUILD_LDFLAGS += --mllvm=-sample-profile-use-profi=false
+   endif
+   KBUILD_LDFLAGS += --mllvm=-enable-fs-discriminator=true --mllvm=-improved-fs-discriminator=true -plugin-opt=thinlto
+   KBUILD_LDFLAGS += $(call ld-option,-plugin-opt=-function-splitting=all,-plugin-opt=-split-machine-functions)
+-- 
+2.56.0.455.g6c5a503b38-goog
+
