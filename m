@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793933722;
-	b=KMk2mU09VhfBbQfZFp+ulKwxI+OO9WgXekcMpA1DjRHtbvY74/+7mfXuLB2Rh431xneH
-	 RzhncRmEFMuYP47NUDHpnxZiUg3vMoS4S+BPQfwBbpmxqgEtTtcjpbWXvexWQUNcly3Sm
-	 vk9M9IInqhaqN5Ay9CITlRTS3iPBaXKrnRP6Z7QnJqkBvoNPIEp6j1n7dAI73cNmWjCnH
-	 1HHP4kOPrLGHm3nUeFZe99N+FI2gbKcdFJx5l1/mhmZWbckRzSaVnVfqXR2Xjmzo8Pm+G
-	 VPuHdqZwh4FswXUPalaby4GAr2Mn5nrk7CsnQEi44hJZa1tan7qfbnE5SUkh5Wjfkqw==
+	t=1793934300;
+	b=a2Zhry2I+xa2GRMuCZBU5UOGNtW/hAhZgw+0VounPh5mBNUH4pEF8TNTXUFPKUobi4Vk
+	 Ds5xDbH0FGEcVotEIwk4FGlno211V7saNwrIqguFMel5nVX2vLuMYFSDdxWsJqzuhTxaz
+	 3lqdZifKa4qilGv+NpHrlA9DNRaOMmd3evjdTJcXLHswcr/8W9uvrBVRF68fi9M7xFB/B
+	 PI3JERZC6FYQpUvRu47wtc525Jec2F48zdCRKzp0S6QFR41Qw7PzWbv7cq5IRGLdDTdxO
+	 Y3bKR9YSNqn2X9q6VV6qVtJ7w2RTUBONDbuGwtUB9Xc2AGJ4RhUy6sHwfEt8b9cmrxA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793933722;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793934300;
 	h=Received:DKIM-Signature:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
 	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=Aa623k5GdP97wZxrRXmZq7MSt77L3dovlNQ4YHJGW4U=;
-	b=B08fZS3MU23u0wsOke9VV0dTYTgYUci1ubSdoqAdGhADAcZR9OBn2zFl3nnd1emSZf1F
-	 q3425aVNVxOCNcaQrE0eSttXSK0uFmOWFjTgJ/pZXOIWVHWKy90KsNDinpXmfsOp6Ef7p
-	 h8uNSBwQjfL9ykfLmvYiTMlKCs+PbSxwRe8rKXCCCH4VCoWIBP7czKcSx7EfuSGmLaCKX
-	 fnNXsroCMZJA/FpazM5BAteFN/ZH/mKcqL8TYNl3yr2ZYBODNfCSNo/nEqPWIG0y+VzGt
-	 BeiNyn4fUxEnGCmmnm3zNzN4wlgnC01//VU6l1Xsc2VtJ5NMn8zWjHwjFm7vyzEc2dA==
+	bh=X9VcMBZ8VVLhOdrEYZ2CkBeaw5wjCp2oNi0ObYxlpVs=;
+	b=UW5MU2J4yHmXJU2e3yClya4pEEwpyPOs2OF+0PNIHoKOPSNNEaqj7nNYoSD0G/awDNrM
+	 kgy/eulfE20Rs6fsY1DZ0lBHwRxdDK2gWL6sqc1pD9v2h+iRN8Irvpr6fuxhS9GM2MvXX
+	 HCowzAM1tlZgS7KrCgHthRMjUA9mR1ehjfRmkNCkeEzUc53lSL7IS5Imemmz5zrC4r3ze
+	 RR0XLUvM2/7kP8XqPoYFKehPopCklagF7mC/pg5zaoQ0C0MNXw+TTp8OIZX2lGhvh0pjG
+	 M+V2bHhrU5kmI9gFIG24qyhKFBnxePGO/q0ip7YcdBR7spJMvW1QlzsUiEkGndKWq/A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="c/uZKnzm";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G3z7vBK7;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFD3606A326;
-	Fri,  6 Nov 2026 02:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FDB606A331
+	for <linux-kbuild@vger.kernel.org>; Fri,  6 Nov 2026 03:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c/uZKnzm
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81CFB1F0089F;
-	Fri,  6 Nov 2026 02:55:20 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G3z7vBK7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E4561F008A3;
+	Fri,  6 Nov 2026 03:04:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793933721;
-	bh=Aa623k5GdP97wZxrRXmZq7MSt77L3dovlNQ4YHJGW4U=;
+	s=k20260515; t=1793934299;
+	bh=X9VcMBZ8VVLhOdrEYZ2CkBeaw5wjCp2oNi0ObYxlpVs=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=c/uZKnzmjcGQ/2uu3XIfEZMoV5lSjnpUuul1cGbMOKVY8VJ2da9qlOFG/AbyHcwHa
-	 R48e2QSNVkJCAKxh2UIFUn+JLW01qWE5r6i8z9brApi5F7LeaRFHEdHh1zmRHJCIO2
-	 nzkMlU7Eo/PABvzJlJ0RMG6iSBeMKspvlcG+gAuEmXcps9bgh5t2JFJlxD2cVE8ewc
-	 to/gPsUhiyyjqJ5BO5qptPJTaC0hYX4tNWLIawoNdgsM7dFwYERT6vZ/YUVwH7CStA
-	 CYVAmUfjD7pyOLJ//0a1/5+6hTVn1salitH8TdJsBt6dH6yNQkwcuiOe6u7hWpJTX+
-	 ZxbfXRK8WAohA==
+	b=G3z7vBK7AEUzVhIqGdvqvUZO3x2nOrpdml9hIoziIIfNytKL2+rIabkpsjvOKSse8
+	 uyDUYPKM2K08HOX6QYCF2/TSt/y424wDdclt2wgMAykwGJKCY7cNsey5UoAYZS+Tp4
+	 YNtKsgCarWsyBufRQ0H6i/EKJozKWXEwSnfRf1RbTZ27YBTW4s6+BpGdX7kDchLQbU
+	 dPFJdE7fjZ/1mkVlm5v/XFBWcwqUc7SdngnPKsOtveOLvOYF5ARHz2RgamYQED17Ky
+	 wke2QocRlD2auutr1UR/kdSBc6YpJeqKFxwSzQm4UByxBjISEepIb1mLLJwvOb44HN
+	 b5UsCqIO7EbTQ==
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -50,42 +50,44 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/3] kbuild: don't print DESCEND messages from tools/
- build
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] scripts: checkkconfigsymbols: match complete numeric
+ literals
 From: Nathan Chancellor <nathan@kernel.org>
-To: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261102-kbuild-descend-spam-v1-0-caff4f840cb7@weissschuh.net>
-References: <20261102-kbuild-descend-spam-v1-0-caff4f840cb7@weissschuh.net>
-Date: Thu, 05 Nov 2026 19:55:14 -0700
-Message-Id: <179393371497.309869.7266157906388601191.b4-review@b4>
+To: Hamdy Abou El Anein <info@daylightlinux.ch>
+Cc: nathan@kernel.org, hamdy.aea@protonmail.com, nsc@kernel.org, 
+ linux-kbuild@vger.kernel.org
+In-Reply-To: <20261103164203.129644-1-info@daylightlinux.ch>
+References: <20261103164203.129644-1-info@daylightlinux.ch>
+Date: Thu, 05 Nov 2026 20:04:51 -0700
+Message-Id: <179393429142.309869.2458871384675038461.b4-review@b4>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=708; i=nathan@kernel.org;
- h=from:subject:message-id; bh=33CzRX2B7A2uXa1VDAqJC8APe1NE6dmkDCYCieD0Vj8=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFlvHafkfHp/pS/Pv7Dd4ujqlzXvz4hUTXtYsuLSxiVO1
- 8/M1rGW6ShlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATidvC8Iev8YO4YuP8tzOk
- VhR82aFkqLXMI1c8IyBzWbDCMsmIuFCG/3XTGbNZqxRMKm6eKN6hnnqiP+iNwH/187Kd36Rz1hl
- zsQEA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=872; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=gWEQ/Lw+88yY3MJ4vxU0LXIkOCbs/ciIcHOMGmx+YCQ=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFlvna9HFL5i2buZuSVswvYXL4294sPTdpwX/pfZNutmi
+ MUbtWfPOkpZGMS4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBE6t0YGe5Ob9kfWLfs0n41
+ m97ANu+3J8JkVy+Pmn8n/s+Gola2p28YGdZ+1VvDcGbxRvnlB2L/f1t1cq/38jbZ77yXLcNeO2Q
+ 9XM4HAA==
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-> kbuild itself does not print the directories it descends into, the
-> tools/ build however does so. When kbuild executes the tools/ build
-> these messages are out of place.
+> REGEX_NUMERIC.match() also accepts the numeric prefix of a symbol such
+> as 64BIT_MISSING. The reference is then discarded as a numeric value,
+> so a misspelled digit-prefixed Kconfig symbol is not reported.
 > 
-> Forward kbuild's behavior to the tools/ build:
-> Nothing is printed by default, the full command is printed with V=1.
+> Require the entire token to match the numeric expression.
 > 
-> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-> ---
-> Thomas Weißschuh (3):
->       tools/build: Deduplicate the descend commands
->       kbuild: drop the tools/ target
->       kbuild: don't print DESCEND messages from tools/ build
+> Tested Kconfig dependencies and conditional defaults containing
+> 64BIT_MISSING and 32BIT_MISSING, alongside decimal and hexadecimal
+> literals. The symbols are retained and the literals remain excluded.
+> 
+> AI assistance: ChatGPT/Codex identified the issue and prepared the
+> change, commit message and executable regression tests.
+> 
+> Fixes: 0bd38ae35522 ("scripts/checkkconfigsymbols.py: support default statements")
+> Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 
-Seems reasonable. The Sashiko comment on patch three seems relevant?
+Seems fine.
 
 Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
