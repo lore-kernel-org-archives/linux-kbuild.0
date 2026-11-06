@@ -1,84 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=212.227.15.19
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793971487;
-	b=vAZurQcvBII8SCsrlsRrZu1Xm43jH9EGYUojKgBMAkcvj+lXj3cwmhxhODJATYOkbBrt
-	 XgMpnRSaD9GEiZuMvDbxWuOylaLmJMeI32s7eOySpxa/VHDie7mq7fbOCJqf7SsLVxzQt
-	 K4xwZagjtEWs/YlhgR/fW7ZOxyf2dknVS2MPRFrZZiT6I0dS9uINqFDI0/KLmyJYQ+82Z
-	 JDhp4XguFX3RJtu4e2Z70aHxdSf37aaN4RPWdFDwAMMzn8V7ZrIRovB3/ci7gOoWYK4fw
-	 tS5ko3AcNDxYn5wSUcwTHQv0p50qQbNooMT0TsAiG+32VRSjlZHNQ6xmkV6iKj0o2fQ==
+	t=1793976757;
+	b=yU0xTkkMRLdT5pn+MR40Go65o+qTWA/XHRpOb3aczbwkIiX5p04Yk4zZncjxh/at8UVm
+	 vyq1ueV6EqcrgM5yEKIVreCjcJR8JGDfqrx+IGZhCWBxzHE0fQ6neQSdTkas9umJ+M39i
+	 tujuZgwdTB4c/YxHZXfXCzjUddeM32UjRwcmFCfUOpWOLwsd9QobUaeDw1c/X+3l/6UTi
+	 yZTrtyiOwSklfX3Vd86SEMZhqvPvO34Ff/wh4W+dvRQ8RwEa9YoLdiwuVTrphygyaDaKC
+	 KDyvmUwiGGuU6/2MFR5XRTtl/LR9c9J3N3O6Jns5wsUcbwz39kixeoGnOkeBlltbGWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793971487;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=7Hfqe2JbCmbfs6zq2Y7WbJ1SrK3Ve34AGEPPJlfuNmo=;
-	b=WH9aVTOVgKRK2cyN6zpvUtC0GDpmfwnG6wf9LYU2+wchEoTZlQ/yf0hpXJBypFXXiRWN
-	 2YFwjY1JEGGRHBwuunIsgUY8moQ0tGI76kLn5nwaCrvC1GnBUIt5xjJg7euP5MmA1G5CT
-	 S97IUMc8DvXIYgdvyMouzc3o6QVbnbSml6tN1UvSHy8pDn0qIkdJLh3U1Tja8xVVrdL3w
-	 b7j/YIzXGMypAkvOQKV8arUm6u8lBgvS17N5lRLwge6MCdC5vX0ecwT3fcDv0Isna05NM
-	 B0I288K5y06Q+ixCsWPkOJ2RsO5SKAHoI7t7pXJBw5zMKSGw6LKiAgj8EWazJ1wR1mw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793976757;
+	h=DMARC-Filter:DKIM-Signature:X-UI-Sender-Class:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:Autocrypt:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Provags-ID:X-Spam-Flag:UI-OutboundReport;
+	bh=l9YxZv2Vfzr3V+FeQUpS8Gd+zPlMw1+YkgPLaCOaQTo=;
+	b=JWz/ZdrjIq0MX7j4E4o13YD5jeDSBA3GcxSaqUwYmMcGNRaxcwOHYxmFPiitdWx7RvQP
+	 11sD16VQZQmAsjMyRxichBB59eBfy2I/9JlwDZ84y67kNkGvUx+5GnA9L8tFZ24SLDgnE
+	 RnehlecV7DERR/fnmykQkIL+5SwxFYr+Doh362uuqgcu6ieKIbIGMyUbH4LaxIcn+8hLs
+	 sW6/VpgU0iTEnxKgjhkKGEtifaVreVvEG4Jw2WWJBasDyRXzNTkztGpIWzRDHHLv/mM8K
+	 eOH71p3KzJMcz0rFfyJBq9zuryytndu+M7TdriFyJ2ElWv2C/jlMcHw35+AK0mOyMdA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gAkvLuKe;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=gmx.de;
+	spf=pass smtp.mailfrom=gmx.de;
+	dkim=pass header.d=gmx.de header.i=deller@gmx.de header.a=rsa-sha256 header.s=s31663417 header.b=fw92Y32k;
+	arc=none smtp.remote-ip=212.227.15.19
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24CE606D803;
-	Fri,  6 Nov 2026 13:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0679606A32C;
+	Fri,  6 Nov 2026 14:52:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0679606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gAkvLuKe
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3CAE1F008A7;
-	Fri,  6 Nov 2026 13:24:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793971486;
-	bh=7Hfqe2JbCmbfs6zq2Y7WbJ1SrK3Ve34AGEPPJlfuNmo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=gAkvLuKe6ueUumOXpzV5EvOzXKLO+t8aCPlhB1AeACUxZBQsKUJ5meb100RRacs51
-	 o6FbsimZc2zCgOh9COyckUH6PA5+EnClXjSUruTJ1LGm//CA0ye1f7R8siPDBOjW/+
-	 hGLgyF7lbhPUILyLFUYXzgmO9jNjHVeJ19/KIhSqWNLzR7QmdqadloGTP6KDh+N0JL
-	 2krBFkA4pnPnRdLFuN1tO65g8IK1e1nosmuVYirsFXhjCEh4LYHhUWt/8POCvcU/qY
-	 LCtcD2i6oeDYFGazTrGcGd6oq8UmcfBSngCpACukH1VnuN9YbrZEIlWK5SP8+7xlm1
-	 URgaTjINaJw1w==
-From: Sasha Levin <sashal@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Richard Weinberger <richard@nod.at>,
-	Juergen Gross <jgross@suse.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Sasha Levin <sashal@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	Greg KH <gregkh@linuxfoundation.org>,
-	Petr Mladek <pmladek@suse.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Kees Cook <kees@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thorsten Leemhuis <linux@leemhuis.info>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Helge Deller <deller@gmx.de>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	Zhen Lei <thunder.leizhen@huawei.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v11 3/4] kallsyms: delta-compress lineinfo tables for ~2.7x size reduction
-Date: Fri,  6 Nov 2026 08:24:31 -0500
-Message-ID: <20261106132432.248387-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261106132432.248387-1-sashal@kernel.org>
-References: <20261106132432.248387-1-sashal@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=gmx.de header.i=deller@gmx.de header.a=rsa-sha256 header.s=s31663417 header.b=fw92Y32k
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1793976740; x=1794581540; i=deller@gmx.de;
+	bh=l9YxZv2Vfzr3V+FeQUpS8Gd+zPlMw1+YkgPLaCOaQTo=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=fw92Y32km0pxBcKevSxUCpdTcs+QRMbePffyJ04IxrDf6TMf4Ru+FfSah5OJM4BG
+	 AkXEACGWqEl5+xFdryNHb7BGYS8OLz6qHV9PgmVT3+88wH2AXBxdbCnuOgNdQbDAH
+	 1epuniCFsg93sNlpzpCVXKI5m4BBfuDDvytgb08PUfNJYx9gdEfEn64eAZlcLht6v
+	 d1Vv0bLI2FdfGJo6JLItAgqpyKLmMT+CXGAfkpS51+JVfkWCB7i+O8bTNMl7hgARl
+	 /4zbdg0YNKj/M2sQZTTD4+Ztkgvf/IU8vYtpSd4XS4C/r+gyRvlGo5zV5QDAosenV
+	 H37S4AqcGdP2LlRKGQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MfYPi-1wsDPg18AK-00k1dU; Fri, 06
+ Nov 2026 15:52:20 +0100
+Message-ID: <3aad6baa-c5e7-49a6-939f-b95b062b6be6@gmx.de>
+Date: Fri, 6 Nov 2026 15:52:12 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -88,1020 +63,333 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 1/4] kallsyms: embed source file:line info in kernel
+ stack traces
+To: Sasha Levin <sashal@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Masahiro Yamada <masahiroy@kernel.org>,
+ Luis Chamberlain <mcgrof@kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Richard Weinberger <richard@nod.at>, Juergen Gross <jgross@suse.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nsc@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,
+ Daniel Gomez <da.gomez@kernel.org>, Aaron Tomlin <atomlin@atomlin.com>,
+ Greg KH <gregkh@linuxfoundation.org>, Petr Mladek <pmladek@suse.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Kees Cook <kees@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>,
+ Thorsten Leemhuis <linux@leemhuis.info>, Vlastimil Babka
+ <vbabka@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ Vivian Wang <wangruikang@iscas.ac.cn>, Zhen Lei
+ <thunder.leizhen@huawei.com>, Sami Tolvanen <samitolvanen@google.com>,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ linux-modules@vger.kernel.org, linux-doc@vger.kernel.org
+References: <20261106132432.248387-1-sashal@kernel.org>
+ <20261106132432.248387-2-sashal@kernel.org>
+Content-Language: en-US
+From: Helge Deller <deller@gmx.de>
+Autocrypt: addr=deller@gmx.de; keydata=
+ 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
+In-Reply-To: <20261106132432.248387-2-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:y7KehjYUehCyt9VUljgwl4RPAr2sMOy4ys0LLqQlvddRqOnXogH
+ IFNDAoYMu4HPuMeGnzzYvHk2PgmxqJMU21lWMVVdNhLK0CZDzXKtaOOsEk+RWyvqDYTV5O4
+ zoTlBoIBaXCRVxidbE69+iHnpJkut2Nsb8nDuTURlTl1c8o4UNyNSqZSx1Ww1HyYlnM5Qa4
+ 20JbQrTU23XE5Uj5rl0mQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:SnUgHtR6Cy8=;w4Wk8EasSrd7nW23W6dm/0ED+d7
+ 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
 
-Replace the flat uncompressed parallel arrays (lineinfo_addrs[],
-lineinfo_file_ids[], lineinfo_lines[]) with a block-indexed,
-delta-encoded, ULEB128 varint compressed format.
+On 11/6/26 14:24, Sasha Levin wrote:
+> Add CONFIG_KALLSYMS_LINEINFO, which embeds a compact address-to-line
+> lookup table in the kernel image so stack traces directly print source
+> file and line number information:
+>=20
+>    root@localhost:~# echo c > /proc/sysrq-trigger
+>    [   11.201987] sysrq: Trigger a crash
+>    [   11.202831] Kernel panic - not syncing: sysrq triggered crash
+>    [   11.206218] Call Trace:
+>    [   11.206501]  <TASK>
+>    [   11.206749]  dump_stack_lvl+0x5d/0x80 (lib/dump_stack.c:94)
+>    [   11.207403]  vpanic+0x36e/0x620 (kernel/panic.c:650)
+>    [   11.208565]  ? __lock_acquire+0x465/0x2240 (kernel/locking/lockdep=
+.c:4674)
+>    [   11.209324]  panic+0xc9/0xd0 (kernel/panic.c:787)
+>    [   11.211873]  ? find_held_lock+0x2b/0x80 (kernel/locking/lockdep.c:=
+5350)
+>    [   11.212597]  ? lock_release+0xd3/0x300 (kernel/locking/lockdep.c:5=
+535)
+>    [   11.213312]  sysrq_handle_crash+0x1a/0x20 (drivers/tty/sysrq.c:154=
+)
+>    [   11.214005]  __handle_sysrq.cold+0x66/0x256 (drivers/tty/sysrq.c:6=
+11)
+>    [   11.214712]  write_sysrq_trigger+0x65/0x80 (drivers/tty/sysrq.c:12=
+21)
+>    [   11.215424]  proc_reg_write+0x1bd/0x3c0 (fs/proc/inode.c:330)
+>    [   11.216061]  vfs_write+0x1c6/0xff0 (fs/read_write.c:686)
+>    [   11.218848]  ksys_write+0xfa/0x200 (fs/read_write.c:740)
+>    [   11.222394]  do_syscall_64+0xf3/0x690 (arch/x86/entry/syscall_64.c=
+:63)
+>    [   11.223942]  entry_SYSCALL_64_after_hwframe+0x77/0x7f (arch/x86/en=
+try/entry_64.S:121)
+>=20
+> At build time, a new host tool (scripts/gen_lineinfo) reads DWARF
+> .debug_line from vmlinux using libdw (elfutils), extracts all
+> address-to-file:line mappings, and generates an assembly file with
+> sorted parallel arrays (offsets from _text, file IDs, and line
+> numbers). These are linked into vmlinux as .rodata.
+>=20
+> At runtime, kallsyms_lookup_lineinfo() does a binary search on the
+> table and __sprint_symbol() appends "(file:line)" to each stack frame.
+> The lookup uses offsets from _text so it works with KASLR, requires no
+> locks or allocations, and is safe in any context including panic.
+>=20
+> The suffix is appended for every symbol variant that already prints an
+> offset, so %pS, %pSb and the %pB backtrace forms all carry it: arm64
+> prints frames with %pSb and the generic stack_trace_print() uses %pS.
+> sprint_symbol_no_offset(), which backs lowercase %ps, stays bare
+> because callers suffix it with a literal "()".
+>=20
+> A line program emits several rows per address, and every row but the
+> last covers zero bytes, so the generator keeps the last row at each
+> address.  That is the row addr2line reports, and for an inlined call it
+> names the inlined body rather than the call site.
+>=20
+> Rows the compiler marks with line 0 declare that no source location
+> applies from there on (DWARF5 6.2.2), and the end of a line program's
+> sequence says the same of the bytes past it.  Both are kept, as entries
+> whose line is zero that the lookup reads as "no annotation", so an
+> address the compiler deliberately left unattributed reports nothing
+> instead of inheriting the line above it.
+>=20
+> The feature requires CONFIG_DEBUG_INFO (for DWARF data) and libelf
+> and libdw (from elfutils) on the build host.
+>=20
+> Memory footprint, measured with:
+>=20
+>    make ARCH=3Dx86_64 O=3D$B defconfig
+>    ./scripts/config --file $B/.config -e DEBUG_INFO \
+>                                       -e DEBUG_INFO_DWARF_TOOLCHAIN_DEFA=
+ULT
+>    make ARCH=3Dx86_64 O=3D$B olddefconfig && make ARCH=3Dx86_64 O=3D$B -=
+j$(nproc)
+>    strip -g $B/vmlinux -o vmlinux.nodbg && stat -c %s vmlinux.nodbg
+>=20
+>    Table: 1,657,663 entries from 4,234 source files
+>      lineinfo_addrs[]     1,657,663 x u32  =3D  6.3 MiB
+>      lineinfo_file_ids[]  1,657,663 x u16  =3D  3.2 MiB
+>      lineinfo_lines[]     1,657,663 x u32  =3D  6.3 MiB
+>      file_offsets + filenames              =3D  0.1 MiB
+>      Total .rodata increase:               =3D 15.9 MiB
+>=20
+>    vmlinux (stripped):  52.2 MiB -> 68.2 MiB  (+16.0 MiB / +30.6%)
+>=20
+> That is the cost of the uncompressed format introduced here; the delta
+> compression added later in this series brings it down to +8.0 MiB
+> (+15.3%) on the same config.
+>=20
+> Suggested-by: Petr Pavlu <petr.pavlu@suse.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-The sorted address array has small deltas between consecutive entries
-(typically 1-50 bytes), file IDs have high locality (delta often 0,
-same file), and line numbers change slowly.  Delta-encoding followed
-by ULEB128 varint compression shrinks most values from 4 bytes to 1.
 
-Entries are grouped into blocks of 64.  A small uncompressed block
-index (first addr + byte offset per block) enables O(log(N/64)) binary
-search, followed by sequential decode of at most 64 entries within the
-matching block.  All decode state lives on the stack -- zero
-allocations, still safe for NMI/panic context.
+Tested-by: Helge Deller <deller@gmx.de>   # parisc
+Acked-by: Helge Deller <deller@gmx.de>
 
-Measured on x86_64_defconfig + CONFIG_DEBUG_INFO (same recipe as patch
-1/4; 1,657,997 entries, 4,235 source files, 25,907 blocks):
+Example:
 
-  Before (flat arrays):
-    lineinfo_addrs[]     6,631,988 bytes (u32 x 1.66M)
-    lineinfo_file_ids[]  3,315,994 bytes (u16 x 1.66M)
-    lineinfo_lines[]     6,631,988 bytes (u32 x 1.66M)
-    Total:              16,579,970 bytes (15.8 MiB, 10.00 bytes/entry)
+root@62:/# echo c > /proc/sysrq-trigger
+[   95.740284] sysrq: Trigger a crash
+[   95.745518] Kernel panic - not syncing: sysrq triggered crash
+[   95.746724] CPU: 1 UID: 0 PID: 1 Comm: bash Not tainted 7.4.0-rc1+ #326=
+3 VOLUNTARY
+[   95.746724] Hardware name: 9000/778/B160L
+[   95.746724] Backtrace:
+[   95.746724]  [<1041d778>] show_stack+0x54/0x78 (arch/parisc/kernel/trap=
+s.c:212)
+[   95.746724]  [<10413404>] dump_stack_lvl+0x80/0xc8 (lib/dump_stack.c:12=
+2)
+[   95.746724]  [<10413468>] dump_stack+0x1c/0x2c (lib/dump_stack.c:130)
+[   95.746724]  [<10401288>] vpanic+0x14c/0x340 (kernel/panic.c:561)
+[   95.746724]  [<104014b0>] panic+0x34/0x48 (kernel/panic.c:787)
+[   95.746724]  [<10e6cbcc>] sysrq_handle_crash+0x20/0x34 (drivers/tty/sys=
+rq.c:154)
+[   95.746724]  [<10e6d734>] __handle_sysrq+0xb4/0x1d8 (drivers/tty/sysrq.=
+c:635)
+[   95.746724]  [<10e6e1b4>] write_sysrq_trigger+0x90/0xe0 (drivers/tty/sy=
+srq.c:1220)
+[   95.746724]  [<10977d88>] proc_reg_write+0xd4/0x120 (fs/proc/inode.c:34=
+3)
+[   95.746724]  [<1088c9cc>] vfs_write+0xbc/0x468 (fs/read_write.c:690)
+[   95.746724]  [<1088cf5c>] ksys_write+0x7c/0x12c (fs/read_write.c:740)
+[   95.746724]  [<1088d028>] sys_write+0x1c/0x3c (fs/read_write.c:747)
+[   95.746724]  [<10418334>] syscall_exit+0x0/0x10 (arch/parisc/kernel/ent=
+ry.S:1722)
+[   95.746724]
+[   95.746724] ---[ end Kernel panic - not syncing: sysrq triggered crash =
+]---
 
-  After (block-indexed delta + ULEB128):
-    lineinfo_block_addrs[]    103,628 bytes (101 KiB)
-    lineinfo_block_offsets[]  103,628 bytes (101 KiB)
-    lineinfo_data[]         6,070,158 bytes (5.8 MiB)
-    Total:                  6,277,414 bytes (6.0 MiB, 3.79 bytes/entry)
-
-  Savings: 9.8 MiB (2.64x reduction)
-
-file_offsets[] and filenames[] are unchanged by this patch and are
-excluded from both totals above.
-
-Whole-image effect, measured the same way as patch 1/4:
-
-  vmlinux (stripped), no lineinfo:      52.2 MiB
-  vmlinux (stripped), before this fix:  68.2 MiB  (+16.0 MiB / +30.6%)
-  vmlinux (stripped), after this fix:   60.2 MiB  ( +8.0 MiB / +15.3%)
-
-Booted in QEMU and verified with SysRq-l that annotations still work:
-
-  default_idle+0x9/0x10 (arch/x86/kernel/process.c:768)
-  default_idle_call+0x6e/0xb0 (kernel/sched/idle.c:122)
-  do_idle+0x38f/0x660 (kernel/sched/idle.c:199)
-  cpu_startup_entry+0x4e/0x60 (kernel/sched/idle.c:453)
-  rest_init+0x277/0x280 (init/main.c:732)
-
-Suggested-by: Juergen Gross <jgross@suse.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- .../admin-guide/kallsyms-lineinfo.rst         |   6 +-
- include/linux/mod_lineinfo.h                  | 265 +++++++++++++++---
- init/Kconfig                                  |   8 +-
- kernel/kallsyms.c                             |  60 ++--
- kernel/kallsyms_internal.h                    |   8 +-
- kernel/module/kallsyms.c                      | 127 ++++-----
- scripts/empty_lineinfo.S                      |  20 +-
- scripts/gen_lineinfo.c                        | 185 ++++++++----
- 8 files changed, 459 insertions(+), 220 deletions(-)
-
-diff --git a/Documentation/admin-guide/kallsyms-lineinfo.rst b/Documentation/admin-guide/kallsyms-lineinfo.rst
-index 9b91adcf82ea3..0fc84a361b14e 100644
---- a/Documentation/admin-guide/kallsyms-lineinfo.rst
-+++ b/Documentation/admin-guide/kallsyms-lineinfo.rst
-@@ -78,10 +78,10 @@ Memory Overhead
- 
- The vmlinux lineinfo tables are stored in ``.rodata``.  On an x86_64
- ``defconfig`` with ``CONFIG_DEBUG_INFO`` they hold 1.66 million entries and
--grow the stripped image by 16 MiB, about 10 bytes per entry after
--deduplication.
-+grow the stripped image by 8 MiB, about 3.8 bytes per entry after delta
-+compression.
- 
--Per-module lineinfo adds about 10 bytes per entry to each ``.ko`` file, plus
-+Per-module lineinfo adds about 4 bytes per entry to each ``.ko`` file, plus
- a small fixed cost per covered section.
- 
- Known Limitations
-diff --git a/include/linux/mod_lineinfo.h b/include/linux/mod_lineinfo.h
-index cb0c7af7b3171..2ede8448e4eed 100644
---- a/include/linux/mod_lineinfo.h
-+++ b/include/linux/mod_lineinfo.h
-@@ -3,9 +3,9 @@
-  * mod_lineinfo.h - Binary format for per-module source line information
-  *
-  * This header defines the layout of the .mod_lineinfo and
-- * .init.mod_lineinfo sections embedded in loadable kernel modules.  It
-- * is dual-use: included from both the kernel and the userspace
-- * gen_lineinfo tool.
-+ * .init.mod_lineinfo sections embedded in loadable kernel modules.  It is
-+ * dual-use: included from both the kernel and the userspace gen_lineinfo
-+ * tool.
-  *
-  * Top-level layout (all values in target-native endianness):
-  *
-@@ -20,16 +20,27 @@
-  * If the relocation fails to resolve (e.g. unknown reloc type), .anchor
-  * stays zero and lookups silently degrade to "no annotation".
-  *
-- * Each per-section sub-table is laid out as a stand-alone
-- * mod_lineinfo_header followed by parallel arrays:
-+ * Each per-section sub-table is laid out exactly as a stand-alone
-+ * mod_lineinfo_header followed by its arrays:
-  *
-- *   struct mod_lineinfo_header     (16 bytes)
-- *   u32 addrs[num_entries]         -- offsets from this section's base, sorted
-- *   u16 file_ids[num_entries]      -- parallel to addrs
-- *   <2-byte pad if num_entries is odd>
-- *   u32 lines[num_entries]         -- parallel to addrs
-+ *   struct mod_lineinfo_header
-+ *   u32 block_addrs[num_blocks]    -- first addr per block, for binary search
-+ *   u32 block_offsets[num_blocks]  -- byte offset into compressed data stream
-+ *   u8  data[data_size]            -- LEB128 delta-compressed entries
-  *   u32 file_offsets[num_files]    -- byte offset into filenames[]
-  *   char filenames[filenames_size] -- concatenated NUL-terminated strings
-+ *
-+ * Each sub-array is located by an explicit (offset, size) pair in the
-+ * header, similar to a flattened devicetree.  All offsets in the per-section
-+ * header are relative to that header itself, so a sub-table is fully
-+ * self-describing.
-+ *
-+ * Compressed stream format (per block of LINEINFO_BLOCK_ENTRIES entries):
-+ *   Entry 0: file_id (ULEB128), line (ULEB128)
-+ *            addr is in block_addrs[]
-+ *   Entry 1..N: addr_delta (ULEB128),
-+ *               file_id_delta (SLEB128),
-+ *               line_delta (SLEB128)
-  */
- #ifndef _LINUX_MOD_LINEINFO_H
- #define _LINUX_MOD_LINEINFO_H
-@@ -44,6 +55,7 @@
- #include <stdint.h>
- typedef uint32_t u32;
- typedef uint16_t u16;
-+typedef uint8_t  u8;
- typedef uint64_t u64;
- #ifndef __aligned
- #define __aligned(x)	__attribute__((__aligned__(x)))
-@@ -53,6 +65,8 @@ typedef uint64_t u64;
- #endif
- #endif
- 
-+#define LINEINFO_BLOCK_ENTRIES 64
-+
- /*
-  * Per-section descriptor.  One entry per ELF text section covered by the
-  * blob (.text, .exit.text, .init.text, ...).
-@@ -84,47 +98,224 @@ static_assert(sizeof(struct mod_lineinfo_section) == 16,
- 
- struct mod_lineinfo_header {
- 	u32 num_entries;
-+	u32 num_blocks;
- 	u32 num_files;
--	u32 filenames_size;	/* total bytes of concatenated filenames */
-+	u32 blocks_offset;	/* offset to block_addrs[] from this header */
-+	u32 blocks_size;	/* bytes: num_blocks * 2 * sizeof(u32) */
-+	u32 data_offset;	/* offset to compressed stream */
-+	u32 data_size;		/* bytes of compressed data */
-+	u32 files_offset;	/* offset to file_offsets[] */
-+	u32 files_size;		/* bytes: num_files * sizeof(u32) */
-+	u32 filenames_offset;
-+	u32 filenames_size;
- };
- 
--/* Offset helpers: compute byte offset from the per-section header to each array. */
--
--static inline u32 mod_lineinfo_addrs_off(void)
--{
--	return sizeof(struct mod_lineinfo_header);
--}
-+/*
-+ * Descriptor for a lineinfo table, used by the shared lookup function.
-+ * Callers populate this from either linker globals (vmlinux) or a
-+ * validated mod_lineinfo_header (modules).
-+ */
-+struct lineinfo_table {
-+	const u32 *blk_addrs;
-+	const u32 *blk_offsets;
-+	const u8  *data;
-+	u32 data_size;
-+	const u32 *file_offsets;
-+	const char *filenames;
-+	u32 num_entries;
-+	u32 num_blocks;
-+	u32 num_files;
-+	u32 filenames_size;
-+};
- 
- /*
-- * The counts come from an on-disk blob and are only validated against the
-- * blob size once the full layout has been summed, so every step widens to
-- * u64: at 10 bytes per entry the u32 sums wrap for counts a caller can
-- * name, which would let a malformed blob pass a bounds check computed from
-- * the wrapped value.
-+ * Read a ULEB128 varint from a byte stream.
-+ * Returns the decoded value and advances *pos past the encoded bytes.
-+ * Never reads at or beyond 'end': a value that 'end' cuts short yields
-+ * the bits read so far, and one wider than 32 bits is truncated, so
-+ * malformed data decodes to a wrong value rather than faulting (safe for
-+ * NMI/panic context).
-  */
--static inline u64 mod_lineinfo_file_ids_off(u32 num_entries)
-+static inline u32 lineinfo_read_uleb128(const u8 *data, u32 *pos, u32 end)
- {
--	return mod_lineinfo_addrs_off() + (u64)num_entries * sizeof(u32);
--}
-+	u32 result = 0;
-+	unsigned int shift = 0;
- 
--static inline u64 mod_lineinfo_lines_off(u32 num_entries)
--{
--	/* u16 file_ids[] may need 2-byte padding to align lines[] to 4 bytes */
--	u64 off = mod_lineinfo_file_ids_off(num_entries) +
--		  (u64)num_entries * sizeof(u16);
--	return (off + 3) & ~3ULL;
-+	while (*pos < end) {
-+		u8 byte = data[*pos];
-+		(*pos)++;
-+		result |= (u32)(byte & 0x7f) << shift;
-+		if (!(byte & 0x80))
-+			return result;
-+		shift += 7;
-+		if (shift >= 32) {
-+			/* Malformed: skip remaining continuation bytes */
-+			while (*pos < end && (data[*pos] & 0x80))
-+				(*pos)++;
-+			if (*pos < end)
-+				(*pos)++;
-+			return result;
-+		}
-+	}
-+	return result;
- }
- 
--static inline u64 mod_lineinfo_file_offsets_off(u32 num_entries)
-+/* Read an SLEB128 varint. Same safety guarantees as above. */
-+static inline int32_t lineinfo_read_sleb128(const u8 *data, u32 *pos, u32 end)
- {
--	return mod_lineinfo_lines_off(num_entries) +
--	       (u64)num_entries * sizeof(u32);
-+	int32_t result = 0;
-+	unsigned int shift = 0;
-+	u8 byte = 0;
-+
-+	while (*pos < end) {
-+		byte = data[*pos];
-+		(*pos)++;
-+		result |= (int32_t)((u32)(byte & 0x7f) << shift);
-+		shift += 7;
-+		if (!(byte & 0x80))
-+			break;
-+		if (shift >= 32) {
-+			while (*pos < end && (data[*pos] & 0x80))
-+				(*pos)++;
-+			if (*pos < end)
-+				(*pos)++;
-+			return result;
-+		}
-+	}
-+
-+	/* Sign-extend if the high bit of the last byte was set */
-+	if (shift < 32 && (byte & 0x40))
-+		result |= -(1 << shift);
-+
-+	return result;
- }
- 
--static inline u64 mod_lineinfo_filenames_off(u32 num_entries, u32 num_files)
-+/*
-+ * Search a lineinfo table for the source file and line corresponding to a
-+ * given offset (from _text for vmlinux, from the covered section's base for
-+ * modules).  @min_offset is the containing symbol's start in the same offset
-+ * space: entries below it belong to a preceding symbol and are rejected.
-+ *
-+ * Safe for NMI and panic context: no locks, no allocations, all state on stack.
-+ * Returns true and sets @file and @line on success; false on any failure.
-+ */
-+static inline bool lineinfo_search(const struct lineinfo_table *tbl,
-+				   unsigned int offset,
-+				   unsigned int min_offset,
-+				   const char **file, unsigned int *line)
- {
--	return mod_lineinfo_file_offsets_off(num_entries) +
--	       (u64)num_files * sizeof(u32);
-+	unsigned int low, high, mid, block;
-+	unsigned int cur_addr, cur_file_id, cur_line;
-+	unsigned int best_addr = 0, best_file_id = 0, best_line = 0;
-+	unsigned int block_entries, data_end;
-+	bool found = false;
-+	u32 pos;
-+
-+	if (!tbl->num_entries || !tbl->num_blocks)
-+		return false;
-+
-+	/* Binary search on blk_addrs[] to find the right block */
-+	low = 0;
-+	high = tbl->num_blocks;
-+	while (low < high) {
-+		mid = low + (high - low) / 2;
-+		if (tbl->blk_addrs[mid] <= offset)
-+			low = mid + 1;
-+		else
-+			high = mid;
-+	}
-+
-+	if (low == 0)
-+		return false;
-+	block = low - 1;
-+
-+	/* How many entries in this block? */
-+	block_entries = LINEINFO_BLOCK_ENTRIES;
-+	if (block == tbl->num_blocks - 1) {
-+		unsigned int remaining = tbl->num_entries -
-+					block * LINEINFO_BLOCK_ENTRIES;
-+
-+		if (remaining < block_entries)
-+			block_entries = remaining;
-+	}
-+
-+	/* Determine end of this block's data in the compressed stream */
-+	if (block + 1 < tbl->num_blocks)
-+		data_end = tbl->blk_offsets[block + 1];
-+	else
-+		data_end = tbl->data_size;
-+
-+	/* Clamp data_end to actual data size */
-+	if (data_end > tbl->data_size)
-+		data_end = tbl->data_size;
-+
-+	/* Decode entry 0: addr from blk_addrs, file_id and line from stream */
-+	pos = tbl->blk_offsets[block];
-+	if (pos >= data_end)
-+		return false;
-+
-+	cur_addr = tbl->blk_addrs[block];
-+	cur_file_id = lineinfo_read_uleb128(tbl->data, &pos, data_end);
-+	cur_line = lineinfo_read_uleb128(tbl->data, &pos, data_end);
-+
-+	/* Check entry 0 */
-+	if (cur_addr <= offset) {
-+		best_addr = cur_addr;
-+		best_file_id = cur_file_id;
-+		best_line = cur_line;
-+		found = true;
-+	}
-+
-+	/* Decode entries 1..N */
-+	for (unsigned int i = 1; i < block_entries; i++) {
-+		unsigned int addr_delta;
-+		int32_t file_delta, line_delta;
-+
-+		addr_delta = lineinfo_read_uleb128(tbl->data, &pos, data_end);
-+		file_delta = lineinfo_read_sleb128(tbl->data, &pos, data_end);
-+		line_delta = lineinfo_read_sleb128(tbl->data, &pos, data_end);
-+
-+		cur_addr += addr_delta;
-+		cur_file_id = (unsigned int)((int32_t)cur_file_id + file_delta);
-+		cur_line = (unsigned int)((int32_t)cur_line + line_delta);
-+
-+		if (cur_addr > offset)
-+			break;
-+
-+		best_addr = cur_addr;
-+		best_file_id = cur_file_id;
-+		best_line = cur_line;
-+		found = true;
-+	}
-+
-+	if (!found)
-+		return false;
-+
-+	/*
-+	 * The best entry is the closest one at or below @offset; reject it
-+	 * if it lies below the resolved symbol's start, so a symbol without
-+	 * line entries of its own does not inherit the preceding symbol's
-+	 * annotation.
-+	 */
-+	if (best_addr < min_offset)
-+		return false;
-+
-+	/*
-+	 * A zero line is the generator's "no source location applies here"
-+	 * marker, taken straight from a DWARF line-0 row.
-+	 */
-+	if (!best_line)
-+		return false;
-+
-+	if (best_file_id >= tbl->num_files)
-+		return false;
-+
-+	if (tbl->file_offsets[best_file_id] >= tbl->filenames_size)
-+		return false;
-+
-+	*file = &tbl->filenames[tbl->file_offsets[best_file_id]];
-+	*line = best_line;
-+	return true;
- }
- 
- #endif /* _LINUX_MOD_LINEINFO_H */
-diff --git a/init/Kconfig b/init/Kconfig
-index 2a5a584b9e369..d5839a51442d1 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1954,8 +1954,9 @@ config KALLSYMS_LINEINFO
- 	    anon_vma_clone+0x2ed/0xcf0 (mm/rmap.c:412)
- 
- 	  This requires libelf and libdw (from elfutils) on the build host.
--	  Costs 10 bytes per DWARF line-table entry; for x86_64_defconfig
--	  with CONFIG_DEBUG_INFO that is about 16MB.
-+	  Costs about 3.8 bytes per DWARF line-table entry after delta
-+	  compression; for x86_64_defconfig with CONFIG_DEBUG_INFO that is
-+	  about 8MB.
- 
- 	  If unsure, say N.
- 
-@@ -1968,7 +1969,8 @@ config KALLSYMS_LINEINFO_MODULES
- 	  so stack traces from module code include (file.c:123) annotations.
- 
- 	  This requires libelf and libdw (from elfutils) on the build host.
--	  Costs 10 bytes per DWARF line entry in each .ko.
-+	  Costs about 3.8 bytes per DWARF line entry in each .ko after
-+	  delta compression.
- 
- 	  If unsure, say N.
- 
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index 77543ac216a92..395297e27af53 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -467,13 +467,17 @@ static int append_buildid(char *buffer,   const char *modname,
- 
- #endif /* CONFIG_STACKTRACE_BUILD_ID */
- 
-+#include <linux/mod_lineinfo.h>
-+
- bool kallsyms_lookup_lineinfo(unsigned long addr, unsigned long sym_start,
- 			      const char **file, unsigned int *line)
- {
- 	unsigned long raw_offset, raw_min;
--	unsigned int offset, min_offset = 0, low, high, mid, file_id;
-+	unsigned int offset, min_offset = 0;
-+	struct lineinfo_table tbl;
- 
--	if (!IS_ENABLED(CONFIG_KALLSYMS_LINEINFO) || !lineinfo_num_entries)
-+	if (!IS_ENABLED(CONFIG_KALLSYMS_LINEINFO) ||
-+	    !lineinfo_num_entries || !lineinfo_num_blocks)
- 		return false;
- 
- 	/* Compute offset from _text */
-@@ -491,8 +495,8 @@ bool kallsyms_lookup_lineinfo(unsigned long addr, unsigned long sym_start,
- 		return false;
- 
- 	/*
--	 * The search below returns the closest entry at or below @offset, so
--	 * a symbol without line entries of its own (assembly without debug
-+	 * The search returns the closest entry at or below the offset, so a
-+	 * symbol without line entries of its own (assembly without debug
- 	 * info, or anything past the _etext cap like .init.text) would
- 	 * inherit the last entry of whatever precedes it.  Bound the result
- 	 * to entries at or above the resolved symbol's start.
-@@ -504,42 +508,18 @@ bool kallsyms_lookup_lineinfo(unsigned long addr, unsigned long sym_start,
- 			min_offset = raw_min;
- 	}
- 
--	/* Binary search for largest entry <= offset */
--	low = 0;
--	high = lineinfo_num_entries;
--	while (low < high) {
--		mid = low + (high - low) / 2;
--		if (lineinfo_addrs[mid] <= offset)
--			low = mid + 1;
--		else
--			high = mid;
--	}
--
--	if (low == 0)
--		return false;
--	low--;
--
--	if (lineinfo_addrs[low] < min_offset)
--		return false;
--
--	/*
--	 * A zero line is the generator's "no source location applies here"
--	 * marker, taken straight from a DWARF line-0 row.
--	 */
--	if (!lineinfo_lines[low])
--		return false;
--
--	file_id = lineinfo_file_ids[low];
--	*line = lineinfo_lines[low];
--
--	if (file_id >= lineinfo_num_files)
--		return false;
--
--	if (lineinfo_file_offsets[file_id] >= lineinfo_filenames_size)
--		return false;
--
--	*file = &lineinfo_filenames[lineinfo_file_offsets[file_id]];
--	return true;
-+	tbl.blk_addrs	= lineinfo_block_addrs;
-+	tbl.blk_offsets	= lineinfo_block_offsets;
-+	tbl.data	= lineinfo_data;
-+	tbl.data_size	= lineinfo_data_size;
-+	tbl.file_offsets = lineinfo_file_offsets;
-+	tbl.filenames	= lineinfo_filenames;
-+	tbl.num_entries	= lineinfo_num_entries;
-+	tbl.num_blocks	= lineinfo_num_blocks;
-+	tbl.num_files	= lineinfo_num_files;
-+	tbl.filenames_size = lineinfo_filenames_size;
-+
-+	return lineinfo_search(&tbl, offset, min_offset, file, line);
- }
- 
- /* Look up a kernel symbol and return it in a text buffer. */
-diff --git a/kernel/kallsyms_internal.h b/kernel/kallsyms_internal.h
-index d7374ce444d81..ffe4c658067ec 100644
---- a/kernel/kallsyms_internal.h
-+++ b/kernel/kallsyms_internal.h
-@@ -16,10 +16,12 @@ extern const unsigned int kallsyms_markers[];
- extern const u8 kallsyms_seqs_of_names[];
- 
- extern const u32 lineinfo_num_entries;
--extern const u32 lineinfo_addrs[];
--extern const u16 lineinfo_file_ids[];
--extern const u32 lineinfo_lines[];
- extern const u32 lineinfo_num_files;
-+extern const u32 lineinfo_num_blocks;
-+extern const u32 lineinfo_block_addrs[];
-+extern const u32 lineinfo_block_offsets[];
-+extern const u32 lineinfo_data_size;
-+extern const u8  lineinfo_data[];
- extern const u32 lineinfo_file_offsets[];
- extern const u32 lineinfo_filenames_size;
- extern const char lineinfo_filenames[];
-diff --git a/kernel/module/kallsyms.c b/kernel/module/kallsyms.c
-index a4eaf28fffe75..e1fd042a42d49 100644
---- a/kernel/module/kallsyms.c
-+++ b/kernel/module/kallsyms.c
-@@ -509,9 +509,9 @@ int module_kallsyms_on_each_symbol(const char *modname,
- #include <linux/mod_lineinfo.h>
- 
- /*
-- * Search one per-section sub-table for @section_offset using flat parallel
-- * arrays.  @hdr is the per-section header at byte offset @hdr_offset within
-- * @blob.  Returns true on hit and populates @file / @line.
-+ * Search one per-section sub-table for @section_offset.
-+ * @hdr is the per-section header at byte offset @hdr_offset within @blob.
-+ * Returns true on hit and populates @file / @line.
-  */
- static bool module_lookup_lineinfo_section(const void *blob, u32 blob_size,
- 					   u32 hdr_offset,
-@@ -521,13 +521,8 @@ static bool module_lookup_lineinfo_section(const void *blob, u32 blob_size,
- 					   unsigned int *line)
- {
- 	const struct mod_lineinfo_header *hdr;
--	const u8 *base;
--	const u32 *addrs, *lines, *file_offsets;
--	const u16 *file_ids;
--	const char *filenames;
--	u32 num_entries, num_files, filenames_size;
--	unsigned int low, high, mid;
--	u16 file_id;
-+	struct lineinfo_table tbl;
-+	const void *base;
- 
- 	if (hdr_offset > blob_size ||
- 	    blob_size - hdr_offset < sizeof(*hdr))
-@@ -543,84 +538,72 @@ static bool module_lookup_lineinfo_section(const void *blob, u32 blob_size,
- 		return false;
- 
- 	base = (const u8 *)blob + hdr_offset;
--	hdr = (const struct mod_lineinfo_header *)base;
--	num_entries = hdr->num_entries;
--	num_files = hdr->num_files;
--	filenames_size = hdr->filenames_size;
-+	hdr = base;
- 
--	if (num_entries == 0)
-+	if (hdr->num_entries == 0 || hdr->num_blocks == 0)
- 		return false;
- 
--	/*
--	 * Check the whole layout against the blob in one go.  The offset
--	 * helpers sum in u64 precisely because a malformed blob can name
--	 * counts whose u32 sum wraps: at 10 bytes per entry across addrs[],
--	 * file_ids[] and lines[], num_entries = 0x33333334 wraps to a small
--	 * value that any bounds check would happily accept.
--	 */
-+	/* Validate each sub-array fits within the remaining blob bytes */
- 	{
- 		u32 avail = blob_size - hdr_offset;
--		u64 needed = mod_lineinfo_filenames_off(num_entries, num_files);
- 
--		if (needed > avail || filenames_size > avail - needed)
-+		if (hdr->blocks_offset > avail ||
-+		    hdr->blocks_size > avail - hdr->blocks_offset)
-+			return false;
-+		if (hdr->data_offset > avail ||
-+		    hdr->data_size > avail - hdr->data_offset)
-+			return false;
-+		if (hdr->files_offset > avail ||
-+		    hdr->files_size > avail - hdr->files_offset)
- 			return false;
--	}
--
--	/*
--	 * Filenames are read as NUL-terminated C strings.  Require the blob
--	 * to end in NUL so a malformed file_offsets entry can never lead the
--	 * later "%s" consumer past the end of the section.
--	 */
--	if (filenames_size == 0 ||
--	    base[mod_lineinfo_filenames_off(num_entries, num_files) +
--		 filenames_size - 1] != 0)
--		return false;
- 
--	addrs = (const u32 *)(base + mod_lineinfo_addrs_off());
--	file_ids = (const u16 *)(base + mod_lineinfo_file_ids_off(num_entries));
--	lines = (const u32 *)(base + mod_lineinfo_lines_off(num_entries));
--	file_offsets = (const u32 *)(base + mod_lineinfo_file_offsets_off(num_entries));
--	filenames = (const char *)(base + mod_lineinfo_filenames_off(num_entries, num_files));
--
--	/* Binary search for largest entry <= section_offset. */
--	low = 0;
--	high = num_entries;
--	while (low < high) {
--		mid = low + (high - low) / 2;
--		if (addrs[mid] <= section_offset)
--			low = mid + 1;
--		else
--			high = mid;
-+		/*
-+		 * block_addrs[], block_offsets[] and file_offsets[] are read
-+		 * as u32 arrays, so their offsets need the same alignment
-+		 * guarantee hdr_offset got above.
-+		 */
-+		if (!IS_ALIGNED(hdr->blocks_offset, sizeof(u32)) ||
-+		    !IS_ALIGNED(hdr->files_offset, sizeof(u32)))
-+			return false;
-+		if (hdr->filenames_offset > avail ||
-+		    hdr->filenames_size > avail - hdr->filenames_offset)
-+			return false;
- 	}
- 
--	if (low == 0)
--		return false;
--	low--;
--
- 	/*
--	 * Reject entries below the resolved symbol's start so a symbol
--	 * without line entries of its own does not inherit the preceding
--	 * symbol's annotation.
-+	 * Validate counts before multiplying by element size — multiplication
-+	 * could otherwise overflow on 32-bit builds with a malformed blob.
-+	 * num_blocks contributes (addr,offset) u32 pairs; num_files contributes
-+	 * one u32 each.
- 	 */
--	if (addrs[low] < min_offset)
-+	if (hdr->num_blocks > hdr->blocks_size / (2 * sizeof(u32)))
-+		return false;
-+	if (hdr->num_files > hdr->files_size / sizeof(u32))
- 		return false;
- 
- 	/*
--	 * A zero line is the generator's "no source location applies here"
--	 * marker, taken straight from a DWARF line-0 row.
-+	 * Filenames are read as NUL-terminated C strings.  Require the blob
-+	 * to end in NUL so a malformed file_offsets entry can never lead the
-+	 * later "%s" consumer past the end of the section.
- 	 */
--	if (!lines[low])
--		return false;
--
--	file_id = file_ids[low];
--	if (file_id >= num_files)
--		return false;
--	if (file_offsets[file_id] >= filenames_size)
-+	if (hdr->filenames_size == 0 ||
-+	    ((const u8 *)base)[hdr->filenames_offset +
-+			       hdr->filenames_size - 1] != 0)
- 		return false;
- 
--	*file = &filenames[file_offsets[file_id]];
--	*line = lines[low];
--	return true;
-+	tbl.blk_addrs	= base + hdr->blocks_offset;
-+	tbl.blk_offsets	= base + hdr->blocks_offset +
-+			  hdr->num_blocks * sizeof(u32);
-+	tbl.data	= base + hdr->data_offset;
-+	tbl.data_size	= hdr->data_size;
-+	tbl.file_offsets = base + hdr->files_offset;
-+	tbl.filenames	= base + hdr->filenames_offset;
-+	tbl.num_entries	= hdr->num_entries;
-+	tbl.num_blocks	= hdr->num_blocks;
-+	tbl.num_files	= hdr->num_files;
-+	tbl.filenames_size = hdr->filenames_size;
-+
-+	return lineinfo_search(&tbl, section_offset, min_offset, file, line);
- }
- 
- /*
-@@ -647,6 +630,7 @@ static bool module_lookup_lineinfo_blob(const void *blob, u32 blob_size,
- 	if (root->num_sections == 0)
- 		return false;
- 
-+	/* Validate sections[] array fits within the blob */
- 	if (root->num_sections > U32_MAX / sizeof(struct mod_lineinfo_section))
- 		return false;
- 	sections_end = sizeof(*root) +
-@@ -682,6 +666,9 @@ static bool module_lookup_lineinfo_blob(const void *blob, u32 blob_size,
- 
- /*
-  * Look up source file:line for an address within a loaded module.
-+ * Uses the .mod_lineinfo / .init.mod_lineinfo sections embedded in the .ko
-+ * at build time.  Each section contains one or more per-section sub-tables
-+ * keyed by an ELF-relocation-resolved anchor.
-  *
-  * Safe in NMI/panic context: no locks, no allocations.
-  * Caller must hold RCU read lock (or be in a context where the module
-diff --git a/scripts/empty_lineinfo.S b/scripts/empty_lineinfo.S
-index e058c41137123..edd5b1092f050 100644
---- a/scripts/empty_lineinfo.S
-+++ b/scripts/empty_lineinfo.S
-@@ -14,12 +14,20 @@ lineinfo_num_entries:
- 	.balign 4
- lineinfo_num_files:
- 	.long 0
--	.globl lineinfo_addrs
--lineinfo_addrs:
--	.globl lineinfo_file_ids
--lineinfo_file_ids:
--	.globl lineinfo_lines
--lineinfo_lines:
-+	.globl lineinfo_num_blocks
-+	.balign 4
-+lineinfo_num_blocks:
-+	.long 0
-+	.globl lineinfo_block_addrs
-+lineinfo_block_addrs:
-+	.globl lineinfo_block_offsets
-+lineinfo_block_offsets:
-+	.globl lineinfo_data_size
-+	.balign 4
-+lineinfo_data_size:
-+	.long 0
-+	.globl lineinfo_data
-+lineinfo_data:
- 	.globl lineinfo_file_offsets
- lineinfo_file_offsets:
- 	.globl lineinfo_filenames_size
-diff --git a/scripts/gen_lineinfo.c b/scripts/gen_lineinfo.c
-index 124f9e30d768c..38bacbd115381 100644
---- a/scripts/gen_lineinfo.c
-+++ b/scripts/gen_lineinfo.c
-@@ -2013,6 +2013,45 @@ static void deduplicate(struct covered_section *sections,
- 	}
- }
- 
-+/*
-+ * Emit the LEB128 delta-compressed data stream for one block.
-+ * @base is the absolute index of the first entry, @count is the number of
-+ * entries in this block (<= LINEINFO_BLOCK_ENTRIES).  Used by both vmlinux
-+ * mode (one section, full entries[]) and module mode (per-section ranges).
-+ */
-+static void emit_block_data_range(unsigned int base, unsigned int count)
-+{
-+	if (!count)
-+		return;
-+
-+	/* Entry 0: file_id, line (both unsigned) */
-+	printf("\t.uleb128 %u\n", entries[base].file_id);
-+	printf("\t.uleb128 %u\n", entries[base].line);
-+
-+	/* Entries 1..N: addr_delta (unsigned), file/line deltas (signed) */
-+	for (unsigned int i = 1; i < count; i++) {
-+		unsigned int idx = base + i;
-+
-+		printf("\t.uleb128 %u\n",
-+		       entries[idx].offset - entries[idx - 1].offset);
-+		printf("\t.sleb128 %d\n",
-+		       (int)entries[idx].file_id - (int)entries[idx - 1].file_id);
-+		printf("\t.sleb128 %d\n",
-+		       (int)entries[idx].line - (int)entries[idx - 1].line);
-+	}
-+}
-+
-+/* Vmlinux-mode wrapper: pick block index out of the global entries[]. */
-+static void emit_block_data(unsigned int block)
-+{
-+	unsigned int base = block * LINEINFO_BLOCK_ENTRIES;
-+	unsigned int count = num_entries - base;
-+
-+	if (count > LINEINFO_BLOCK_ENTRIES)
-+		count = LINEINFO_BLOCK_ENTRIES;
-+	emit_block_data_range(base, count);
-+}
-+
- static void compute_file_offsets(void)
- {
- 	unsigned int offset = 0;
-@@ -2036,6 +2075,11 @@ static void print_escaped_asciz(const char *s)
- 
- static void output_assembly(void)
- {
-+	unsigned int num_blocks;
-+
-+	num_blocks = num_entries ?
-+		(num_entries + LINEINFO_BLOCK_ENTRIES - 1) / LINEINFO_BLOCK_ENTRIES : 0;
-+
- 	printf("/* SPDX-License-Identifier: GPL-2.0 */\n");
- 	printf("/*\n");
- 	printf(" * Automatically generated by scripts/gen_lineinfo\n");
-@@ -2056,29 +2100,40 @@ static void output_assembly(void)
- 	printf("lineinfo_num_files:\n");
- 	printf("\t.long %u\n\n", num_files);
- 
--	/* Sorted address offsets from _text */
--	printf("\t.globl lineinfo_addrs\n");
-+	/* Number of blocks */
-+	printf("\t.globl lineinfo_num_blocks\n");
- 	printf("\t.balign 4\n");
--	printf("lineinfo_addrs:\n");
--	for (unsigned int i = 0; i < num_entries; i++)
--		printf("\t.long 0x%x\n", entries[i].offset);
--	printf("\n");
-+	printf("lineinfo_num_blocks:\n");
-+	printf("\t.long %u\n\n", num_blocks);
- 
--	/* File IDs, parallel to addrs (u16 -- supports up to 65535 files) */
--	printf("\t.globl lineinfo_file_ids\n");
--	printf("\t.balign 2\n");
--	printf("lineinfo_file_ids:\n");
--	for (unsigned int i = 0; i < num_entries; i++)
--		printf("\t.short %u\n", entries[i].file_id);
--	printf("\n");
-+	/* Block first-addresses for binary search */
-+	printf("\t.globl lineinfo_block_addrs\n");
-+	printf("\t.balign 4\n");
-+	printf("lineinfo_block_addrs:\n");
-+	for (unsigned int i = 0; i < num_blocks; i++)
-+		printf("\t.long 0x%x\n", entries[i * LINEINFO_BLOCK_ENTRIES].offset);
- 
--	/* Line numbers, parallel to addrs */
--	printf("\t.globl lineinfo_lines\n");
-+	/* Block byte offsets into compressed stream */
-+	printf("\t.globl lineinfo_block_offsets\n");
- 	printf("\t.balign 4\n");
--	printf("lineinfo_lines:\n");
--	for (unsigned int i = 0; i < num_entries; i++)
--		printf("\t.long %u\n", entries[i].line);
--	printf("\n");
-+	printf("lineinfo_block_offsets:\n");
-+	for (unsigned int i = 0; i < num_blocks; i++)
-+		printf("\t.long .Lblock_%u - lineinfo_data\n", i);
-+
-+	/* Compressed data size */
-+	printf("\t.globl lineinfo_data_size\n");
-+	printf("\t.balign 4\n");
-+	printf("lineinfo_data_size:\n");
-+	printf("\t.long .Ldata_end - lineinfo_data\n\n");
-+
-+	/* Compressed data stream */
-+	printf("\t.globl lineinfo_data\n");
-+	printf("lineinfo_data:\n");
-+	for (unsigned int i = 0; i < num_blocks; i++) {
-+		printf(".Lblock_%u:\n", i);
-+		emit_block_data(i);
-+	}
-+	printf(".Ldata_end:\n\n");
- 
- 	/* File string offset table */
- 	printf("\t.globl lineinfo_file_offsets\n");
-@@ -2086,45 +2141,39 @@ static void output_assembly(void)
- 	printf("lineinfo_file_offsets:\n");
- 	for (unsigned int i = 0; i < num_files; i++)
- 		printf("\t.long %u\n", files[i]->str_offset);
--	printf("\n");
- 
- 	/* Filenames size */
--	{
--		unsigned int fsize = 0;
--
--		for (unsigned int i = 0; i < num_files; i++)
--			fsize += strlen(files[i]->name) + 1;
--		printf("\t.globl lineinfo_filenames_size\n");
--		printf("\t.balign 4\n");
--		printf("lineinfo_filenames_size:\n");
--		printf("\t.long %u\n\n", fsize);
--	}
-+	printf("\t.globl lineinfo_filenames_size\n");
-+	printf("\t.balign 4\n");
-+	printf("lineinfo_filenames_size:\n");
-+	printf("\t.long .Lfilenames_end - lineinfo_filenames\n\n");
- 
- 	/* Concatenated NUL-terminated filenames */
- 	printf("\t.globl lineinfo_filenames\n");
- 	printf("lineinfo_filenames:\n");
- 	for (unsigned int i = 0; i < num_files; i++)
- 		print_escaped_asciz(files[i]->name);
--	printf("\n");
-+	printf(".Lfilenames_end:\n");
- }
- 
- /*
-- * Emit one per-section table in the simple flat-array layout:
-+ * Emit one per-section table.  @suffix uniquifies the local labels so
-+ * multiple tables can coexist in a single output blob; @blob_root_label
-+ * is the symbol for the start of the enclosing blob (used for
-+ * table_offset = .Lhdr - .Lroot).
-  *
-- *   mod_lineinfo_header
-- *   addrs[count]    (u32, sorted)
-- *   file_ids[count] (u16) + 2-byte pad if count is odd
-- *   lines[count]    (u32)
-- *   file_offsets[]  (u32)
-- *   filenames[]
-- *
-- * @suffix uniquifies labels so multiple tables can coexist in one blob.
-- * Caller has sorted entries[] so this section's entries occupy [first,
-- * first + count).
-+ * Caller has already sorted entries[] so this section's entries occupy
-+ * the contiguous range [first, first + count).  This function emits
-+ * block-relative addresses computed from entries[first + N].offset.
-  */
- static void emit_section_table(unsigned int first, unsigned int count,
- 			       const char *suffix)
- {
-+	unsigned int num_blocks;
-+
-+	num_blocks = count ?
-+		(count + LINEINFO_BLOCK_ENTRIES - 1) / LINEINFO_BLOCK_ENTRIES : 0;
-+
- 	/*
- 	 * Align before defining the label, not after: the descriptor stores
- 	 * table_offset as .Lhdr - .Lroot, and every field offset inside the
-@@ -2135,29 +2184,45 @@ static void emit_section_table(unsigned int first, unsigned int count,
- 	printf("\t.balign 4\n");
- 	printf(".Lhdr%s:\n", suffix);
- 	printf("\t.long %u\t\t/* num_entries */\n", count);
-+	printf("\t.long %u\t\t/* num_blocks */\n", num_blocks);
- 	printf("\t.long %u\t\t/* num_files */\n", num_files);
-+	printf("\t.long .Lblk_addrs%s - .Lhdr%s\n", suffix, suffix);
-+	printf("\t.long .Lblk_offsets_end%s - .Lblk_addrs%s\n", suffix, suffix);
-+	printf("\t.long .Ldata%s - .Lhdr%s\n", suffix, suffix);
-+	printf("\t.long .Ldata_end%s - .Ldata%s\n", suffix, suffix);
-+	printf("\t.long .Lfile_offsets%s - .Lhdr%s\n", suffix, suffix);
-+	printf("\t.long .Lfile_offsets_end%s - .Lfile_offsets%s\n", suffix, suffix);
-+	printf("\t.long .Lfilenames%s - .Lhdr%s\n", suffix, suffix);
- 	printf("\t.long .Lfilenames_end%s - .Lfilenames%s\n\n", suffix, suffix);
- 
--	/* addrs[] */
--	for (unsigned int i = 0; i < count; i++)
--		printf("\t.long 0x%x\n", entries[first + i].offset);
--
--	/* file_ids[] */
--	for (unsigned int i = 0; i < count; i++)
--		printf("\t.short %u\n", entries[first + i].file_id);
--	if (count & 1)
--		printf("\t.short 0\t\t/* pad to align lines[] */\n");
--
--	/* lines[] */
--	for (unsigned int i = 0; i < count; i++)
--		printf("\t.long %u\n", entries[first + i].line);
-+	printf(".Lblk_addrs%s:\n", suffix);
-+	for (unsigned int i = 0; i < num_blocks; i++)
-+		printf("\t.long 0x%x\n",
-+		       entries[first + i * LINEINFO_BLOCK_ENTRIES].offset);
-+
-+	printf(".Lblk_offsets%s:\n", suffix);
-+	for (unsigned int i = 0; i < num_blocks; i++)
-+		printf("\t.long .Lblock%s_%u - .Ldata%s\n", suffix, i, suffix);
-+	printf(".Lblk_offsets_end%s:\n\n", suffix);
-+
-+	printf(".Ldata%s:\n", suffix);
-+	for (unsigned int i = 0; i < num_blocks; i++) {
-+		unsigned int base = first + i * LINEINFO_BLOCK_ENTRIES;
-+		unsigned int n = count - i * LINEINFO_BLOCK_ENTRIES;
-+
-+		if (n > LINEINFO_BLOCK_ENTRIES)
-+			n = LINEINFO_BLOCK_ENTRIES;
-+		printf(".Lblock%s_%u:\n", suffix, i);
-+		emit_block_data_range(base, n);
-+	}
-+	printf(".Ldata_end%s:\n", suffix);
- 
--	/* file_offsets[] */
- 	printf("\t.balign 4\n");
-+	printf(".Lfile_offsets%s:\n", suffix);
- 	for (unsigned int i = 0; i < num_files; i++)
- 		printf("\t.long %u\n", files[i]->str_offset);
-+	printf(".Lfile_offsets_end%s:\n\n", suffix);
- 
--	/* filenames[] */
- 	printf(".Lfilenames%s:\n", suffix);
- 	for (unsigned int i = 0; i < num_files; i++)
- 		print_escaped_asciz(files[i]->name);
-@@ -2437,7 +2502,11 @@ int main(int argc, char *argv[])
- 		deduplicate(NULL, 0);
- 		compute_file_offsets();
- 
--		verbose_msg("%u entries, %u files", num_entries, num_files);
-+		verbose_msg("%u entries, %u files, %u blocks",
-+			    num_entries, num_files,
-+			    num_entries ?
-+			    (num_entries + LINEINFO_BLOCK_ENTRIES - 1) /
-+			    LINEINFO_BLOCK_ENTRIES : 0);
- 
- 		output_assembly();
- 	}
--- 
-2.53.0
 
