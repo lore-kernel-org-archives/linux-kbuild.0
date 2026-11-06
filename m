@@ -1,62 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793956786;
-	b=Vr4qp2WYj7ZOIhXI+IQIhfO+iLP65RMZTqOw1EHWD5vYZ3rXM2WR5XDDhfzHv9gBsRvQ
-	 VFBcBQBWEGplICCjH6+uFjdL52h/kZb++N4ZhF/R6q8xSaC22VnOk0Rlr9bE8b3Vq6pxh
-	 nZBvirU3EQPt0Cv72U6blBjCAGcJV19xS3m60ydG/u0lsLzpFbvzF9F2efe1a8suPSxhw
-	 zgbWZ5joy/gJhdqMKASaTOfnXS2ZJVfaV0NjEr4yLpeMud6ZzXvMV9WrZ1OtMSCC+QlsD
-	 ym6rTRShysC3LUjo45bcpm/nOyUu5ntp1xayZiGvB6EYdY1kJIB//AhaFIfsNYh/V+A==
+	t=1793956792;
+	b=0ZhnTJqwX7gL7sPiqqlGM4RkitFrF1XVBtbZY5m2yorwT+Bg/WHMYAfdqQ5+hrrkOzxP
+	 4BT3fpjCJMQYcSavPs5Q1eoN1Lx7szyiycSTPw9km04wu3NdRa/yNB5YhSYdiERphniXN
+	 boMxnlzed++1biv8XPX2BMMr2RpUWukKXmbwZI6sp4tvYcEw59e4eQ9AkQ1smh+lJ+UzO
+	 na5V/5OXYXvAqRC+nm55eNarrH2PFcmM4ZDGPeaWczS4PjsMsubzOwYG9Dw9uI5TyDs7d
+	 zjr9XfMH0mMkPIX22oCZPREj0RhI4hSHswEANYnf4sVI9utoNFLVW0S/xvKd3cxy4zA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793956786;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793956792;
 	h=DMARC-Filter:From:DKIM-Signature:DKIM-Signature:To:Cc:Subject:Date:
 	 Message-ID:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=0X7uhXFmtfFZdleKpIxRqSx/g9j+1ioWtVw98FdmCRc=;
-	b=nA3uRHkPaJMQzM5yO3hGhPhNVBo1LV8LMO0j04hPwgkRpkj9CPQGj1dNA7Y697dLWP4O
-	 L06zOx2DM/RPjNcjD/JaPVwRsZq+J3Wr7OESVV+msG91ICA+hXCl8M0XHmPBsqlgkvLuF
-	 xMdBeIwZcQX9/d2IUr0+G6TZ7/wgwEPhSkve2Jk/OAapI1oykQ8bA3VfKz5oz+gtrRqN2
-	 QE6Oj7N9AziaaFORvtyBK3VQGi5ITUh4E4i5+LQYDxYD047ybq0JdBO+Q5QkYSwpDCTJl
-	 Ttv8v4fV9uo921T9j/+LMhydAV1zTHOmOcQsLyGUz6SsnKr+EeWj/BnzraDog8WSyeQ==
+	bh=LgkTYIbNEu4h2CLjKP9sCMockS/sHgrH65SUWpK2ukA=;
+	b=EKnUZVuD4lBdK6nhfPkXPPWBhS9cVhxZcbwXwG6xft2AAte96eDgdLFQjL2ePbxHOTsb
+	 sD4uqk1FHDsZLEvCYuGam4ESdpVjir7QiqCXCdnRzmvonlzZErbo39McRGoPoUt+DoBgF
+	 z9/CH86WJ3LhLlXcNuXS1olvI8Us0V86uQ1xRqk3LDanF8a5+JA8G5Gx1SOqWXHWa4CVt
+	 suh8S4eorBGOBkCugC531+MhpFkXOsxXAcOBvYFfoJnXDdKQVZjdeoEvWwvZV28DNXF4S
+	 wPymKsXD3kQMDf03+85G+xakq6eZ/PBNovs1jRKEU4S8EQ6FSAqfsrOnFmDAuKy8C4Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linutronix.de;
 	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=YCUYv6Bq;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=e+1NQCiB;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=EB3zBbz0;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="oibvC/+W";
 	arc=none smtp.remote-ip=193.142.43.55
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED98606A32F;
-	Fri,  6 Nov 2026 09:19:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8ED98606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FE7606A331;
+	Fri,  6 Nov 2026 09:19:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C2FE7606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=YCUYv6Bq;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=e+1NQCiB
+	dkim=pass (2048-bit key, unprotected) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=EB3zBbz0;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=oibvC/+W
 From: "Ahmed S. Darwish" <darwi@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1793956784;
+	s=2020; t=1793956790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0X7uhXFmtfFZdleKpIxRqSx/g9j+1ioWtVw98FdmCRc=;
-	b=YCUYv6BqIjBRFDe/l3WKU3TiIa0Usk9sesvkiacGVGWkS47G+Wfw8Bb4spjDlTQP1CWhMY
-	z9zXcBGs6qNi1I9Kcc9euJoX6lTQvjIx0WqZAhCWByzPrYe2YAAwAtWDkwmpMoHM/ueFtX
-	x8Bpoy6B8xkfkBRPzQu13shWvU8rGDcYhJ6wApn8PTy4LKlC8WVavwsXeFSA6up1iQmQSi
-	x/4E+FjDX1X7PMvI62gRc82HhQPWMTWmplTOxM8jJiZwpD4Uu/d+n67X8/X+bXCXJUTzc+
-	nqihDRjg08oTnocNAXnxW3yG2WtCYUFvlNojJJRD9x6Bk+ruSIqWlAuAKA88zQ==
+	bh=LgkTYIbNEu4h2CLjKP9sCMockS/sHgrH65SUWpK2ukA=;
+	b=EB3zBbz05E9GYFZMnjnzaMIY4OoY/1oF0E0FmmChWd8UzCshW8YWgDlZCT0PO/YIj/jdvX
+	yBzr8DWCDVv8+TqUL5AT3vG9xQyQqRSMfE76ejM/zmjOKuG7rGDcb3LevxFFCdB7ztHD9c
+	V1Hj8+WsS/M4KA4YErki0XQ3jCFiEO7gulKY6nXiBvFw4AdyxHTGf5k4Ltn6W6oMgMSw9g
+	JL252QPPTZF0XnzcoWmCiauC2Q9544fNknLNInTgwXzm1AUdXuayDe2GfPyUSsqOWZMSQL
+	RgO4KB5MdkOVTIuNQYH1UZUodZkn+k6HzRARSzgNf25Ql8butxWhDNOUctyTeQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1793956784;
+	s=2020e; t=1793956790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0X7uhXFmtfFZdleKpIxRqSx/g9j+1ioWtVw98FdmCRc=;
-	b=e+1NQCiBcMPN+wl6WvRhhIuMRLbhN5tXwncXr9vrcfAbxX/QwFgqCi2P9yGT7VGy2VAvsV
-	Haohn/ld9XqmHjDg==
+	bh=LgkTYIbNEu4h2CLjKP9sCMockS/sHgrH65SUWpK2ukA=;
+	b=oibvC/+W8YAha42WctdZeLkQWkHPd298ut47NTADlZlrn/MOLrxR7NtnXhmdPlXJm6ySnL
+	mJPOB+5TMY4m/3BA==
 To: Clark Williams <clrkwllms@kernel.org>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -77,9 +77,9 @@ Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Ahmed S. Darwish" <darwi@linutronix.de>
-Subject: [PATCH v1 03/10] kconfig-checker: Add the configuration checker code
-Date: Fri,  6 Nov 2026 10:19:15 +0100
-Message-ID: <20261106091922.7560-4-darwi@linutronix.de>
+Subject: [PATCH v1 05/10] Documentation: Describe kconfig-checker usage and design
+Date: Fri,  6 Nov 2026 10:19:17 +0100
+Message-ID: <20261106091922.7560-6-darwi@linutronix.de>
 In-Reply-To: <20261106091922.7560-1-darwi@linutronix.de>
 References: <20261106091922.7560-1-darwi@linutronix.de>
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -93,590 +93,159 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a kernel configuration checker.
+Describe the kconfig-checker design, invocation, and external dependencies.
 
-Validate the passed kernel .config against a YAML rules file and report
-problematic configuration issues by severity.
+For PREEMPT_RT users, mention that the checker can now be used for
+validating a kernel's .config against PREEMPT_RT requirements.
 
-For correctness, readability, and long-term maintainability, type-annotate
-all the Python code and split the tool's logic into a clean set of classes.
-
-Create a proper Python objects data model for the kconfig checker to work
-with.  Confine all direct YAML dictionary access to YAML files loading,
-validation, and data model construction.
-
-Document the tool's development rules on top.
+For the kconfig-checker external dependencies error handling code,
+reference the newly added documentation as well.
 
 Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
 ---
- tools/kconfig-checker/check.py | 558 +++++++++++++++++++++++++++++++++
- 1 file changed, 558 insertions(+)
- create mode 100755 tools/kconfig-checker/check.py
+ Documentation/admin-guide/README.rst          | 24 +++++++++
+ .../real-time/kernel-configuration.rst        |  3 ++
+ Documentation/tools/index.rst                 |  1 +
+ Documentation/tools/kconfig_checker.rst       | 50 +++++++++++++++++++
+ tools/kconfig-checker/check.py                |  7 ++-
+ 5 files changed, 84 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/tools/kconfig_checker.rst
 
-diff --git a/tools/kconfig-checker/check.py b/tools/kconfig-checker/check.py
-new file mode 100755
-index 000000000000..476cd13e59eb
+diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
+index 77fec1de6dc8..77ffe4dcb85b 100644
+--- a/Documentation/admin-guide/README.rst
++++ b/Documentation/admin-guide/README.rst
+@@ -256,6 +256,30 @@ Configuring the kernel
+       should probably answer 'n' to the questions for "development",
+       "experimental", or "debugging" features.
+ 
++Checking the kernel configuration
++---------------------------------
++
++The kconfig build system can validate the generated kernel ``.config``
++against a selected rules profile. Running ``make checkconfig`` prints
++usage information and the available profiles::
++
++  Usage: make RULES=<profile> checkconfig
++  Available RULES: preempt_rt
++
++For example, to validate the current configuration against the PREEMPT_RT
++profile, run::
++
++  make RULES=preempt_rt checkconfig
++
++``checkconfig`` reports kconfig options whose values do not match the
++selected rules profile. Each diagnostic includes a severity, such as
++``FATAL`` or ``INFO``, plus the suggested configuration change.
++
++Apply the reported changes as needed and run ``make checkconfig`` again,
++against the same rules, until no relevant diagnostics remain.
++
++For more information, see Documentation/tools/kconfig_checker.rst
++
+ Compiling the kernel
+ --------------------
+ 
+diff --git a/Documentation/core-api/real-time/kernel-configuration.rst b/Documentation/core-api/real-time/kernel-configuration.rst
+index d7f08e7b8760..15245c34a053 100644
+--- a/Documentation/core-api/real-time/kernel-configuration.rst
++++ b/Documentation/core-api/real-time/kernel-configuration.rst
+@@ -14,6 +14,9 @@ Introduction
+ This document lists the kernel configuration options that might affect a
+ real-time kernel's worst-case latency.  It is intended for system integrators.
+ 
++You can validate your kernel's ``.config`` against the guidelines below using
++the ``kconfig-checker`` tool.  See Documentation/tools/kconfig_checker.rst
++
+ Configuration options
+ =====================
+ 
+diff --git a/Documentation/tools/index.rst b/Documentation/tools/index.rst
+index 1adf4a6f909b..8912a627a7ac 100644
+--- a/Documentation/tools/index.rst
++++ b/Documentation/tools/index.rst
+@@ -10,6 +10,7 @@ more additions are needed here:
+ .. toctree::
+    :maxdepth: 1
+ 
++   kconfig_checker
+    rtla/index
+    rv/index
+    python
+diff --git a/Documentation/tools/kconfig_checker.rst b/Documentation/tools/kconfig_checker.rst
+new file mode 100644
+index 000000000000..73717ac56ea9
 --- /dev/null
++++ b/Documentation/tools/kconfig_checker.rst
+@@ -0,0 +1,50 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++============================
++Kernel configuration checker
++============================
++
++``kconfig-checker`` is a Python tool for checking a kernel ``.config`` file
++against a set of rules; e.g., PREEMPT_RT configuration requirements.  It
++gives users and system integrators a sanity report showing whether the
++passed kernel configuration satisfies a known profile.
++
++Invocation
++==========
++
++The checker can be invoked from anywhere in the file system::
++
++   check.py list-rules
++
++   check.py check -c path/to/.config -r preempt_rt
++
++As described in Documentation/admin-guide/README.rst, it is also used by
++``make checkconfig``.
++
++External dependencies
++=====================
++
++The checker requires the ``PyYAML`` and ``jsonschema`` python packages.
++Install them using your distribution's package manager, for example:
++
++.. table::
++   :align: left
++
++   ============ ================== ======================
++   Distribution       PyYAML             jsonschema
++   ============ ================== ======================
++   Debian       ``python3-yaml``   ``python3-jsonschema``
++   Red Hat      ``python3-pyyaml`` ``python3-jsonschema``
++   Arch Linux   ``python-yaml``    ``python-jsonschema``
++   ============ ================== ======================
++
++Rule files
++==========
++
++The checker's rule files are written in YAML, and are stored in::
++
++   tools/kconfig-checker/rules/
++
++The schema for these files is fully documented in::
++
++   tools/kconfig-checker/schema.yml
+diff --git a/tools/kconfig-checker/check.py b/tools/kconfig-checker/check.py
+index 476cd13e59eb..ef49c28b9dab 100755
+--- a/tools/kconfig-checker/check.py
 +++ b/tools/kconfig-checker/check.py
-@@ -0,0 +1,558 @@
-+#!/usr/bin/env python3
-+#
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Kernel .config checker
-+#
-+# Main usage:
-+#
-+#     $ check.py list-rules
-+#     $ check.py check -c path/to/linux/.config -r preempt_rt
-+#
-+# Notes:
-+#
-+# - All code is to be fully type-annotated. Before introducing changes,
-+#   please verify type-safety using:
-+#
-+#     $ mypy --strict --no-warn-return-any check.py
-+#
-+# - The minimum required Python version must not be newer than what is
-+#   required by the kernel build at Documentation/process/changes.rst.
-+#
-+# - The tool must not depend on being run inside the kernel source tree.
-+#   This simplifies invocation, testing and possible future packaging.
-+#
-+# - The YAML rule files are only treated as a serialization format.  After
-+#   loading and schema validation, such rules are parsed into an internal
-+#   data model: Severity, Rule, SymbolRule, PatternRule, Rules, and other
-+#   related python objects.
-+#
-+#   All checker logic must operate on that typed model, and not on the raw
-+#   YAML dictionaries.
-+#
-+# - Minimize external dependencies: this tool is also intended to be run
-+#   from distribution kernel-package scripts in the future.
-+#
-+# Script exit codes:
-+#
-+#   os.EX_CONFIG          passed kernel .config does not match rules
-+#   os.EX_NOINPUT         input file(s) could not be opened
-+#   os.EX_DATAERR         YAML/schema/rule data is malformed
-+#   os.EX_UNAVAILABLE     Python version or dependency is unavailable
-+#
-+
-+from __future__ import annotations
-+
-+import argparse
-+import os
-+import re
-+import sys
-+import textwrap
-+
-+from dataclasses import dataclass
-+from enum import Enum, auto
-+from pathlib import Path
-+from typing import Any, NoReturn, Optional
-+
-+#
-+# Initial sanity checks:
-+#
-+
-+def error(message: str, code: int) -> NoReturn:
-+    print(f'Error: {message}', file=sys.stderr)
-+    sys.exit(code)
-+
-+if sys.version_info < (3, 9):
-+    error('Python 3.9 or later is required', os.EX_UNAVAILABLE)
-+
-+try:
-+    import jsonschema               # type: ignore
-+    import yaml as yaml_m           # type: ignore
-+except ModuleNotFoundError as e:
-+    error(f'Missing Python module: {e.name}', os.EX_UNAVAILABLE)
-+
-+#
-+# Actual script:
-+#
-+
-+class KernelConfig:
-+    """.config file parser"""
-+
-+    def __init__(self, file: Path):
-+        try:
-+            self.lines = file.read_text().splitlines()
-+        except OSError as e:
-+            error(f'Could not open {file}: {e.strerror}', os.EX_NOINPUT)
-+
-+        self.symbols = self._parse_symbols()
-+
-+    def _parse_symbols(self) -> dict[str, str]:
-+        """Extract CONFIG_* symbol assignments from .config"""
-+        symbol_set = re.compile(r'^(CONFIG_[A-Za-z0-9_]+)=([ym])$')
-+        symbol_unset = re.compile(r'^# (CONFIG_[A-Za-z0-9_]+) is not set$')
-+
-+        symbols: dict[str, str] = {}
-+        for line in self.lines:
-+            line = line.rstrip('\n')
-+
-+            if m := symbol_set.match(line):
-+                symbols[m.group(1)] = m.group(2)
-+                continue
-+
-+            if m := symbol_unset.match(line):
-+                symbols[m.group(1)] = 'n'
-+
-+        return symbols
-+
-+    def get_symbol_value(self, sym_name: str) -> Optional[str]:
-+        """Return a .config symbol value: 'y', 'm', or 'n'"""
-+        return self.symbols.get(sym_name)
-+
-+    def get_matching_symbols(self, pa: re.Pattern[str]) -> list[str]:
-+        """Get all CONFIG_* symbol names matching passed regex"""
-+        return [ sym for sym in self.symbols if pa.search(sym) ]
-+
-+YamlDict = dict[str, Any]
-+
-+class Helpers:
-+    """YAML file access helpers"""
-+
-+    @staticmethod
-+    def load_yaml(yaml_f: Path) -> YamlDict:
-+        try:
-+            with open(yaml_f, 'r') as f:
-+                return yaml_m.safe_load(f)
-+        except OSError as e:
-+            error(f'Could not open {yaml_f}: {e.strerror}', os.EX_NOINPUT)
-+        except yaml_m.YAMLError as e:
-+            error(f'Invalid YAML syntax at {yaml_f}:\n {e}', os.EX_DATAERR)
-+
-+    @staticmethod
-+    def validate_yaml(yaml: YamlDict, schema: YamlDict, f_name: str) -> None:
-+        try:
-+            jsonschema.validate(yaml, schema)
-+        except jsonschema.exceptions.ValidationError as e:
-+            error(
-+                f'{f_name} does not match its schema\n'
-+                f'Reason: {e.message}',
-+                os.EX_DATAERR
-+            )
-+
-+class Schema:
-+    """Rules file schema, in json-schema.org format"""
-+
-+    def __init__(self, schema_f: Path):
-+        self.schema = Helpers.load_yaml(schema_f)
-+        # Validate the schema itself against draft-07 metaschema
-+        jsonschema.Draft7Validator.check_schema(self.schema)
-+
-+    def as_dict(self) -> YamlDict:
-+        return self.schema
-+
-+class ExpectedValue(Enum):
-+    """Expected values for a .config symbol"""
-+
-+    y       = auto()  # 'y' implies a built-in or a module; as in schema
-+    n       = auto()
-+    allowed = auto()
-+
-+class Severity(Enum):
-+    """Rule-check severity"""
-+
-+    fatal  = auto()
-+    high   = auto()
-+    medium = auto()
-+    low    = auto()
-+    info   = auto()
-+
-+class Rule:
-+    """Single rule entry"""
-+
-+    expected: ExpectedValue
-+    severity: Severity
-+    rationale: Optional[str] = None
-+    docs_hint: Optional[str] = None
-+
-+    def __init__(self, rule: YamlDict) -> None:
-+        self.expected = ExpectedValue[rule['expected']]
-+        self.severity = Severity[rule['severity']]
-+        self.rationale = rule.get('rationale')
-+        self.docs_hint = rule.get('docs_hint')
-+        self._normalize_docs_hint()
-+
-+    def _normalize_docs_hint(self) -> None:
-+        """Transform the hint to a URI fragment identifier"""
-+        if self.docs_hint:
-+            self.docs_hint = '#' + self.docs_hint
-+
-+class SymbolRule(Rule):
-+    """Rule entry for one .config symbol"""
-+
-+    symbol: str
-+
-+    def __init__(self, rule: YamlDict):
-+        self.symbol = rule['name']
-+        super().__init__(rule)
-+
-+    def _normalize_docs_hint(self) -> None:
-+        """Transform the hint to a docs.kernel.org URI fragment identifier"""
-+        if self.docs_hint == 'config':
-+            self.docs_hint = self.symbol.lower().replace('_', '-')
-+
-+        super()._normalize_docs_hint()
-+
-+class PatternRule(Rule):
-+    """Rule entry for a regex pattern of .config symbols"""
-+
-+    symbol_regex: re.Pattern[str]
-+
-+    def __init__(self, rule: YamlDict):
-+        regex = rule['name_pattern']
-+        try:
-+            self.symbol_regex = re.compile(regex)
-+        except re.error as e:
-+            error(f'Invalid symbol regex {regex}: {e}', os.EX_DATAERR)
-+
-+        super().__init__(rule)
-+
-+@dataclass
-+class Rules:
-+    """The .config checker rules repository / data model"""
-+
-+    rules: list[Rule]
-+    docs_url: Optional[str] = None
-+
-+    def add_rule(self, rule: Rule) -> None:
-+        """Add given rule to the existing rules repository"""
-+        if isinstance(rule, SymbolRule):
-+            symbol = rule.symbol
-+            if self.get_symbol_rule(symbol):
-+                error(f'Duplicate rule name: {symbol}', os.EX_DATAERR)
-+
-+        if isinstance(rule, PatternRule):
-+            pattern = rule.symbol_regex.pattern
-+            if self.get_pattern_rule(pattern):
-+                error(f'Duplicate rule pattern: {pattern}', os.EX_DATAERR)
-+
-+        self.rules.append(rule)
-+
-+    def get_docs_url_for(self, rule: Rule) -> Optional[str]:
-+        """Return full documentation URL for a rule, if available"""
-+        if not self.docs_url or not rule.docs_hint:
-+            return None
-+
-+        return f'{self.docs_url}{rule.docs_hint}'
-+
-+    def get_symbol_rule(self, kconfig_symbol: str) -> Optional[SymbolRule]:
-+        """Return symbol rule matching passed .config symbol, if any"""
-+        for rule in self.rules:
-+            if isinstance(rule, SymbolRule):
-+                if rule.symbol == kconfig_symbol:
-+                    return rule
-+
-+        return None
-+
-+    def get_pattern_rule(self, pattern: str) -> Optional[PatternRule]:
-+        """Return pattern rule matching passed .config symbol, if any"""
-+        for rule in self.rules:
-+            if isinstance(rule, PatternRule):
-+                if rule.symbol_regex.pattern == pattern:
-+                    return rule
-+
-+        return None
-+
-+class RulesFile:
-+    """YAML rules file access"""
-+
-+    yaml: YamlDict
-+
-+    def __init__(self, yaml_f: Path, schema: Schema):
-+        self.yaml = Helpers.load_yaml(yaml_f)
-+        Helpers.validate_yaml(self.yaml, schema.as_dict(), yaml_f.name)
-+
-+    def parse(self) -> Rules:
-+        """Parse the YAML rules into a python Rules object"""
-+        rules = Rules([])
-+
-+        for rule in self.yaml.get('rules', []):
-+            if 'name' in rule:
-+                rules.add_rule(SymbolRule(rule))
-+                continue
-+
-+            if 'name_pattern' in rule:
-+                rules.add_rule(PatternRule(rule))
-+                continue
-+
-+        rules.docs_url = self.yaml.get('docs_url')
-+        return rules
-+
-+@dataclass
-+class Issue:
-+    message: str
-+    docs_url: Optional[str]
-+    severity: Severity
-+    rationale: Optional[str]
-+
-+@dataclass
-+class SymbolIssue(Issue):
-+    """Checker issue concerning a single .config symbol"""
-+    symbol: str
-+
-+@dataclass
-+class PatternIssue(Issue):
-+    """Checker issue concerning a regex pattern of .config symbols"""
-+    symbols: list[str]
-+
-+class Issues:
-+    """Repository of all issues found by the checker"""
-+
-+    def __init__(self, issues_l: list[Issue]):
-+        # Index all issues by severity
-+        self.issues: dict[Severity, list[Issue]] = {
-+            severity: [] for severity in Severity
-+        }
-+        for issue in issues_l:
-+            self.issues[issue.severity].append(issue)
-+
-+    def by_severity(self, severity: Severity) -> list[Issue]:
-+        return self.issues[severity]
-+
-+@dataclass
-+class Report:
-+    """kconfig checker sanity report. Main script output"""
-+
-+    issues: Issues
-+
-+    def _print_header(self, header: str) -> None:
-+        print(header)
-+        print('=' * len(header))
-+        print()
-+
-+    def _print_symbol(self, issue: SymbolIssue) -> None:
-+        print(f'* {issue.symbol} is {issue.message}')
-+        print()
-+
-+    def _print_pattern(self, issue: PatternIssue) -> None:
-+        print(f'* Below options are {issue.message}:\n')
-+        for symbol in issue.symbols:
-+            print(f'  {symbol}')
-+        print()
-+
-+    def _print_issue(self, issue: Issue) -> None:
-+        if isinstance(issue, SymbolIssue):
-+            self._print_symbol(issue)
-+        elif isinstance(issue, PatternIssue):
-+            self._print_pattern(issue)
-+
-+    def _print_rationale(self, issue: Issue) -> None:
-+        if not issue.docs_url and not issue.rationale:
-+            return
-+
-+        print('  Rationale:')
-+
-+        if issue.docs_url:
-+            print(' ', issue.docs_url)
-+            if issue.rationale:
-+                print()
-+
-+        if issue.rationale:
-+            print(textwrap.fill(
-+                issue.rationale,
-+                width=75,
-+                initial_indent='  ',
-+                subsequent_indent='  ',
-+            ))
-+
-+        print()
-+
-+    def print(self) -> None:
-+        """Print the checker's .config report, in order of severity"""
-+        print()
-+        for severity in Severity:
-+            issues = self.issues.by_severity(severity)
-+            if not issues:
-+                continue
-+
-+            self._print_header('Configuration Issues with severity = ' +
-+                               severity.name.upper())
-+
-+            for issue in issues:
-+                self._print_issue(issue)
-+                self._print_rationale(issue)
-+
-+@dataclass
-+class Checker:
-+    """The actual kconfig checker machinery"""
-+
-+    kconfig: KernelConfig
-+    rules: Rules
-+
-+    def _find_issue_symbol(self, rule: SymbolRule) -> Optional[SymbolIssue]:
-+        """Check the .config against passed rule. Return found issues, if any"""
-+        value = self.kconfig.get_symbol_value(rule.symbol)
-+        docs_url = self.rules.get_docs_url_for(rule)
-+
-+        if rule.expected == ExpectedValue.y:
-+            if value is None:
-+                return SymbolIssue(
-+                    'not in .config',
-+                    docs_url,
-+                    rule.severity,
-+                    rule.rationale,
-+                    rule.symbol,
-+                )
-+            if value == 'n':
-+                return SymbolIssue(
-+                    'unset',
-+                    docs_url,
-+                    rule.severity,
-+                    rule.rationale,
-+                    rule.symbol,
-+                )
-+
-+        if rule.expected == ExpectedValue.n:
-+            if value in ('y', 'm'):
-+                return SymbolIssue(
-+                    'set',
-+                    docs_url,
-+                    rule.severity,
-+                    rule.rationale,
-+                    rule.symbol,
-+                )
-+
-+        return None
-+
-+    def _find_issue_pattern(self, pattern_rule: PatternRule) -> Optional[PatternIssue]:
-+        """Check the .config against a pattern rule. Return found issues, if any."""
-+        if pattern_rule.expected == ExpectedValue.allowed:
-+            return None
-+
-+        violation_type = 'unset' if pattern_rule.expected == ExpectedValue.y else 'set'
-+        docs_url = self.rules.get_docs_url_for(pattern_rule)
-+
-+        violating_symbols = []
-+
-+        for symbol in self.kconfig.get_matching_symbols(pattern_rule.symbol_regex):
-+            symbol_value = self.kconfig.get_symbol_value(symbol)
-+
-+            if pattern_rule.expected == ExpectedValue.y and symbol_value == 'n':
-+                # Exclude the config symbol if it's explicitly disabled elsewhere
-+                symbol_rule = self.rules.get_symbol_rule(symbol)
-+                if symbol_rule and symbol_rule.expected == ExpectedValue.n:
-+                    continue
-+
-+                violating_symbols.append(symbol)
-+
-+            if pattern_rule.expected == ExpectedValue.n and symbol_value in ('y', 'm'):
-+                # Exclude the config symbol if it's explicitly allowed elsewhere
-+                symbol_rule = self.rules.get_symbol_rule(symbol)
-+                if symbol_rule and symbol_rule.expected in (ExpectedValue.y, ExpectedValue.allowed):
-+                    continue
-+
-+                violating_symbols.append(symbol)
-+
-+        if not violating_symbols:
-+            return None
-+
-+        return PatternIssue(
-+            violation_type,
-+            docs_url,
-+            pattern_rule.severity,
-+            pattern_rule.rationale,
-+            violating_symbols,
-+        )
-+
-+    def _find_issue(self, rule: Rule) -> Optional[Issue]:
-+        """Check the .config against passed rule. Return found issues, if any"""
-+        if isinstance(rule, SymbolRule):
-+            return self._find_issue_symbol(rule)
-+
-+        if isinstance(rule, PatternRule):
-+            return self._find_issue_pattern(rule)
-+
-+        return None
-+
-+    def find_issues(self) -> Optional[Report]:
-+        """Check the .config file against required rules"""
-+        issues: list[Issue] = []
-+        for rule in self.rules.rules:
-+            if issue := self._find_issue(rule):
-+                issues.append(issue)
-+
-+        if issues:
-+            return Report(Issues(issues))
-+
-+        return None
-+
-+def parse_args(rules: list[str]) -> argparse.Namespace:
-+    parser = argparse.ArgumentParser(
-+        prog='check.py',
-+        description='Kernel .config options checker',
+@@ -69,7 +69,12 @@ try:
+     import jsonschema               # type: ignore
+     import yaml as yaml_m           # type: ignore
+ except ModuleNotFoundError as e:
+-    error(f'Missing Python module: {e.name}', os.EX_UNAVAILABLE)
++    docs = 'Documentation/tools/kconfig_checker.rst'
++    error(
++        f'Missing Python module: {e.name}\n'
++        f'Check {docs} for how to install required dependencies',
++        os.EX_UNAVAILABLE
 +    )
-+
-+    subparsers = parser.add_subparsers(
-+        dest='command',
-+        required=True,
-+    )
-+
-+    subparsers.add_parser(
-+        'list-rules',
-+        help='return available .config rule checking profiles',
-+    )
-+
-+    check_parser = subparsers.add_parser(
-+        'check',
-+        help='check a .config file against a rule profile',
-+    )
-+
-+    check_parser.add_argument(
-+        '-c',
-+        '--config',
-+        metavar='KCONFIG_FILE',
-+        type=Path,
-+        required=True,
-+        help='.config file to be checked',
-+    )
-+
-+    check_parser.add_argument(
-+        '-r',
-+        '--rules',
-+        metavar='RULES',
-+        choices=rules,
-+        required=True,
-+        help='rules file to check against',
-+    )
-+
-+    return parser.parse_args()
-+
-+def main() -> None:
-+    base_dir = Path(__file__).resolve().parent
-+    rules_dir = base_dir / 'rules'
-+
-+    rules_l = sorted(path.stem for path in rules_dir.glob('*.yml'))
-+    args = parse_args(rules_l)
-+
-+    if args.command == 'list-rules':
-+        print(*rules_l, sep=', ')
-+        return
-+
-+    kconfig_f = args.config.resolve()
-+    kconfig = KernelConfig(kconfig_f)
-+
-+    schema_f = base_dir / 'schema.yml'
-+    schema = Schema(schema_f)
-+
-+    rules_f = rules_dir / f'{args.rules}.yml'
-+    rules = RulesFile(rules_f, schema).parse()
-+
-+    checker = Checker(kconfig, rules)
-+    report = checker.find_issues()
-+
-+    if report:
-+        report.print()
-+        error(f'{kconfig_f} does not match required rules', os.EX_CONFIG)
-+
-+    print(f'Success: {kconfig_f} matches required rules')
-+
-+if __name__ == '__main__':
-+    main()
+ 
+ #
+ # Actual script:
 -- 
 2.56.0
 
