@@ -1,87 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793956803;
-	b=wu+yu+Q+debC8aS04SXd36DeaGUCnehtT/ZiAsj3+I0f8NWlm1wQk5Xpq2uMET/Psk3W
-	 5B/0Hsz0mK/E116dJPL+sGL4FM4J6DqrSyjbawWXcmPkdVNnxmdg9DfPENafRq3xsK68V
-	 W5lv7R16ZpPhizoei6HJqnocx8hhB6pfPBUgkLfNJ9pjcr0jIQRS4Y0W60s5EIXTpuF+Q
-	 sC8bMcOZ7eNv+KbtZBNn1MVVNJVzdsz7eUOWksHS0cr3PK39H4EUQ2jvRtLyVQQzS9yJy
-	 Khq19HQOed0SBWDvcrRqfN7aYGbzmbjrHrNUILJi3CLYSWT6lgt6ZOQ4t3/gx4Wxz/w==
+	t=1793961949;
+	b=NYGBeM80wtVB4C8j8mi/4PlXZJAt4wdk9Od0Ek0bIHrHyfoFR2Pp6Jc8SkZ95WpTF9HH
+	 hTQyQgmbFEZYGeLYCv8nigk/obevcVK+I+fWEHa8tShe/1EPT2Mz13qE62tksITEgtDTG
+	 ur+r36M/cYg5G7R1X7gA62o6zWVMZbdgplo9mrjcspu+k3FC7MFg+BuoRFHlCsvQnYw1y
+	 GdCmiHmXN2+359co7T4XFfpo8EPSCmThRs4qERMKeMHwAMsSbDvSev0pvgLRphd3By6xY
+	 wA+P4919ib2A5YNI6D/mD8ImWl5QSVVGHNhnGFVSjHleIfFabhse0H1flw05JZh/i8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793956803;
-	h=DMARC-Filter:From:DKIM-Signature:DKIM-Signature:To:Cc:Subject:Date:
-	 Message-ID:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=cieHxXYoFdvsDAnH4UZMQYIUTVvb5arMKcEfb2knAhY=;
-	b=3ozDiuM3RscIP82+A6NY50hydu0fLEjgOOlU68aQEuDPvoqy7EvtPJn1ETBT+uLmzPTW
-	 vNQncxUs6/v2UWd7iJpN/P4b3Qh5CXGmQp3XPXfI5+CYlHwuRhC+DCXLc+feglDMScR9j
-	 SW8Jnak16WtoK6pbIK1zv9xlaNzpu0lgizuFK/Z0nv1SdBxbu9Mxy9lYgrXvxUF0CzxqL
-	 30MCQ9a/b2LmeOdAmcjk/Eyj5pAPehvk67HWAdoYW2RZxVy176SySVgHy0KbHUmaKU+IQ
-	 mGXn6Ei4+IARMw4aFxV8R7jc7r/4hxCIZ07D+1YJaBrf7JxUFDKfoJnV5aN4ekzyC5w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793961949;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=rGdvxnA0iFsROgXGKz2Xx6QFRzdA7CWUAIqJ0/cbrs8=;
+	b=Iti6N468/PL3drmV0VmwwXW0M8kLfedlJssBpfaaGGy1DG/J80DzTKabXMJyGk71wO6a
+	 vXnSS3uvZbAFc3DOcHRIRmA0Mu8V6q/SinIXw+u33TI8XQm4c9mA5H/+wJeRVhaBHTQpI
+	 eqqPZ0FZG8ExCHLZGBkvbKdFMBycHTvTb8UdQiGPh0yCioFDY2ToPBL7gO0QMve6cMh+R
+	 0katBJEi6BX3kwmRY8TQHqdA/kFYpPV57NrQ4tQoMNlgwV8MoFWtEPaJVH3bfWHlNWBjL
+	 FCdrCyZyf4B4akqgcZAVl2sd2qZhJFSKvMtPUuZL4UGh/CEVy3hVMMkDeCoWmzneKMA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linutronix.de;
-	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=fKLMx54w;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="qwHET7/t";
-	arc=none smtp.remote-ip=193.142.43.55
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=PjaQxyg8;
+	arc=none smtp.remote-ip=209.85.208.70
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FA1606A33D;
-	Fri,  6 Nov 2026 09:20:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C0FA1606A33D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174CB606A32D
+	for <linux-kbuild@vger.kernel.org>; Fri,  6 Nov 2026 10:45:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 174CB606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=fKLMx54w;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=qwHET7/t
-From: "Ahmed S. Darwish" <darwi@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1793956800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cieHxXYoFdvsDAnH4UZMQYIUTVvb5arMKcEfb2knAhY=;
-	b=fKLMx54whJvpxEHRcjpGttIXBvx/EvgJqj38ppJB4rSa6YMkur7iVThvZSy4sppNnZYcfd
-	JiM3HC6JBQUwF/QmMs+5lpyQJf76ptF7b7ImDb+lQdAKnjzflX21d9SzfoUVXQbYaXaeV8
-	KrO5TjIgry4nsmTYdK69vuSh9Hb7flBSWHM/O+I150EwuWOm12ZehEV89UIRTX7iq4Qix1
-	q+UFO0ctsO0bqpG0FvjOfefl3hVuWfBAFojydfnt5pIRSUdu1MlD8lQNvKs06gw0rZdAKS
-	ElywcB+PRT9EL+Ed3HWJNY5oGefB5rewF8jBPVB2FjeR3AvQM2fa0OEy7pFM+g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1793956800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cieHxXYoFdvsDAnH4UZMQYIUTVvb5arMKcEfb2knAhY=;
-	b=qwHET7/tjAbHU1i/ljh7YgwRvwlfdnJYgcbzZ/0mJeJDKyWQ4tClFhh8qGUC3QO0LrzRyM
-	oRX6y5kc+XbE7LAA==
-To: Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	=?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev,
-	debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Ahmed S. Darwish" <darwi@linutronix.de>
-Subject: [PATCH v1 08/10] kconfig-checker: Add support for rule overlays
-Date: Fri,  6 Nov 2026 10:19:20 +0100
-Message-ID: <20261106091922.7560-9-darwi@linutronix.de>
-In-Reply-To: <20261106091922.7560-1-darwi@linutronix.de>
-References: <20261106091922.7560-1-darwi@linutronix.de>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=PjaQxyg8
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6b57668479aso622134a12.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 06 Nov 2026 02:45:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793961947; x=1794566747; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rGdvxnA0iFsROgXGKz2Xx6QFRzdA7CWUAIqJ0/cbrs8=;
+        b=PjaQxyg8hJI56eL6sgdX1VPw8JniIaFdSqGvBImoWdJt1WDpTVxm9y5bTh+IvBnynU
+         VsCFsiSR1S2QmtZNZdLY6RytOurChJJdIzm9wf5qkcS3nQdAwdu3f1i0onDhytvKK3vY
+         Y3s/4sfYxe2fHWAhcnm9EuSDaPwvJjfoas85YWn/pS5qcODIk6WOiwaLnBCcF93ZbqOm
+         1hZkli7HLsS+F0MjeG8b0m26JQcdJKKcCAgX9Ag66C/fO0Lv6fUWIj37jcNlP3z/yncV
+         ts643gPRQRaWTJEf4ObzatVxQO492Ry6pZAziXoGe3aJajkS3tCr7KgK6RfU/9hnBMOu
+         j52w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793961947; x=1794566747;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=rGdvxnA0iFsROgXGKz2Xx6QFRzdA7CWUAIqJ0/cbrs8=;
+        b=XKFXBdo3yl7NpV/XwR58n0KbZ4/NdN8C/dsLJ2IuRUDqt9w72txswGyszM0dRueesI
+         tI4Uypr/Ec7bKQIOg8kTZV2GqcVSIPJn/stNuJQbwvJZSvmO/8HfRnmgpIHBrAhS/Bzr
+         vbzys6O45xg9gxSC8+RLxlCIAAtFRPJIUiQIY8VKuHsszWwpG8nyoDdW87f2g3crZCZw
+         L5Km6MKqlVAZLpyzVcFrnZcv0ibscPTZOvto+vIvVttNNqFZFQ3ya6k7ZkCNUBpwNeNn
+         GMQeCrgJeNCAJ0AKTLXlhCN5pirq+P/ZCHORMrxfLrtLXla/seeP2G1F43y1hxNFin4W
+         6TwQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwj2m8fawxJFtBcVuyC5LzUDBhMp7GYvFKnm8FlA5kD58A9u3jC/t3Wrk1W7kH/tERgZRMBVqN0w3020XA=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/CH9l4XUZKf6Sttb1WPfMaz8b1NTk29AOiAJD/UtUvPtL56ZTt
+	aIK/zRqAth9qc5P07y6QIwVfOAv6Ap11BuJCHIE2BXRAnIDqB6uQ9VqdcLND25f3mRtErdNKYww
+	mMbx+s/OgtlPU6n9aeg==
+X-Received: from edr23.prod.google.com ([2002:a05:6402:44d7:b0:6b4:363a:88ea])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:1ecd:b0:6b4:21f6:ff48 with SMTP id 4fb4d7f45d1cf-6b597524b81mr1549991a12.3.1793961947235;
+ Fri, 06 Nov 2026 02:45:47 -0800 (PST)
+Date: Fri,  6 Nov 2026 10:45:46 +0000
+In-Reply-To: <20261106073528.93371-1-ojeda@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -90,166 +78,68 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20261106073528.93371-1-ojeda@kernel.org>
+X-Mailer: git-send-email 2.56.0.506.g506a7eabc5-goog
+Message-ID: <20261106104546.2297584-1-aliceryhl@google.com>
+Subject: Re: [PATCH] kbuild: rust: support stabilized flag `-Cprofile-sample-use`
+ for Rust >= 1.100
+From: Alice Ryhl <aliceryhl@google.com>
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: Alice Ryhl <aliceryhl@google.com>, Rong Xu <xur@google.com>, Han Shen <shenhan@google.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org, 
+	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	"=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	"=?UTF-8?q?Onur=20=C3=96zkan?=" <work@onurozkan.dev>, rust-for-linux@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-An kconfig-checker overlay is a YAML file applied on top of an existing
-rules file.
+On Fri, Nov 06, 2026 at 08:35:28AM +0100, Miguel Ojeda wrote:
+> Starting with Rust 1.100.0 (expected 2026-11-12), the
+> `-Zprofile-sample-use` flag has been stabilized as
+> `-Cprofile-sample-use` and the former is not available anymore [1].
+> 
+> Without this change, when building with `CLANG_AUTOFDO_PROFILE` set, one
+> gets in the latest betas and nightlies:
+> 
+>     error: unknown unstable option: `profile-sample-use`
+> 
+> Thus pass the right name.
+> 
+> Cc: stable@vger.kernel.org # Needed in 7.3.y.
+> Link: https://github.com/rust-lang/rust/pull/155942 [1]
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+> ---
+> I can take it via `rust-fixes` to get it in for the release, but please
+> let me know if you prefer to do something else. Thanks!
+> 
+>  scripts/Makefile.autofdo | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/Makefile.autofdo b/scripts/Makefile.autofdo
+> index 57a3aba6ffc2..32c18df237f1 100644
+> --- a/scripts/Makefile.autofdo
+> +++ b/scripts/Makefile.autofdo
+> @@ -13,7 +13,7 @@ endif
+>  ifdef CLANG_AUTOFDO_PROFILE
+>    CFLAGS_AUTOFDO_CLANG += -fprofile-sample-use=$(CLANG_AUTOFDO_PROFILE) -ffunction-sections
+>    CFLAGS_AUTOFDO_CLANG += -fsplit-machine-functions
+> -  RUSTFLAGS_AUTOFDO_CLANG += -Zprofile-sample-use=$(CLANG_AUTOFDO_PROFILE) -Zfunction-sections=y
+> +  RUSTFLAGS_AUTOFDO_CLANG += $(if $(call rustc-min-version,110000),-Cprofile-sample-use,-Zprofile-sample-use)=$(CLANG_AUTOFDO_PROFILE) -Zfunction-sections=y
+>    RUSTFLAGS_AUTOFDO_CLANG += -Cllvm-args=-split-machine-functions
+>  endif
 
-Overlays are intended for distribution kernel packaging scripts, CI
-environments, and board support packages; where the base rules may need
-local adjustments.  Overlays may override any rule's field.  They may
-also update the documentation URL or introduce totally new rules.
+Could we check for `-Cprofile-sample-use` directly using `rustc-option`
+instead of checking the rustc version (e.g. testing
+`-Cprofile-sample-use=/dev/null` or using `$(call rustc-option,...)`)?
+That way toolchains that cherry-pick the stabilization (or older 1.100
+nightlies from before the flag was stabilized) are also handled
+properly.
 
-Add support for such an overlay mechanism at the kconfig checker.
+Either way:
 
-Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
----
- tools/kconfig-checker/check.py | 89 +++++++++++++++++++++++++++++++++-
- 1 file changed, 88 insertions(+), 1 deletion(-)
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
-diff --git a/tools/kconfig-checker/check.py b/tools/kconfig-checker/check.py
-index 4f79ec487da7..38ae4ed32817 100755
---- a/tools/kconfig-checker/check.py
-+++ b/tools/kconfig-checker/check.py
-@@ -7,7 +7,7 @@
- # Main usage:
- #
- #     $ check.py list-rules
--#     $ check.py check -c path/to/linux/.config -r preempt_rt
-+#     $ check.py check -c path/to/linux/.config -r preempt_rt [-o path/to/overlay.yml]
- #
- # Notes:
- #
-@@ -225,6 +225,48 @@ class Rule:
-         if self.docs_hint:
-             self.docs_hint = '#' + self.docs_hint
- 
-+    def overlay(self, overlay: YamlDict) -> None:
-+        """Overlay passed yaml structure over existing data"""
-+        if 'expected' in overlay:
-+            self.expected = ExpectedValue[overlay['expected']]
-+
-+        if 'severity' in overlay:
-+            self.severity = Severity[overlay['severity']]
-+
-+        if 'rationale' in overlay:
-+            self.rationale = overlay['rationale']
-+
-+        if 'docs_hint' in overlay:
-+            self.docs_hint = overlay['docs_hint']
-+            self._normalize_docs_hint()
-+
-+    @staticmethod
-+    def _ensure_required_fields(rule: YamlDict, rule_id: str) -> None:
-+        """Ensure that passed rule has all required fields"""
-+
-+        # Normal rule files require every rule to define both 'expected'
-+        # and 'severity'.
-+        #
-+        # Overlay files are different: an overlay may update only selected
-+        # fields of an existing rule, so the overlay schema permits these
-+        # fields to be omitted.
-+        #
-+        # However, an overlay may also introduce a completely new rule,
-+        # where such a rule has no existing base rule to inherit from.
-+        # Manually check all required fields existence in that case.
-+
-+        if 'expected' not in rule:
-+            error(
-+                f'Required field `expected` is missing from {rule_id}',
-+                os.EX_DATAERR
-+            )
-+
-+        if 'severity' not in rule:
-+            error(
-+                f'Required field `severity` is missing from {rule_id}',
-+                os.EX_DATAERR
-+            )
-+
- class SymbolRule(Rule):
-     """Rule entry for one .config symbol"""
- 
-@@ -232,6 +274,8 @@ class SymbolRule(Rule):
- 
-     def __init__(self, rule: YamlDict):
-         self.symbol = rule['name']
-+
-+        super()._ensure_required_fields(rule, f'symbol {self.symbol}')
-         super().__init__(rule)
- 
-     def _normalize_docs_hint(self) -> None:
-@@ -253,6 +297,7 @@ class PatternRule(Rule):
-         except re.error as e:
-             error(f'Invalid symbol regex {regex}: {e}', os.EX_DATAERR)
- 
-+        super()._ensure_required_fields(rule, f'pattern {regex}')
-         super().__init__(rule)
- 
- @dataclass
-@@ -333,6 +378,36 @@ class Issue:
-     severity: Severity
-     rationale: Optional[str]
- 
-+class OverlayFile:
-+    """YAML overlay file access"""
-+
-+    overlays: YamlDict
-+
-+    def __init__(self, overlay_f: Path, schema: Schema):
-+        self.overlays = Helpers.load_yaml(overlay_f)
-+        Helpers.validate_yaml(self.overlays, schema.validator, overlay_f.name)
-+
-+    def apply(self, rules: Rules) -> Rules:
-+        if 'docs_url' in self.overlays:
-+            rules.docs_url = self.overlays['docs_url']
-+
-+        for overlay in self.overlays.get('rules', []):
-+            if 'name' in overlay:
-+                if rule := rules.get_symbol_rule(overlay['name']):
-+                    rule.overlay(overlay)
-+                else:
-+                    rules.add_rule(SymbolRule(overlay))
-+                continue
-+
-+            if 'name_pattern' in overlay:
-+                if prule := rules.get_pattern_rule(overlay['name_pattern']):
-+                    prule.overlay(overlay)
-+                else:
-+                    rules.add_rule(PatternRule(overlay))
-+                continue
-+
-+        return rules
-+
- @dataclass
- class SymbolIssue(Issue):
-     """Checker issue concerning a single .config symbol"""
-@@ -563,6 +638,14 @@ def parse_args(rules: list[str]) -> argparse.Namespace:
-         help='rules file to check against',
-     )
- 
-+    check_parser.add_argument(
-+        '-o',
-+        '--overlay',
-+        metavar='OVERLAY_FILE',
-+        type=Path,
-+        help='file overlay over picked rules',
-+    )
-+
-     return parser.parse_args()
- 
- def main() -> None:
-@@ -586,6 +669,10 @@ def main() -> None:
-     rules_f = rules_dir / f'{args.rules}.yml'
-     rules = RulesFile(rules_f, schema).parse()
- 
-+    if args.overlay:
-+        schema = Schema(schema_dir / 'overlay.yml')
-+        rules = OverlayFile(args.overlay, schema).apply(rules)
-+
-     checker = Checker(kconfig, rules)
-     report = checker.find_issues()
- 
--- 
-2.56.0
-
+Alice
