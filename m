@@ -1,62 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793956798;
-	b=dbz+2rSeK46O0YY2+KnhPCXIxRq8ffNUOfQqd24SkJybUgbJYaKmqC4TunhhcONw4wT/
-	 QXMv8FB5N3HiM39s5oYnFuf1Kdy0KWo54Y9oZCHeUXZG+nKCcG5YKSRzeyCM7leHl20pW
-	 wzBQxFKZAGI07uN8SGvOjw8ABFlGHwKjOarNR+X6CmclyLP348JVRgzpjbjp+2tQpVbaN
-	 UzwjiP1Y4E+Ms5qNuzz6eXOG4V66cep/CqkAtJ7cg3BEZacAo1T9UhiEirQiyuy4QY2hp
-	 wxQYnXWuRRLUv/hE9JNgzY4EqNI8UBLbeKN95JN+XN9MLqrnumC9BvFeD4luw4fTTcQ==
+	t=1793956810;
+	b=1786yDlZKah9IRo0H0/B6oZFM+Sbwh2eW1NG+aJcSv1od7Y5gPnhGeYrsGByLwXcM273
+	 C5QcroovfPXuQQcd2lRtuD1KZg8WSOuj7NL9rq+K1/fCUAmqzYosd6nPteNnfnIs6A5Nu
+	 OTgyvakGLPvn8kd5Myp9wtM7g2/LUhzx46ipEVGlURwx4jGoVtEmRkQFhKH30DDFHwiDr
+	 RZBk1n8wUws+oqsrLMwV/SFFQgkbgszE3fO5nkVIKVC9f0oxnOaEIOPXYm8lwdC6TScxa
+	 fAGT5+7s4D8JzVyhep2lkv5tGO+fnxYMHzmwousqx70m9335aNE76FogOaPm1COwbAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793956798;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793956810;
 	h=DMARC-Filter:From:DKIM-Signature:DKIM-Signature:To:Cc:Subject:Date:
 	 Message-ID:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=VVQM4vpmIqtUkXlQycTZmxQFVlzTE7nC1mJ7AMYBMDo=;
-	b=tEnLSmZXTWcQ0KBE2esogcMLUevBE6N7jOhxqk3Gse2X7kCa3iKuCTpZSdcVQPXUgTV3
-	 3kkbbbTj574mQJiB0KlTGfeOckMMpreeHpCxGdVRkh01ERBgLH2J2Wjre3DBmPq7/APOt
-	 03H4Tj+VRPKekfg1RqA1xCtouI+VZt/i2c4C5rODolX4tfHepi+0dPJBcCppbr8ji8FF4
-	 luUS9I7/gQhzAI3xWnBa/Q4ezozlLa6XXd2uwQ3d1y44YRFw4XByv/wt5UYIqfcCe/a6i
-	 NTsa0MicmoQ5BlJVAGfkfrrF35l9VJEl1W79lQqBm9B9xfkNHs50C47KgrLBEWKgYhw==
+	bh=fsmJiYhHFp8PcnlPHKhucEhEpsHbUsMO9OOi7pQoBRc=;
+	b=YNjTHrdcE0XJdQs5pWWPgjVfJmeLIZoxIjuKEohc9ODAbi9YGHFLJBUWnLbTaIuiohHg
+	 nL8fpM+jfnxEtSsFhUXAdbRBPB3pSLadfI7YQu4UtYeAg5aJvnZE6tH0Mmf0LPAdANLGN
+	 DLTwVkBmmN3vQPKJdcC4XZlU3QmczhQhtsJLael9O5e3rUrt1QQbbnz926mkjH4iaOnFw
+	 IOJO3nGWKab9hJta4BXakFRu0Wpd63TPx70W+iMcUyV27ctDCtrSzvl0JxEodof8eR8sg
+	 BNVitdqKWaIZ5jSJc7DthiZSl4/THGqSwt+zLXw2uiVpQZIq8LmpDiaLTg6ctVLa0uQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linutronix.de;
 	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=jA7uuWou;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=rHEfF4HE;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b="XR6M1S/T";
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="7SHz/SlS";
 	arc=none smtp.remote-ip=193.142.43.55
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605D7606A329;
-	Fri,  6 Nov 2026 09:19:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 605D7606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BC5606D801;
+	Fri,  6 Nov 2026 09:20:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71BC5606D801
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=jA7uuWou;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=rHEfF4HE
+	dkim=pass (2048-bit key, unprotected) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=XR6M1S/T;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=7SHz/SlS
 From: "Ahmed S. Darwish" <darwi@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1793956796;
+	s=2020; t=1793956807;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VVQM4vpmIqtUkXlQycTZmxQFVlzTE7nC1mJ7AMYBMDo=;
-	b=jA7uuWouOwWkZQ+uSsTvE7Y3WvtOhduBDYoFkQlzPW0Zsc25QoSb9hZvbiH6aUxPF6f+x1
-	UE6ded12dAx3O5CmFBfjgODvb+tKFAlR0QuqTSmUbP32/tTdIjmK471dUzESfsDi7b//bZ
-	HsBBEz9MpC9KupDb4rimU0dLC27cKoNDdiSnaUXxLMWAcbv+bXY4tp5Y317AIXv+HztLwu
-	A7odMBP/D5pAzO6mgsFsDw3Gicq/GFFf8p0pOg84tDwXBMVt/1fBVhK5yvJhseJzc8TZFj
-	SxL+bkH5OocsSw+/sYo+f+4jNUQ4kvuysOe69Z9m2A9W/VdmXkXHl8JZO+IO/A==
+	bh=fsmJiYhHFp8PcnlPHKhucEhEpsHbUsMO9OOi7pQoBRc=;
+	b=XR6M1S/TiyCtgphzBSk9KSsI7wglQvugGDwImzn2uVytPw55X+QHk3efxDxuRdu+gx60lM
+	y5X38P1rpXHtjb+xqUMbkxyyA13/DYmxoroR9TJvRKdktRNQXf1za0DAhEb4y1cs7PX/+6
+	ybHmBIOw6c0HryLt9Tu8GOvECUAj1jqE7HgL+v9CouZvW/fvm8pSg6QC+J2YWymCRRZ9MN
+	RXZN0GLDeruQzJXdvbcOiEJua7N64VnU7CUAkFIPTYO41XARaOOqYMjt0ohcz3bb3gtoJJ
+	91k8g6VJROHOU+OAOz9LM06H3obW4i8sUdOwDj8pKbXEYFQLtceE46Q+6NEJRg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1793956796;
+	s=2020e; t=1793956807;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VVQM4vpmIqtUkXlQycTZmxQFVlzTE7nC1mJ7AMYBMDo=;
-	b=rHEfF4HE/F/0vu2k1eqKQLg/3NzVGNRH0axzRz2vfFflb5RmrC8lYlc9V6B0L/scQlWpjD
-	ECUgvlJJ9O4lP0Aw==
+	bh=fsmJiYhHFp8PcnlPHKhucEhEpsHbUsMO9OOi7pQoBRc=;
+	b=7SHz/SlSQBc0I4hRdVK2D7xO1u2w78O1ff/C4dCu2rmWKcVD+F1fSHmkSO2/7lAziUmi8e
+	GXzYRxDXsbVV8BAw==
 To: Clark Williams <clrkwllms@kernel.org>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -77,9 +77,9 @@ Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Ahmed S. Darwish" <darwi@linutronix.de>
-Subject: [PATCH v1 07/10] kconfig-checker: Introduce overlays schema
-Date: Fri,  6 Nov 2026 10:19:19 +0100
-Message-ID: <20261106091922.7560-8-darwi@linutronix.de>
+Subject: [PATCH v1 10/10] kconfig: Introduce OVERLAY= for make checkconfig
+Date: Fri,  6 Nov 2026 10:19:22 +0100
+Message-ID: <20261106091922.7560-11-darwi@linutronix.de>
 In-Reply-To: <20261106091922.7560-1-darwi@linutronix.de>
 References: <20261106091922.7560-1-darwi@linutronix.de>
 X-Mailing-List: linux-kbuild@vger.kernel.org
@@ -93,67 +93,77 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Keep `expected` and `severity` as optional for every rule.
+For the kconfig checkconfig target, allow passing a rules overlay file
+through an OVERLAY= parameter.  This is mostly intended for distribution
+kernel packaging scripts, CI systems, and board support packages.
 
-This allows overlay files to be partial by design: they may override only
-selected fields of an existing rule.
+Document this parameter at the kernel's administration guide.
+
+Note, the detailed overlay semantics are already explained at
+Documentation/tools/kconfig_checker.rst
 
 Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
 ---
- tools/kconfig-checker/schemas/base.yml    |  4 ++--
- tools/kconfig-checker/schemas/overlay.yml | 28 +++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 2 deletions(-)
- create mode 100644 tools/kconfig-checker/schemas/overlay.yml
+ Documentation/admin-guide/README.rst | 7 ++++++-
+ scripts/kconfig/Makefile             | 6 ++++--
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/tools/kconfig-checker/schemas/base.yml b/tools/kconfig-checker/schemas/base.yml
-index 1cc19752ebd6..6217eaba3e41 100644
---- a/tools/kconfig-checker/schemas/base.yml
-+++ b/tools/kconfig-checker/schemas/base.yml
-@@ -53,8 +53,8 @@ properties:
-         #   y        option is expected to be enabled (built-in or module).
-         #   n        option is expected to be disabled or unset.
-         #   allowed  option is permitted and must not be reported as a violation.
--        #            This is used to exempt a specific symbol from a broader
--        #            `name_pattern` rule  with `expected: n`.
-+        #            This is to be used either by overlays, or to exempt a specific
-+        #            symbol from a broader `name_pattern` rule  with `expected: n`.
-         #
-         expected:
-           type: string
-diff --git a/tools/kconfig-checker/schemas/overlay.yml b/tools/kconfig-checker/schemas/overlay.yml
-new file mode 100644
-index 000000000000..4ac9a364a344
---- /dev/null
-+++ b/tools/kconfig-checker/schemas/overlay.yml
-@@ -0,0 +1,28 @@
-+# SPDX-License-Identifier: GPL-2.0-only
+diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
+index 77ffe4dcb85b..b62689bcda6b 100644
+--- a/Documentation/admin-guide/README.rst
++++ b/Documentation/admin-guide/README.rst
+@@ -263,7 +263,7 @@ The kconfig build system can validate the generated kernel ``.config``
+ against a selected rules profile. Running ``make checkconfig`` prints
+ usage information and the available profiles::
+ 
+-  Usage: make RULES=<profile> checkconfig
++  Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig
+   Available RULES: preempt_rt
+ 
+ For example, to validate the current configuration against the PREEMPT_RT
+@@ -278,6 +278,11 @@ selected rules profile. Each diagnostic includes a severity, such as
+ Apply the reported changes as needed and run ``make checkconfig`` again,
+ against the same rules, until no relevant diagnostics remain.
+ 
++The ``OVERLAY=`` parameter specifies an overlay file whose rules overrides
++the built-in mainline profile selected by ``RULES=``. It is intended for
++distributions kernel packaging scripts, CI systems, and board support
++packages.
 +
-+"$schema": "https://json-schema.org/draft-07/schema#"
+ For more information, see Documentation/tools/kconfig_checker.rst
+ 
+ Compiling the kernel
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index d67a23730259..faaa8c16ab03 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -126,6 +126,8 @@ testconfig: $(obj)/conf
+ clean-files += tests/.cache
+ 
+ checkconfig := $(PYTHON3) -B $(srctree)/tools/kconfig-checker/check.py
++checkconfig_overlay = $(if $(OVERLAY),-o "$(OVERLAY)")
 +
-+title: Schema for kconfig-checker overlay files
-+
-+#
-+# Full rule files require 'expected' and 'severity' for every rule.
-+# Overlay files are partial by design: they may override only selected
-+# fields of an existing rule, so such fields are not required here.
-+#
-+# For example, preempt_rt.yml:
-+#
-+# rules:
-+#  - name: CONFIG_DRM
-+#    expected: n
-+#    severity: info
-+#    docs_hint: config
-+#
-+# and a custom-overlay.yml:
-+#
-+# rules:
-+#  - name: CONFIG_DRM
-+#    expected: allow
-+#
-+
-+allOf:
-+  - $ref: "base.yml"
+ list_checkconfig_rules =						\
+ 	echo -n >&2 "Available RULES: ";				\
+ 	$(checkconfig) list-rules >&2;					\
+@@ -134,7 +136,7 @@ list_checkconfig_rules =						\
+ PHONY += checkconfig
+ checkconfig:
+ 	$(Q)if [ -z "$(RULES)" ]; then					\
+-		echo >&2 "Usage: make RULES=<profile> checkconfig";	\
++		echo >&2 "Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig"; \
+ 		$(list_checkconfig_rules);				\
+ 		exit 2;							\
+ 	fi
+@@ -143,7 +145,7 @@ checkconfig:
+ 		$(list_checkconfig_rules);				\
+ 		exit 2;							\
+ 	fi
+-	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)"
++	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)" $(checkconfig_overlay)
+ 
+ # Help text used by make help
+ help:
 -- 
 2.56.0
 
