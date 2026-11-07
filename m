@@ -1,68 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793998444;
-	b=ymIieI9ngEW+gzKHRv6zmOQeTseFUsClXOEzahKXoZ67fnCBMtvX3sqwZutjdyi1qULn
-	 YGbXs29FqVejZkAh8hlZ+rxH6mUrrVDAGNb3x14UQN3qcBcKsV3rkAK7nybh5bn+qVUkO
-	 8olb3gb8rWUQmhLtQ+74xYiXoxP2CY9v8jSmrdRr4v0+ogpUkYi6SCvKNgABkq/+wuwvL
-	 +pIdygB2U7D9IPZmKBPS7HEXVyWZtm8SA5uXVZkO9nTvppe/fjNxH1ivDGaeFMsofVQHe
-	 nTkE0433BVXuN7gY9RDveetpCXnV0w1w+Crk+ul3kijfFSaq9IXq16mxIQcOpduBrHQ==
+	t=1794018308;
+	b=p+O6O+U7o2SypOXyt87EOpebT2hwCqHzwNGUFlO8a94pC1721aqVanFSvA3PQkfXGfM5
+	 DaNsuiQjVY9+czU2Kg4tEvDLcZttoKjpE7rluexj6EI22QS2YQ8q9WrVVtK6OBEplhjEa
+	 UQeHG61wgETyb3pnBWbolsZUaRKv0G1lSlHBWbBlEffZZITpeKBptGtxL93WPBV6e5t8V
+	 YV5dZq9JcX57kH1RELWYHZWIjp3yyhklwRSPjpl9Rm/MsfJ5Do8KWHLFmR+k+3NERs3jc
+	 1NpW/7JdCgd5NnWJwVq3paBIS5GF4sZHrDlLeenj/novjl00QRSfqA5cpnhDPVe9eWA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793998444;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=GLqhz4fnwD2jbyndKPwTTlFLM1XVQgShCxmfx522pdY=;
-	b=Vg3lhLTZw4RnpOgmZ8sJqbIetA5FnCt05SPe/MDQmPiNo1b7FZiekrNTyV3N7+Y09EIq
-	 BCorua1AMK1IMHkpX6fhTAAUDFPeelPResh30zL3VNfqTIXqyKTn3IMLvgokwOJG5m3UL
-	 hy3ispQvTbLf2blEfKKycHDeKO/IRKVbidMGACzieYdxuYD040uxWVYWjxV9F5uYNsLwX
-	 O2tGdmOYq4Nv2Nz9eOkeZluX5Zr60Z84vW4rN8QETzDGV6fZudeoIGhjZrQuZOWBZmftK
-	 Xnlr6ZnaMX4tm9EB3qxgJbPgzFXiX8W6X4q4BoCizyMTg9Jz7WocaOH5VVwtv4uS9vQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794018308;
+	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
+	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=r7I0ZPKoyK57lrWRAjn8hzItvyN2aZVtTjY91KDbjSY=;
+	b=2EB1XbE4FO94QisirYu6L5bvpZFxBRvbrK2wrNXHWhFyFCz26jAadIPYpc/wLRyD4F2v
+	 bhPljS89CvHUg5EP83AzBgUwxprq8Jt14b4zTyJn5r+pYHFU1UySkFJgR1vsBayNc+VyU
+	 qO6XORC5v3rAQG1/4kPwC8aYdz8EQmKTFt618dSB/gRGKea31uKGmIkI8Ql5iwDS2xK0Q
+	 OEIxdzt+cG1EmUYih3SKgshcgoAQyqB1PXKe/6N/iUNYd/3LPw5SqrMVBpr3+e2DYY/hT
+	 MMe+Crgn7R3DIlLEygRccz1aphGE4FuVTFs0TSWWfLcIkkDDBsBsEHNchhubllGlytA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WgiNIKcY;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YUJS+hj5;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBAD606A329;
-	Fri,  6 Nov 2026 20:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B0B606A333;
+	Sat,  7 Nov 2026 02:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WgiNIKcY
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2E771F0089F;
-	Fri,  6 Nov 2026 20:53:59 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YUJS+hj5
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE5101F008A1;
+	Sat,  7 Nov 2026 02:25:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793998444;
-	bh=GLqhz4fnwD2jbyndKPwTTlFLM1XVQgShCxmfx522pdY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=WgiNIKcYU46fmXcALNq5dW+kWmNQwgbEFrbWnO2ZAV1x66YPw6A6HiB8/V/qOMyWe
-	 ZKBxL4aCb5/g0rzFTjOC3gpbaU/6w/AjdwbcsOkF5TrUreZK3twBW3nyN9HWNVcWwQ
-	 /wsaKusT2xlDZW996Yyxl3ugm50gwg+nFw/w2+lMji7TVKMFwfI+NqinTmlLSWwnFh
-	 dvZCBNtg/Tni5AvbmytlrSS3+NLxEPj3srVHnCbnECrOcy2Pv4eFJFBnZ0FnGMeMDV
-	 224w2eDwgm64O82VMHvCVvHcMjRySDl6Jv7TCPAjKC9Xal7tpRALIjpgnHcaiAprVd
-	 3c2EU+e2SNJ8Q==
-Date: Fri, 6 Nov 2026 13:53:56 -0700
+	s=k20260515; t=1794018308;
+	bh=r7I0ZPKoyK57lrWRAjn8hzItvyN2aZVtTjY91KDbjSY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=YUJS+hj5TFcL5/TKbQEA9NxrVYeNF6w/LGL5nrgq4JG8qBz02SdiQPf9zMPbNeOmD
+	 7mcaDsB6+HszsPcF1EmzZetLRryyGMD5SbJURSYOYeYq0Yy4kKOwJDiI4MkyynYnrq
+	 LXc/9k4GMW0oHb6i1TpodyJK2k4tFnDnU6Pmv3kxT05rHnL/WOHvkU63yYpDioZyCd
+	 lZD165z126DxcYFwu6uaxh3wLVaxG2ec4fWPVyavyAem++GRYJFRUTbeo7V/e02XBQ
+	 NJlV2nZTTC3CfZHxADusN+v89U6CgUfIYO1q/LB3+WO1qkqZekin7/xkpq3pArnV3M
+	 KgKpRx28S8gQg==
 From: Nathan Chancellor <nathan@kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Alice Ryhl <aliceryhl@google.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Rong Xu <xur@google.com>, Han Shen <shenhan@google.com>,
-	Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org,
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	rust-for-linux@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] kbuild: rust: support stabilized flag
- `-Cprofile-sample-use` for Rust >= 1.100
-Message-ID: <20261106205356.GA21490@ax162>
-References: <20261106073528.93371-1-ojeda@kernel.org>
- <20261106104546.2297584-1-aliceryhl@google.com>
- <CANiq72kSG61mTC3_0pPokoLbbE87oFrKHcNUZhxhbxpg24USYw@mail.gmail.com>
+To: Nicolas Schier <nsc@kernel.org>, Vineet Gupta <vineet.gupta@linux.dev>
+Cc: Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+ Jakub Jelinek <jakub@redhat.com>, Julian Braha <julianbraha@gmail.com>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ llvm@lists.linux.dev
+In-Reply-To: <20261105175748.3057520-1-vineet.gupta@linux.dev>
+References: <20261105175748.3057520-1-vineet.gupta@linux.dev>
+Subject: Re: [PATCH v2] kbuild: move gcc's -Wconstant-logical-operand to
+ W=2
+Message-Id: <179401823380.3455564.6991992300630125115.b4-ty@b4>
+Date: Fri, 06 Nov 2026 19:23:53 -0700
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -72,61 +63,41 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72kSG61mTC3_0pPokoLbbE87oFrKHcNUZhxhbxpg24USYw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=777; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=eu6pW09wQo8caXmBvKqCiifq927nBl7uH0wBtnSNVxA=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFnvur8ntNjGbNQ9FVRbX7x56p4vhor150+Frl58zMrz9
+ n3JCM+ajlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRuSUM/5TuxfOrf3YybL4k
+ l6Igc+T6F713zGdUDoUL/N3Bx3ens4vhf5r+8gm9X3v6RHbdktPZpR2x12A2j2jOuqwbx/6wXbG
+ XYwAA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Fri, Nov 06, 2026 at 12:04:08PM +0100, Miguel Ojeda wrote:
-> On Fri, Nov 6, 2026 at 11:45 AM Alice Ryhl <aliceryhl@google.com> wrote:
-> >
-> > Could we check for `-Cprofile-sample-use` directly using `rustc-option`
-> > instead of checking the rustc version (e.g. testing
-> > `-Cprofile-sample-use=/dev/null` or using `$(call rustc-option,...)`)?
-> > That way toolchains that cherry-pick the stabilization (or older 1.100
-> > nightlies from before the flag was stabilized) are also handled
-> > properly.
-> 
-> It is definitely an option, as usual, but this file uses the version
-> elsewhere, and we have preferred so far the version one where
-> possible, because it is way simpler and spawns fewer processes
-> (especially so in newer Make), which Kbuild has usually appreciated.
+On Thu, 05 Nov 2026 09:57:45 -0800, Vineet Gupta wrote:
+> kbuild: move gcc's -Wconstant-logical-operand to W=2
 
-Yeah, there is always a fine line between deciding whether or not to do
-a dynamic versus version check. Obviously the cost of querying the
-compiler is not that high in the grand scheme of the total build time,
-so I don't think we should be scared of doing dynamic tests, However, I
-do think doing plain version checks is simpler to support, especially
-since it makes cleaning up these changes as the minimum version is
-bumped.
+I added a 'Cc: stable' to help older trees.
 
-> Regarding old nightlies, those are not supported by upstream nor by
-> us, and we intentionally never attempted to make flags work for
-> particular binaries out there. I think the fact that we support even
-> nightlies from Rust is already quite a success :)
+Applied to
 
-Yeah, for clang, we have done our best to support prerelease versions
-but once the toolchain stabilizes, we don't care about those old
-versions. I generally try to do version checks against the stable
-version (i.e., x.1.0, instead of x.0.0) to avoid breaking compiler
-bisects but I guess Rust doesn't have such a scheme? That is the only
-area where I feel friction with version checks.
+  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-fixes-unstable
 
-> Same for custom `rustc` forks, if you mean "cherry-picking the
-> stabilization". We can't really test those, and if someone really
-> needs that properly working and can make a case, then we would need to
-> take a look at all the version tests we do (and not just for Rust).
-> Perhaps some folks only customize 1 or 2 flags and thus only care
-> about those working, but we wouldn't know which ones.
+Thanks!
 
-To be honest, I would avoid supporting franken-toolchains if you have
-the option not to. Presumably if a vendor has customized or vendored
-their toolchain, they are likely working with a downstream kernel as
-well, in which case they can just adjust the check in their tree as
-needed. You could obviously deal with exceptions on a case-by-case basis
-but reasoning about all the different options and their first supported
-version is hard enough as it is.
+[1/1] kbuild: move gcc's -Wconstant-logical-operand to W=2
+      https://git.kernel.org/kbuild/c/4d8996081dd19
 
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped or
+reverted. Patches applied to an "unstable" branch are accepted pending
+wider testing in -next and any post-commit review; they will generally
+be moved to the main branch in a week if no issues are found.
+
+Best regards,
 -- 
 Cheers,
 Nathan
+
+
