@@ -1,55 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=84.16.66.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794060269;
-	b=RQnnVl3pcuiKsGttWyUII232iH4R4cVZcdLhx0BFWqTzmdS6ETshENf/QKB5XO6+kjSq
-	 tbnVwlqzsDHXMTxigfFjf8wzln541V/fz4EDVps1mbZjuvFnzsO9kt25xdKPUrEcjyhmo
-	 Kg0HkKjpTxvAf08wbyezHXJ/GQ2Rmi/OwZz91XVMJVnERWwD/GiLsWZhltQyxwzge2bz+
-	 vzvOC7I+KSNyLz/u3BL6VNn0/f/YL0QXu5cfv8lkgtV2GwJHx4UgeCUHjMX9wcpYFbM9j
-	 Y22rMKsxywTRxdr9OrfuAZ0iuXrS6JU+qXisxE8s/r+G+m/tDmgwnFMVVw9+bOl+Otg==
+	t=1794078850;
+	b=h2yUc7kN5tnfXcL6fVDP7tY8CVD1Jgu2tbTUnMDTIIDaQtq4kWzkgJa+EjrrcEC/s+Q5
+	 dSEMYJWJSpaeLco79F1fS3oBmF0ZieTe43tUnfylAbj6KVK6Om79Ep4MyoFRxCdabM/RW
+	 q9HEsAq547cxrJcl7KW+R0q2PfSoIA3ZMrnwIZ93tgQsnUPicmGjZ8hH9i1Va9j9ubsUk
+	 MxZutj0SOQhtLWENd3s6Myd0bTx4XAO4EEx/tVa+2w3NxcK/11cCW8B5GJhXDlqyd/fDc
+	 lpYnxtej4P1u8+T+hMbOH74BMt5twAvo+lUrgBpVf6qob0V54wRU7uksPRxorUOrLDA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794060269;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=iz4ILeaLK/9TEw5ONvASXLYJT0mntrU76Bzr9kVTezY=;
-	b=lWunQYvfwqFIaDFn3YwJ8noIvNfBD5fNRXanCBkN8xnv8kcL5/d1BLoGhNR4rc/PgBEJ
-	 UQKlIxnXfza+m3mAFYUGDI2SXda5Iiy6GQlHaE0b7Cc67xusp1kZnvKIiVsv078hqFY8F
-	 InFgexmXxJ42HIRwPKUAVKlHvf8C6ZcWgpdtDJLL1xl2zR+V840LfPGa4BYhM/0BRWrm/
-	 lKumQXOsfbcYwodDiZMuRpJsE1GxF0F1iry5M5lUyCvT0tzIYxtufs94AMfUUy2ZjlHcq
-	 0vyASDvnLIgVRksCkid/Sou2ds/y8Jt8T40SBCe2gq9AbbTQPBNejemRZqjz4ThI4Tg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794078850;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-Infomaniak-Routing;
+	bh=79CCLER5XkcOWvks0TM+BO2JVYt1R9dSbZEWQHd5IgI=;
+	b=5Q3wS35aeOgJ6x0QGC1Z5wrMyo8WdBX9mj9mCylkyMShhP7vZy2wjiswFE7Nu2tExP3i
+	 G5xOpUwpShfAuSUJirSvEn886lC1qjo+waRkI1+bl6hUJ7rJDjmFvhpmHhC3xuBMAYcAX
+	 +hEsKJVTsEaO47aLbfxAJznwAK41YDeO17GqqgdnqVEdupiUTAVTNG0z4lUOlA/NcbBcE
+	 KdT3kRg2iuH0L2fFEIwLlnS3Rxspovr3kYSR/7nF/rITWn8qv1SAikdsmHOZqx+RCRT7k
+	 BAN2gJehR/+2dJnmwULEvytcM2CAg6PwBe/evL2VZqrCr1zSTW6zbjfFk+tPJqhvVAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Mpz5/dtc";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=daylightlinux.ch;
+	spf=pass smtp.mailfrom=daylightlinux.ch;
+	dkim=pass header.d=daylightlinux.ch header.i=@daylightlinux.ch header.a=rsa-sha256 header.s=20261016 header.b=Jro0Z5g3;
+	arc=none smtp.remote-ip=84.16.66.173
+Received: from smtp-42ad.mail.infomaniak.ch (smtp-42ad.mail.infomaniak.ch [84.16.66.173])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 0336C606A32F;
-	Sat,  7 Nov 2026 14:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E28C606A32D
+	for <linux-kbuild@vger.kernel.org>; Sat,  7 Nov 2026 19:14:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9E28C606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=daylightlinux.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daylightlinux.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mpz5/dtc
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 526C71F0089F;
-	Sat,  7 Nov 2026 14:04:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794060268;
-	bh=iz4ILeaLK/9TEw5ONvASXLYJT0mntrU76Bzr9kVTezY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=Mpz5/dtcs5Oc1x2Cl6ofTg+wKDhbgL4uDEzJQ4kKHPtFuDGr6xcb/VK7I/srTWr2B
-	 2H0PlikMuGuIeItRN9Qs6YZMfby6kcZwLGX5okXMaXOIAeQfdUWT09kbXOCl+dPWGy
-	 Rp1NnEQSxn2Gbm2MDLYdYodW3T0nXB4IDg8msm4ZzHZoTVvbqAeHVzqHgtovCjaxlD
-	 Rp08vYuYF+R/ppvq9XzGVm2AS2cxJCbeKRSztmkLAzhSkDINbkrP25AlPatVh9XvMQ
-	 MiyUvjkhIX1ft31NCtkZ2UFYpVpLpl4kCuH+XU2WEV7rPjJg/sSnBEnYPCqMaJ8Czu
-	 AwWn7EsD9/iLw==
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261107-kbuild-descend-spam-v2-0-3bb0a7c4781c@weissschuh.net>
-References: <20261107-kbuild-descend-spam-v2-0-3bb0a7c4781c@weissschuh.net>
-Subject: Re: [PATCH v2 0/3] kbuild: don't print DESCEND messages from
- tools/ build
-Message-Id: <179406011233.60865.11422599083662810895.b4-ty@b4>
-Date: Sat, 07 Nov 2026 15:01:52 +0100
+	dkim=pass (2048-bit key) header.d=daylightlinux.ch header.i=@daylightlinux.ch header.a=rsa-sha256 header.s=20261016 header.b=Jro0Z5g3
+Received: from smtp-4-0001 (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4jMQh63jLpzlPB;
+	Sat,  7 Nov 2026 20:13:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=daylightlinux.ch;
+	s=20261016; t=1794078838;
+	bh=79CCLER5XkcOWvks0TM+BO2JVYt1R9dSbZEWQHd5IgI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Jro0Z5g3NTAdltlqgUbT9BBMuG/MZxOiqoWmQ8QL3r65gCICaxzkGjQP2K7h2pqpX
+	 +Dygt/08MrLx7gIVfv39CvilpengMhFae+bMAy3I66ojpRfgl3z8kB1wSbTEWkicfy
+	 nIyrh9Wyv5gDifD9OtD9suBXa2/j7oAlOT7xn4y+l1rAf8FMreBnK1xF9zS1D/y4+R
+	 yDUpf7vLnf9Thu12FKEqprE5RVSE85PNUNDTcUtsWqj1tpq1LjonHTpLxOOIsKbFbo
+	 FtyU5o+pxAHHobR0MHVcRV+zyw0kFc7H4WAVAD7UxTb9a5MKqKyIcwE717ztcblyUy
+	 7S9WqBlZthP7A==
+Received: from unknown by smtp-4-0001 (Postfix) with ESMTPA id 4jMQh537DSzJBX;
+	Sat,  7 Nov 2026 20:13:57 +0100 (CET)
+Received: from unknown by raspberrypi with local (Exim 4.96)
+	(envelope-from <info@daylightlinux.ch>)
+	id 1xPlrQ-00036w-1A;
+	Sat, 07 Nov 2026 20:13:56 +0100
+From: Hamdy Abou El Anein <info@daylightlinux.ch>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: arnd@arndb.de,
+	quic_johmoo@quicinc.com,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hamdy.aea@protonmail.com
+Subject: [PATCH] check-uapi: avoid truncating the failure count in the exit status
+Date: Sat,  7 Nov 2026 20:13:55 +0100
+Message-ID: <20261107191355.151276-1-info@daylightlinux.ch>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -59,59 +73,52 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1254; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=1L9SHaZtINA5liODJBQps+4sD4pjccWDUemDimkDLc0=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBq7y9WVg/jsvxvFP6Z+1ga3i37Mfba+nG3nRMm2
- 284vtqKJpiJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCau8vVgAKCRAHUgpwFiYS
- aVqcEADig7BFDmuzoYu+B7awlKcgqOquIqrwkW1FPgQOg2hE/l0FqIDUHQM1RfrAAkANOfnZ8oj
- z5rHwIsbSQQmVSz6si8D/r6tcMB2MWXjDVU23aTZhvyEL20hZdHbIX8PcxmU2CxFRLUuOio/TCn
- XD/S2tYpaLm4RDhhGSKAKSiQmwxLo2KVBPmwNCkcr3AOjJ+CJgeNP9EI2JHN3sNPjzo8sQc2D0g
- ZoR9H9ViqcdM6mBh5Zv+FrGQgSvCE1Fy+cZ9mi8cQw7TWzwIQSE1YUdFKu26CVWMTgTTiVn7IUt
- BTs0O2vJ4vzobSfAz0q+THjhD6b4b5TNw7RyoLpV3n8jgdTVzLtD51r7OcHv6l+Guz9sV+fXCoY
- XBtp54aTHWZW1SWnQqkGKKivGEspHkbmO9MWeIFQvb7r5z++PLVFYvBdrmtmktStl30AWKi4WPU
- l+jOohPMRysoBiuoN0n3cmsF22JYN5VDfxZHMBnk5n1loyzC1LzGA4T7e0nH5fr+r/LOBFM7Of1
- g5C87Xyk1qKHfzp2DDjdmKqxsvxRlh4YgNwRBFknrl3jrNUw8GP6Vqcu7N44UuoN0Drf1VB7wVV
- FaMomcrW2snqT1TH8zaMhHHID6IdQUp+/l4fmwq3XbYqmoeZ3tDHPhL4FCvHUh7C3S/7yFHL2VO
- TtDeLc2P07fBLcg==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+X-Infomaniak-Routing: alpha
 
-On Sat, 07 Nov 2026 03:02:40 +0000, Thomas Weißschuh wrote:
-> kbuild: don't print DESCEND messages from tools/ build
-> 
-> kbuild itself does not print the directories it descends into, the
-> tools/ build however does so. When kbuild executes the tools/ build
-> these messages are out of place.
-> 
-> Forward kbuild's behavior to the tools/ build:
-> Nothing is printed by default, the full command is printed with V=1.
-> 
-> [...]
+From: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 
-Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+check_uapi_files() returns the number of failed header checks as its
+status. Bash truncates this to eight bits, so 256 failed checks return
+zero. run() then treats the ABI check as successful. With -q, the error
+diagnostics are hidden as well.
 
-[1/3] kbuild: drop the tools/ target
-      https://git.kernel.org/kbuild/c/6766b341
-[2/3] tools/build: Deduplicate the descend commands
-      https://git.kernel.org/kbuild/c/746dfc4c
-[3/3] tools/build: Don't print DESCEND messages when executed through kbuild
-      https://git.kernel.org/kbuild/c/c9946f66
+Return a boolean status instead, while keeping the full failure count
+in the existing summary.
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
+Tested the complete CLI with fixture Git trees containing 0, 1, 255,
+256, 257 and 512 removed headers, plus -j 1 and -q. The 256- and
+512-failure cases now exit 1 instead of 0.
 
-Patches applied to the kbuild-next-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-next branch in about a week if no
-issues are found.
+AI assistance: ChatGPT/Codex identified the issue and prepared the
+change, commit message and executable regression tests.
 
-Best regards,
+Fixes: 1f7f31bf7202 ("check-uapi: Introduce check-uapi.sh")
+Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
+---
+The regression fixtures use a minimal headers_install Makefile and
+an abidiff stand-in that only supplies --version. Actual removed-header
+checks, Git archives and the CLI exit path are exercised; no ABI
+comparison is invoked for these removed headers.
+
+ scripts/check-uapi.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/check-uapi.sh b/scripts/check-uapi.sh
+index c8beec588..93095a5b8 100755
+--- a/scripts/check-uapi.sh
++++ b/scripts/check-uapi.sh
+@@ -295,7 +295,7 @@ check_uapi_files() {
+ 			"$total" "$ARCH"
+ 	fi
+ 
+-	return "$failed"
++	return "$((failed != 0))"
+ }
+ 
+ # Check an individual file for UAPI compatibility
+
+base-commit: d48723711bae9b8cdc56719c448ba42fef28cbee
 -- 
-Nicolas
-
+2.56.0
 
