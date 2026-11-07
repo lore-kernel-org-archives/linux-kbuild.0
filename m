@@ -1,64 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794043229;
-	b=Nau4T6JCHXLqTGopKA+0S/wFDz2vy7XhTZR5jTADmu+Gplkgy6jddIo+hfyIPqXfcbNK
-	 j430gIsGqZe4b3ICVfEWGZS/YPnCuoj/jskswL0ESM6imE7zyNnCBZfqVNvxRFOzApcKL
-	 rCCIx2vM2HErPQYV1zbbyFcjwfS4XKMkFf+R/orV4A4uoV/o/sglhrelOst5O4mGYdxGu
-	 c4SAZuU/3Tt8wUudNGJeQfjbap1XNcG7ytpDt3MB0eMEH0SHHqpqEOB8Y1buuR5KWcV71
-	 rObOcWmhXOmuXXHa//cWCdH7yOW5SrF55xyH+rvZJpnrbdbOEDJkKw01QZq6xTDuPOw==
+	t=1794057297;
+	b=IhmlQV229b0d4NamPAMP2M4PzpDEgHckpRgUyw7eaFLqetVmmiHEmw4cabuZeLbkhL3F
+	 YfrA2KtkTPcZhF2kThiCcPV7s7X7w9zlVTIgOAcoTwrgs/e9ZkwGwdxZ/JqUQxp57bTel
+	 cSrzVNHaFkoGFCkS8lJVGO4I5VDg+JRtYal5EkTb75l8HDnfiwMvquR1Q0jNlIhjuZXA1
+	 5q6F92zt0vr+PH2nmfhxCgL0UC69aAuKnAZmUAi9xZH1bH8gJ1AML1cW6d8WlpflMJLHv
+	 vbNEERTbVpZQGi61gfllYlfqsB7EcwiqbrQSMTiCSaMLyIqs45BlhwRnAmizKce4pGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794043229;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=fH9ZInNpZ+Ow6HAJ32cdUs+0EKHjb4TvJ+Ry64dX10Q=;
-	b=iftN3G1x7oKSquh+TOWZFFTqJSQQ0ciL4OX8MU2CvWTf7QKiEkPlEscGaujqNgtrFyt1
-	 8iqGu3vNmSQUWEIfnSEWnDk2PnLBUOhmTSYTMlrqktM6kRwvLL4jslvQVS2hBSJFmOu63
-	 SU4gJmKKi36t4mERFu9xxPGfywZwvUe3YsKi+NE48NebeQmT9mRBi9bAAXo6rREOy3s9G
-	 /TlC6rqeqtR8J7/WgNempjaDAPVBWysAcRdAFZbv0NYar732DEAgWFWBKiqzwHQ5vbiNz
-	 Ow1W0Y8ZEDSd0KLFp6bMzWNF+DqTZuA2fNx1/B1Iv+s2V7mV2XfbQi4hS+y1auLm5WA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794057297;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=O3Z/W+pFM7Jt+ww/1hF0Exw9/hjMGiUg9ShLdHu1PZU=;
+	b=1m9WK5CMdEIuQoNEbbPlmJXdfngAS0RMB0ycHUtaKH3PldJGHiF5Bc6M6yCK25tlMt2/
+	 X5Y/0HpoXeqnkChaYy9fLH/eAnThRg1+ocyllw+e5+Ck4BVIEkRUVFOQqSHhjI0udD/KF
+	 eAgTtFn9sCGz0QrIQCoWf7r+8ldIQVecfKFC31tMX27voBVRyQDymHqZgqQsT63JurS3Y
+	 x5Id6BOAmLd5w+GXBakGQvuKff5hXmcw2b6Df7JwK4EhjzTTLp1gQqYv7PkgQnQm+uQb9
+	 2SVdqP8tbNPbq4FK0z29UL4yhZanfrC98axyqN8TUqnTg+9rzSc+o29VrXJrg8aXr2Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=F5GoGyn3;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YtvXIhN8;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DBD606A331;
-	Sat,  7 Nov 2026 09:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 55BC8606A32D;
+	Sat,  7 Nov 2026 13:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=F5GoGyn3
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84CFF1F008A1;
-	Sat,  7 Nov 2026 09:20:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YtvXIhN8
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 680A21F0089F;
+	Sat,  7 Nov 2026 13:14:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794043229;
-	bh=fH9ZInNpZ+Ow6HAJ32cdUs+0EKHjb4TvJ+Ry64dX10Q=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=F5GoGyn3lMJu3cvNGtf5C3shHt9FK1KfyDIqtU3wPBLcZTZ/+UIkOZZsCJbSSajuy
-	 12aPokzfSYEvZV3pnGvAGaTgovNT+j3QV07Ookc2EW/arDBNakzfyF4D73UMgBI62v
-	 5d4MsNYgCDFiWPt3N2H280N8JAFFhVH+DX774G3OwL26jSqzsdpPATUC4BGvfDWJwX
-	 AgMU2VyCm1P6TDFqSToTOj+NPyCUiBkrLQl5eteCXnStcONHdXBrnYTufvGj+CW+mv
-	 3X40eRlyEjEEvlABwg9t8Y2t1+QJz8/lWBDhtroKGl8GyT5JXJCZsED2n2xAF2kkQR
-	 eF1KQB1JYP8VQ==
-Message-ID: <sashiko-outbox-202761@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v1 06/10] kconfig-checker: Split schema to support
- component reuse
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Ahmed S. Darwish" <darwi@linutronix.de>, "Clark Williams" <clrkwllms@kernel.org>, "Steven
- Rostedt" <rostedt@goodmis.org>, "Ingo Molnar" <mingo@redhat.com>, "Nathan
- Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>
-Cc: "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>, "Frederic
- Weisbecker" <frederic@kernel.org>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Jonathan
- Corbet" <corbet@lwn.net>, "John Ogness" <john.ogness@linutronix.de>, "Derek
- Barbosa" <debarbos@redhat.com>, =?utf-8?b?WmJpZ25pZXcgSsSZZHJ6ZWpld3Nr?=
- =?utf-8?b?aS1Tem1law==?= <zbyszek@amutable.com>, "Daan De Meyer" <daan.j.demeyer@gmail.com>, "Luca
- Boccassi" <luca.boccassi@gmail.com>, linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261106091922.7560-7-darwi@linutronix.de>
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-7-darwi@linutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Nov 2026 09:20:28 +0000
+	s=k20260515; t=1794057296;
+	bh=O3Z/W+pFM7Jt+ww/1hF0Exw9/hjMGiUg9ShLdHu1PZU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=YtvXIhN8RENn3g6HUz47++v6lcxJHeXoYs5XAV2dJHCAE6a/WQYVaWaTAtviZoUo1
+	 T4EID3yCsKHz2qGPXKgvcz8LRthqjMcjbYOW45rpftGjN7Lo5nXygnBqYM12Ec2YLF
+	 BnHZQf0FdGLNkQV+fL8NGUy3nQw8yv+dMqPIlDHJpJL2Yr2fiZlPwj/OtMTB6lBbRW
+	 rhJMrdL3mKMtRiQUV45tEiWhjEmZ3nnamhotukz8VOq4IYuoSEAAiycXIzxt0sLhH1
+	 uRERu7zXUhfm7Fc13OaskwGKC6pKjhj+bmHNV3PJKR7qpqzxz9aMcAR6BiacLkQ5PI
+	 BA5WPlFUgmpEA==
+From: Nicolas Schier <nsc@kernel.org>
+To: nathan@kernel.org,
+	Hamdy Abou El Anein <info@daylightlinux.ch>
+Cc: Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hamdy.aea@protonmail.com
+Subject: Re: [PATCH] kbuild: detect module name collisions between '-' and '_'
+Date: Sat,  7 Nov 2026 14:14:49 +0100
+Message-ID: <179405726799.59648.18423712734918184078.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261103110411.11698-1-info@daylightlinux.ch>
+References: <20261103110411.11698-1-info@daylightlinux.ch>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -67,87 +61,38 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 3 potential
-issues to consider:
-- [Low] kconfig-checker: stale schema path in
-  Documentation/tools/kconfig_checker.rst
-- [Low] kconfig-checker: missing type: ignore on Draft7Validator import
-- [Low] kconfig-checker: unused Schema.as_dict() method left behind in
-  check.py
---
+On Tue, 03 Nov 2026 12:04:11 +0100, Hamdy Abou El Anein wrote:
+> Kbuild converts hyphens to underscores in KBUILD_MODNAME, and the module
+> loader treats both characters as equivalent. However, modules-check.sh
+> compares module basenames without normalization. Consequently, modules
+> named foo-bar.o and foo_bar.o pass the conflict check even though they
+> have the same effective module name.
+> 
+> Normalize basenames before checking for duplicates, and use awk to show
+> the original module paths in diagnostics. Preserve detection of exact
+> duplicates and leave distinct names unaffected.
+> 
+> [...]
 
-commit e95d8c61bd1b396a43ce4115372f7685c287a202
-Author: Ahmed S. Darwish <darwi@linutronix.de>
+Applied to kbuild/linux.git (kbuild-next-unstable), with 'Fixes:' tag added, thanks!
 
-kconfig-checker: Split schema to support component reuse
+[1/1] kbuild: detect module name collisions between '-' and '_'
+      https://git.kernel.org/kbuild/c/bc348949
 
-This commit moves the common rule schema into schemas/base.yml, adds
-schemas/rules.yml for complete rule files, and updates check.py to resolve
-local file:// schema references using Draft7Validator.
+Please look out for regression or issue reports or other follow up
+comments, as they may result in the patch/series getting dropped,
+reverted or modified (e.g. trailers).
 
-> diff --git a/tools/kconfig-checker/check.py b/tools/kconfig-checker/check=
-.py
-> index ef49c28b9dab6..4f79ec487da79 100755
-> --- a/tools/kconfig-checker/check.py
-> +++ b/tools/kconfig-checker/check.py
-> @@ -80,6 +80,8 @@ except ModuleNotFoundError as e:
->  # Actual script:
->  #
-> =20
-> +from jsonschema import Draft7Validator
+Patches applied to the kbuild-next-unstable branch are accepted pending
+wider testing in linux-next and any post-commit review; they will
+generally be moved to the kbuild-next branch in about a week if no
+issues are found.
 
-[Severity: Low]
-Does this import need a "# type: ignore" comment to match the earlier
-"import jsonschema" statement?  Without it, running "mypy --strict
---no-warn-return-any check.py" as documented in the file header fails with
-a missing-stubs error (or fails on the earlier "# type: ignore" when
-types-jsonschema is installed).
+Best regards,
+-- 
+Nicolas
 
-[ ... ]
-
->      def as_dict(self) -> YamlDict:
->          return self.schema
-> @@ -273,7 +308,7 @@ class RulesFile:
-> =20
->      def __init__(self, yaml_f: Path, schema: Schema):
->          self.yaml =3D Helpers.load_yaml(yaml_f)
-> -        Helpers.validate_yaml(self.yaml, schema.as_dict(), yaml_f.name)
-> +        Helpers.validate_yaml(self.yaml, schema.validator, yaml_f.name)
-
-[Severity: Low]
-This isn't a bug, but now that RulesFile.__init__() and
-Helpers.validate_yaml() take schema.validator instead of schema.as_dict(),
-Schema.as_dict() has no remaining callers in this patch or later in the
-series and could be removed.
-
-[ ... ]
-
-> @@ -533,6 +568,7 @@ def parse_args(rules: list[str]) -> argparse.Namespac=
-e:
->  def main() -> None:
->      base_dir =3D Path(__file__).resolve().parent
->      rules_dir =3D base_dir / 'rules'
-> +    schema_dir =3D base_dir / 'schemas'
-> =20
->      rules_l =3D sorted(path.stem for path in rules_dir.glob('*.yml'))
->      args =3D parse_args(rules_l)
-> @@ -544,7 +580,7 @@ def main() -> None:
->      kconfig_f =3D args.config.resolve()
->      kconfig =3D KernelConfig(kconfig_f)
-> =20
-> -    schema_f =3D base_dir / 'schema.yml'
-> +    schema_f =3D schema_dir / 'rules.yml'
-
-[Severity: Low]
-Should Documentation/tools/kconfig_checker.rst also be updated here now
-that tools/kconfig-checker/schema.yml has moved to
-tools/kconfig-checker/schemas/base.yml and
-tools/kconfig-checker/schemas/rules.yml?  Later commit "Documentation:
-Describe kconfig-checker overlays" updates that section to reference
-tools/kconfig-checker/base.yml and tools/kconfig-checker/rules.yml,
-omitting the schemas/ directory component.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106091922.7560=
--1-darwi@linutronix.de?part=3D6
