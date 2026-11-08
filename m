@@ -1,87 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.2.64.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.107.87.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794105388;
-	b=Ry9AhBYAY4RPa4GuGnZEyzZMm2CiTxroW//rGr0LxIM9ANUFmZPOvFwdr2MxT6Fa6iCf
-	 weOAoa6C8vS1ErEnPiwPEk4lay937IprcVTPx956Y6hztQg08qwCIQLkl3ahjmtc74NiD
-	 QlhPfKIYMbhvfMvxBdFm94pggiTzbdkf3BaRpQXT6bxeJcq21xY8RguOE2mvrW7Q0+Cdv
-	 IB0tXpkRA6MCyDCGniMgnUSzRC6vMqTz/UfdWyBBAcvz3I530ttdIpAqr1ADUdK0y5Kqc
-	 fxDg1aqWFIAfnk7OcqWVsw/UQD78GW7nB1xZQjkyPZQuNqZszECqZN5f7mv3Z+Fswbg==
+	t=1794146703;
+	b=eXZhUpiDfU8J1NQBlDrAWFagN+mcCzoz6SbO8fwICzt9BaKiMkLePVgokupj76QQuaNO
+	 Icvu+fvvxtHn49D2kfeLBLL3Mlzg4inv3jNtZdlDvw60aLhbV7WrfK25v1z2210k3YxUW
+	 CR0ki59pazXlRp0TpqCrheAKQFWVZqbSQKkAxSYdiRIC3BBLS36GZzjDCzfcIrg8VuXGB
+	 1aa3p3OSaTYx5Vt+ctDRamfX2AM2jwzhFNpcquPjalJhdk/dpo4zFGa+EKzJE1MDnctfn
+	 y2VDucyL253zc07KukmYgZbJUv9/J2DR4neMNtKCdiJRuKya/wz80TVeCw/eGnwviKw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794105388;
-	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
-	 X-Sonic-ID:Received:Received:From:To:Cc:Subject:In-Reply-To:
-	 References:Date:Message-ID:Content-Type:Content-Transfer-Encoding:
-	 MIME-Version:X-Mailer;
-	bh=dcxb2OtDZ2muNlnYwXVmi2FrKAeiyS26nrso39IWX/w=;
-	b=huWO+E+HzLb7/kilGUg7dcBo+YUEZ1i63+V2orVEz+Y4Ss8t3dQ0KaW48ukqNlCuiFEL
-	 vV3PSjPLIrgX5FCgcCVowQ//34dZ2SOKwa1iGqEcHjjFSBsJ96JftQmeHquvNGmNpsFvl
-	 UZZD3c1p3R0ZTP72U7ofhHnA9F08iV/4s/7L/Ftye/rS91TPdoefRemm/PFXvE3aSAL71
-	 dLxyeyd0gvKOssyD5g9adHpmVH/D3xGLhrWC3PGVn6dHvY20Jf74swudS2iCfV3aUlCXh
-	 DgsVL7T8MaOxxqHPafSllGsWauaEpKkgYfVlou2/N3He1gwU8m9QPuVCJW0Nrvw9RZg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794146703;
+	h=DMARC-Filter:Received:Received:Received:Received:DKIM-Filter:
+	 DKIM-Signature:X-Virus-Scanned:Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type;
+	bh=O1yPpaG//o3w1Zj+0G4s/uyW1TqEYcGXoDtfvB+hwTY=;
+	b=fXrzLYYfIhi1/EEXLyzM/MLZ7lid2d0vfwTz/jlHDxapucBW+0bhizP30tZDVNa74Njw
+	 T30PnHOvhA8XJZSYcEk1IH97HD11IBvCYqt4z2pwU5xAxSwSl0v6iVW6A28MUVT+yZkaH
+	 SzXMc2PEYI6m5b1p9m4M4t3N9m+KnsU48mDOfpcVhgpLsq53KBNHbOGbSi6M5PPqwBove
+	 Z+uxDq/FcXZnSXYn7cE63kQSSpxFv1/C2SJHxvjfGA87RRrMSWLH4TqGDlSIwbh+N6zl9
+	 fr/fdlGgsAe4EuM9Dfg1AYjC0+vHk0B9fa6risL1fmQxtTUbT+lIz/i9zysd3b0gkmQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=yahoo.com;
-	spf=pass smtp.mailfrom=yahoo.com;
-	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=bBXIheQH;
-	arc=none smtp.remote-ip=34.2.64.18
-Received: from sonic.asd.mail.yahoo.com (sonic-usea1-0019.asd.mail.yahoo.com [34.2.64.18])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=tngtech.com;
+	spf=pass smtp.mailfrom=tngtech.com;
+	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=Is7jQ7OJ;
+	arc=none smtp.remote-ip=34.107.87.41
+Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8700E606A31C
-	for <linux-kbuild@vger.kernel.org>; Sun,  8 Nov 2026 02:36:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8700E606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F43606A31C
+	for <linux-kbuild@vger.kernel.org>; Sun,  8 Nov 2026 14:05:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 77F43606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=bBXIheQH
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794105386; bh=dcxb2OtDZ2muNlnYwXVmi2FrKAeiyS26nrso39IWX/w=; h=From:To:Cc:Subject:In-Reply-To:References:Date:From:Subject:Reply-To; b=bBXIheQHu0SvcMOSLTjw706BU7+KpQcDYr3MRp6pN7btbVd0IqAFOVc0hPUs7dKvIzLQy4/HnmOwNpghMoRP8e2bJRbE1etTC8NJUFe18ZlKk7ZSFggV5CP13kQH9W+8JjbztpI6pt8bo5YXHHD/MpmSMLm/+N8NiKocQOz7/ZZ83f+s+1/NqEW1HKWY++rWXNHR6MuAiLAk1D/wyIzmd1bpWInNliDgbbM7QCphUb0nIhMOGtolIoehrUsAj9qdv4Y6UMdaDSrG4qSW5/Lszh0EXlvlsONFnhmFEd/7fH+ileH3Q2HMw7wwCInE9eXLEnXCUVYfCw5tyEboyIi2zA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794105386; bh=NIKF3KvlpZRIvQ54dVaflu6TbBSVYybC9rBEarJRkmG=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=SbSedStOkcoVNC9/KjQQQmgyPa8ov1+ycYj67sZyzvSAleXbWMBIcYxQhboBEnCQ9ezOVJRmtoLVUi7XHjMOiB+udvALqdht9ScLiOH8vCnlmqXej9g3l1UAJ8bpc7lIl/Tth6YAVEWpXuq9mujKilOCmPKCrvDmc9Cm4KGybYDDqBQB5q3Gvr4/AeVoT491OLU2PVgs4KO3VyhqHP4RqK3Yk7FcKQVG+MCou3R5CPy+Qi6snC+wXbXzFQWffPDxG7YAtUDY5Myplcf5FzVPfxPekyJOVUa4gWyj+44DCwSuUzhxrqhIjgimIQ7JV7DPDgJs0XdMa3SotHokMdEadg==
-X-YMail-OSG: 4aUzieAVM1mn1oUFG.qwRuh0GMKf0az9o_mr5O8MypTDB5rsKSa6KIR38SSMTSu
- 7E6nYVBpsBuSKeCASftOq5saanr5xgS5Ss7g4XSfTvsftyJaLosvaxP9.xC_k_BEuVq55YB9wyrc
- 9aOw_tNLcaxqjMggMNxcIugbKu3056r_oTs5tBsnyb1Al_.5X33Y8FQz3Ejr47b34s937_ezyqVZ
- LozEWxJeSWcHBE8Ijcxtoj28.qSsJMPKf7Wmxp33S945qrrSIRZ4OHxii8iOua8089l8fBjYuG.0
- DVGUD926X5ianJoA74AdiSe2g4ZMZ6eKnGRX3WyPmWLs7HVCm_ryqIyt5xVEZOIPSo7tk5sCFXN4
- Mpoyevq4YF3h6mwczfSsY8G6FShDrCIuUAf0O1_nwmQ5jxLNwxCvMxEfaCDZgHE_o3GkjRxncvAX
- yZpBoQ4VLraTScHhcitrTE2Q.AcfBnAS.uHUZsoX.Wvw2Bp2UWbrnx04Oj7RYy5_z0gHoacvA743
- 8eVTqj1BdC8Nstb4D9gnO66WbXTcFEC7N54XTj2K517NpVDwJtYc.8yHUgJhF5Jh.Sq_JEOzFrnK
- EkhNJiAH2DqLbGLm4VtaXqINcOGz_WMbEPWChc8J151d3ZBUE2BbpHMB1PkfFGgn._Xb0VUhYSUF
- fvZMvEcrq3B3yhMucqbtz1FbvTdqHVHrOoQrG77cwjN1zzTQ.H0dmv.i8SudknB.4mAm6qfF0xX0
- CfnlJLAgQ7651Zye_7DCMs5ov_H.5KTalZ5dPgWEGBIdvTGlr4XxCIf9I2Dp60GuIaqSlhGGwL0j
- kAVqvsbJwuM.Zj97uh20ubDg9mIhKQUYgAEz_etZWDoj1Re6zlC4DezEue2mHI8wDYba4nrFoMqt
- 9IG.60i3vOU0g34WNn73s4r3JppVap.BHrsGz9mSnBQsl31gT9yMYCgvbANCA5A3HKOZtLm9k_UI
- ALPx6VeYt7vEbaJvT7DA3beKIPilJQfBszB.FkuflUxhAUa_A2Z_HJsv81cDsGY2uzYs1QqJLmLs
- EqknLQwNcETWjS3M457lf3XZhOggQc7moxFh_9f0DpfEPLRC2ZqAslnLiyEEHJic4OzsrOm1dVos
- Uorhtnc2GmX3R1M7DvYaMOV.fNyoXdi2ftQjYkWtkjB4fZpbTQyD7xKEPzClbYYkysTZXcG1QL_T
- ujed0jj9Qgz7BfUlTCyZxywuvyvv_9OOym2GMl4nqBV9jiReCla759ZWmolJcn7AMraM3ombnZmO
- pKHLSQC89MHNJgXIYe8DiD9sM5ORJCBZFS45FpCkFJurM6vr6w0ic34L7qfu1ePnsqDtONYIAZJk
- ThbTQKsOL3w8.YN4ucgeUar3ysfyTq26qhWe7_LINtqCS6TBeZLG2UsPQ9ZxpDFhLcD2Sy3LagfP
- yf0b_IObFiZymHTDGJk3CvA0IMzq.eWGCYL9H6814YtNebLQLkg3ahAZHdWQ3krDOTTsPDk.79VR
- Y8qF_icglQxCLwqLBsBZWCt7zS9jdUWNYCmWnICW.7ESpbXQpiFlBi9aE5E2ku7Eb4WaTE2XdHkx
- OEr1fDMBNesmauavjvZIzZN0493HOnAU97u_PTW4Yb8mDHnwQz8eGOh_.GDouxwiqgKcJvibKiks
- Qq7WhN01vxi_czjMFjM493J4IGw16zqqOKx65SFg_sj.EQ1xE3nUEKxhG_8vqXx7tVg5lMAtIDzt
- 8rNj4f4UnuNE5W9NDGzm1yb2HXVsxGBECi3uGSl8gGSQzTNQHqAWihiVWiqA8UfNC3PPzCmxypJn
- vR7Q6DUn4y6KEZtsG9NnwD3aPQzMEgfdHjG5CeRTp6acjUSXN6W3h3nxXPwYsHVnaH.bJGD6JdRE
- 0thRYQNv0oDN1W_aeixoXdu9WT3R2VshYGnNYHmqESoZODGoEElCuNvrireePdSbq6NlAHn5VfKS
- _j4zFsWExFkoulRSwm45NwOwzDCSvGGuI0ZRiTf2hyeyA6PuyYP3LA9hXE.QsFo09n0VuWlWMcgM
- aXtJr7exM62dGLhpYr68-
-X-Sonic-MF: <capitain_jack@yahoo.com>
-X-Sonic-ID: d406044c-29f3-4bc3-8f6e-0bfb07efa539
-Received: from sonic.gate.mail.ne1.yahoo.com by mail-asdoutdeli-p-cin-usea1-prod-sonicconsumer-svc-104 with HTTP; Sun, 8 Nov 2026 02:36:26 +0000
-Received: from dip61.lsn.bf1.yahoo.com ([67.195.177.70])
-          by hello (SMTP) with SMTP ID 76980b0d153db45702007aab87c25563;
-          Sun, 08 Nov 2026 02:36:24 +0000 (UTC)
-From: Daniel Campos Ramos <capitain_jack@yahoo.com>
-To: Lorenzo Stoakes <ljs@kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/23] kbuild: significantly speed up kernel builds
-In-Reply-To: <179252139906.1666014.10596432029920554734@yahoo.com>
-References: <CAHk-=wieaheq8rXSps3xRZpNNMQMEj9BH5gU+Dh4q_ZgokO51Q@mail.gmail.com>
- <179252139906.1666014.10596432029920554734@yahoo.com>
-Date: Sat, 07 Nov 2026 23:36:21 -0300
-Message-ID: <179410538124.1716246.9582944258691673781@yahoo.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (2048-bit key, unprotected) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=Is7jQ7OJ
+Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 5B9AF4028E;
+	Sun,  8 Nov 2026 15:04:55 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 4601B1FBC81;
+	Sun,  8 Nov 2026 15:04:55 +0100 (CET)
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id BYfLtnquX5a4; Sun,  8 Nov 2026 15:04:54 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 75D3E1FBCCB;
+	Sun,  8 Nov 2026 15:04:54 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 75D3E1FBCCB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1794146694;
+	bh=O1yPpaG//o3w1Zj+0G4s/uyW1TqEYcGXoDtfvB+hwTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=Is7jQ7OJicV1w8gg1N7NxEyEUVsFF8VJd+eVjz+C3Ac9gP0H/1pr90pI9G0oPlau9
+	 WaSXZoP/SuRyR8HNTXrSmnHD1rFZVChF3LG76EQMH1rIsf5f/GKQTo/zzZ1bpwk92F
+	 3/AjZHh9ZzsmkF07DIFQ7X6zTs/phmJ9jRWvQp3rgDOGGrMGwrFoPjaaMROs20yc30
+	 39OY7zBAh7HhDaSUIcklyKhnIJ1ke2Dh7bgMW6HDyFD9Qbc2BsJBtSvsYgPEWno7mh
+	 MIzLyierd6kcIRWqXIidAn0ieUE7MaeeAgoRi1kVkmnvNJcNp1xX46LFF/UE7mZrrG
+	 plwKqGaIkEWGg==
+X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 6B-mur2QaVSs; Sun,  8 Nov 2026 15:04:54 +0100 (CET)
+Received: from [192.168.0.168] (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 24AAA1F8B44;
+	Sun,  8 Nov 2026 15:04:54 +0100 (CET)
+Message-ID: <576e1f86-1d8b-4b15-b0fb-cf8c66cb62c8@tngtech.com>
+Date: Sun, 8 Nov 2026 15:04:53 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -91,47 +75,90 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Mailer: WebService/1.1.26943 mail.core.serving.mcws.prd.acl:role.token.mcws.jsmtp.yahoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: Tools using the generated kernel SBOM as input
+To: Andre Wagner <wagnerandre85@aol.de>,
+ "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+Cc: "maximilian.huber@tngtech.com" <maximilian.huber@tngtech.com>
+References: <1313907070.258672.1793951761777.ref@mail.yahoo.com>
+ <1313907070.258672.1793951761777@mail.yahoo.com>
+Content-Language: en-US
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+In-Reply-To: <1313907070.258672.1793951761777@mail.yahoo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------8ZBwA0uontJFtJaUHJBghlEK"
 
-Hi Lorenzo, Linus,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------8ZBwA0uontJFtJaUHJBghlEK
+Content-Type: multipart/mixed; boundary="------------4XWnWk00xlZQIw7kRWIbHMPR";
+ protected-headers="v1"; hp="clear"
+Message-ID: <576e1f86-1d8b-4b15-b0fb-cf8c66cb62c8@tngtech.com>
+Date: Sun, 8 Nov 2026 15:04:53 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Tools using the generated kernel SBOM as input
+To: Andre Wagner <wagnerandre85@aol.de>,
+ "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+Cc: "maximilian.huber@tngtech.com" <maximilian.huber@tngtech.com>
+References: <1313907070.258672.1793951761777.ref@mail.yahoo.com>
+ <1313907070.258672.1793951761777@mail.yahoo.com>
+Content-Language: en-US
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+In-Reply-To: <1313907070.258672.1793951761777@mail.yahoo.com>
 
-A follow-up to my 20 October note, with controlled numbers.
+--------------4XWnWk00xlZQIw7kRWIbHMPR
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-The principle is the compiler's, applied to comments: prepare once what the machine reads, and keep what people read beside it.
-The web already does this: minifiers remove 48 to 70% of JavaScript bytes in one study, and source maps lead back to the original.
-Debian does it for binaries: stripped in the package, debug symbols in -dbgsym.
-Lean Code does it for the text a system reads: headers, scripts, settings.
+DQpPbiAxMS82LzI2IDA4OjU2LCBBbmRyZSBXYWduZXIgd3JvdGU6DQo+IEhlbGxvIEBhbGws
+DQo+IE1heSBJIGFzayB3aGljaCB0b29scyB5b3UgdXNlIGZvciBjb25zdW1pbmcgdGhlIGdl
+bmVyYXRlZCBrZXJuZWwgU0JPTT8NCj4gR3JlZXRpbmdzLA0KPiBBbmRyw6kNCg0KSGkgQW5k
+csOpLA0KDQpUaGUga2VybmVsIFNCT00gZG9jdW1lbnRzIGFyZSBTUERYIDMuMC4xIEpTT04t
+TEQsIHNvIGFueSB0b29saW5nIHRoYXQgDQpzdXBwb3J0cyBTUERYIDMgc2hvdWxkIGJlIGFi
+bGUgdG8gd29yayB3aXRoIHRoZW0uDQoNCkZvciBleGFtcGxlLCBJJ3ZlIHVzZWQgdGhlIG9m
+ZmljaWFsIFNQRFggSmF2YSB0b29scyBbMV0gdG8gdmVyaWZ5IHRoZSANCnZhbGlkaXR5IG9m
+IHRoZSBkb2N1bWVudHMuIE5vdGUsIGhvd2V2ZXIsIHRoYXQgdGhlIEphdmEgdG9vbHMgY3Vy
+cmVudGx5IA0KZG8gbm90IHN1cHBvcnQgdGhlIGN1c3RvbSBKU09OLUxEIGNvbnRleHRzIHVz
+ZWQgYnkgdGhlIGtlcm5lbCBTQk9NIA0KZG9jdW1lbnRzLiBUaGVzZSBjb250ZXh0cyBtdXN0
+IGZpcnN0IGJlIGV4cGFuZGVkIG1hbnVhbGx5LiBNb3JlIA0KaW5mb3JtYXRpb24gb24gdGhp
+cyBpbiB0aGUgZG9jdW1lbnRhdGlvbiBbMl0uDQoNCkFub3RoZXIgdXNlZnVsIHRvb2wgSSd2
+ZSBjb21lIGFjcm9zcyBpcyBzcGR4M192aXogWzNdLiBJdCBhbGxvd3MgeW91IHRvIA0KdXBs
+b2FkIGFsbCB0aHJlZSBrZXJuZWwgU0JPTSBkb2N1bWVudHMgKHNvdXJjZSwgYnVpbGQsIGFu
+ZCBvdXRwdXQpIA0KdG9nZXRoZXIgYW5kIGludGVyYWN0aXZlbHkgZXhwbG9yZSB0aGUgZGlz
+Y292ZXJlZCBsaWNlbnNlcyBhbmQgdGhlIGZpbGVzIA0KdGhleSBhcmUgYXNzaWduZWQgdG8u
+DQoNClsxXSBodHRwczovL2dpdGh1Yi5jb20vc3BkeC90b29scy1qYXZhDQpbMl0gaHR0cHM6
+Ly9kb2NzLmtlcm5lbC5vcmcvdG9vbHMvc2JvbS9zYm9tLmh0bWwjb3V0cHV0LWZvcm1hdA0K
+WzNdIGh0dHBzOi8vZ2l0aHViLmNvbS9rYXJ0YmVuL3NwZHgzX3Zpeg0KDQpCZXN0LA0KTHVp
+cw0KDQotLSANCkx1aXMgQXVnZW5zdGVpbiAqIGx1aXMuYXVnZW5zdGVpbkB0bmd0ZWNoLmNv
+bSAqICs0OTE1MjI1Mjc1NzYxDQpUTkcgVGVjaG5vbG9neSBDb25zdWx0aW5nIEdtYkgsIEJl
+dGEtU3RyLiAxMywgODU3NzQgVW50ZXJmw7ZocmluZw0KR2VzY2jDpGZ0c2bDvGhyZXI6IERy
+LiBSb2JlcnQgRGFobGtlLCBUaG9tYXMgRW5kcmVzLCBNb3JpdHogUHJpbnoNCkF1ZnNpY2h0
+c3JhdHN2b3JzaXR6ZW5kZXI6IEhlbnJpayBLbGFnZ2VzDQpTaXR6OiBVbnRlcmbDtmhyaW5n
+ICogUmVnaXN0ZXJnZXJpY2h0OiBBbXRzZ2VyaWNodCBNw7xuY2hlbiAqIA0KSGFuZGVsc3Jl
+Z2lzdGVybnVtbWVyOiBIUkIgMTM1MDgyDQoNCg==
 
-Every changed file has three forms:
-1. The authored source, unchanged, in the source package.
-2. The machine form, installed: comment-only lines removed; blank lines, directives and code untouched.
-3. The human form, the complete authored text, in a <package>-lc-hr companion at the same version.
-The human form costs nothing at build or run time, so documentation can grow there, better grounded, paid for once by the person who reads it.
-Line numbers shift on purpose; a tool finds a machine-form line by its content in the authored source (dpkg-stereo --resolve PATH:LINE).
-An earlier form inserted #line directives: it cost about 21% more preprocessing and silently disabled -Wmisleading-indentation. It is gone.
+--------------4XWnWk00xlZQIw7kRWIbHMPR--
 
-Measured, per file type (instructions with perf):
-- Kernel headers, linux-headers 7.3.1, 50.7 to 46.9 MB (-7.5%): preprocessing -0.78%, compiling -0.52%.
-- libstdc++, 864 headers (-23.6% bytes): preprocessing -2.7 to -3.0% instructions and -3.9 to -4.3% cycles; -O2 objects byte-identical; one compile of bits/stdc++.h reads 1.9 MB less.
+--------------8ZBwA0uontJFtJaUHJBghlEK
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-Measured, the whole system: a 2016 AMD A10 laptop, 28,500 installed files lean, then restored to the originals, then lean again:
-- DKMS module builds against the kernel headers: 6 to 9% faster warm, 1 to 6% cold. That is more than the instruction counts, which points at reading and caching; the two are not separated yet.
-- Programs use 3 to 6% less memory; boot time is unchanged; installed package files take 140 MB less disk.
-- The cost: 0.4 to 0.8 s more per dpkg run for the integrity check (about 64 ms in the current version), and a full verification takes 22 s instead of 11.
-- Modules built lean are identical to each other; against the original headers, modules whose macros carry header line numbers differ in those numbers only.
+-----BEGIN PGP SIGNATURE-----
 
-Scaled, as estimates rather than measurements; I found no reliable count of Linux machines, so per million, to multiply by any fleet:
-- A developer building 1 hour a day against kernel headers saves 15 to 22 hours a year; per million such machines, 15 to 22 million hours.
-- Per million machines: 140 TB less disk, and 3.8 TB less page cache where the kernel headers are kept.
-- A desktop user who never compiles comes out about even.
+wsF5BAABCAAjFiEEJzBrWn4qHw5a0jAXeVyKys3c+zQFAmrwgYUFAwAAAAAACgkQeVyKys3c+zQS
+iw/9GkLCqziUZZiz3UI1WqYAEFbko7floWpOxIAsPzRnhWkqyq7jMGYqw4VqfISYhnJVym17Kx7F
++1Jqg8k8kkSZP5YUl/Eis5Wq4okiMVWso0bszihxDd/NifshjdTpwmck9qWVoG+IHm0DeV5/EG0b
+FmHr/V7qiqeoWlQJm2gxUKjC+NFhA/x6tg8bd/B8IjVWuoi6EOFZECkj8y8yHMSFYnddlHS5BmUr
+mT9hpDvyzBVxmpcaYqng2r63HzGuiiQctP2ANmfNhrd/eWZKWkjTSE6msvalc9/4HCJr+GDt0h0Z
+afxRh4k4FapGc1vgc8wlq/ZnoP++Sxm4vWmx3IsfADrPFthZvBRQ3noAJLsJ+tP06RkLbKbI2Iz6
+N7yq8ejMJIpKOjc2DZI1+ahGH7brAwbsvcNu0YuAKyWWud4QpRxWhOwE77vgT5NgwMznq4yVt6dX
+BZLDrp+EjtTmKqYNIiquTBs8AOmfwHU4sGTbX06vIhGjDyn21dOc7qVrr08DmCOuj2eHp/BgsrRW
+hi85e0qQiDK7mOT0o2bhHdCPQDkRz3H7LcHxx9bv+Yyy8Nd/5xLmEu1cmaIpQlzuVI4qgAtalQnR
+IIpLNlHU4mLxNJ00Gjf6U7XD4HhFZW4Ne4ffDtchCmlv/Rh7wqlZJyTVC6DbQUN+KWjd3Y3b5Zeq
+2ys=
+=RL2W
+-----END PGP SIGNATURE-----
 
-For scale: GCC 16 builds the kernel about 2.6% slower than GCC 15 in one report; Ingo Molnar's first header attempts gave barely 4% before Fast Kernel Headers reached 50 to 80% with over 2,000 commits; your series reports allmodconfig up to 36% faster.
-This stacks with all of them, with no source change.
-
-I am not proposing anything for the kernel tree.
-If a defconfig or allmodconfig comparison on the kernel's own include/, with the objects checked, would be useful, I can run it.
-Methods and raw data:
-https://github.com/Sparky-OS/sparky-stereo-os/blob/main/docs/proofs/lean-code-a10-aba.md
-https://github.com/Sparky-OS/sparky-stereo-os/blob/main/docs/proofs/lean-code-compile-cycles.md
-
-Daniel Campos Ramos
+--------------8ZBwA0uontJFtJaUHJBghlEK--
