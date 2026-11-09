@@ -1,88 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794242748;
-	b=GfPSH5SDCTcGBxIOpIiIE6+u3hnPylL0O0nYqE9OkN5XQn86rPK+JQam2cF1ZZkpAQCa
-	 RwIwjbpBthcxXAjErTL/7EcnKVgs2oSI30DJfEmRIz2SyFTispBcrnkcWUn+cmdpnTyfq
-	 WZDjVJGTTLzhLZc2VA2GJgQJyf4g/C+pz9QrgSW1FBmso0e+ZrejaQFrH94iLyNrB63+1
-	 JpP0p41l5cpiysNXAbBn9wKRApORc5UDiYJLbCBKdZNEMlnJeXErK2434S/5vTtpcCqwM
-	 ieDRuIxjSD4FgipEKD0KjvlbpW2pe1Ij0pe2MT2nh+BC1RavtiMI5PqnLEXtWS9mgGg==
+	t=1794242894;
+	b=H2DTlktvhQyzh3pvRbgFZ+3AyNpZrqRF27lnKcKp1jyEk81Qk293IMDVXT0ZN6McHm6j
+	 FSAOTJy8DLJ9irvOXphlasBG/6yKE4Gea4yXgOMKMnbmz7DxtDzRs+10Zd5A3CYZokAKf
+	 LklYGgUzXPb/zLaALpc8o8cdgnt697pFSBx+T3Nq/wismnofWPDBgEKoMfYIA+sY938Xc
+	 IQFF3YR7uSS1DN5p19ajlcUmYrjrUOxS9tpbtLMoVblRPQtl6+j45zhu/5QIv91DNWXf7
+	 bI9SHNHTK+V2UB//AEklVydfxqRug6hTD117Lz5IqfGacvMoaUl/VTGpXfkk9FWfEQg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794242748;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=KaxLEDS88ItrKwFFpF3PUgaqHFKPv05h6XZaeYQUHW0=;
-	b=12lsaecBPjjSvqc+StpwTgBcbmn6LBu3w8SZIqy3/ms8seWUb4tQ66ZmOZg2ChbAgwOZ
-	 snoMD48NtMdmz5HJ9aRVEuRMGBz35N1Nj+sIiRJ6652z0xkngEF8gk6S8JSGFcflg42eO
-	 7cD/iRwwLlcN+5xq/NEQPTxmqMmxJc6sIiPlu8XTqWBw2imz+UZgAJQecNMqYWhp/CcND
-	 35Ia7VmUqCm84AUEGCtL7Jaiz+cRTvD5Wj7pm7nOCuczrPxvTO4uUDktepV0u8MUYektu
-	 PtjGF2bRNX1Amr7m9elcX219i9laRqTPaTPasgkoCx6jEJ63+8dcitaAOOSSHmKMTOA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794242894;
+	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=WjCmpvBTBtjAAl5ks8xILiuJnGJaZE8yootAcNpntZg=;
+	b=IX7FyK4NjG91+eF0emzxDawYiMo5sbgIPyIMFnRwf99XRG2rBW7MeOzcpbtX5/Gq53d9
+	 EmlfRDsCjdU/eduvcU4q1Rr9x6n3puyOjd1n6iOFHQ+Xk2DXaicnUexhT6lOMiMFPw/lk
+	 Kw0ynnHthvLOsgbgGUZnFxc4u5XlxZRGWoHdYpUoWhl+htx4yqJJuKonVBIkXy6xydaZz
+	 HLvVKcJDOT4gZXpfE8HpHppPe6lw6zmvfHy82gIxkbE42YICMYN0Ny/mCvg9axcAD89Ob
+	 HgnxfKLc/qyB6YyBLs9I5aesBHbwtBCl7c+3NYzSrVDoTjV/plk9D/I9jwcKvdWfQNw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.com;
-	spf=pass smtp.mailfrom=suse.com;
-	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=IVc4xmHR;
-	arc=none smtp.remote-ip=209.85.221.52
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=linutronix.de;
+	spf=pass smtp.mailfrom=linutronix.de;
+	dkim=temperror header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=2fgB66IY;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="zDcrh/E0";
+	arc=none smtp.remote-ip=193.142.43.55
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1DA606EE88
-	for <linux-kbuild@vger.kernel.org>; Mon,  9 Nov 2026 16:45:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B1DA606EE88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3708606A321;
+	Mon,  9 Nov 2026 16:48:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3708606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=IVc4xmHR
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4922523d1afso622208f8f.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Nov 2026 08:45:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1794242746; x=1794847546; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KaxLEDS88ItrKwFFpF3PUgaqHFKPv05h6XZaeYQUHW0=;
-        b=IVc4xmHRUI7l0d1aI01B1bf0TgxhgAWqtMAsztsXJDiGo9QYkOa5VcjnsqiEUEW094
-         +obdWRcpaN+j/B14EgCb1KFG4LUdRJV+GvcaWubRrOtQazg82Ix3i4nQYf/jMIEHX2tU
-         ObAWnI3isjfiH/yuAvxeUlSdxCVgZvZqsNiqWudHZdY1CeA0GDvuzZKyEo07VSJB5Ahb
-         AkgMpN2gR8U3WlRYJOmZsZme0ERrSqL4LiPSZuS2JprQ1rmSLrAT4/GHrebv/GqHlMzY
-         v6V4vdWFB2UPahEWWeEq02QTnTWgioPULqgClxAVoK/PJ41XSdFU191pmOOCiiUzrCYI
-         QHHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794242746; x=1794847546;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=KaxLEDS88ItrKwFFpF3PUgaqHFKPv05h6XZaeYQUHW0=;
-        b=tHlM11FcjHXrZ23PCBtBQxz+QuVc42Z0MNVE+JNG0AIXHzKubM5EwgErDtKjC3ehev
-         FsbPDZJSEa6eY421wvrwrdueA9wQ/JwzRsPqFX219Kk79tzHf/50zfqnGebhhUuymIBG
-         3wjNcJrdSPAcHH1+Xkkzwwvj04Yr5y9OPdbap/l9xDeN4HV1MDX66RwUlLwmuYuANaXK
-         CpFZHjF5uD7mbBzlO/8nmhyzI6rY/yZfio6QidkSW+MjHAH5XmYiLS0/WXioOWHhFgr5
-         Rdw5sL/DSIucnlCW7I+5O2yRxiYaqJ4kbY7uP34TB1+h52l1bQyChi40kNWYK73PysON
-         A7cQ==
-X-Forwarded-Encrypted: i=1; AL+hErGHfLO6WaoMWNgp5xIxBiE2Hq6ltKmSlHc+JY9IqtfPfu/tGWNFYlW0JLu2hi6/Z64GikdOxKRE2xLzvwM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+UeJ0WMqT22rErfNK6rtpAyiVrNqmf5Tg+1FEUDtrtcMtnDDs7
-	YJcczxK8QfhBE3yT4i7NFZumRSF/QKjxoKKOtxzGAevK0yVmRxV2A3vfU4/5IMzWNII=
-X-Gm-Gg: AYBFou0T3IwoVteoT8NsK6gvU3vnAydyHE4mIHCon2nlUIaEzPrBjFJEr08F87CRqj3
-	Rj8Ez61jcn6m58yqSim0S5EbgPWK12i6pCmOYu2djGC9PM3p4ZQvDEME1gxv92mig3zDpX6FrMG
-	XINqY8jO/tOwDx5ZZdFEElSI5ScUPDV0OLcnhH67zl6mKVhFdjaS7OMxrX4QzPlqGhuOi4w3J9M
-	FVeWl4LOS5OcItT+nQDPGa2rnX9Q9HY0Y7ZwLjLMCedAfr/ZGY4eitTVB/bRQXdNTZt7YgiiSvJ
-	qz49td+UQl9YkLgDkWit7e25QM84bkqYrJ9+7/f4vtFbDKYTJ5loz15Ya7bxOMNO8/TbmBbR8NT
-	NQLtIFFTi6P23k8VTxhZpXx97HtJHxUAB3iF7O9lHYL52kgFJyB1rwFXyIItg7l+1Jxj3noTEjG
-	1ZOPL97aV9EL01YNTr/c0P8p1KJS8UHs79RObZGb6gtM0+zLEwB6w/jVyMh0UecwsHb+Dm3S0Lt
-	B4BK6fW02D6U45JIQ6CXe9gqlWkia7J9d9DUr4b18irO0GsGCkbv6jgrPSUqWX/0EiI2fjrzvNJ
-	F86t7fnKfFBPKfDOXgZ4Jhm7GrOV2A6eSI5fVdVFQZCdSdDRfcY5RXrR3ku7lm2m
-X-Received: by 2002:a05:6000:2389:b0:491:8462:20cc with SMTP id ffacd0b85a97d-49830d8186fmr7425f8f.37.1794242745831;
-        Mon, 09 Nov 2026 08:45:45 -0800 (PST)
-Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49597187162sm11283249f8f.34.2026.11.09.08.45.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Nov 2026 08:45:45 -0800 (PST)
-Message-ID: <b5abb55f-202d-458b-ba6d-92af16f80137@suse.com>
-Date: Mon, 9 Nov 2026 17:45:44 +0100
+	dkim=temperror header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=2fgB66IY;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=zDcrh/E0
+Date: Mon, 9 Nov 2026 17:47:57 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1794242879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WjCmpvBTBtjAAl5ks8xILiuJnGJaZE8yootAcNpntZg=;
+	b=2fgB66IYCOqAsgDiJ4Y85b+V/KNFfe3n2zAj36z1c5pXBXxmohpfcoMWGGbZHuiBzx5LZ9
+	stSz/0vfbvISOISpa20+j80Zqf8ni9PPZgSDM3BZIEy3trqRZ50XU5jh+QoNhkJwaGvBeL
+	iOP44Bf+r8tRSWphQYvET3l1XglBOb0Z/Zesbg2ypJSaFytVIjaM8j1tit+gozKPP0VHmr
+	ao9rrSHIioHV0v/qNi4t4HQP35KcDHfgwlyj7RCeo3P5uOp/SH8G/jqLlgWEm7Q3qXH3Qz
+	DBwoufM7XVe/+aOPkBGA0TjCDQ6Lw2MsMW+GTjejqNlA1TXUwLsKEnJhtWvDBA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1794242879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WjCmpvBTBtjAAl5ks8xILiuJnGJaZE8yootAcNpntZg=;
+	b=zDcrh/E0c3Ts0L0CWB+Jv2CTG9QtpQQJ64ye3yZTlp8mPMNQw5byWSM6ik4azIjQ5nQ2eK
+	JhSjaWTyJmkuVKBw==
+From: "Ahmed S. Darwish" <darwi@linutronix.de>
+To: sashiko-reviews@lists.linux.dev
+Cc: Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Ogness <john.ogness@linutronix.de>,
+	Derek Barbosa <debarbos@redhat.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Luca Boccassi <luca.boccassi@gmail.com>,
+	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 07/10] kconfig-checker: Introduce overlays schema
+Message-ID: <avH5PftePd_0y6Lv@lx-t490>
+References: <20261106091922.7560-1-darwi@linutronix.de>
+ <20261106091922.7560-8-darwi@linutronix.de>
+ <sashiko-outbox-202762@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -92,174 +87,27 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 04/11] modpost: emit module descriptors as assembly
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Luis Chamberlain <mcgrof@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
- <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
- linux-modules@vger.kernel.org, rust-for-linux@vger.kernel.org
-References: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
- <20261104-build-speedup-v5-4-0f6018be8dae@kernel.org>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20261104-build-speedup-v5-4-0f6018be8dae@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <sashiko-outbox-202762@kernel.org>
 
-On 11/4/26 7:20 PM, Lorenzo Stoakes (ARM) wrote:
-> modpost generates a descriptor for every module in the form of a
-> <module>.mod.c file with .modinfo strings, the __this_module descriptor,
-> exported symbol tables and (with CONFIG_MODVERSIONS set), the CRC of
-> imported symbols.
-> 
-> These files are compiled like any other kernel C file with all of the
-> -include preamble, as well as including linux/module.h, header dependencies
-> generated by fixdep of a few hundred headers, an objtool run and if LTO is
-> being performed, a link is performed to generate native code.
-> 
-> On an x86-64 allmodconfig build 11,189 *.mod.c files are built, each
-> taking ~0.24s of CPU time to compile, and module finalisation as a whole
-> 6,300 CPU seconds, or 64 seconds of wall time when run over 128 threads.
-> 
-> It also generates ~1.3 GiB of *.mod.o.cmd files that every subsequent build
-> has to read back.
-> 
-> Avoid all this by emitting the descriptors as assembly instead.
-> 
-> The layout required (size and alignment of struct module, struct
-> modversion_info, the module's name offsets, init, and exit fields and
-> whether the architecture uses PREL32 ksymtab references) can all be derived
-> from scripts/mod/module-offsets.h.
-> 
-> The fields of __this_module are emitted in offset order rather than
-> declaration order, as CONFIG_RANDSTRUCT shuffles struct module so the name,
-> init and exit fields can land anywhere.
-> 
-> An assembly file avoids all of the issues previously mentioned so this
-> conversion results in a very significant performance win on kernel build.
-> 
-> As a consequence of this change, since module-offsets.c includes
-> linux/module.h, scripts/mod is now built after the generated headers in
-> prepare0, rather than before.
-> 
-> Also update .gitignore and make clean to handle .mod.S files, but keep
-> .mod.c files there to ensure that users do not end up with untracked
-> changes/dirty trees after the change takes effect.
-> 
-> The sections were confirmed to be byte-for-byte identical to the C version
-> produced - each of .modinfo, .gnu.linkonce.this_module, __ksymtab*,
-> __ksymtab_strings, __kcrctab*, __kflagstab*, __versions,
-> __version_ext_crcs, __version_ext_names and their relocations - for all
-> 8,135 modules of a clang allmodconfig build with CONFIG_COMPILE_TEST off
-> and CONFIG_MODVERSIONS, CONFIG_EXTENDED_MODVERSIONS and
-> CONFIG_MODULE_SRCVERSION_ALL on, and for a sample built with gcc.
-> 
-> What differs is what the compiler added around them: the __UNIQUE_ID_*
-> locals, the KASAN constructor for the .mod.c globals, and on x86 a
-> .note.gnu.property that the linker already drops from any module containing
-> an assembly file and the loader never reads.
-> 
-> None of these have any impact on the build, however.
-> 
-> The assembly carries no debug information, so in order to keep describing
-> __this_module in each module's debug information, define it weakly in
-> module-common.c too, in a section which the module link discards.
-> 
-> Nothing initialises struct module::arch from C any more, so
-> MODULE_ARCH_INIT is removed from include/linux/module.h and from m68k, the
-> only architecture that defined it.
-> 
-> x86_64 kernels built with gcc and clang, with CONFIG_MODVERSIONS,
-> CONFIG_EXTENDED_MODVERSIONS and CONFIG_MODULE_SRCVERSION_ALL, were booted,
-> every module and an external one loaded and unloaded, and the srcversions
-> checked against modinfo, i386 and arm64 defconfigs (gcc and clang) and a
-> ThinLTO build were also built as part of testing.
-> 
-> An x86_64 CONFIG_RANDSTRUCT_FULL build with clang, which places the name
-> field after init and exit, was checked the same way and produces the same
-> .gnu.linkonce.this_module sections and relocations as the C version.
-> 
-> On the x86_64 allmodconfig with clang 22, "make modules" with every
-> *.mod.o and *.ko deleted goes from 64.5s (6,306 CPU-s) to 28.5s (518
-> CPU-s).
-> 
-> A consequence of this change is that the make jobs are now so small that
-> make cannot dispatch them quick enough, however the next commit in the
-> series addresses this issue.
-> 
-> This impacts clean and no-op builds with a large number of modules most
-> noticeably.
-> 
-> Whole build, 128-thread Threadripper 9980X, best of N runs:
-> 
->                                          before   after     delta
->                                          -------------------------------
->   x86 allmodconfig, no-op make, gcc        12.7s     2.3s    -10.4s (-82%)
->   x86 allmodconfig, no-op make, clang      13.9s     2.8s    -11.2s (-80%)
->   x86 allmodconfig, clean, gcc            342.6s   306.6s    -36.0s (-11%)
->   x86 allmodconfig, clean, clang          340.1s   290.2s    -49.8s (-15%)
-> 
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+On Sat, 07 Nov 2026, sashiko-bot@kernel.org wrote:
+>
+> > +# and a custom-overlay.yml:
+> > +#
+> > +# rules:
+> > +#  - name: CONFIG_DRM
+> > +#    expected: allow
+>
+> [Severity: Low]
+>
+> Should this example use "expected: allowed" instead of "expected: allow"?
+>
+> base.yml restricts expected to y, n, or allowed, so an overlay written
+> from this example fails schema validation.
+>
 
-Looks ok to me from a modules perspective.
+Correct, it should be 'allowed' in that comment above; will fix.
 
-Reviewed-by: Petr Pavlu <petr.pavlu@suse.com>
-
-> +/* The equivalent of KSYMTAB_FUNC()/KSYMTAB_DATA() and SYMBOL_FLAGS(). */
-> +static void add_asm_ksymtab(struct buffer *buf, const struct symbol *sym)
-> +{
-> +	const char *name = sym->name;
-> +
-> +	/* The name and namespace strings the entry refers to. */
-> +	buf_printf(buf, "\t.section \"__ksymtab_strings\",\"aMS\",%%progbits,1\n");
-> +	buf_printf(buf, "__kstrtab_%s:\n", name);
-> +	buf_asciz(buf, name);
-> +	buf_printf(buf, "__kstrtabns_%s:\n", name);
-> +	buf_asciz(buf, sym->namespace);
-> +	buf_printf(buf, "\t.previous\n");
-> +
-> +	buf_printf(buf, "\t.section \"___ksymtab+%s\", \"a\"\n", name);
-> +	buf_printf(buf, "\t.balign %d\n", KSYM_ALIGN);
-> +	buf_printf(buf, "__ksymtab_%s:\n", name);
-> +	add_asm_ksym_ref(buf, sym->is_func ? MOD_FUNC_PREFIX : "", name);
-> +	add_asm_ksym_ref(buf, "__kstrtab_", name);
-> +	add_asm_ksym_ref(buf, "__kstrtabns_", name);
-> +	buf_printf(buf, "\t.previous\n");
-> +
-> +	buf_printf(buf, "\t.section \"___kflagstab+%s\", \"a\"\n", name);
-> +	buf_printf(buf, "__flags_%s:\n", name);
-> +	buf_printf(buf, "\t.byte 0x%02x\n", get_symbol_flags(sym));
-> +	buf_printf(buf, "\t.previous\n");
-> +}
-> +
-> +/* The equivalent of SYMBOL_CRC(). */
-> +static void add_asm_crc(struct buffer *buf, const struct symbol *sym)
-> +{
-> +	buf_printf(buf, "\t.section \"___kcrctab+%s\",\"a\"\n", sym->name);
-> +	buf_printf(buf, "\t.balign 4\n");
-> +	buf_printf(buf, "__crc_%s:\n", sym->name);
-> +	buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
-> +	buf_printf(buf, "\t.previous\n");
-
-Nit: add_asm_ksymtab() and add_asm_crc() emit unnecessarily .previous
-directives.
-
--- 
 Thanks,
-Petr
+Ahmed
