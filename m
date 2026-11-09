@@ -1,62 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794252567;
-	b=Nj9ahdJg+CFba8cMVbaJHkPCcftDMUXJyE0wA/FyeBw3qRAHwUGbSlGSYLq5PX0x3NY1
-	 /Qzm991N2Ekpu8dBtAIUaif1fJF1C/6P1mZzj6p9MDNz2rAiQuZdvhS1AxrdUj3Irqd83
-	 KkyjMhVMfuc8KtORY6S2b9xXGQMvbtQ6ZbmnsOV9ke7icB2o8FTDmMS45Lx5NaVfhXjzz
-	 E3U9QkwPVmHnzLTuxdWUmIfF+CTgISF8Z2WHvH+K4wBT9nLvrtIbsPKyIgkiwipHnz22H
-	 jJ8QeoRCxXA2lvPQA1hZNmmIC6+VPV6nyG1Kiye2mImGyX+0/ch1JRMUfqlMjHc53pA==
+	t=1794254836;
+	b=rnDPLFxXHJ3QvbqpBFpXEkzffiFQYOnIFzmlJ0yITtv2fhh8L9fTMheGiFl13ICVt2nd
+	 7ArRcshMhHGzBgY/Gc6jAJCAQepU+I5Gur+X0KujB1LpgRWIbC56qbgFPnhUKzKCpBryR
+	 Q2czDfXD3Seo46tk6SzRySOIAdKHaoQNdxY1SUdrCtlGRWZ5BgQVwpRGErIxwotsootXY
+	 wTSlbZ3CsEiJTLPNXTWfwhdYjaoHc3NHVcMRtldCFD97aLmgdI44u5tSFiFmTww3NVrb7
+	 yFMbLOLc6maNhwdrQyEGWZ7Qcgiecm6P3Z8t6p6UVIE+cmgcO43bmRQNgR+XmtcduaA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794252567;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794254836;
 	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
 	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=jVCGfkX1RIb2wLuptqR9bvcqrBU7RikfXXwk8aiHdtg=;
-	b=K9ZreCqy3sHLDnRVC2Foy/ufmZyT8UU7Bc5y+qBhBFm9dVoU9/LwavYtVGlKGA4KH9o3
-	 Xnkb5w1v/7anTjP5a4dZ2jJYmZ3qn+Olm+Yyp0ISdxri4AMLQcg8lnfVTkfjah/4AhpBO
-	 ouQY9CUFhUS9E38OQPyeVL+kxCsJsVTT+YHjM6NqFloiSe5JtQhfi7CzpYKeofdpUkoP3
-	 TWUGsuJV64LePhK/NDSam6lNKjj2XQgsCWh1p2v8kIaeaqI22xuhgeRoLs8/5bEUEw9sY
-	 vxKFqXBC2u159wGO5Nx5lUAt0zAhOAtlef2ihP9CGALwAH4SQVO2+vXF/ul3EKCyI8w==
+	 In-Reply-To;
+	bh=yRz3xBS2P6QB23UW9SPrskdtcdbexIqa29HxXhxwnyc=;
+	b=EwL4k5blaYNuWr6pSInq9M8xcTyjX1jZDCKmOU1Gtop2Tsk2NV/JUj4BE8t75oT3bwv8
+	 yiqStJJia6ERoKpeMfMRsTKN4RMC5CIIh51uhpeJ9SI8ux5NwLUS0lzvcDyl9o/+oA5Pb
+	 mrfD0TcC/yi4dmtmSU+00lpGVNdop4Y6/P2aAgPYlp/MLy6sUr7oNErh2c1P72lkIxEha
+	 EnZh8hJZPcuYGwzQIWYpWFHqS2ghZ3Pyvhs3k+F/3yFUMWQ+Wyk1MLKU7Xk1jJkiNYtg0
+	 F6iVn230uHb7NpzI1tzluWwJ/IczGwx7+uxUbPjeDbGbloKHB3rCtoRtoO9IF4297Nw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linutronix.de;
 	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b="fjLY/+VF";
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=1tdcC3gh;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=1yaSpnxb;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=Lq9+W8xG;
 	arc=none smtp.remote-ip=193.142.43.55
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72564606A31C;
-	Mon,  9 Nov 2026 19:29:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72564606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F5C606A321;
+	Mon,  9 Nov 2026 20:07:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6F5C606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=fjLY/+VF;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=1tdcC3gh
-Date: Mon, 9 Nov 2026 20:29:22 +0100
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=1yaSpnxb;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=Lq9+W8xG
+Date: Mon, 9 Nov 2026 21:07:11 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1794252564;
+	s=2020; t=1794254833;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jVCGfkX1RIb2wLuptqR9bvcqrBU7RikfXXwk8aiHdtg=;
-	b=fjLY/+VFMKmkJECS8BA54MKsiBaEKQwVQWNOJhtiDteQpWvrbKIrqkHjf5zblWYIJiPtkK
-	lgeQwEvwE16OLyJkLnEGw8qyR5KBNy0Aqu61bSVGcpcJ9ny61pf/mBRbVgaq+mjJbrm5Q8
-	0a2EdCPWcnn91A3QXhzTwMyEuhk7IMqglSF+vTYv6jHHXb9Us0HgMPxr94hSE7wqjJC50r
-	UwIZFFiNDM8Lv9umbs+iuQ1YFmaGkFucGqiJ94vNSvocyG0jVy+zqh6LTyEgMHOkKFgt93
-	f3iBY2d0+u7vb/kv3oJRZerE83lnc/rVeK8fFvRCFltXdAqqeBg7dk915ZHX3Q==
+	bh=yRz3xBS2P6QB23UW9SPrskdtcdbexIqa29HxXhxwnyc=;
+	b=1yaSpnxbovoH8DcGVOVIMJL9Az88a0SGbTS3bMkFvGcQ+RD6tW2e6AH6d0Wg4X6Z1j8GaM
+	dxvrPPKg7lg2BFVOdzeAX0tRB0SA92IFwFEl1p72wqlq5MektW7DukRuClJvIqHStKK3ks
+	SQeVdIOprrbGjTCOkA5FYhWL1ZzXAiuUZ0LKWPAo9yU3C45AEmIZU0KwCluYhPe7zHs8Nk
+	kN6EYnLYWkESkQ9HUSnu7T2n+P67zZq7CE/rJrc1WQAYnVSEcFShsgLGtIuZeLXVvYN+PQ
+	MqiF8UdD0mUerK01lK+zm7wIbPTGwz5nEO+QUfIB6iSCwLH/gAeeH0yhP58v1g==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1794252564;
+	s=2020e; t=1794254833;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jVCGfkX1RIb2wLuptqR9bvcqrBU7RikfXXwk8aiHdtg=;
-	b=1tdcC3ghJ0UbmhHHYclN2HiCG2v+MZMzGS2Afnr4k5ZSGRPcyZG7Dyz1gxXuElCVKArA8U
-	u+t1w64Wk1JdLHAQ==
+	bh=yRz3xBS2P6QB23UW9SPrskdtcdbexIqa29HxXhxwnyc=;
+	b=Lq9+W8xGRwCZ/RcDWGQ44nuGzp9INi8Xrq8+3iktck6bvjvXB854avzo9gr3d7qXi0FRCV
+	HOxH5FqIXHnRGDBg==
 From: "Ahmed S. Darwish" <darwi@linutronix.de>
 To: sashiko-reviews@lists.linux.dev
 Cc: Clark Williams <clrkwllms@kernel.org>,
@@ -75,12 +73,11 @@ Cc: Clark Williams <clrkwllms@kernel.org>,
 	Luca Boccassi <luca.boccassi@gmail.com>,
 	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
 	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 03/10] kconfig-checker: Add the configuration checker
- code
-Message-ID: <avIfEhE83UkF9g_Y@lx-t490>
+Subject: Re: [PATCH v1 04/10] kconfig: Introduce checkconfig target
+Message-ID: <avIn71Md3LtNaYje@lx-t490>
 References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-4-darwi@linutronix.de>
- <sashiko-outbox-202758@kernel.org>
+ <20261106091922.7560-5-darwi@linutronix.de>
+ <sashiko-outbox-202759@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -90,112 +87,78 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <sashiko-outbox-202758@kernel.org>
+In-Reply-To: <sashiko-outbox-202759@kernel.org>
 
 On Sat, 07 Nov 2026, sashiko-bot@kernel.org wrote:
 > >
-> > + def _find_issue_pattern(self, pattern_rule: PatternRule) -> Optional[PatternIssue]:
-> > +	  """Check the .config against a pattern rule. Return found issues, if any."""
-> > +	  if pattern_rule.expected == ExpectedValue.allowed:
-> > +	      return None
+> > +checkconfig := $(PYTHON3) -B $(srctree)/tools/kconfig-checker/check.py
+> > +list_checkconfig_rules =						\
+> > +	echo -n >&2 "Available RULES: ";				\
+> > +	$(checkconfig) list-rules >&2;					\
+> > +	echo >&2
 > > +
-> > +	  violation_type = 'unset' if pattern_rule.expected == ExpectedValue.y else 'set'
-> > +	  docs_url = self.rules.get_docs_url_for(pattern_rule)
-> > +
-> > +	  violating_symbols = []
-> > +
-> > +	  for symbol in self.kconfig.get_matching_symbols(pattern_rule.symbol_regex):
-> > +	      symbol_value = self.kconfig.get_symbol_value(symbol)
-> > +
-> > +	      if pattern_rule.expected == ExpectedValue.y and symbol_value == 'n':
-> > +		  # Exclude the config symbol if it's explicitly disabled elsewhere
-> > +		  symbol_rule = self.rules.get_symbol_rule(symbol)
-> > +		  if symbol_rule and symbol_rule.expected == ExpectedValue.n:
-> > +		      continue
-> > +
-> > +		  violating_symbols.append(symbol)
-> > +
-> > +	      if pattern_rule.expected == ExpectedValue.n and symbol_value in ('y', 'm'):
-> > +		  # Exclude the config symbol if it's explicitly allowed elsewhere
-> > +		  symbol_rule = self.rules.get_symbol_rule(symbol)
-> > +		  if symbol_rule and symbol_rule.expected in (ExpectedValue.y, ExpectedValue.allowed):
-> > +		      continue
-> > +
-> > +		  violating_symbols.append(symbol)
+> > +PHONY += checkconfig
+> > +checkconfig:
+> > +	$(Q)if [ -z "$(RULES)" ]; then					\
+> > +		echo >&2 "Usage: make RULES=<profile> checkconfig";	\
+> > +		$(list_checkconfig_rules);				\
+> > +		exit 2;							\
+> > +	fi
+> > +	$(Q)if ! $(checkconfig) list-rules | grep -qw "$(RULES)"; then	\
+> > +		echo >&2 "Unknown RULES profile = $(RULES)";		\
+> > +		$(list_checkconfig_rules);				\
+> > +		exit 2;							\
+> > +	fi
+> > +	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)"
 >
-> [Severity: Low]
-> Should _find_issue_pattern() skip any symbol that has an explicit
-> SymbolRule, regardless of symbol_rule.expected?
+...
 >
-> Only checking for opposing expected values causes two issues: when
-> pattern_rule.expected is ExpectedValue.y, a symbol with a SymbolRule of
-> ExpectedValue.allowed is not exempted and is falsely reported as unset,
+> When either module is missing, check.py writes the error to stderr,
+> produces no stdout, and exits with os.EX_UNAVAILABLE.  Because the POSIX
+> shell pipeline ignores the exit status of $(checkconfig) list-rules,
+> grep -qw exits 1 on the empty stdout and the negated condition enters the
+> branch.  That reports a valid setting such as RULES=preempt_rt as an
+> unknown profile and runs $(list_checkconfig_rules), which invokes check.py
+> a second time and prints a duplicate module error on the same line after
+> "Available RULES: ".
 
-I think you misunderstand what 'allowed' means.
+It works, so there is no reason to complicate things.
 
-'expected: allowed', means that an option is permitted. Quoting the schema:
+For example, invoking the make target from a container with old Python:
 
-        #
-        # Expected value for the matching kernel configuration option.
-        #
-        # Values:
-        #
-        #   y        option is expected to be enabled (built-in or module).
-        #   n        option is expected to be disabled or unset.
-        #   allowed  option is permitted and must not be reported as a violation.
-        #            This is to be used either by overlays, or to exempt a specific
-        #            symbol from a broader `name_pattern` rule  with `expected: n`.
-        #
-        expected:
-          type: string
-          enum: [y, n, allowed]
+   $ make checkconfig
+   Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig
+   Available RULES: Error: Python 3.9 or later is required
 
-So, for below policy:
+   make[2]: *** [scripts/kconfig/Makefile:138: checkconfig] Error 2
+   make[1]: *** [/home/darwi/linux/Makefile:772: checkconfig] Error 2
+   make: *** [Makefile:248: __sub-make] Error 2
 
-  - name_pattern: CONFIG_DEBUG_.*
-    expected: n
+and:
 
-  - name: CONFIG_DEBUG_ATOMIC_SLEEP
-    expected: allowed
+   $ make RULES=nonExistent checkconfig
+   Error: Python 3.9 or later is required
+   Unknown RULES profile = nonExistent
+   Available RULES: Error: Python 3.9 or later is required
 
-having a CONFIG_DEBUG_ATOMIC_SLEEP=y should not trigger an audit warning.
+   make[2]: *** [scripts/kconfig/Makefile:139: checkconfig] Error 2
+   make[1]: *** [/home/darwi/linux/Makefile:772: checkconfig] Error 2
+   make: *** [Makefile:248: __sub-make] Error 2
 
-But for below policy:
-
-  - name_pattern: CONFIG_DEBUG_.*
-    expected: y
-
-  - name: CONFIG_DEBUG_ATOMIC_SLEEP
-    expected: allowed
-
-having CONFIG_DEBUG_ATOMIC_SLEEP=y should trigger no warning, but having
-'CONFIG_DEBUG_ATOMIC_SLEEP is unset' should definitely trigger a warning,
-even with the second 'expected: allowed' rule.
-
-TLDR; the pattern expected: y / symbol expected: allowed case is not a bug.
+The duplicate error, which is a single line, is no big deal. IMO, it's
+better than complicating the Makefile for that single edge case.
 
 >
-> and when a SymbolRule has the same expected value as the PatternRule (for
-> example, to give a specific symbol its own severity or rationale), the
-> violation is reported twice—once by _find_issue_symbol() and once by
-> _find_issue_pattern().
+> In addition, grep -qw treats $(RULES) as a regular expression with word
+> boundaries against the comma-separated output of list-rules rather than
+> matching an exact profile name, and spawns Python twice on every valid
+> invocation even though check.py check -r already validates the profile
+> name.
 >
 
-Hmm, the tool does not handle below case:
-
-  - name_pattern: CONFIG_DEBUG_.*
-    expected: n
-    serverity: medium
-
-  - name: CONFIG_DEBUG_ATOMIC_SLEEP
-    expected: n
-    severity: fatal
-    rationale: Danger! must disable! Danger!
-
-But on a second look, maybe it should... I'll think about it.
+That's good catch; will fix.
 
 Thanks,
 Ahmed
