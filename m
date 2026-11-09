@@ -1,68 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794184755;
-	b=0MD2JhcTkmGWKL5T9XtBdhchp9QalAakBM3d822c+imXk8CBNWdqQfciSGB6OWtWZvJj
-	 53SJHT+YmSf97qAtspgRmlKMhUbFPF76CRVLm/oiLFJ6kCwW482wJLCbjd+MZmAyhskFm
-	 DN6oMFXzcVv/4+UBdOibvJATAucPsIsF4CyQteGi4/zepjaiYnjAQk27tCkx2r0xMg5/7
-	 Wz2Ndyd+DZ+hUr7Du5fX+/6Fnl3E8krDOeGQWiyn76p7DgzcSLBgZdktf+BMbHQiSnSqz
-	 af4nNurmdSqg5BvYyfg0Oj6WtuzVvf8TyJpDgMLTEMZFTo4WXYveA/DGSXOufutrm7w==
+	t=1794205536;
+	b=GErA3tU4wK8rtX3PFDcgcn2znMKfEaKthWCuvR/IE/0dkY614RMHu5CyoMPjla4XQjNB
+	 bVplv4kvgJBdDnBagu02C4qWtKJnqo8AjwEX9UcNO/Lp0SeaRhMLZGUujXzya9/T0uFQp
+	 jyUwAPffuvlQ5vgkOFEhdTxJO7VsXLLpXRAsMkPNGOxgLbvcEn39lwzu3QzQEqFmaWUO7
+	 jKSiHGXvz+6yhgxJ/lc5N5Ply7xTG0K9xOtnIar2ivIXpBEyC5noEO9AF6fEAvRNKZT9o
+	 /tNNavuo5ecrfuDUf99YEX+tFEycAE0kRT95+tb1ESKfXzO8PRDO7hESKeC03Lg6Zmg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794184755;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=+K+PG/oogt/eNAg9NDEXRDJuxcbPu513PzwhryksQVQ=;
-	b=wun81L7oDlBgiLP+a5Ad2EZjFCwtT8bmuJnvDVJC1C/8tNsy00ePZ4vcmTlkhlO3PiAA
-	 70ED/GHHwBtvwLZY+ULoNkCRApB1Xm5kfDP8LTI7m3255P0nzcng1MMVCOkfqX9i+5FH1
-	 Xb5FJ5C8V1QVjeiSgrNEAWnWIUGg7zRDFkfxYCUOVrH6+ZNPWmRGgnrKhiug1xalQ5k+m
-	 JkNHXjXAOHgX/QWi/mhUwnWNjwemC9yEeJbUW1IhA50sMRSpe5/X3Cr1+YyD6AgFzAC5G
-	 17T9Yz3CuJYcAZMx1W/Bl/vrQcwGljBR4D/yCYsprHtuZPm2vLAU7YiLmr7j6PXWqrg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794205536;
+	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=vxR0y8O6Yjfa9xBmupmiYjq0RBrrS/LkXi20mWxNVj4=;
+	b=MqmSNkSECLaCK512kwn1Tyl3nRbFR7H20qWgH7kri25qeaWdhcX4SVFmiJAHQbYQPdtr
+	 4qT0pwFBX/J52DetO92uaSZhWtt6JJCnkXPLF/wQaQCOceWISUlueAh2CRAZ8ZSYsmnSQ
+	 2+MrAXhoz8xaML8L8shzq+FqAFJcwuogWrbN26qiCEsHRFkB6KjD72BRTm1HrW8Mn4pRS
+	 bVJyOLdYHTcfX4t5R3shWL3hW35S3u/3PZcSUADdSKRkOkcLCfMrs+HvFn/lwoRau6EXz
+	 HFs6FYPqfrTl4vwNDf86F3lJvTNkdqxPp9zbiqm2k+JlPoRPNKOn65OL9LeWjb67hyA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YXxX6eOM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mLSKRX3B;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87859606A31C;
-	Mon,  9 Nov 2026 00:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE951606A31C;
+	Mon,  9 Nov 2026 06:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YXxX6eOM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B0FC1F0089F;
-	Mon,  9 Nov 2026 00:39:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mLSKRX3B
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F41D1F008A1;
+	Mon,  9 Nov 2026 06:25:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794184755;
-	bh=+K+PG/oogt/eNAg9NDEXRDJuxcbPu513PzwhryksQVQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YXxX6eOMtPSiFx//WISHWWxWTHIwzCPoYFHr1D0Tompx9dWFoe4dfc6luRvj7OTjt
-	 0plc2V8LQcnEH/GLUSlwU8nHwxygzIUmlRpS2a04MxUkVbHs2XppGT8m0+4T4eTIVL
-	 iHDUhZ5t6Zr60kboFLNhSBZEfzNvydUnGz98+gCdCoLWoVfONfU8mxLFU658Wriota
-	 oLJXKQ/ru7W7RvI0m/SXriIaMQMCpCA2E7FeSBNocimr5l7XXZ1FUfCDSqOz5w6vO5
-	 alHgAwxwB5XprdocJPsX/ESBEPcQ9DiHL0oDM8gWSULSJJCq1JO5A++lnRwasVTYn+
-	 ZfJ3EuSIqgX7g==
-Date: Sun, 8 Nov 2026 19:39:09 -0500
+	s=k20260515; t=1794205535;
+	bh=vxR0y8O6Yjfa9xBmupmiYjq0RBrrS/LkXi20mWxNVj4=;
+	h=From:Date:Subject:To:Cc;
+	b=mLSKRX3BsieLi4GLeZuPq0+ZHK9kVNOPWSfwixBMn4rpaVkA9YsE6GmciW2bwB/GS
+	 jMhza4Hel1F/vyASKGubuDwP+evpOsrc42c52ET8aYW58TE+iULoJrwdd/xy8YfJ8N
+	 vVHhWt2HxsHQ977KH8nX5W7vFaxJgDf3xYqCrtasrntgUjWJobvAVJfeJZA7nlfTs3
+	 J/xwuPkpnRgIxT1U1chNy+FTjmyc+NUb8SvWstd4tbR4OcDpOaKn6V9BiiG7dJf/ue
+	 RCJ/169I/OKMg0/NZSKGz8dvpkuRtJNXMuO3YG8OFfaIlonagAG1jnnis8WrBsuT1p
+	 1AErDaT5zWuvw==
 From: Nathan Chancellor <nathan@kernel.org>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: "Ahmed S. Darwish" <darwi@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>, Nicolas Schier <nsc@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 04/10] kconfig: Introduce checkconfig target
-Message-ID: <20261109003909.GB3429615@ax162>
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-5-darwi@linutronix.de>
- <3dd2bb0d-8486-4630-b496-e92e4ac37c29@gmail.com>
+Date: Mon, 09 Nov 2026 01:25:26 -0500
+Subject: [PATCH] Input: apm-power - Rename to apm-power-input
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -72,83 +52,82 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3dd2bb0d-8486-4630-b496-e92e4ac37c29@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261109-apm-power-input-rename-v1-1-0609e7b91825@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAA/yXMQQrCMBBG4auUWTuQpKLoVcTFtPnVEZqGSauF0
+ rsbdfkt3lupwBSFzs1KhpcWHVOF3zXUPyTdwRqrKbhw8N6dWPLAeXzDWFOeJzYkGcASorSudXF
+ /FKpxNtx0+Y0v17/L3D3RT98bbdsHPY5OwHoAAAA=
+X-Change-ID: 20261109-apm-power-input-rename-a2da3030d47a
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+ Nicolas Schier <nsc@kernel.org>
+Cc: linux-input@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Sasha Levin <sashal@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2220; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=Zm6n7DvPV/zt+FKqZ0sjzZv/v8rOmXG/Eq1yFEOyh8I=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFkf06P4DTnV9t09uXaJ3Ke8/TW6Tju3hRusifx3do2Z7
+ aU1wbqbOkpZGMS4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBENGQZ/kqICBo7fTRZZ777
+ w4NPJl9Pa0VflHazsZ69OyW15+r9djOG/4lb7zZZdBx9eVbQ4fqZ5YzrDniuiz2t2/D4wI3nwst
+ E5/AAAA==
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Sun, Nov 08, 2026 at 06:59:45PM +0000, Julian Braha wrote:
-> On 11/6/26 09:19, Ahmed S. Darwish wrote:
-> > Add a checkconfig target to validate the current kernel .config against a
-> > set of rules.  Select the rules using a mandatory RULES= make variable.
-> > 
-> > Example usage:
-> > 
-> >    make RULES=preempt_rt checkconfig
-> > 
-> > Use the kconfig-checker to perform all sanity checks.
-> > 
-> > Document the new target at the 'make help' text.
-> > 
-> > Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
-> > ---
-> >  scripts/kconfig/Makefile | 23 +++++++++++++++++++++++
-> >  1 file changed, 23 insertions(+)
-> > 
-> > diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> > index 5baf1c44ffa2..d67a23730259 100644
-> > --- a/scripts/kconfig/Makefile
-> > +++ b/scripts/kconfig/Makefile
-> > @@ -125,6 +125,26 @@ testconfig: $(obj)/conf
-> >  	$(if $(findstring 1,$(KBUILD_VERBOSE)),--capture=no)
-> >  clean-files += tests/.cache
-> >  
-> > +checkconfig := $(PYTHON3) -B $(srctree)/tools/kconfig-checker/check.py
-> > +list_checkconfig_rules =						\
-> > +	echo -n >&2 "Available RULES: ";				\
-> > +	$(checkconfig) list-rules >&2;					\
-> > +	echo >&2
-> > +
-> > +PHONY += checkconfig
-> > +checkconfig:
-> > +	$(Q)if [ -z "$(RULES)" ]; then					\
-> > +		echo >&2 "Usage: make RULES=<profile> checkconfig";	\
-> > +		$(list_checkconfig_rules);				\
-> > +		exit 2;							\
-> > +	fi
-> > +	$(Q)if ! $(checkconfig) list-rules | grep -qw "$(RULES)"; then	\
-> > +		echo >&2 "Unknown RULES profile = $(RULES)";		\
-> > +		$(list_checkconfig_rules);				\
-> > +		exit 2;							\
-> > +	fi
-> > +	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)"
-> > +
-> >  # Help text used by make help
-> >  help:
-> >  	@echo  'Configuration targets:'
-> > @@ -154,6 +174,9 @@ help:
-> >  	@echo  '                    default value without prompting'
-> >  	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
-> >  	@echo  '  testconfig	  - Run Kconfig unit tests (requires python3 and pytest)'
-> > +	@echo  '  checkconfig	  - Check current config against sanity rules specified by RULES'
-> > +	@echo  '                    Example usage: "make RULES=preempt_rt checkconfig"'
-> > +	@echo  '                    (requires python3, PyYAML, and jsonschema)'
-> >  	@echo  ''
-> >  	@echo  'Configuration topic targets:'
-> >  	@$(foreach f, $(all-config-fragments), \
-> > -- 2.56.0
-> > 
-> 
-> I think this tool may belong in scripts/ due to the kbuild integration,
-> as was mentioned in the past on another tool review:
-> 
-> https://lore.kernel.org/linux-kbuild/20260428183101.GA3304253@ax162/
+When scripts/modules-check.sh is fixed to normalize the module's name
+like name-fix-token does in scripts/Makefile.lib before checking that it
+is unique [1], there is an error due to drivers/input/apm-power.ko and
+drivers/power/supply/apm_power.ko having the same module name.
 
-Yeah, while I would prefer for the script to live in scripts/ due to
-being called from Kbuild, I am not sure if the rules/schemas belong
-there? It might be better to keep everything in tools/ for that reason,
-especially if this may be called externally, but I am open to other
-thoughts.
+  error: the following would cause module name conflict:
+    drivers/input/apm-power.ko
+    drivers/power/supply/apm_power.ko
 
--- 
+  $ modinfo drivers/input/apm-power.ko drivers/power/supply/apm_power.ko | grep name:
+  filename:       drivers/input/apm-power.ko
+  name:           apm_power
+  filename:       drivers/power/supply/apm_power.ko
+  name:           apm_power
+
+Rename drivers/input/apm-power.c to apm-power-input.c to make the module
+name unique and clear up the error.
+
+Reported-by: Sasha Levin <sashal@kernel.org>
+Closes: https://lore.kernel.org/20261108225808.1809266-1-sashal@kernel.org/
+Link: https://lore.kernel.org/20261103110411.11698-1-info@daylightlinux.ch/ [1]
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+We would like to take [1] for 7.5 in kbuild-next, so we would appreciate
+an ack to take this directly or a stable branch that we can pull in.
+---
+ drivers/input/Makefile                           | 2 +-
+ drivers/input/{apm-power.c => apm-power-input.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/input/Makefile b/drivers/input/Makefile
+index 2cd6e1c9a778..842a7e4f7b50 100644
+--- a/drivers/input/Makefile
++++ b/drivers/input/Makefile
+@@ -27,6 +27,6 @@ obj-$(CONFIG_INPUT_TOUCHSCREEN)	+= touchscreen/
+ obj-$(CONFIG_INPUT_MISC)	+= misc/
+ obj-$(CONFIG_INPUT_KUNIT_TEST)	+= tests/
+ 
+-obj-$(CONFIG_INPUT_APMPOWER)	+= apm-power.o
++obj-$(CONFIG_INPUT_APMPOWER)	+= apm-power-input.o
+ 
+ obj-$(CONFIG_RMI4_CORE)		+= rmi4/
+diff --git a/drivers/input/apm-power.c b/drivers/input/apm-power-input.c
+similarity index 100%
+rename from drivers/input/apm-power.c
+rename to drivers/input/apm-power-input.c
+
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+base-tree: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+change-id: 20261109-apm-power-input-rename-a2da3030d47a
+
+Best regards,
+--  
 Cheers,
 Nathan
+
