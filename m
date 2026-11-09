@@ -1,88 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794242593;
-	b=W3lbnNXRigOVSL+OY/Oh1focBJ3mN61ynXQjkGCpJPVlMBfXkHb4K9CKe0AWrU8k9sz5
-	 xf5mfzigDNTAIRmGcaEXOTtDolCJ8FOFU+SPfS87GEmW/IXXVDGk4HlJG8PRUQ65o1mXU
-	 boJ+7wJSRTw09HLZSdaoz82pItUWTTom3YQvyiJYwJKWvFDaBwDq12smFAQkZEZ0FeEx5
-	 OU4EqSKUsEdiI964tFCJsldpPKke5Z5fQugU2NqXXhdhkAjp73hSpT2gnNO+BpeAff1Od
-	 QUMABndtftX+zL1BsPQIz37ZF9th6CkwHIppf3yS9kfgjc0shFQOaJCuqzeFK3FeKlw==
+	t=1794242670;
+	b=3oW/ytBEvnndUJxhAbVNEKR8a2iYeRaBa6mmdPTFvJmD4RrbUj35Nzqm764pUOkJEnQJ
+	 xjPa1SDDGKTxtZk7jiw8Jo3YEDUW39rY2PDJ/xykGN0dypPEFO3pAkUHFAsJlDl7khrpV
+	 PoY1AOAhJFHHUSsDSZLnB6icdA7ipseWbrkuapsEXaTxY3RxpVKQQCrRj7i51T0XzQIRe
+	 jHv5HYbJOWeQZi+cyNcDAW0gCq/8ebi6+xFAVby/Vk02QeGE+R1a+8tyJLaBXBuKckdu1
+	 OheJEz7tLT7qRmUq+GOzs+sJSi5iU1yo5efbLvakHZP24bHG8bZcjrtX931rIlU6uCA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794242593;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=HLYen38mKGP677B1oAzbJm7ZesXCZSDjKVwDLOHWtRg=;
-	b=S+JHweP4EVB+ZPTDJ1ji7t3phtWNriaGKZiyDsNwVMuCKxkqZZKUl3aIe5Fhuju+XwS5
-	 yC9IburrglkAVZugL8of/zNqe5Dp5xZF5RTBtq+BdjvewkpRDIeoPdwHdOu/pSlhoSb7C
-	 4gC3aN4zx7uuJAoMxa5SsRN3wQAZF5+LIg0Bm6tLN4tkjjpDTwIfS4EIab46PZEfxnuue
-	 kiVb0y46MJ6s1Mr3wFQzcgHNBsZgkncL3YDis5GQPxJNYxIdf9mE9dCA7QMcZdzVildwn
-	 hgmgo5GrWJLjyDME37QjVEXiv6ixQKaL64w4UfTgjnHWTRoV9FfbCTlkOU9beu/nLgQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794242670;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=pqc2L1WzcvzIZX23ze7NEAQi3S+/FWCxRg0BqVfI6Vg=;
+	b=3GciM4Uj6saNxWVSQ7zh52Mm5pwxA5sbcZONF06Ht1k1/V+OfjmfaAp25OdgO8oDgXUS
+	 4fRmikOcvdGgtxPaud5LZBHpgUKYqSpEyDP7YQXS4OUyIvUMOGiGj1Dts2SN28Bjwp6we
+	 QHVJiBAnzrjOBE+HXr1/2kshM3MnRTOwz2Yc5I97j6RhJD4Y6l6z1xBzXBLTwwVFlHogk
+	 vfBbvZdJUvOMvIKMZ4+8aWeRV/GTsT7Wl5C/h9EA7d7DGrNwoE2pPwszaMz0LzLMTyqWY
+	 2K1U0LA41833FvhplIPgTIYONGZ7crJWQcxEFZ5hwoRRWk1KfkkItZ5tXhXQfFLWx4Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=suse.com;
-	spf=pass smtp.mailfrom=suse.com;
-	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=YGuhw1oZ;
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RwYrWyq9;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FFC606A337
-	for <linux-kbuild@vger.kernel.org>; Mon,  9 Nov 2026 16:43:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C1FFC606A337
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C29606A321;
+	Mon,  9 Nov 2026 16:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=YGuhw1oZ
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a9a8d6cea8so13493165e9.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Nov 2026 08:43:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1794242591; x=1794847391; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=HLYen38mKGP677B1oAzbJm7ZesXCZSDjKVwDLOHWtRg=;
-        b=YGuhw1oZxUPL/bbx+i0ijosSnISYIbUul/qGq2zAELOacB08dvYDccSx/x9rU6g9gl
-         QyPht0zwbkvD9ejc3WNj6TDVij9KZUrBEQ9Xt5i0q2PMick2I5G7BiPPIhuJ5QsC5cpF
-         Hc9VdS41J2qakEC5kRjP6W1h9qpqNpRyQS76N9UiluO+WrKbrxUc+eHpH3MgwEVU/LBg
-         EKYTjvlmvVcRDnUT5YdBxwyzf6msDAIK2mLzEprKTk57LkQxxSPMwQJzYJo0fRMdPBCc
-         S1EcyuYCyB06Nre1/tH9qJ9dfWqNPjCBc4QnRUd5kWvI+126KhchYL1WWv8hq+Sx8TwT
-         sacg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794242591; x=1794847391;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=HLYen38mKGP677B1oAzbJm7ZesXCZSDjKVwDLOHWtRg=;
-        b=o1JhYa+kUJKrW0ekvPdLQHi51air6MSGVNFPvR+7cHtMTVgMqt3MbNDhfweZjOO+5l
-         JhY3h7e+XflcWFhnqPYTqQRAGDcIE7bDAQhckb5Fw8qLvH1rkzfg0ykgi3LkSNpoIXxE
-         iN/s/PkNxrfAjK06I5q8Rgwe7hWwTZpe+gXTrBaKD0m+POYu+4b8i+InVXo4bBvDD1lr
-         9XbSJ5PkXI6Hqny9bhx+HweDX/wnsY+l3wvDUmPLfHviyRcx12vgq66wHv6WBkLin8sc
-         yMlYcRq5h+G0ANEK9hAfNGN+ZXFOR6RUfnUcOhv3S/9aw+lmzRFH2xLtSNHtQbJlNzDN
-         Fasg==
-X-Forwarded-Encrypted: i=1; AL+hErHd6ZLlhAG3epgKvf/X8myPwt5rz6mJ6/enk7L2Vt2F6qtUXOt1JSLI9fvSQMhLytnaRvoFBzT6Em1PSvU=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8DmO9jAavJ+k4M0ljgHGN8bHOUQujPRyNuxZjnQVQBV9Xi5suX
-	R4GIF0TuEdXYF2W6kSVzfV349u0th4pFizi4uRywozDSuJFO2S7IbzmKtHDgkowaLJQ=
-X-Gm-Gg: AYBFou1gWogiKxIGE4ZyWVhcq+UbtJk/bvGEkm8E1uG7UwdkLCrMZY2naK6JftFQmW7
-	zTNe/P710wRLAn6+ueMZYTax2i1ngIwG4IJm4HvMlb6KjeinNl4IFX14ZK55DSzcLXVVAn5f+fL
-	19egaJYzrAlabvaYkBTcpKzpvUedhr9TZVGOblZSWUfwzJGziG5uidWNEPpsjKzO9s/Oo46U5g/
-	/8KgVmVFz6lwVeh3AAlwreWepZ1kRt8kW3JHVDtT/orV5IFLWDRRsXHYbtA2hN5WzlUrzcXymOb
-	ej5pNsVnqmoADnNw7m4m7B381MnkBydAAC5eaVjabvAXQ6cXWQwyJYVuMo6TjJ/EfY5Z/4PFLNJ
-	cxZTLPA2QgCfwnxe+sgdGzOdeiae+PbOCYHzzgV7bugmTklhFz3l5Mv3yL/dtx3d5lqGD2gfhgZ
-	/ihDMN78sYSVbKqbgkm8PuY2lOcpcyLuuTPI1nYuKRN1INwQXlcKHLmo5kCdAgTeb4Pd3cFWPNb
-	zT4sqd4THT1raTVXGQeFULy9aNkgLNYfNmJEkgBx4TGtUNSHOdgj8c7QZCTpdAIEHCPBgiubhdu
-	R6Nxkxlh/hUuh8pefFgHWDGw7RUquWByuLulkEl2agWdpJFlspcO841vWNgwdnMn
-X-Received: by 2002:a05:600c:3508:b0:4a2:526b:d40f with SMTP id 5b1f17b1804b1-4ba015b8c6amr1961265e9.0.1794242591012;
-        Mon, 09 Nov 2026 08:43:11 -0800 (PST)
-Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba01d8ae9fsm806785e9.3.2026.11.09.08.43.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Nov 2026 08:43:10 -0800 (PST)
-Message-ID: <1dddcf29-36a9-4ffd-999f-54b730c9ea27@suse.com>
-Date: Mon, 9 Nov 2026 17:43:09 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RwYrWyq9
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB6DB1F0089F;
+	Mon,  9 Nov 2026 16:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794242670;
+	bh=pqc2L1WzcvzIZX23ze7NEAQi3S+/FWCxRg0BqVfI6Vg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RwYrWyq9onaHDWrzcgUAnNT+SCoruSQGm9pYpLkASnNzt+eJw6UaP/20lLzCx53Tg
+	 Wq/fzGQuKca+BL62LT2ecyreaIjmIcz1jp30nfdV++sUhfKFKT63PaTdjKFfDyafEr
+	 98bjeO0KYM4XsracQeh3hGCrUI4SmuGqKunKrLyeAPTyqW9tfaZxcRwJL5ATMQ9lQa
+	 XMSohEDAX5THIp9B+tYk3akCt1kk3PX4zT3DVK50IjlwwQLynszpFmdpQ9R/SUmz4V
+	 uy8S+96lC7Ed1ISDIhV4df+jGQMzks7Ar7XQ/Qm3powg856/HDIl9f5zyAz6yLg+84
+	 zi8dbhTRQ83cw==
+Date: Mon, 9 Nov 2026 11:44:25 -0500
+From: Nathan Chancellor <nathan@kernel.org>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Nicolas Schier <nsc@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Daniel Mack <daniel@zonque.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Sasha Levin <sashal@kernel.org>, linux-input@vger.kernel.org,
+	linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Input: apm-power - remove driver
+Message-ID: <20261109164425.GB1608140@ax162>
+References: <20261109080944.3802916-1-dmitry.torokhov@gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -92,73 +60,47 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/11] modpost: cache section relocation mismatch state
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Luis Chamberlain <mcgrof@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
- <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
- linux-modules@vger.kernel.org, rust-for-linux@vger.kernel.org
-References: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
- <20261104-build-speedup-v5-3-0f6018be8dae@kernel.org>
-Content-Language: en-US
-From: Petr Pavlu <petr.pavlu@suse.com>
-In-Reply-To: <20261104-build-speedup-v5-3-0f6018be8dae@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261109080944.3802916-1-dmitry.torokhov@gmail.com>
 
-On 11/4/26 7:20 PM, Lorenzo Stoakes (ARM) wrote:
-> For every relocation modpost invokes check_section_mismatch() to determine
-> whether there is any kind of mismatch between the source and destination,
-> and if so which classification applies.
+On Mon, Nov 09, 2026 at 12:09:44AM -0800, Dmitry Torokhov wrote:
+> The apm-power input handler solely listens for EV_PWR KEY_SUSPEND
+> events to queue APM_USER_SUSPEND via legacy APM emulation. The only
+> in-tree platforms generating those events are legacy Sharp Zaurus ARM
+> machines (spitz/borzoi/akita and collie), none of which were converted
+> to Device Tree. Both mach-pxa board files and mach-sa1100 were marked
+> deprecated in v7.3 by commit cc7852314abd ("ARM: PXA: mark remaining
+> board files as deprecated") and commit 7d92e50ceacd ("ARM: mark
+> mach-sa1100 as deprecated"), and are queued for removal in v7.5. None
+> of the remaining ARM platforms or other APM_EMULATION targets
+> (MIPS_ALCHEMY, PMAC_APM_EMU, and SH_HP6XX) emit EV_PWR input events or
+> enable CONFIG_INPUT_APMPOWER, and arch/arm/configs/pxa_defconfig
+> already dropped CONFIG_PXA_SHARPSL at the same time, leaving its
+> CONFIG_INPUT_APMPOWER=m entry inert.
 > 
-> Each time it does this it invokes section_mismatch() which iterates
-> through the sectioncheck[] array every time it's called.
+> Normalizing dashes and underscores in scripts/modules-check.sh for v7.5
+> exposes a module name collision (apm_power) between
+> drivers/input/apm-power.ko and drivers/power/supply/apm_power.ko.
+> Remove this obsolete input bridge to resolve the collision rather than
+> renaming a module whose last target platforms are going away in the
+> same cycle.
 > 
-> When walked a relocation section the source is fixed and there aren't many
-> targets, so the same names are looked up over and over again.
-> 
-> Therefore cache not only mismatch categorisation but also whether a
-> mismatch even exists for a given section and look up the sections in the
-> cache.
-> 
-> Special indices (undefined, absolute, common) take the uncached path as
-> before.
-> 
-> This results in very significant speed ups for allmodconfig incremental
-> builds.
-> 
-> modpost is on the serial tail of every build that links vmlinux.
-> 
-> Whole build, 128-thread Threadripper 9980X, best of N runs:
-> 
->                                          before   after     delta
->                                          -------------------------------
->   x86 defconfig, touch mm/vma.c, gcc        8.5s     8.3s    -0.14s (-2%)
->   x86 defconfig, touch mm/vma.c, clang      7.7s     7.6s    -0.13s (-2%)
->   x86 allmodconfig, touch mm/vma.c, gcc    33.9s    29.4s     -4.5s (-13%)
->   x86 allmodconfig, touch mm/vma.c, clang  31.9s    27.9s     -4.0s (-13%)
-> 
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-Looks reasonable to me.
+> Reported-by: Sasha Levin <sashal@kernel.org>
+> Closes: https://lore.kernel.org/r/20261108225808.1809266-1-sashal@kernel.org
+> Link: https://lore.kernel.org/r/20261109-apm-power-input-rename-v1-1-0609e7b91825@kernel.org
+> Link: https://lore.kernel.org/r/e4da2f9d-d3b9-4267-9b64-b0f2cb43402a@app.fastmail.com
+> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 
-Reviewed-by: Petr Pavlu <petr.pavlu@suse.com>
+Thanks a lot for helping with this.
+
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+
+Nicolas, do you prefer taking this via kbuild-next directly or having
+Dmitry take it via the input tree and giving us an immutable branch? I
+assume the chance of conflicts or follow-ups are low, so we can probably
+just take it directly but I don't want to assume your preference.
 
 -- 
-Thanks,
-Petr
+Cheers,
+Nathan
