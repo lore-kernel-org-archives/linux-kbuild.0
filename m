@@ -1,83 +1,103 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794239397;
-	b=NJ4VLep0C4Pc8g/TAhYo2REqCcF3vssHQEe/2Q4dltLxfTMpNQ4BPj8s78q2Yq+mz9fo
-	 6D+QJEOch9hMuV0X+PTnM+MWyRkcMuCQi3nj3mNfkgGRE752VJYvdS+sy0brouCqZxmxl
-	 GXbVh/g8NpJ4e4fkxkLSiXRI35MT0QHhsxc3fGOVqJjUOMPWgMchMD6pN3Jna9H7f1uEF
-	 e33W95oR8r2TaPeeDOAX427Y+ApqDlX6V3r+/2uYvH+56zXV/ybjcbLFm+qBy7zzfBETx
-	 XqE+VEyqodE7khIIZR2ELDTIxeSQd6fi4uzxs/Yzrn/y9kWKk0C8pDm+EmwMqBHFxjQ==
+	t=1794239825;
+	b=at3cTy9hK7oovE1drfihp8bgbUFnX8ah31F/VpXYfBdGz8dpPDqcba3PJoYapd8nfdYl
+	 OyxUgUK4LSWQofe/QPdp4SesAX8+V24BkOKLUTLvsfGC2afP+3WAw43aWDv6rf3kVJvXO
+	 YxvlJ1BDogbNWFeNMoiqIcAX+sfeZDHgt0BNUPZJy6XjhnNXngZSaBvh4IoaYEjHQmAu6
+	 Gvw8KGBy7ceiwU3y2Y5gEOi6JyfrVrqM0UvvXsSx4P+mfkVxtu7j3u56bE9GqwLEwegyN
+	 KxKumRbyUXgKnrkYrzvVENDIDO6RYtNWA3iQ6Qxso6nx1zdvkFb5Q7Ds7OJSDgyAx8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794239397;
-	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To;
-	bh=fzoqxKLaBDRZoQJ0AXTUnKYnidJqAGP4Dy7AtaGjvCo=;
-	b=CXeMVkQgdci7KoYn7ohIo0igFmfQWr+8evyQmmGsknZyzx+LVHXe4T0GsfAGj9smQm8w
-	 QDRLtIkK+IVAXSk9I53yaOyAiEUW9oXlQtrM2hfyuiNVcbaUqsU+5nal/JF9moEz/hpLg
-	 piGzyUR3F4Ea9krqr6mZq6ICNfblHUaJuzCFooCtsa+mcP6fRGMfqMtFAREFUGyP0BESI
-	 hmK6DEgG69BNk4S4bYfrnyRTjbIxPl5ItmyMCtJ4HKAOpb6cvjebOa2yUu/JWhr8XUvfe
-	 gWKOrADqCIn6Du0su8gvsPto7dpKJitast1XzyDwTqrUmKlOhLYUuQz94Jst/vu3PQg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794239825;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=pmUFbIi5ELXaVKVermTkfc30pmQFDxvmo4N0D8U5m1Y=;
+	b=FRWHEGj+aYPWeyMeuGNhT2nGRkCj/KVNa7w6YhasV42nK/XnUjC7rowKH/smZ37OFLce
+	 icFN4/aGK//Ta/NH7aYIrKqgaVY7fKkmh5hzlML+7QsD15l0O/EmlVwAN4NdDHft5+86U
+	 UvCcJ5HxjwaRseANo9VPa+89eR17OHkKH2VSVtykrcbGxo5aRd2yhqn7zX47g2rqZXRrf
+	 6lRfxeYicHLe1kND8UWqvZSYVGvOLTGr+ozGkGu5Fax731e65qEMlO2DrNWyjokXtC9U9
+	 BG5od9eJUlVk6gGawiJmwzJHQBPT6CiSwAm2iwl68CA6YT2UzETEl3Kyn83Y5WdzdSg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linutronix.de;
-	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b="xo/2tJZh";
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=2pLz5F40;
-	arc=none smtp.remote-ip=193.142.43.55
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=baylibre.com;
+	spf=pass smtp.mailfrom=baylibre.com;
+	dkim=pass header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=UDLqnf7m;
+	arc=none smtp.remote-ip=209.85.221.51
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EBC606A31C;
-	Mon,  9 Nov 2026 15:49:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 12EBC606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADC0606A326
+	for <linux-kbuild@vger.kernel.org>; Mon,  9 Nov 2026 15:57:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DADC0606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=xo/2tJZh;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=2pLz5F40
-Date: Mon, 9 Nov 2026 16:49:52 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1794239394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fzoqxKLaBDRZoQJ0AXTUnKYnidJqAGP4Dy7AtaGjvCo=;
-	b=xo/2tJZhqcNf7D4jyoWB/UQoVzCqQpuMa9Nlb2Pf2bU9MssqSyUsBI1MUiCqHURvByjmhp
-	bA8PtHmi9RkL1utLq/aapRcP7eynGBpNulFDrHBQha06ZfgtKmai4ZC3i0OgQS906oSN75
-	tCUMFbdKa6nzBNWjvgOxYsLU/BS68Plf2oPQaErGyi6x9DJdbyDCP7A3q9Gf0sWDrLY9+F
-	xAWD/vA1pzETluwtHicgrqT24HT4+Qk/Cv1o57VNoblcfUvZxn3EocD/VPHSGS3Qrztznx
-	FvStGzR6dmDCR/MOJi0V3mzMuJN9U47BbKL6cKvu7r3apLdBtPNmh11L/5m8wQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1794239394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fzoqxKLaBDRZoQJ0AXTUnKYnidJqAGP4Dy7AtaGjvCo=;
-	b=2pLz5F40pYHuIAoIKssXj3vv630LtYU0veP+T64OOa9utBSVrrIpd11WHox1P+bXcKWnfP
-	wMWl74JHE8guctDg==
-From: "Ahmed S. Darwish" <darwi@linutronix.de>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, arighi@nvidia.com
-Subject: Re: [PATCH v1 00/10] tools: Introduce a kernel configuration checker
-Message-ID: <avHroNa1vcxmCIOs@lx-t490>
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <a20153cd-d148-4618-8089-ad81cb16fe23@gmail.com>
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=UDLqnf7m
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4918c2d727fso527282f8f.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Nov 2026 07:57:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre.com; s=google; t=1794239823; x=1794844623; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=pmUFbIi5ELXaVKVermTkfc30pmQFDxvmo4N0D8U5m1Y=;
+        b=UDLqnf7m6MP9XOON1P2yBuMNdHBpOeVN/b/jwE+XxoD9ltNnxMyJaaDEvydhmAeuc7
+         Ew3AxhkfHo16dffHcSjkn7Ewb7ud3PaWGROInw6JmvcvzTv404/kLL4aT3eMRB/CEhFh
+         zFK9sb6aegQMNog2cSasODE4i2b0HMVvrGn6Bu10dAB4GmcXzFoX4eurOH7im3Ke97rI
+         BGiPujPpPJNP7Pu8wSH4XtKW63VLENynHyaT1XsAF1lazfNaj6LvXquLCjsX5RbnI0Xd
+         ZAk9lrnPVigkCW9DjLcDJr3ntOwx3VRNrvu0eltOAeWUU8RGJfk7aqjaEm3hcHNeJJZb
+         nMLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794239823; x=1794844623;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=pmUFbIi5ELXaVKVermTkfc30pmQFDxvmo4N0D8U5m1Y=;
+        b=t05/F4QhDhaT70740bwJW1+kmQGKkxsDlBjPFSgZp5eTF8DNL82OTtIEouD4aGjq5k
+         9dZyEfUS13SCCRZTMHtziNM9ysaz8fEqTXRvHhZTK3SE2HXY+CD4IZ5Yqq3sShcWN31/
+         avEkMJ5Do7GcJwKkEUNT92N17W9Nph3cGscwFaCTKdZFsqaXDnMNckKRKk5B6hnutqtI
+         0VbSPcn1KpQSoX5jMwUsPv3vuXJkrmrj3Xhhk4pkUoouTt559kqgnAS6xaXSQxccLXxn
+         lN1K/9KmEL61h3SHBc6sh2jz9wE+NksQTHZxxMtTG7bt41EGGnKru/vpQqFbsj3x3Tzi
+         vViA==
+X-Forwarded-Encrypted: i=1; AL+hErFs2lGyj2BJvSVpd7iwHxh/aX+N8FlQv5ve/UhjI8qOvChQeZk8RIrmTpCLXrnj2V05lJl5cZKVnekfx34=@vger.kernel.org
+X-Gm-Message-State: APuU4Z96lqhLtkiUQET162jZXQyKfRoJCIFfIADrKp75UdGduAONyU2M
+	3QAeuz+sDNCUL97y3LTgnUHRChFp97JH9WEYYjEN8jSJn96CWH2FcUotZiYos5Mzm6o=
+X-Gm-Gg: AYBFou1xpG3q/8srq/7AbPQs6lMio7DAN0XVbJ6DgvMQfXIAHNOe+32IZ9FVNwZ/Vty
+	j31ufl990iMcQJtjkybxWi7RZaDT6dvRnpb40afoyEYJFITdSt3TXbVSoIumnd87S7LMuv3GfAi
+	ngpWsqYRoTCNWWk3Z3Qu4+lxy6xAmojM6yDb3BFIQy8eiCWG5kw/UI8wfMNkrVLPeversXalh2y
+	aiBDTJY/bZbvEFneLACSomwLMLe5/IQwglmGyPYfCTVh78hARH0XYfT59uq2JDvvKj1aV0AFN7I
+	jxWJnoBLc1EqkTZrbdiLK/ZR5paaxSUrQ+iQuahl0QrjOGMQ0Z10pQiJ9AgYvvxPU42rImZVmQU
+	FEc/PMMkrFdRGVvVln9EAGRTGU3qxc44EWpLHEfFEK4aJ/F6wOr5lHkJV4SVI2jvvS86HA78Pyi
+	83isiW55Gnvy4goSzZ26TrZNp92B0sMgHQyFMGqA7gr7/FUj2NRdxL8oqKyrZPAwWo4DSMYcCHE
+	F9WFtdr8gXSBm6LFWlmIjVigCGbGK2pMkc0cg6d3pM5lKedalAbnquU/K68ZwExgyvACAtMA/ax
+	9bs9x1OPibF5kJ3bqG6n2Z/mPfH5OgCuXXcoCVbOxVxL1bwIuu6Z8exBf9pgFH8eo3SdU4Kmf2Z
+	p5riU3OSByVjxuA==
+X-Received: by 2002:a05:6000:2913:b0:48f:bc05:76fc with SMTP id ffacd0b85a97d-4958871da7cmr8465559f8f.11.1794239823132;
+        Mon, 09 Nov 2026 07:57:03 -0800 (PST)
+Received: from localhost (p200300f65f19a90407b2ef73b14b6bb2.dip0.t-ipconnect.de. [2003:f6:5f19:a904:7b2:ef73:b14b:6bb2])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-496150c6e90sm9293515f8f.2.2026.11.09.07.57.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2026 07:57:02 -0800 (PST)
+Date: Mon, 9 Nov 2026 16:57:01 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Sasha Levin <sashal@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Harald Freudenberger <freude@linux.ibm.com>, Holger Dengler <dengler@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	WANG Xuerui <kernel@xen0n.name>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"kernelci.org bot" <bot@kernelci.org>
+Subject: Re: [PATCH 2/2] devicetable-offsets: Get struct cpu_feature from a
+ device-id header
+Message-ID: <avHrnT-rUMynqyeh@monoceros>
+References: <cover.1792144769.git.u.kleine-koenig@baylibre.com>
+ <179416565740.60865.16102443399828949110.b4-review@b4>
+ <66e4ee9c7f9b4bc48fcee92a94b6bb6d92fe1ad2.1794233316.git.sashal@kernel.org>
+ <f610c07f39df15f3e7ebdc63bfcd759ca7a687a8.1794233316.git.sashal@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -87,100 +107,58 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2fgrweo6pewwby7y"
 Content-Disposition: inline
-In-Reply-To: <a20153cd-d148-4618-8089-ad81cb16fe23@gmail.com>
+In-Reply-To: <f610c07f39df15f3e7ebdc63bfcd759ca7a687a8.1794233316.git.sashal@kernel.org>
 
-Hi Julian,
 
-On Sun, 08 Nov 2026, Julian Braha wrote:
->
-> Cool tool :)
->
+--2fgrweo6pewwby7y
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 2/2] devicetable-offsets: Get struct cpu_feature from a
+ device-id header
+MIME-Version: 1.0
 
-Thanks!
+On Mon, Nov 09, 2026 at 09:14:41AM -0500, Sasha Levin wrote:
+> Since commit cdfdbc11552b ("Move struct cpu_feature to
+> <linux/cpufeature.h>"), devicetable-offsets.c includes
+> <linux/cpufeature.h>, which includes <asm/cpufeature.h> on architectures
+> that select GENERIC_CPU_AUTOPROBE. On loongarch and mips that header
+> pulls in <asm/elf.h>, and from there <linux/fs.h> and <linux/mmzone.h>,
+> which need <generated/bounds.h>. devicetable-offsets.c is built before
+> that header is generated, so even defconfig fails on both:
+>=20
+>   include/linux/page-flags-layout.h:6:10: fatal error: generated/bounds.h=
+: No such file or directory
+>=20
+> Move struct cpu_feature to <linux/device-id/cpu_feature.h>, next to the
+> other device id types, and include that from <linux/cpufeature.h>,
+> devicetable-offsets.c and file2alias.c.
 
-> >
-> > If no ruleset is specified, the target prints the available rulesets:
-> >
-> >     $ make checkconfig
-> >       Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig
-> >       Available RULES: preempt_rt
-> >
-> > The overlay mechanism allows distributions, CI systems, and Board Support
->
-> On the topic of distributions, this seems *a lot* like Canonical's
-> Annotations [1], albeit yours uses YAML and supports matching option
-> names with regex.
+I didn't do that before because I didn't have the impression that struct
+cpu_feature is a device id type. Seems a bit like a misuse to me, but
+=F0=9F=A4=B7.
 
-The difference is not only in the implementation details. Please see below.
+Acked-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@baylibre.com>
 
-> As you say about PREEMPT_RT configuration not being
-> "one-size-fits-all", similarly there are 100+ Ubuntu kernels that need
-> to adhere to a configuration "policy".
->
-> So this seems to be a real problem that others are having.
->
+Best regards
+Uwe
 
-Kernel configuration is definitely getting trickier.  That's why I've
-contributed the PREEMPT_RT kernel configuration guide earlier:
+--2fgrweo6pewwby7y
+Content-Type: application/pgp-signature; name="signature.asc"
 
-   https://docs.kernel.org/core-api/real-time/kernel-configuration.html
+-----BEGIN PGP SIGNATURE-----
 
-Regarding the Canonical tool, it's the first time I see it.  From that
-announce e-mail, it seems that they're using it for generating a .config:
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmrx7UsACgkQj4D7WH0S
+/k61Rwf+LVoPzWsK/woGLLlyviU+6CbjuXgKqChzk+2WLkEBD+PwtIXB8AH9dbPn
+M6002PBuVjZim21ciWzb4KrFg+A7r8v7VwgqC0guYCC0fmT5saCufWs+mD3K0UNm
+v99+XG+Beb0pbOot1KBVbwhXV+bC3Me9emG+M/tnXXHJCQKspmNpEZveIk7dSlWF
+YkDj52lX/LcDMa7bDOfNfbEbMOZOoyzvXhBdLN5vonShXeWbBTvbIHDhIBXYUiXe
+TPKI4T+X/rK0qjc0N33xYdbPFPxC6JtA0bY19P+H9qXRHfDET9c4m1tBDYI/f4GF
+TRJz+4C8sNz42lbj0xNszq4D4wu9LA==
+=wmA7
+-----END PGP SIGNATURE-----
 
-   Starting with 22.04 (Jammy Jellyfish), Ubuntu kernels are now using
-   only annotations to /generate/ their corresponding .config.
-
-   ...
-
-   $ ./debian/scripts/misc/annotations --arch amd64 --flavour generic > .config
-
-Yocto also provides a very light concept of .config generation:
-
-   https://docs.yoctoproject.org/kernel-dev/common.html#creating-configuration-fragments
-
-But this tool does not conern itself with generation.  That is, Canonical
-can use this tool to validate that they've generated the right thing! ;-)
-
-> > For example:
-> >
-> >     $ ./tools/kconfig-checker/check.py check	\
-> >           -c path/to/.config			\
-> >           -r preempt_rt				\
-> >           -o path/to/overlay.yml
-> >
-> > or:
-> >
-> >     $ make RULES=preempt_rt OVERLAY=path/to/overlay.yml checkconfig
-> >
->
-> I think the name will cause confusion.
->
-> We already have some "kconfig checkers" in-tree, like
-> scripts/kconfig-sym-check.pl
->
-> But actually, your tool is quite unrelated, because that one checks
-> 'Kconfig' source files, while yours checks the user's '.config' file.
->
-> This has already caused some confusion in the past, for example in this
-> thread [2], someone misunderstood which one 'kconfig-sym-check'
-> actually checks.
->
-
-Haha, good point :)
-
-> In addition to .config vs Kconfig, the name is similar to
-> 'kconfig-sym-check', but is not as descriptive about *what kind* of
-> checks it performs.
-
-Maybe "kconfig-audit" would be a good name?
-
-It makes it clear that it "audits" a .config against a certain policy.
-
-Thanks!
-
---
-Ahmed S. Darwish
-Linutronix GmbH
+--2fgrweo6pewwby7y--
