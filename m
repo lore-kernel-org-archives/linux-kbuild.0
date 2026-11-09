@@ -1,70 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794240439;
-	b=Bjy3Lx+WRL1AACTd+Pzm3LV5U+8cQObC1BGSTECTzD3ibf8ye4GG7ijY7HKOAMZQjIh6
-	 GrTW8s93iqqbsl4E1pj6+vJeLXSZsY+dTjtb5fBB/H558aXWWKvN4+/PXoin/gIaKK4PK
-	 mqQW3GGEdcy94epGCOEjU7wWRx5fGICarH4aNG0t5YDZtFbEIuFjUAr4oaH5wyF+8Lstz
-	 g0AATX7QhHt3Vsf9DHfyXZrgW5gglUeAb6PJh0+hk59FlMemOKdR+ypMKF8iuh1RQnj6H
-	 FuOlUTahy5b0pit3WY2GtMZCkN+xONW1fiJ3zE0TATPtr8I13u54wJRdDf20rdhARaw==
+	t=1794240924;
+	b=CBMwBjaIg4GlMXU2NBfD1OqKh6hpz2vP6AYvrIEKb+mn4c0nawIiB6NeqWRF1QjsJ7aL
+	 bIhRjocLw15QoOQb0PqSS0SdyDqprZfqIjVh1H4jJ7XaXASbmBLYady9gEqpkMY/c95qD
+	 VKhFjpQ5Cqq4QOVDQFIs6TWRv1veyM62pJ5WTYjJxs4VIQuYkDgVBHz3uObP72EZRcDG5
+	 pT52G5DSrOw/mZ3qfEmfu1ccPdZjrkFGNUn8vN4RHg0jJS4CHDcfBRTMybE2gh/6M1g0J
+	 NoNe3d2neHynn3+jORj2VCRDFPAWtxNPIGLT5uu7jmQQWfSBH/zO9x2HKYkNBKmyNmA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794240439;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=SVOmDRps/YsTAgWokFT8+GwgNyoAcEKE4T7uVUf2NyM=;
-	b=FIOw03vgfCP7ymsCcdzGlrkcTFLQydiq+GGBo6UzpNj/xyl4DN+lkw2a8sbjzvMchUur
-	 RmOmTXMdaBrCUKatc2Un6fy1zBwevVtx++QHwRPFiJ5KVfO8LNkwTktS8u4GWZD8nfTdV
-	 LXDz/GQTzIP9LiPWE0Oqe4uhIk35S1xFALbyC8bBD7APcfGVGS7u8gpk869N5kheUhP4/
-	 KaqcKoa0J1ktal69zaPab1nhIU6xN/FthuX/cRLLfZ0o61Y7hgRz90v+AInDfxsNfhDOm
-	 0wm4O1csAl2aBKE6XOjsYY8jdJ3QcQeXcrrdxFA4GH9pApfEjRjLR+ZGIcsCx2SXr+Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794240924;
+	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To;
+	bh=MN1BnROEORvgYw+MypT4h2Jcvdysaix5bzeL3TZj7Ug=;
+	b=BcuBi2F7f48mR/baFd7tVaCBT/4gJDOrHf9eArDjYAQE3wp/BfhfN2K7M3gnYXE3Pw1w
+	 KvM+D4zrRWvAIlA47QmbMJ4RaRb9AgJBRzxRUdKE71csmZaGXslTRXh8LP6or9qt+A3dI
+	 m1HhELWjH/CeUc99UZqPNGN1kPKIHOwMa3U+JogyUqqqXdkR4TqgaDzkRx19TzhKkQTDO
+	 dg0J0ChSVlhKXnuMS6rUzWhMMsijWNnjCuVL7zAdDVG101uNoP1BQx6iBXurlCORrwXj8
+	 2Ptz9rjlCEZSpa+PmeLBv58CJB93f9OGDuJ12gnkvPJcdZ+4eNZ57yyIOmCzdDO9gGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Vetztiii;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=linutronix.de;
+	spf=pass smtp.mailfrom=linutronix.de;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b="Nxb/MLdA";
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=6Qx5XPOv;
+	arc=none smtp.remote-ip=193.142.43.55
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id B06D9606EEBD;
-	Mon,  9 Nov 2026 16:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F09D606A326;
+	Mon,  9 Nov 2026 16:15:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5F09D606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Vetztiii
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id F092F1F00939;
-	Mon,  9 Nov 2026 16:07:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794240438;
-	bh=SVOmDRps/YsTAgWokFT8+GwgNyoAcEKE4T7uVUf2NyM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VetztiiiMA3mKOw5ZuM5unuUv/1gBX+plgcgNeYZM/NiJBeAunJizLFc+ex/OC1KH
-	 ruCluqxABnjxL1fV5Ya95nJSrWpg9wumRRwSpEeDXXSJae7a9HVoz8VNwEF34W8Xx9
-	 xVoD6jqwS/QJHxjR7wogSJjh8bjwYWb1LoRv2KodV27OA18DzHaRhZXUDViJaS2vZX
-	 gQFDK8X1gs4cNZVDot7ZM8xGLhujrNHp1mgz96Ssl6nMTcCLnwOirCLxMpNopcwSfq
-	 qpyQMqllln+bxV9PP2IQvLY5etPAzGou1Y0Yc/8gYrEnmHDFp4zl7jqdwbG60u817E
-	 kcWFnCFRL/9mQ==
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-kbuild@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"kernelci.org bot" <bot@kernelci.org>
-Subject: Re: [PATCH 1/2] s390/pkey: Include <linux/device-id/ap.h> for struct ap_device_id
-Date: Mon,  9 Nov 2026 17:07:04 +0100
-Message-ID: <179424040473.1704532.16041517405742082345.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <66e4ee9c7f9b4bc48fcee92a94b6bb6d92fe1ad2.1794233316.git.sashal@kernel.org>
-References: <66e4ee9c7f9b4bc48fcee92a94b6bb6d92fe1ad2.1794233316.git.sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=Nxb/MLdA;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=6Qx5XPOv
+Date: Mon, 9 Nov 2026 17:15:20 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1794240922;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MN1BnROEORvgYw+MypT4h2Jcvdysaix5bzeL3TZj7Ug=;
+	b=Nxb/MLdAkBa8XsF9k4yN7JmmPWhb8eEZ4Wx0xAxLiQm4wV/EKdGA2b7vjyaEYTOj9rMTUv
+	MULDhOcSoINy1O2FUxnboI/qdEKA2U44jWA5KkmARngPnZ132W1A2SZbdfpfpOx10h/M83
+	x1JW8Yc7fQCC+vBVYGuDDuxqa9jqH4WhTtzWe3Ql+gIsbBHY2mBDTm6sftmxRWdfGuQyUY
+	yQ5ynwDKnwgsCHJrlGyi5gvzs3LPxm0CDYBMFQ89F2AB/+VXH2RXQcOZ8R7R+fBwX5fkDo
+	3YzGn7rbQESMqQdnk4EnrTUic1Sl+761RUJiDSpAbqOUgByyeGCFG5owA9EFpw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1794240922;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MN1BnROEORvgYw+MypT4h2Jcvdysaix5bzeL3TZj7Ug=;
+	b=6Qx5XPOvhwNYptQdWHV4IOm3h9SuIai0MbKolYUcGGjW2585+syNcIkyAKHYlIuU84OMub
+	McwTYs2bfaHtl1Dg==
+From: "Ahmed S. Darwish" <darwi@linutronix.de>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Julian Braha <julianbraha@gmail.com>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ingo Molnar <mingo@redhat.com>, Nicolas Schier <nsc@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Ogness <john.ogness@linutronix.de>,
+	Derek Barbosa <debarbos@redhat.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Luca Boccassi <luca.boccassi@gmail.com>,
+	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
+	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, arighi@nvidia.com
+Subject: Re: [PATCH v1 00/10] tools: Introduce a kernel configuration checker
+Message-ID: <avHxmCEdHgyRD7n0@lx-t490>
+References: <20261106091922.7560-1-darwi@linutronix.de>
+ <a20153cd-d148-4618-8089-ad81cb16fe23@gmail.com>
+ <20261109003745.GA3429615@ax162>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -74,35 +89,53 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261109003745.GA3429615@ax162>
 
-On Mon, 09 Nov 2026 09:14:40 -0500, Sasha Levin wrote:
-> pkey_cca.c and pkey_ep11.c got struct ap_device_id from
-> <linux/mod_devicetable.h> by way of <linux/cpufeature.h>. Commit
-> cdfdbc11552b ("Move struct cpu_feature to <linux/cpufeature.h>") dropped
-> that include, so s390 defconfig no longer builds:
-> 
->   drivers/s390/crypto/pkey_cca.c:22:28: error: array type has incomplete element type 'struct ap_device_id'
->   drivers/s390/crypto/pkey_ep11.c:23:28: error: array type has incomplete element type 'struct ap_device_id'
-> 
-> [...]
+On Sun, 08 Nov 2026, Nathan Chancellor wrote:
+>
+> On Sun, Nov 08, 2026 at 06:59:26PM +0000, Julian Braha wrote:
+> > I think the name will cause confusion.
+> >
+> > We already have some "kconfig checkers" in-tree, like
+> > scripts/kconfig-sym-check.pl
+> >
+> > But actually, your tool is quite unrelated, because that one checks
+> > 'Kconfig' source files, while yours checks the user's '.config' file.
+> >
+> > This has already caused some confusion in the past, for example in this
+> > thread [2], someone misunderstood which one 'kconfig-sym-check'
+> > actually checks.
+> >
+> > In addition to .config vs Kconfig, the name is similar to
+> > 'kconfig-sym-check', but is not as descriptive about *what kind* of
+> > checks it performs.
+>
+> Yeah, I had similar thoughts when this initially appeared in my inbox.
+> As you mentioned in your email, this is basically a policy checker (“we
+> need these configuration options enabled or disabled to meet our
+> requirements”), so maybe config-policy-checker or something like that
+> would be clearer?
 
-Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+I would've loved to keep "kconfig" in the name so that outside the kernel,
+it's still clear it's about a kernel .config. For example, a Debian package
+for this tool can be called "kconfig-checker", "kconfig-policy-checker",
+etc.
 
-[1/2] s390/pkey: Include <linux/device-id/ap.h> for struct ap_device_id
-      https://git.kernel.org/kbuild/c/b48d1c04
+What about kconfig-audit?  Something like:
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
+   ./tools/kconfig-audit/audit.py -c .config -p PREEMPT_RT
 
-Patches applied to the kbuild-next-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-next branch in about a week if no
-issues are found.
+   make POLICY=preempt_rt auditconfig
 
-Best regards,
--- 
-Nicolas
+config-policy-checker does sound good, but it feels verbose.
 
+Feedback appreciated.
+
+Thanks!
+
+--
+Ahmed S. Darwish
+Linutronix GmbH
