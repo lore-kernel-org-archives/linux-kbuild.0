@@ -1,56 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794242670;
-	b=3oW/ytBEvnndUJxhAbVNEKR8a2iYeRaBa6mmdPTFvJmD4RrbUj35Nzqm764pUOkJEnQJ
-	 xjPa1SDDGKTxtZk7jiw8Jo3YEDUW39rY2PDJ/xykGN0dypPEFO3pAkUHFAsJlDl7khrpV
-	 PoY1AOAhJFHHUSsDSZLnB6icdA7ipseWbrkuapsEXaTxY3RxpVKQQCrRj7i51T0XzQIRe
-	 jHv5HYbJOWeQZi+cyNcDAW0gCq/8ebi6+xFAVby/Vk02QeGE+R1a+8tyJLaBXBuKckdu1
-	 OheJEz7tLT7qRmUq+GOzs+sJSi5iU1yo5efbLvakHZP24bHG8bZcjrtX931rIlU6uCA==
+	t=1794242748;
+	b=GfPSH5SDCTcGBxIOpIiIE6+u3hnPylL0O0nYqE9OkN5XQn86rPK+JQam2cF1ZZkpAQCa
+	 RwIwjbpBthcxXAjErTL/7EcnKVgs2oSI30DJfEmRIz2SyFTispBcrnkcWUn+cmdpnTyfq
+	 WZDjVJGTTLzhLZc2VA2GJgQJyf4g/C+pz9QrgSW1FBmso0e+ZrejaQFrH94iLyNrB63+1
+	 JpP0p41l5cpiysNXAbBn9wKRApORc5UDiYJLbCBKdZNEMlnJeXErK2434S/5vTtpcCqwM
+	 ieDRuIxjSD4FgipEKD0KjvlbpW2pe1Ij0pe2MT2nh+BC1RavtiMI5PqnLEXtWS9mgGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794242670;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=pqc2L1WzcvzIZX23ze7NEAQi3S+/FWCxRg0BqVfI6Vg=;
-	b=3GciM4Uj6saNxWVSQ7zh52Mm5pwxA5sbcZONF06Ht1k1/V+OfjmfaAp25OdgO8oDgXUS
-	 4fRmikOcvdGgtxPaud5LZBHpgUKYqSpEyDP7YQXS4OUyIvUMOGiGj1Dts2SN28Bjwp6we
-	 QHVJiBAnzrjOBE+HXr1/2kshM3MnRTOwz2Yc5I97j6RhJD4Y6l6z1xBzXBLTwwVFlHogk
-	 vfBbvZdJUvOMvIKMZ4+8aWeRV/GTsT7Wl5C/h9EA7d7DGrNwoE2pPwszaMz0LzLMTyqWY
-	 2K1U0LA41833FvhplIPgTIYONGZ7crJWQcxEFZ5hwoRRWk1KfkkItZ5tXhXQfFLWx4Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794242748;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=KaxLEDS88ItrKwFFpF3PUgaqHFKPv05h6XZaeYQUHW0=;
+	b=12lsaecBPjjSvqc+StpwTgBcbmn6LBu3w8SZIqy3/ms8seWUb4tQ66ZmOZg2ChbAgwOZ
+	 snoMD48NtMdmz5HJ9aRVEuRMGBz35N1Nj+sIiRJ6652z0xkngEF8gk6S8JSGFcflg42eO
+	 7cD/iRwwLlcN+5xq/NEQPTxmqMmxJc6sIiPlu8XTqWBw2imz+UZgAJQecNMqYWhp/CcND
+	 35Ia7VmUqCm84AUEGCtL7Jaiz+cRTvD5Wj7pm7nOCuczrPxvTO4uUDktepV0u8MUYektu
+	 PtjGF2bRNX1Amr7m9elcX219i9laRqTPaTPasgkoCx6jEJ63+8dcitaAOOSSHmKMTOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RwYrWyq9;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=suse.com;
+	spf=pass smtp.mailfrom=suse.com;
+	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=IVc4xmHR;
+	arc=none smtp.remote-ip=209.85.221.52
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C29606A321;
-	Mon,  9 Nov 2026 16:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1DA606EE88
+	for <linux-kbuild@vger.kernel.org>; Mon,  9 Nov 2026 16:45:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B1DA606EE88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RwYrWyq9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB6DB1F0089F;
-	Mon,  9 Nov 2026 16:44:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794242670;
-	bh=pqc2L1WzcvzIZX23ze7NEAQi3S+/FWCxRg0BqVfI6Vg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RwYrWyq9onaHDWrzcgUAnNT+SCoruSQGm9pYpLkASnNzt+eJw6UaP/20lLzCx53Tg
-	 Wq/fzGQuKca+BL62LT2ecyreaIjmIcz1jp30nfdV++sUhfKFKT63PaTdjKFfDyafEr
-	 98bjeO0KYM4XsracQeh3hGCrUI4SmuGqKunKrLyeAPTyqW9tfaZxcRwJL5ATMQ9lQa
-	 XMSohEDAX5THIp9B+tYk3akCt1kk3PX4zT3DVK50IjlwwQLynszpFmdpQ9R/SUmz4V
-	 uy8S+96lC7Ed1ISDIhV4df+jGQMzks7Ar7XQ/Qm3powg856/HDIl9f5zyAz6yLg+84
-	 zi8dbhTRQ83cw==
-Date: Mon, 9 Nov 2026 11:44:25 -0500
-From: Nathan Chancellor <nathan@kernel.org>
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Daniel Mack <daniel@zonque.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Sasha Levin <sashal@kernel.org>, linux-input@vger.kernel.org,
-	linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Input: apm-power - remove driver
-Message-ID: <20261109164425.GB1608140@ax162>
-References: <20261109080944.3802916-1-dmitry.torokhov@gmail.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=IVc4xmHR
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-4922523d1afso622208f8f.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Nov 2026 08:45:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1794242746; x=1794847546; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=KaxLEDS88ItrKwFFpF3PUgaqHFKPv05h6XZaeYQUHW0=;
+        b=IVc4xmHRUI7l0d1aI01B1bf0TgxhgAWqtMAsztsXJDiGo9QYkOa5VcjnsqiEUEW094
+         +obdWRcpaN+j/B14EgCb1KFG4LUdRJV+GvcaWubRrOtQazg82Ix3i4nQYf/jMIEHX2tU
+         ObAWnI3isjfiH/yuAvxeUlSdxCVgZvZqsNiqWudHZdY1CeA0GDvuzZKyEo07VSJB5Ahb
+         AkgMpN2gR8U3WlRYJOmZsZme0ERrSqL4LiPSZuS2JprQ1rmSLrAT4/GHrebv/GqHlMzY
+         v6V4vdWFB2UPahEWWeEq02QTnTWgioPULqgClxAVoK/PJ41XSdFU191pmOOCiiUzrCYI
+         QHHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794242746; x=1794847546;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=KaxLEDS88ItrKwFFpF3PUgaqHFKPv05h6XZaeYQUHW0=;
+        b=tHlM11FcjHXrZ23PCBtBQxz+QuVc42Z0MNVE+JNG0AIXHzKubM5EwgErDtKjC3ehev
+         FsbPDZJSEa6eY421wvrwrdueA9wQ/JwzRsPqFX219Kk79tzHf/50zfqnGebhhUuymIBG
+         3wjNcJrdSPAcHH1+Xkkzwwvj04Yr5y9OPdbap/l9xDeN4HV1MDX66RwUlLwmuYuANaXK
+         CpFZHjF5uD7mbBzlO/8nmhyzI6rY/yZfio6QidkSW+MjHAH5XmYiLS0/WXioOWHhFgr5
+         Rdw5sL/DSIucnlCW7I+5O2yRxiYaqJ4kbY7uP34TB1+h52l1bQyChi40kNWYK73PysON
+         A7cQ==
+X-Forwarded-Encrypted: i=1; AL+hErGHfLO6WaoMWNgp5xIxBiE2Hq6ltKmSlHc+JY9IqtfPfu/tGWNFYlW0JLu2hi6/Z64GikdOxKRE2xLzvwM=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+UeJ0WMqT22rErfNK6rtpAyiVrNqmf5Tg+1FEUDtrtcMtnDDs7
+	YJcczxK8QfhBE3yT4i7NFZumRSF/QKjxoKKOtxzGAevK0yVmRxV2A3vfU4/5IMzWNII=
+X-Gm-Gg: AYBFou0T3IwoVteoT8NsK6gvU3vnAydyHE4mIHCon2nlUIaEzPrBjFJEr08F87CRqj3
+	Rj8Ez61jcn6m58yqSim0S5EbgPWK12i6pCmOYu2djGC9PM3p4ZQvDEME1gxv92mig3zDpX6FrMG
+	XINqY8jO/tOwDx5ZZdFEElSI5ScUPDV0OLcnhH67zl6mKVhFdjaS7OMxrX4QzPlqGhuOi4w3J9M
+	FVeWl4LOS5OcItT+nQDPGa2rnX9Q9HY0Y7ZwLjLMCedAfr/ZGY4eitTVB/bRQXdNTZt7YgiiSvJ
+	qz49td+UQl9YkLgDkWit7e25QM84bkqYrJ9+7/f4vtFbDKYTJ5loz15Ya7bxOMNO8/TbmBbR8NT
+	NQLtIFFTi6P23k8VTxhZpXx97HtJHxUAB3iF7O9lHYL52kgFJyB1rwFXyIItg7l+1Jxj3noTEjG
+	1ZOPL97aV9EL01YNTr/c0P8p1KJS8UHs79RObZGb6gtM0+zLEwB6w/jVyMh0UecwsHb+Dm3S0Lt
+	B4BK6fW02D6U45JIQ6CXe9gqlWkia7J9d9DUr4b18irO0GsGCkbv6jgrPSUqWX/0EiI2fjrzvNJ
+	F86t7fnKfFBPKfDOXgZ4Jhm7GrOV2A6eSI5fVdVFQZCdSdDRfcY5RXrR3ku7lm2m
+X-Received: by 2002:a05:6000:2389:b0:491:8462:20cc with SMTP id ffacd0b85a97d-49830d8186fmr7425f8f.37.1794242745831;
+        Mon, 09 Nov 2026 08:45:45 -0800 (PST)
+Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49597187162sm11283249f8f.34.2026.11.09.08.45.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Nov 2026 08:45:45 -0800 (PST)
+Message-ID: <b5abb55f-202d-458b-ba6d-92af16f80137@suse.com>
+Date: Mon, 9 Nov 2026 17:45:44 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -60,47 +92,174 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261109080944.3802916-1-dmitry.torokhov@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 04/11] modpost: emit module descriptors as assembly
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Luis Chamberlain <mcgrof@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
+ Josh Poimboeuf <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+ Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
+ Daniel Almeida <daniel.almeida@collabora.com>,
+ Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
+ <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+ linux-modules@vger.kernel.org, rust-for-linux@vger.kernel.org
+References: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
+ <20261104-build-speedup-v5-4-0f6018be8dae@kernel.org>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20261104-build-speedup-v5-4-0f6018be8dae@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 09, 2026 at 12:09:44AM -0800, Dmitry Torokhov wrote:
-> The apm-power input handler solely listens for EV_PWR KEY_SUSPEND
-> events to queue APM_USER_SUSPEND via legacy APM emulation. The only
-> in-tree platforms generating those events are legacy Sharp Zaurus ARM
-> machines (spitz/borzoi/akita and collie), none of which were converted
-> to Device Tree. Both mach-pxa board files and mach-sa1100 were marked
-> deprecated in v7.3 by commit cc7852314abd ("ARM: PXA: mark remaining
-> board files as deprecated") and commit 7d92e50ceacd ("ARM: mark
-> mach-sa1100 as deprecated"), and are queued for removal in v7.5. None
-> of the remaining ARM platforms or other APM_EMULATION targets
-> (MIPS_ALCHEMY, PMAC_APM_EMU, and SH_HP6XX) emit EV_PWR input events or
-> enable CONFIG_INPUT_APMPOWER, and arch/arm/configs/pxa_defconfig
-> already dropped CONFIG_PXA_SHARPSL at the same time, leaving its
-> CONFIG_INPUT_APMPOWER=m entry inert.
+On 11/4/26 7:20 PM, Lorenzo Stoakes (ARM) wrote:
+> modpost generates a descriptor for every module in the form of a
+> <module>.mod.c file with .modinfo strings, the __this_module descriptor,
+> exported symbol tables and (with CONFIG_MODVERSIONS set), the CRC of
+> imported symbols.
 > 
-> Normalizing dashes and underscores in scripts/modules-check.sh for v7.5
-> exposes a module name collision (apm_power) between
-> drivers/input/apm-power.ko and drivers/power/supply/apm_power.ko.
-> Remove this obsolete input bridge to resolve the collision rather than
-> renaming a module whose last target platforms are going away in the
-> same cycle.
+> These files are compiled like any other kernel C file with all of the
+> -include preamble, as well as including linux/module.h, header dependencies
+> generated by fixdep of a few hundred headers, an objtool run and if LTO is
+> being performed, a link is performed to generate native code.
 > 
-> Reported-by: Sasha Levin <sashal@kernel.org>
-> Closes: https://lore.kernel.org/r/20261108225808.1809266-1-sashal@kernel.org
-> Link: https://lore.kernel.org/r/20261109-apm-power-input-rename-v1-1-0609e7b91825@kernel.org
-> Link: https://lore.kernel.org/r/e4da2f9d-d3b9-4267-9b64-b0f2cb43402a@app.fastmail.com
-> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> On an x86-64 allmodconfig build 11,189 *.mod.c files are built, each
+> taking ~0.24s of CPU time to compile, and module finalisation as a whole
+> 6,300 CPU seconds, or 64 seconds of wall time when run over 128 threads.
+> 
+> It also generates ~1.3 GiB of *.mod.o.cmd files that every subsequent build
+> has to read back.
+> 
+> Avoid all this by emitting the descriptors as assembly instead.
+> 
+> The layout required (size and alignment of struct module, struct
+> modversion_info, the module's name offsets, init, and exit fields and
+> whether the architecture uses PREL32 ksymtab references) can all be derived
+> from scripts/mod/module-offsets.h.
+> 
+> The fields of __this_module are emitted in offset order rather than
+> declaration order, as CONFIG_RANDSTRUCT shuffles struct module so the name,
+> init and exit fields can land anywhere.
+> 
+> An assembly file avoids all of the issues previously mentioned so this
+> conversion results in a very significant performance win on kernel build.
+> 
+> As a consequence of this change, since module-offsets.c includes
+> linux/module.h, scripts/mod is now built after the generated headers in
+> prepare0, rather than before.
+> 
+> Also update .gitignore and make clean to handle .mod.S files, but keep
+> .mod.c files there to ensure that users do not end up with untracked
+> changes/dirty trees after the change takes effect.
+> 
+> The sections were confirmed to be byte-for-byte identical to the C version
+> produced - each of .modinfo, .gnu.linkonce.this_module, __ksymtab*,
+> __ksymtab_strings, __kcrctab*, __kflagstab*, __versions,
+> __version_ext_crcs, __version_ext_names and their relocations - for all
+> 8,135 modules of a clang allmodconfig build with CONFIG_COMPILE_TEST off
+> and CONFIG_MODVERSIONS, CONFIG_EXTENDED_MODVERSIONS and
+> CONFIG_MODULE_SRCVERSION_ALL on, and for a sample built with gcc.
+> 
+> What differs is what the compiler added around them: the __UNIQUE_ID_*
+> locals, the KASAN constructor for the .mod.c globals, and on x86 a
+> .note.gnu.property that the linker already drops from any module containing
+> an assembly file and the loader never reads.
+> 
+> None of these have any impact on the build, however.
+> 
+> The assembly carries no debug information, so in order to keep describing
+> __this_module in each module's debug information, define it weakly in
+> module-common.c too, in a section which the module link discards.
+> 
+> Nothing initialises struct module::arch from C any more, so
+> MODULE_ARCH_INIT is removed from include/linux/module.h and from m68k, the
+> only architecture that defined it.
+> 
+> x86_64 kernels built with gcc and clang, with CONFIG_MODVERSIONS,
+> CONFIG_EXTENDED_MODVERSIONS and CONFIG_MODULE_SRCVERSION_ALL, were booted,
+> every module and an external one loaded and unloaded, and the srcversions
+> checked against modinfo, i386 and arm64 defconfigs (gcc and clang) and a
+> ThinLTO build were also built as part of testing.
+> 
+> An x86_64 CONFIG_RANDSTRUCT_FULL build with clang, which places the name
+> field after init and exit, was checked the same way and produces the same
+> .gnu.linkonce.this_module sections and relocations as the C version.
+> 
+> On the x86_64 allmodconfig with clang 22, "make modules" with every
+> *.mod.o and *.ko deleted goes from 64.5s (6,306 CPU-s) to 28.5s (518
+> CPU-s).
+> 
+> A consequence of this change is that the make jobs are now so small that
+> make cannot dispatch them quick enough, however the next commit in the
+> series addresses this issue.
+> 
+> This impacts clean and no-op builds with a large number of modules most
+> noticeably.
+> 
+> Whole build, 128-thread Threadripper 9980X, best of N runs:
+> 
+>                                          before   after     delta
+>                                          -------------------------------
+>   x86 allmodconfig, no-op make, gcc        12.7s     2.3s    -10.4s (-82%)
+>   x86 allmodconfig, no-op make, clang      13.9s     2.8s    -11.2s (-80%)
+>   x86 allmodconfig, clean, gcc            342.6s   306.6s    -36.0s (-11%)
+>   x86 allmodconfig, clean, clang          340.1s   290.2s    -49.8s (-15%)
+> 
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-Thanks a lot for helping with this.
+Looks ok to me from a modules perspective.
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+Reviewed-by: Petr Pavlu <petr.pavlu@suse.com>
 
-Nicolas, do you prefer taking this via kbuild-next directly or having
-Dmitry take it via the input tree and giving us an immutable branch? I
-assume the chance of conflicts or follow-ups are low, so we can probably
-just take it directly but I don't want to assume your preference.
+> +/* The equivalent of KSYMTAB_FUNC()/KSYMTAB_DATA() and SYMBOL_FLAGS(). */
+> +static void add_asm_ksymtab(struct buffer *buf, const struct symbol *sym)
+> +{
+> +	const char *name = sym->name;
+> +
+> +	/* The name and namespace strings the entry refers to. */
+> +	buf_printf(buf, "\t.section \"__ksymtab_strings\",\"aMS\",%%progbits,1\n");
+> +	buf_printf(buf, "__kstrtab_%s:\n", name);
+> +	buf_asciz(buf, name);
+> +	buf_printf(buf, "__kstrtabns_%s:\n", name);
+> +	buf_asciz(buf, sym->namespace);
+> +	buf_printf(buf, "\t.previous\n");
+> +
+> +	buf_printf(buf, "\t.section \"___ksymtab+%s\", \"a\"\n", name);
+> +	buf_printf(buf, "\t.balign %d\n", KSYM_ALIGN);
+> +	buf_printf(buf, "__ksymtab_%s:\n", name);
+> +	add_asm_ksym_ref(buf, sym->is_func ? MOD_FUNC_PREFIX : "", name);
+> +	add_asm_ksym_ref(buf, "__kstrtab_", name);
+> +	add_asm_ksym_ref(buf, "__kstrtabns_", name);
+> +	buf_printf(buf, "\t.previous\n");
+> +
+> +	buf_printf(buf, "\t.section \"___kflagstab+%s\", \"a\"\n", name);
+> +	buf_printf(buf, "__flags_%s:\n", name);
+> +	buf_printf(buf, "\t.byte 0x%02x\n", get_symbol_flags(sym));
+> +	buf_printf(buf, "\t.previous\n");
+> +}
+> +
+> +/* The equivalent of SYMBOL_CRC(). */
+> +static void add_asm_crc(struct buffer *buf, const struct symbol *sym)
+> +{
+> +	buf_printf(buf, "\t.section \"___kcrctab+%s\",\"a\"\n", sym->name);
+> +	buf_printf(buf, "\t.balign 4\n");
+> +	buf_printf(buf, "__crc_%s:\n", sym->name);
+> +	buf_printf(buf, "\t.long 0x%08x\n", sym->crc);
+> +	buf_printf(buf, "\t.previous\n");
+
+Nit: add_asm_ksymtab() and add_asm_crc() emit unnecessarily .previous
+directives.
 
 -- 
-Cheers,
-Nathan
+Thanks,
+Petr
