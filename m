@@ -1,85 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794240924;
-	b=CBMwBjaIg4GlMXU2NBfD1OqKh6hpz2vP6AYvrIEKb+mn4c0nawIiB6NeqWRF1QjsJ7aL
-	 bIhRjocLw15QoOQb0PqSS0SdyDqprZfqIjVh1H4jJ7XaXASbmBLYady9gEqpkMY/c95qD
-	 VKhFjpQ5Cqq4QOVDQFIs6TWRv1veyM62pJ5WTYjJxs4VIQuYkDgVBHz3uObP72EZRcDG5
-	 pT52G5DSrOw/mZ3qfEmfu1ccPdZjrkFGNUn8vN4RHg0jJS4CHDcfBRTMybE2gh/6M1g0J
-	 NoNe3d2neHynn3+jORj2VCRDFPAWtxNPIGLT5uu7jmQQWfSBH/zO9x2HKYkNBKmyNmA==
+	t=1794242381;
+	b=gLpgqyM5Sa4Uj4PTey1QJzLRwCsp1SMREqMVDRjeuHfYF63aOvFDsxiKs8Qa5ERNYhGC
+	 xMU87bdoW6j+Hrp4Mic+QQam+zyBHmrFD0YEW5KIgzq0jPveqjimcFfNzXiy5Pzncr5nT
+	 22zr+QeJ2OCHYzX5H9UwQnb4sGHqZfIK7FKfK50luWQ9+7x8wL4oIjKqdrTi+8a/PkrdE
+	 rTOLGb70FbDZIof+PTp7bAEhJD2XV/N821Gb2RfKs3oQ9begDPyaP/OqWMxmN2FErqXOu
+	 BEWnL2u3z59A0d6WdvvCldYt+YPKgoSXWURAGUDLgv/O9LYQKzYPzHxpjJjH75TTPPg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794240924;
-	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=MN1BnROEORvgYw+MypT4h2Jcvdysaix5bzeL3TZj7Ug=;
-	b=BcuBi2F7f48mR/baFd7tVaCBT/4gJDOrHf9eArDjYAQE3wp/BfhfN2K7M3gnYXE3Pw1w
-	 KvM+D4zrRWvAIlA47QmbMJ4RaRb9AgJBRzxRUdKE71csmZaGXslTRXh8LP6or9qt+A3dI
-	 m1HhELWjH/CeUc99UZqPNGN1kPKIHOwMa3U+JogyUqqqXdkR4TqgaDzkRx19TzhKkQTDO
-	 dg0J0ChSVlhKXnuMS6rUzWhMMsijWNnjCuVL7zAdDVG101uNoP1BQx6iBXurlCORrwXj8
-	 2Ptz9rjlCEZSpa+PmeLBv58CJB93f9OGDuJ12gnkvPJcdZ+4eNZ57yyIOmCzdDO9gGg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794242381;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=XczfXdyyzzvBMaK7H65uC8tHQp56fcZp9lsoW/OvEfE=;
+	b=Eo2zqEh4LWDxCqRao+DY6DI/OMaYwFYVDmOlVL+tFvmsiGWPLn2QkOjYCoLzXVtMX9o9
+	 +bfHtOPTzbOrFz+snW0MCz1K4JSOBKEK+HQXpIN6cVuswxxNAWZhpNMfAVMXtuiCQKwhf
+	 2UHl7NRdGHWqrBdYu30NB+LOKxBtwxPL1hEG59Vb7B1NjcEmiXDY3azCAJPHZVBZWcehA
+	 WxHFPL2oRsBZrygUVxHXIS/MhtQVgyCYLsMn82m3kYyz3xswfgVY1PwDzfYPk68s8Y6ID
+	 YbFYEjN/sL0PHPzEn6FxhlILe3ijah1oXr3ckVp44PQdqXjce5rUnIxpQ5QRR5MYnuQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linutronix.de;
-	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b="Nxb/MLdA";
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=6Qx5XPOv;
-	arc=none smtp.remote-ip=193.142.43.55
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dzQCkfBN;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F09D606A326;
-	Mon,  9 Nov 2026 16:15:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5F09D606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C94606A331;
+	Mon,  9 Nov 2026 16:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=Nxb/MLdA;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=6Qx5XPOv
-Date: Mon, 9 Nov 2026 17:15:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1794240922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MN1BnROEORvgYw+MypT4h2Jcvdysaix5bzeL3TZj7Ug=;
-	b=Nxb/MLdAkBa8XsF9k4yN7JmmPWhb8eEZ4Wx0xAxLiQm4wV/EKdGA2b7vjyaEYTOj9rMTUv
-	MULDhOcSoINy1O2FUxnboI/qdEKA2U44jWA5KkmARngPnZ132W1A2SZbdfpfpOx10h/M83
-	x1JW8Yc7fQCC+vBVYGuDDuxqa9jqH4WhTtzWe3Ql+gIsbBHY2mBDTm6sftmxRWdfGuQyUY
-	yQ5ynwDKnwgsCHJrlGyi5gvzs3LPxm0CDYBMFQ89F2AB/+VXH2RXQcOZ8R7R+fBwX5fkDo
-	3YzGn7rbQESMqQdnk4EnrTUic1Sl+761RUJiDSpAbqOUgByyeGCFG5owA9EFpw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1794240922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MN1BnROEORvgYw+MypT4h2Jcvdysaix5bzeL3TZj7Ug=;
-	b=6Qx5XPOvhwNYptQdWHV4IOm3h9SuIai0MbKolYUcGGjW2585+syNcIkyAKHYlIuU84OMub
-	McwTYs2bfaHtl1Dg==
-From: "Ahmed S. Darwish" <darwi@linutronix.de>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Julian Braha <julianbraha@gmail.com>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>, Nicolas Schier <nsc@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, arighi@nvidia.com
-Subject: Re: [PATCH v1 00/10] tools: Introduce a kernel configuration checker
-Message-ID: <avHxmCEdHgyRD7n0@lx-t490>
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <a20153cd-d148-4618-8089-ad81cb16fe23@gmail.com>
- <20261109003745.GA3429615@ax162>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dzQCkfBN
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6ADC11F0089F;
+	Mon,  9 Nov 2026 16:39:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794242381;
+	bh=XczfXdyyzzvBMaK7H65uC8tHQp56fcZp9lsoW/OvEfE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=dzQCkfBNoJ/MVAxSdeMblCLGbyp28LvZG01v1zKrZrtXTBVis3aecojY4BHBAI+SB
+	 Q/6wVxPELdYDD6h3Q/LQ3/cLXZJL2iG13cY2wqB+16w+S8iGlSZ5sslPD8l7f3vDWJ
+	 kCpMiUqqqSJCQVsAyJkGRnkWXSOhUsZRYQj3gpyzYSlXvzYZtNEwmDvy1N8UGBv0KU
+	 XZkgwntXskeFWHQeWIGoTcqTFBiGGiSCF04ngPGuIl1oN3qXynibboHUHkeV8FAbFJ
+	 jKzflO/PU8SW2T00yhydFwJQJQkJz6vZsCvQ/5bum7BmzY0DkOtMUSy1tKgfj2CP3F
+	 t5LeqTADIH3Ag==
+Date: Mon, 9 Nov 2026 11:39:36 -0500
+From: Nathan Chancellor <nathan@kernel.org>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Nicolas Schier <nsc@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	linux-input@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH] Input: apm-power - Rename to apm-power-input
+Message-ID: <20261109163936.GA1608140@ax162>
+References: <20261109-apm-power-input-rename-v1-1-0609e7b91825@kernel.org>
+ <e9cf3745ebc09bf04ce0bf75b67a31f0@gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -89,53 +58,51 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261109003745.GA3429615@ax162>
+In-Reply-To: <e9cf3745ebc09bf04ce0bf75b67a31f0@gmail.com>
 
-On Sun, 08 Nov 2026, Nathan Chancellor wrote:
->
-> On Sun, Nov 08, 2026 at 06:59:26PM +0000, Julian Braha wrote:
-> > I think the name will cause confusion.
-> >
-> > We already have some "kconfig checkers" in-tree, like
-> > scripts/kconfig-sym-check.pl
-> >
-> > But actually, your tool is quite unrelated, because that one checks
-> > 'Kconfig' source files, while yours checks the user's '.config' file.
-> >
-> > This has already caused some confusion in the past, for example in this
-> > thread [2], someone misunderstood which one 'kconfig-sym-check'
-> > actually checks.
-> >
-> > In addition to .config vs Kconfig, the name is similar to
-> > 'kconfig-sym-check', but is not as descriptive about *what kind* of
-> > checks it performs.
->
-> Yeah, I had similar thoughts when this initially appeared in my inbox.
-> As you mentioned in your email, this is basically a policy checker (“we
-> need these configuration options enabled or disabled to meet our
-> requirements”), so maybe config-policy-checker or something like that
-> would be clearer?
+On Mon, Nov 09, 2026 at 12:09:33AM -0800, Dmitry Torokhov wrote:
+> Hi Nathan,
+> 
+> On Mon, Nov 09, 2026 at 01:25:26AM -0500, Nathan Chancellor wrote:
+> > When scripts/modules-check.sh is fixed to normalize the module's name
+> > like name-fix-token does in scripts/Makefile.lib before checking that it
+> > is unique [1], there is an error due to drivers/input/apm-power.ko and
+> > drivers/power/supply/apm_power.ko having the same module name.
+> ...
+> > Rename drivers/input/apm-power.c to apm-power-input.c to make the module
+> > name unique and clear up the error.
+> ...
+> > We would like to take [1] for 7.5 in kbuild-next, so we would appreciate
+> > an ack to take this directly or a stable branch that we can pull in.
+> 
+> drivers/input/apm-power.c only reacts to EV_PWR/KEY_SUSPEND input events
+> to queue APM_USER_SUSPEND via APM emulation. The only in-tree users that
+> generate those events are the legacy Sharp Zaurus ARM machines
+> (spitz/borzoi/akita on PXA alongside SHARPSL_PM, and collie on SA1100
+> via locomokbd). None of them were converted to Device Tree, both
+> mach-pxa board files and mach-sa1100 were marked deprecated in 7.3, and
+> Arnd (added to Cc) already has their removal queued up for 7.5 after
+> holding it back from 7.4 LTS:
+> 
+> https://lore.kernel.org/r/e4da2f9d-d3b9-4267-9b64-b0f2cb43402a@app.fastmail.com
+> 
+> None of the remaining ARM platforms or other APM_EMULATION targets emit
+> EV_PWR input events or enable CONFIG_INPUT_APMPOWER (and pxa_defconfig
+> already dropped CONFIG_PXA_SHARPSL in commit cc7852314abd, leaving
+> CONFIG_INPUT_APMPOWER inert there).
 
-I would've loved to keep "kconfig" in the name so that outside the kernel,
-it's still clear it's about a kernel .config. For example, a Debian package
-for this tool can be called "kconfig-checker", "kconfig-policy-checker",
-etc.
+Ah, thanks a lot for doing this archaeology!
 
-What about kconfig-audit?  Something like:
+> Since you are targeting 7.5 for the modules-check change anyway, let's
+> just drop drivers/input/apm-power.c altogether instead of renaming a
+> module whose last users are going away in the same cycle. I will send
+> out a removal patch shortly, and either you can take it directly through
+> kbuild-next or I can put it on an immutable branch for you to pull.
 
-   ./tools/kconfig-audit/audit.py -c .config -p PREEMPT_RT
+Sounds good, I will reply on that patch.
 
-   make POLICY=preempt_rt auditconfig
-
-config-policy-checker does sound good, but it feels verbose.
-
-Feedback appreciated.
-
-Thanks!
-
---
-Ahmed S. Darwish
-Linutronix GmbH
+-- 
+Cheers,
+Nathan
