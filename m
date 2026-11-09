@@ -1,82 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794268854;
-	b=bJ6efSdSdehBK9lPeZZqB01gop8+bwAri4wGYXoeDdsYFLjd1AwT868tkKllwZgvpyrg
-	 5zf30SRFLQ0bQ0sthycp8InkOXEQvXHsss0KFFF8BF+v+lfM3trDeEZrkMb2b+IyGaHop
-	 HX95rOcJcAQWPBkJzBwszc90TWOjjmBpUDHgASDKeSMBpGOInSzL0zo/hHv51EsuVLfHH
-	 HVWX5gWzoPVGk3CcQz6Rd8tkNqMV0dovC4Yx7M01b5V8rWqZ7BJsXctaE9L5eUryhuc9I
-	 /mrKmOhot+ycx+1j8oZA7Nf+Ow2shDZl2XuSu7cCAPS/QPVk2GeDyBdaZb1J5Ly1IyQ==
+	t=1794268856;
+	b=ZR44b5SQMbJmUZuf1N5cxNTjOQawlt8+0Htwt5RowWAKbfQkQMwMVtAriEnJUeykBqwz
+	 n8ZGYffnhQYcZDpnCaITABx59yGD6540kvUzde/CVoXoJF4R3D9stZ9IW3ZFUiookrIlL
+	 ddf4IHxBs2m2XHw+cqTPoooRBeVSXUQ0+yjPkEzigo0QfDB24+hxb+2c8T0mFpDCslTK8
+	 tvWSsxMo+wV/2qX07wvF7lPmv+eMaYi/enONQRRyzjRPpcwrGNUvBwtuJDZV1mI6JYZPI
+	 AMuHIBpvsO97lc5av8raowUFh6Uzq1S2HpK3hbBVVA1d3DmnEDdZkAaNJ4yHTJYhIuQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794268854;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794268856;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=WFJKTttb+9w1SToDPMlK+ZhvhJNtUsRWKsncaoz5Paw=;
-	b=X3bosod+oNh5Kw1LlWslthoaVUNfdmV7Yq9Pbq8jzDc+Iurd7l5UtYtdLbOokGIUzCgj
-	 1IlfOKDRexYd8S2ssgEUD7gI62AqNh/lODcToWGN3nvyDfUDrPLRr/JlvUynBb/wrosFw
-	 d0Xiy1WWgnDUpHFEpDj9/S2unrLT5foVKLC9qZoDWl8HThfNu3D+dBphDjpvYH8/Jbxv8
-	 eNd38P1fabzZptdj3f6g7mx7KVke9gViwNVOEW1fmhNEyV5l8Bpq9p/q4zpwonS5rV47I
-	 z/4H0s63P+P38oRr6uHmF5+Qi2QXnX6KTXPEF1yBSRzKm0p23BHHCXnIanO/LxcfogQ==
+	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=C6v8yQiRwIXyjVO4a2RoDhFAswA1B+x9SGkBxm38Q8M=;
+	b=OwTdJuw78sGPiwuOrvDiCra1URzLc7cMmIZ8aF5kurFIBjEKsWKYpd3RrONxlSdvr61w
+	 qJ+3y/e6FxFsk7HeeO+d5RcGWBjCJkQ95d3TUmpboUy+KN+igyDoTj7szhgUi835qzjTb
+	 4D9F3gjyNB+LUEaZiCokTw+uY/fKkSig1n3SOlB40RsJ4ZsR3oAIGNuv4UV1qwVJoDFf5
+	 cZJGcmBFYspH8FP86mv+9WAKn2fExkTa+WWmLHmDaUrFumULKtd/G1aM+8YV4Vfk1D9IT
+	 itt7Z8VSwA9mIixczdkTc14B85DQq1stGqvdIEadm2xGQvbM4JuKDH74UksRJM6IKUA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qXUCJciS;
-	arc=none smtp.remote-ip=209.85.167.177
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OPJnytAt;
+	arc=none smtp.remote-ip=209.85.167.175
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BA6606A321
-	for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 00:00:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18BA6606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F97606A336
+	for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 00:00:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 17F97606A336
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qXUCJciS
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-53aa0802881so678069b6e.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Nov 2026 16:00:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OPJnytAt
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-4b28d9537bcso1022079b6e.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Nov 2026 16:00:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794268853; x=1794873653; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WFJKTttb+9w1SToDPMlK+ZhvhJNtUsRWKsncaoz5Paw=;
-        b=qXUCJciSL9bZkBJ8qtcVkDNIjvWdze1sW84sQMktjsWURrnxFYKdmz3ahEboofMG+p
-         SUtaHq3s2NhtRv+mp5UzikLrXYJfNM/5pWAf084oiHiSQVdqPZVlBeW/HXvtdB0kiETm
-         PSWkCi4CIg+Mx58fk9YM/EV/uQKhI0+a+2rVKziTgvPik4KaS3dYYzhFuRke/Y+kqLKP
-         I7luG/hCz1EhMOsTgnwplD6i2Lw8WyCriEK8KAHbONqhqOMssosqH6sPupApOL6nOWSt
-         CuENFDS5Z6VMwCL3H3cjn5nkHNfEbRB0hJySzxjmNdvZZZcItMAgNSX5UmmTMzeTRufS
-         zUVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794268853; x=1794873653;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1794268855; x=1794873655; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=WFJKTttb+9w1SToDPMlK+ZhvhJNtUsRWKsncaoz5Paw=;
-        b=XzE+Z3YFrAopWASJQvv22DMZhYycNxgmdMwRrko4gwpbUj1wdVKPLalLSkIb1EheBv
-         UHJV8xG1t3B0bRyvOf7pLKWUJemHGHpwloWKFkk1qEX6NAOpXLhCFwrQm7cOhM2QMA09
-         qAXHxU6hEHXygoKka8mRK5WRmC7OtAH9svHSeB1cA8jpR2taymiY8NtO6KRSzlnje0hh
-         Pj2qZJSybOE4KklIHDeYPIE9UnCckyPW+io2Y+W9pvXBDqLWCcgpr3Ejx9AKv67Ts/3h
-         IpyQ9+thDTKYA2s8LCmW8pf0gkidzdR7PGWVH3WbOs5MDTCBSPdSu5VZzHyAnO+HfDzS
-         UyfQ==
-X-Forwarded-Encrypted: i=1; AL+hErF10zB6gFk7zITkqdFzeVp6vadW8yfZP8EYATIiJX5Tw+ZveQp9ANVK7BCsFqbaV+OH6Pqna60tldjdtes=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/1pJcXXVFSkRul+3UTQIs89y56dJHhDhjUFHYOLEBOWf5TbvUS
-	ycIxzj49FuIgtR+0cw4hwXJgpMjYqEqJszc7JzENBjm3hWNJAasBUlLn
-X-Gm-Gg: AYBFou2wnq+5lWUk+DYeKezqWY218O/vHBxQjl80xICIU3JBjblXxgtB5SSlLC283Sw
-	/FO7+IEBPAXIVBxlrZAAJIQw5haQ2a9ZFHAQ+UYnHeo/Uhwsa4ErrSfsC4hJbAnT4uKVLZ8ytRz
-	PddF6vnYwuLSArBo/puotdcL3OZEEjCoUBeEZ8zHuAqsLWom4m245tu4M/WEVxP+MLwtJaCMun8
-	pXcL1qfooKoCIax9l7AxotyS4oXtcMhojrqaMda5i8OSvIESkuqCePl1acLwOavuTK8QNs9RwHh
-	+hfG5BdyfKsavY4KomDFqPk7qZNR+U32iYyucvYvz23wu9yODXYF8/zGiw406k61yrok6/crZRh
-	/Oc7m05Rn42vfD1ohZC5vbGEy+4FFEqlQtJgIif/aLRAfV0r5+bijZFayOdJ4himVrNJQgyDbuh
-	Of8L9zuLq/OARntxC0jrvUQ5r0IMPguCvgrNkNIQZywjBIa3l8wem/nPnAQmMZ6DcxE/6NwEtTL
-	iDUx1/8LNPJfgZis8x1iNL/sixPJTdriaXrMJS0QN7/ofJjjCBV/DP0lnOT3ZXGt9zcHvDVMKXv
-	v4G6rNuJ4RQ+0SviVuLaB+qaf4CtJ0qKsjUcLCSg/GA=
-X-Received: by 2002:a05:6808:148e:b0:4e9:69e9:59c3 with SMTP id 5614622812f47-5683df688dcmr796994b6e.67.1794268852828;
-        Mon, 09 Nov 2026 16:00:52 -0800 (PST)
+        bh=C6v8yQiRwIXyjVO4a2RoDhFAswA1B+x9SGkBxm38Q8M=;
+        b=OPJnytAtrZ+lmd5q6j8qQvodlISbdEptBXRcHBqqmcF6HwF0V3HZzMzJzqmTbLq3O+
+         fP18zRwfcJTF7Ax8klYWwgkGSyHJghSWj+1eHnxTYZrCt2+SDtbPoblWDYdfv4V5zZQa
+         GXhcRcBUrmLEriYbS11Q2zWio4d2UIDit8p1a3RVxtr5R/lswQbcWH7gKRIXB+nzQsTb
+         ncT+uL2KXQY5H8Kepkt1ENSIihkznYwDz23S+FIW4gqh+q/crCMZI7kY7tQwHNnOa6ZE
+         E0bdOdkVnmXSoX0EwieICtSLbLULCfHEl6iwJyv/p12pVKhQa1V3SMEkKoSAuTYo/y8/
+         yjqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794268855; x=1794873655;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=C6v8yQiRwIXyjVO4a2RoDhFAswA1B+x9SGkBxm38Q8M=;
+        b=u4I2rolG6unYN6ZRBhBw3jZtODlXfYoFSGqqBCjvuVtV1bhMwjR28mr9c76YmOlbd6
+         oOQUcs3ZgPJpJBXrKc7BTbQyzOVslYOl5LW5+RkZetUvh1KldqFxf15Zq8dPUxZsmLgV
+         84jBXL4F3JHpSIecplcHmirDIDjhtqU67lYdRDruPh8SWmAA+IFOLvTKhf8lZIJ2qfDT
+         9SutrO6nLXw1+ks7QcIMaYKp9Fc85sb6vVrrwip5rp305nBHQC35EdVKreA6HEf9kogV
+         8x9mcUk8tYVf4J8Z+0Sn6QzskeQq6O4nW1wOogHjNY34RqrCLswFhXiHmCdD9MYVVwYv
+         8krw==
+X-Forwarded-Encrypted: i=1; AL+hErGHdjJ8VwY8ya35yQR2kifzWPbB+l3dxOLzCb5EcvSH78aBn7nzI+qDaVAQ0Rr4ofsoPkZCc5EqBdO1bEA=@vger.kernel.org
+X-Gm-Message-State: APuU4Z83qlCY4jQZLL+Fxq0sHxMsBLclFuUovYXaREi2lTAx6UWMDxhf
+	4rvEZHkGkqDHJ9jnlU13pjHM/vD/qOsqzuL9enaf4HYLhqxrL6zIzQAh
+X-Gm-Gg: AYBFou1Q83kb4aqgb4qexUDqjZXpP8nXUzlJhmhF/P8yXwn8Isy+KkWj+siTMOsLDi1
+	kXrtv2wxr0Bt7PJQeFlYlTpdbD7Z2YxJoCPAabn6znDNGeUryRZWmA7yIKOS4E7BmIs4mwOPj+0
+	FVjy7QwENLohBM+gxRGl64zzspXcSTSzMy4gqxPNVrRrun6dJHXp7/MYwCQ8pSoGpLOGw1enX/Q
+	0Xhfo/R99qRWIEtAce77hXrIr+pYZI05tecI7bC5xjPSmuNIaO/xoU63RzT7XsnddaBDIIPczZL
+	Asx+FmzpwehTYu+FGYXIitQBmqalhRwOSJX4G9o1MUhZazfKQfuRYXfcD3ckvqpjoFU8E7HsCmm
+	cr4U3l3K/aestTjRHTYZOyskoWv+gSzBqvQL1Gs7nwO0qCuwbfr2+4nWRLRvaOX2pjadoYbMBZb
+	qKhox8d8nFLXFZVAB1GMRQeB+taGT3z8n2LfgS2xGEfmD4TKqtcEIQmzwlAIVG7Jp/tP/mnr3Dr
+	NJsy6sUC3qX6M0ju4HTJ/YsJ85MG3qVCKCLV6/8X3sVSZtrKkoWoF/wmi/VsYt9CSYwuujzUQxN
+	jA/7VoXEql0v6bYowBOSoDtNwHtMdKOVkvR5qD8W37Q=
+X-Received: by 2002:a05:6808:124d:b0:4b8:4703:db92 with SMTP id 5614622812f47-5688130178dmr490167b6e.27.1794268854914;
+        Mon, 09 Nov 2026 16:00:54 -0800 (PST)
 Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-56905735edasm623697b6e.7.2026.11.09.16.00.49
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-56905735edasm623697b6e.7.2026.11.09.16.00.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 16:00:51 -0800 (PST)
+        Mon, 09 Nov 2026 16:00:54 -0800 (PST)
 From: Leizhen Zhang <lzsx618@gmail.com>
 To: nathan@kernel.org,
 	nsc@kernel.org
@@ -87,10 +88,12 @@ Cc: masahiroy@kernel.org,
 	linux-kbuild@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Leizhen Zhang <lzsx618@gmail.com>
-Subject: [PATCH v3 0/6] kbuild: fix UB hit by normal builds in host tools
-Date: Mon,  9 Nov 2026 17:59:57 -0600
-Message-Id: <20261110000003.1719966-1-lzsx618@gmail.com>
+Subject: [PATCH v3 1/6] genksyms: fix infinite loop on declarations with parameter lists
+Date: Mon,  9 Nov 2026 17:59:58 -0600
+Message-Id: <20261110000003.1719966-2-lzsx618@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20261110000003.1719966-1-lzsx618@gmail.com>
+References: <20261110000003.1719966-1-lzsx618@gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -102,77 +105,93 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v3 of the host tool fixes. The main change is what is left in
-it: following the feedback on my elf-parse series, I went back over
-every patch and kept only the ones a normal build or valid source can
-trigger. Each of the six below was re-checked on mainline as of
-b23545529c21 (the rc1 rebase changed no code) by doing a plain x86_64
-defconfig build (MODVERSIONS and MODULE_SRCVERSION_ALL enabled, 12
-modules) with the host tools built with sanitizers, and then rerunning
-the same step with the patch applied:
+decl_specifier_seq updates the global decl_spec, which is used by the ','
+action of init_declarator_list to give each further declarator the
+specifiers of the declaration. However, decl_specifier_seq is also used
+for parameter declarations, so for a declaration such as
 
-  1/6 genksyms   'int a, f(int);' is valid C and makes genksyms loop
-                 forever; 'int a; int f(int);' is fine.
-  2/6 kallsyms   link-vmlinux.sh hands kallsyms an empty .syms file on
-                 every build (the .tmp_vmlinux0 pass), and both qsort()
-                 calls then get a NULL table. 2 UBSan reports -> 0, the
-                 generated tables are byte-identical.
-  3/6 modpost    read_text_file() rereads into the start of the buffer
-                 after a short read. Not something a local filesystem
-                 does in practice; shown with an LD_PRELOAD shim that
-                 caps read() at 64 bytes, under which modpost rejects a
-                 valid Module.symvers.
-  4/6 modpost    parse_source_files() does arithmetic on the NULL that
-                 strstr() returns for dependencies outside the module's
-                 directory. Reported on the build's own modpost
-                 invocation; Module.symvers is identical with the fix.
-  5/6 sorttable  the sort_needed address is computed by adding a kernel
-                 virtual address to a host pointer first. Reported on
-                 the real vmlinux.
-  6/6 tools      __get_unaligned_le32() shifts a byte >= 0x80 into the
-                 sign bit. Hit 4 times during the defconfig link, by
-                 sorttable.
+  int a, f(int);
 
-The 4/6 and 5/6 reports need clang's -fsanitize=undefined; GCC 12 does
-not instrument those two pointer-arithmetic cases, so they are silent
-with a GCC host build.
+decl_spec is clobbered by the specifiers of the parameter "int" by the
+time the ',' action runs. The action then links the parameter's own token
+node back into its chain, creating a cycle, and copy_list_range() loops
+forever while allocating memory:
 
-The 2/6 and 6/6 reports reproduce unchanged on v7.4-rc2 (GCC host
-build, same config).
+  $ printf 'int a, f(int);\n' | scripts/genksyms/genksyms
+  (hangs)
 
-Changes in v3:
-- Rebased onto v7.4-rc1. No code changes in the patches that remain.
-- Dropped "fixdep: fix out-of-bounds read on a comment ending with a
-  backslash": it needs a hand-written .d file; the compiler never
-  produces one.
-- Dropped "modpost: fix stack out-of-bounds read for unterminated PNP
-  ids": all 699 PNP ids in the tree are 7 characters, and the overflow
-  needs an 8-character one, which is not a well-formed PNP id.
-- Replaced the Assisted-by trailers, which checkpatch no longer
-  accepts, with a sentence in each changelog saying how the problem was
-  found and that an AI coding assistant helped prepare the fix.
+Before commit 45c9c4101d3d ("genksyms: fix memory leak when the same
+symbol is added from source") the same corruption did not hang but
+silently recorded a wrong type for subsequent declarators (e.g. for
+"int f(long), a;" the type of "a" was recorded as "int f ( long a").
 
-v2: https://lore.kernel.org/r/20261008164035.3668885-1-lzsx618@gmail.com
+Only set decl_spec in decl_specifier_seq_opt, which is used at the
+declaration level, and let decl_specifier_seq just return the last
+specifier. Struct and union member declarations use a new
+member_decl_specifier_seq_opt that does not touch decl_spec, so a
+struct body nested in a parameter list cannot clobber it either.
 
-Leizhen Zhang (6):
-  genksyms: fix infinite loop on declarations with parameter lists
-  kallsyms: do not call qsort() with a NULL table
-  modpost: fix handling of short reads in read_text_file()
-  modpost: fix pointer arithmetic on NULL in parse_source_files()
-  sorttable: avoid pointer arithmetic overflow when locating sort_needed
-  tools/include: fix signed shift overflow in 32-bit unaligned accessors
+The generated symtypes and CRCs for 149 preprocessed kernel source files
+(1128 exported symbols) are unchanged, and no new bison conflicts are
+introduced.
 
- scripts/genksyms/parse.y           | 23 +++++++++++++++++++----
- scripts/kallsyms.c                 |  6 ++++--
- scripts/mod/modpost.c              |  6 +++++-
- scripts/mod/sumversion.c           |  3 ++-
- scripts/sorttable.c                |  2 +-
- tools/include/tools/be_byteshift.h |  2 +-
- tools/include/tools/le_byteshift.h |  2 +-
- 7 files changed, 33 insertions(+), 11 deletions(-)
+Found by fuzzing genksyms with ASan/UBSan.
 
+The problem was found with ASan and UBSan, and the analysis and fix were
+prepared with the help of an AI coding assistant; I reviewed and
+tested the result.
 
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
+---
+ scripts/genksyms/parse.y | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/genksyms/parse.y b/scripts/genksyms/parse.y
+index cabcd146f3aa..7cc0336a7954 100644
+--- a/scripts/genksyms/parse.y
++++ b/scripts/genksyms/parse.y
+@@ -201,13 +201,28 @@ init_declarator:
+ /* Hang on to the specifiers so that we can reuse them.  */
+ decl_specifier_seq_opt:
+ 	/* empty */				{ decl_spec = NULL; }
++	| decl_specifier_seq			{ decl_spec = *$1; }
++	;
++
++/*
++ * Unlike decl_specifier_seq_opt, this does not touch decl_spec, so that
++ * a struct/union body nested in a parameter list does not clobber the
++ * specifiers of the enclosing declaration.
++ */
++member_decl_specifier_seq_opt:
++	/* empty */				{ $$ = NULL; }
+ 	| decl_specifier_seq
+ 	;
+ 
++/*
++ * Do not set decl_spec here; decl_specifier_seq is also used for parameter
++ * declarations, which would clobber the specifiers of the enclosing
++ * declaration, e.g. "int a, f(long);".
++ */
+ decl_specifier_seq:
+-	attribute_opt decl_specifier		{ decl_spec = *$2; }
+-	| decl_specifier_seq decl_specifier	{ decl_spec = *$2; }
+-	| decl_specifier_seq ATTRIBUTE_PHRASE	{ decl_spec = *$2; }
++	attribute_opt decl_specifier		{ $$ = $2; }
++	| decl_specifier_seq decl_specifier	{ $$ = $2; }
++	| decl_specifier_seq ATTRIBUTE_PHRASE	{ $$ = $2; }
+ 	;
+ 
+ decl_specifier:
+@@ -456,7 +471,7 @@ member_specification:
+ 	;
+ 
+ member_declaration:
+-	decl_specifier_seq_opt member_declarator_list_opt ';'
++	member_decl_specifier_seq_opt member_declarator_list_opt ';'
+ 		{ $$ = $3; dont_want_type_specifier = false; }
+ 	| error ';'
+ 		{ $$ = $2; dont_want_type_specifier = false; }
 -- 
 2.34.1
 
