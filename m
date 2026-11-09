@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794228006;
-	b=K2jSn3qCwCKJCubHksJx5GslcyU/jRuCnHzWyBhBl9KZHTSr6FFYQFpxwDjzeFsP7Y7h
-	 hIn8t4zRQ2zHB10JVMtCDqzlp46QvPkBQDU8E4uIEEzZtAuDZmSJh/TlGoz/SxmdEmL6k
-	 Md+kGO8+QW5lcBtGoJcLxXv2ixJegOFHmCM6410dXEKy/W3x5svnikcAwr+4WtQvp32g8
-	 XWqz5GXaIUkyt8qsvBuPyvxEGShfSRZeCjGqYNTBg2ocjFwX41ur3QVGp+mBk7FmSu2FP
-	 Kk11qpPisMt86jy/GYA9+6/z0ZRFUlE/bw5brAvT42FEDKA0qEwjMyGxgbnIM0WqUZw==
+	t=1794229248;
+	b=ePgE6VEXW5KCwWcvsfXtwmR0AeOnO5BSEUzW0KLDNbm6abcVqAgPtzOeHWACAFv16X+/
+	 cUDj1PM9mwJRO+EVOhJtrWjGv+/2y6nDnQOW1dYgYLjZs5/cW64e0egzKkAW5BLZCOg0O
+	 h6aKkGeCt/WvROG07/Uq1d8fqwondNIDuu9o2VbO3ntPgL2Zjdg0wiVvUCUj+HuvMXi6S
+	 EzICO+PpfQGu9QA4ks1jQHQ56+McI/l95mId9qc59dVo+nSO5sBUzGXEuyfUZlVml9Twg
+	 VjJqbz3iNqJ++CVuDCkBU9RzD+mvoBybB3SCAP4pZMYI41BpiY+Dqk2qRge++Xhbkng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794228006;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794229248;
 	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
 	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
 	 In-Reply-To;
-	bh=WWb056gPipccz0Z+Rf2etpC3VqitL7tkSZ//q9NzwZQ=;
-	b=LPKor4IURZilap0aDUMsN6nUqVOt1o17woLuTebYTQOKclpuXQEAU7mMWooajfma8Mep
-	 Z9s5Fd0SEnGz2vES5zN6J3t4qNS4L0P9D+39lgL83lTZc5Pzmu/z4UQ/ajcIRwCwpccCz
-	 8XPptmX+OxA9SfG2mlH1lxJHp3P0yEdMfzEY3Ul9k6pqfuh+PVr+6PcII2efydUcVWsxZ
-	 ZwilhNIeN13HRIwrsvOjp4ehLxBnBRbfs3JNB7SKEbRTGpYJtk+RcEp/uCBTJ8/vkMTIm
-	 FtQU6HGmjiJ/NbwKT2LIyVaQ0wdGFSFE2IlrPtD7Sz6IUnJyb677U0/al26JKHcktVg==
+	bh=WH6vONAUZCDa/nrW45QhpFZ/1YVe1V2n6dO6VBPl2/U=;
+	b=weSMZe5ntlVRNkulBoPLE7+mkK6B05+KuMtFrZz4HXcn7MrpA62FiOwe+960SbhrjSHW
+	 pmXfECrvs/omaj5CaQXFem1i8Y5DxydDRIN/JjZqAhsC5bRIQznkZsNfcHGsVzWNWG4Up
+	 tVnobi8w7WLarLFGQHB/nYeAw7KCysORnu2R4GRuKTBV1njXHl0r8VVdk4uLu81cDtHTU
+	 QtnABS01zEetagcfrTK9fgeNXXzx4VAKC9mzAN3es53wScGU7swBka7/OORIGNHVW94Cp
+	 GMsarlDcHBN2EcNfm+7FyaTm03Rb/6CGpoYhmSgEgSLtugMnGBjT5LqXgh98OYBv3mg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linutronix.de;
 	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=NgpkRXhN;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=9piDjCwH;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=antO0PN7;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="U2zhFn/d";
 	arc=none smtp.remote-ip=193.142.43.55
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DB6606A321;
-	Mon,  9 Nov 2026 12:40:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 89DB6606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C438B606A323;
+	Mon,  9 Nov 2026 13:00:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C438B606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=NgpkRXhN;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=9piDjCwH
-Date: Mon, 9 Nov 2026 13:40:01 +0100
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=antO0PN7;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=U2zhFn/d
+Date: Mon, 9 Nov 2026 14:00:43 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1794228003;
+	s=2020; t=1794229245;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WWb056gPipccz0Z+Rf2etpC3VqitL7tkSZ//q9NzwZQ=;
-	b=NgpkRXhNAxzUdTG5+1ErHI4Bdi3xz5RF4IbE05z4lhqW3Dim5Co5HVJWuOmL4qpjo+eQ9k
-	UDKTieCgat9zt9axBKLg3dPvNHHYVDQ0uajk3f+rt5lypdGnp3WMbxxPy9dPvuh01B7CTO
-	n6NqxcShKB73869PlhdU91rB0oKSDeLBaJ5xVnZm5X/ekrpMEsQgKrULUQ4cdMCupYtwhX
-	D8JR7mArn4pBSmI+hXrVP3eE8BSWZlbf4Uu8+KARHwce4MceN/BHgJ6VwEFUEgc9yX5+9U
-	YIw3Pq9M7dQmp5bWDatkHW0kvPMHT8H6wGP+6k2cjpSeRCH60CQNDHEzRfz8Rw==
+	bh=WH6vONAUZCDa/nrW45QhpFZ/1YVe1V2n6dO6VBPl2/U=;
+	b=antO0PN74enTHsEQP8fXrva5841B8kYJm3f/8g4WiNUDMEHnkHrqQcbV16doRVkV6t0nGR
+	wNbTi7RkTZGvikTR/Oprvgns5g1GVnTcSe6Sszl7a5/AE5a7aPnmmrzQQ4HFULeaC80aCD
+	bgYPqLN6S9hgtHUS5f6LN7lTHKm6zQIsouUUe3TziYVQkdH8LYSWLOifz3k4G1lUramJF3
+	4CnWQp3ATGFR0ewBicGlPeEcgjtByezao9+8/oKoK7Ppf/+Lx9aK4YomdAnV6tD4ZQmZRk
+	X0kJGfXk45h+K4kf0z1VV31B8pt+7qWLKiVaqKZb4vFqKxPkCp3TW4XrlznalQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1794228003;
+	s=2020e; t=1794229245;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WWb056gPipccz0Z+Rf2etpC3VqitL7tkSZ//q9NzwZQ=;
-	b=9piDjCwHPumPCCOarJvE9FW/bdj5Kujx5ekmk8xq7Wv01NAeZeA2TLCtygQfXf1LNGDyrD
-	6XWvkZp3iiNuC4CA==
+	bh=WH6vONAUZCDa/nrW45QhpFZ/1YVe1V2n6dO6VBPl2/U=;
+	b=U2zhFn/dp4n9V/CkFWblCRclJtuI2mdyDqWDdZOArcG8iZM6Fkc/RpReGQJQ+HEPA9SfQq
+	IxbL4o8rbuu2EMAQ==
 From: "Ahmed S. Darwish" <darwi@linutronix.de>
 To: Julian Braha <julianbraha@gmail.com>
 Cc: Clark Williams <clrkwllms@kernel.org>,
@@ -73,12 +73,13 @@ Cc: Clark Williams <clrkwllms@kernel.org>,
 	Luca Boccassi <luca.boccassi@gmail.com>,
 	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
 	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 01/10] kconfig-checker: Add schema for rule files
-Message-ID: <avG_IXPcRY7njMgP@lx-t490>
+	linux-kernel@vger.kernel.org, arighi@nvidia.com
+Subject: Re: [PATCH v1 03/10] kconfig-checker: Add the configuration checker
+ code
+Message-ID: <avHD-3JwbQofpJdH@lx-t490>
 References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-2-darwi@linutronix.de>
- <e0ffecfe-8c4f-457e-ae8d-32a9601e69e5@gmail.com>
+ <20261106091922.7560-4-darwi@linutronix.de>
+ <9729a4c6-22f9-4102-b62f-c76a75488240@gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -90,89 +91,46 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e0ffecfe-8c4f-457e-ae8d-32a9601e69e5@gmail.com>
-
-Hi Julian,
-
-Thanks for all the feedback!
+In-Reply-To: <9729a4c6-22f9-4102-b62f-c76a75488240@gmail.com>
 
 On Sun, 08 Nov 2026, Julian Braha wrote:
 >
 > On 11/6/26 09:19, Ahmed S. Darwish wrote:
-> >
-> > --- /dev/null
-> > +++ b/tools/kconfig-checker/schema.yml
+> > +
+> > +class KernelConfig:
+> > +    """.config file parser"""
 ...
 > > +
-> > +        #
-> > +        # Expected value for the matching kernel configuration option.
-> > +        #
-> > +        # Values:
-> > +        #
-> > +        #   y        option is expected to be enabled (built-in or module).
+> > +    def _parse_symbols(self) -> dict[str, str]:
+> > +        """Extract CONFIG_* symbol assignments from .config"""
+> > +        symbol_set = re.compile(r'^(CONFIG_[A-Za-z0-9_]+)=([ym])$')
+> > +        symbol_unset = re.compile(r'^# (CONFIG_[A-Za-z0-9_]+) is not set$')
 >
-> Kconfig's tristates use 3-state logic. It seems like you're
-> approximating 'm' as 'y'?
+> What does this do for Kconfig's int, hex, and string options?
 >
 
-You're correct.
+So far, the tool only supports stating whether an option is enabled,
+disabled, or have a neutral 'allowed' policy.
 
-'y' is deceiving, even with the comment beside it saying that it implies
-either a built-in or a module.
+But there's nothing stopping us from supporting something like:
 
-I guess it would be better to have the expected values like:
+- name: CONFIG_PANIC_TIMEOUT
+  expected: int
+  expected_value: 10
 
-   expected:
-      type: string
-      enum: [enabled, disabled, allowed]
+- name: CONFIG_MAGIC_SYSRQ_DEFAULT_ENABLE
+  expected: hex
+  expected_value: 0x1
 
-As a bonus, 'enabled' and 'disabled' rhymes well with 'allowed'.
+- name: CONFIG_NLS_DEFAULT
+  expected: string
+  expected_value: "utf-8"
 
-So the policies can be:
+In v2 of this series, I'll make the schema explicitly versioned.  This way,
+new features like the above can be cleanly added.
 
-  - name: CONFIG_PREEMPT_RT
-    expected: enabled
-    ...
-
-  - name: CONFIG_NO_HZ_FULL
-    expected: disabled
-    ...
-
-  - name: CONFIG_DEBUG_FS
-    expected: allowed
-    ...
-
-I think that's much cleaner.
-
-> These are meaningfully different values :/
-
-I wrote some policies beside the PREEMPT_RT one, and the main requirement
-was always that a certain kernel feature is either enabled or disabled.
-
-In the future, I can add;
-
-    expected:
-      type: string
-      enum: [enabled, disabled, allowed, builtin-only, module]
-
-But so far, there was no need for that.
-
-> > +        #   n        option is expected to be disabled or unset.
-> > +        #   allowed  option is permitted and must not be reported as a violation.
-> > +        #            This is used to exempt a specific symbol from a broader
-> > +        #            `name_pattern` rule  with `expected: n`.
-> > +        #
-> > +        expected:
-> > +          type: string
-> > +          enum: [y, n, allowed]
->
-> What if a user wants to specify that the value can be 'n' or 'y', but
-> not 'm'?
-
-Is this a real-world use case?
-
-I did not encounter a need for making the expected values that complex
-before.
+P.S.,  I can definitely implement such support, but I'm a bit hesitant to
+adding features that are not yet needed by the existing mainline policies.
 
 Thanks!
 
