@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794242894;
-	b=H2DTlktvhQyzh3pvRbgFZ+3AyNpZrqRF27lnKcKp1jyEk81Qk293IMDVXT0ZN6McHm6j
-	 FSAOTJy8DLJ9irvOXphlasBG/6yKE4Gea4yXgOMKMnbmz7DxtDzRs+10Zd5A3CYZokAKf
-	 LklYGgUzXPb/zLaALpc8o8cdgnt697pFSBx+T3Nq/wismnofWPDBgEKoMfYIA+sY938Xc
-	 IQFF3YR7uSS1DN5p19ajlcUmYrjrUOxS9tpbtLMoVblRPQtl6+j45zhu/5QIv91DNWXf7
-	 bI9SHNHTK+V2UB//AEklVydfxqRug6hTD117Lz5IqfGacvMoaUl/VTGpXfkk9FWfEQg==
+	t=1794243037;
+	b=CMDo57/10HA6dEfiDYkddG8IfbQUi3juImuJHWdxezC9bkYx3fvqeJCcxAGVjuwGGZea
+	 AS1ccQDe0g7LGqUNJayWqcy9rmb2uru4jw9TavoiDbsyqY60DO5/uxe4WtEwmaVdPLrnD
+	 eTrG/HKcNYiixILAY81ipoPaHgtZeevDpMfl1B9URRiVAx5mMgPz/Qwpr5DpnWzGx5sUz
+	 965RpywXsMl3ZzW0S8UMQC0BGWPuM2fxa612ep8RMRIjxIOoMIl256d8k+RmbtjpQu0wM
+	 ntFDwZPzGqXc2jB0lt2oKULvmbUzVYjU/rWKd8FyJCfjSeRm5HNh6sCq75jCSsq26EA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794242894;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794243037;
 	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
 	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
 	 In-Reply-To;
-	bh=WjCmpvBTBtjAAl5ks8xILiuJnGJaZE8yootAcNpntZg=;
-	b=IX7FyK4NjG91+eF0emzxDawYiMo5sbgIPyIMFnRwf99XRG2rBW7MeOzcpbtX5/Gq53d9
-	 EmlfRDsCjdU/eduvcU4q1Rr9x6n3puyOjd1n6iOFHQ+Xk2DXaicnUexhT6lOMiMFPw/lk
-	 Kw0ynnHthvLOsgbgGUZnFxc4u5XlxZRGWoHdYpUoWhl+htx4yqJJuKonVBIkXy6xydaZz
-	 HLvVKcJDOT4gZXpfE8HpHppPe6lw6zmvfHy82gIxkbE42YICMYN0Ny/mCvg9axcAD89Ob
-	 HgnxfKLc/qyB6YyBLs9I5aesBHbwtBCl7c+3NYzSrVDoTjV/plk9D/I9jwcKvdWfQNw==
+	bh=2jRbhBw6baBMUmbh4XONHUrX7MOgp3Ir4bPIfNW4hEA=;
+	b=hW0oYye9YmTsaQq5Klt/ynm33s6dTAC80tC+/CBPGDHi8C9s+ZA06tdlHmRUA6a4xmOl
+	 bPwcuvoUubEHjUFvbtNwozYIRREbhKU/9oQQEeiBiMIDggifq1aS8G3VIIKB9v0EoczCk
+	 VtcX4CoLUvXHNFmRxa2Fvy70sSFIObehE/d6PKkLuWpqoJZuDyIXXc2VCcWKDGnO46v6z
+	 C6ZS9evsyxv7Mdgen0eVVYFmoswEbD+GvRC48nALRCqu6yzlCLJO8BPii3cyCOyNlyEi7
+	 mG6nG7PNr9rYGmk8IcsHtWkEduclg1ugucwOgCSFa9GEuUC7PTZYI9R4BG2tH05xuMA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linutronix.de;
 	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=temperror header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=2fgB66IY;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="zDcrh/E0";
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=duGuiTyR;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=erKPWCqA;
 	arc=none smtp.remote-ip=193.142.43.55
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3708606A321;
-	Mon,  9 Nov 2026 16:48:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3708606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB320606A331;
+	Mon,  9 Nov 2026 16:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB320606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=2fgB66IY;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=zDcrh/E0
-Date: Mon, 9 Nov 2026 17:47:57 +0100
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=duGuiTyR;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=erKPWCqA
+Date: Mon, 9 Nov 2026 17:50:33 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1794242879;
+	s=2020; t=1794243034;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WjCmpvBTBtjAAl5ks8xILiuJnGJaZE8yootAcNpntZg=;
-	b=2fgB66IYCOqAsgDiJ4Y85b+V/KNFfe3n2zAj36z1c5pXBXxmohpfcoMWGGbZHuiBzx5LZ9
-	stSz/0vfbvISOISpa20+j80Zqf8ni9PPZgSDM3BZIEy3trqRZ50XU5jh+QoNhkJwaGvBeL
-	iOP44Bf+r8tRSWphQYvET3l1XglBOb0Z/Zesbg2ypJSaFytVIjaM8j1tit+gozKPP0VHmr
-	ao9rrSHIioHV0v/qNi4t4HQP35KcDHfgwlyj7RCeo3P5uOp/SH8G/jqLlgWEm7Q3qXH3Qz
-	DBwoufM7XVe/+aOPkBGA0TjCDQ6Lw2MsMW+GTjejqNlA1TXUwLsKEnJhtWvDBA==
+	bh=2jRbhBw6baBMUmbh4XONHUrX7MOgp3Ir4bPIfNW4hEA=;
+	b=duGuiTyRv+49YBjT1Ft6NT0W91FLB22eQnpH+F1L23o6keejZnKvacwq4/ZT5kZt7Ss1zb
+	Vxj8RYnMDpVRcYLl0hbYHVyVXwKWpV6rDngRRQeUxlZshzprcc4LY4pkzZphYekseoceqE
+	YbjfVnuIJURV4+vc4xG8xR3fVUvp4QqSSrtqNEkE43A/5O4j5N+u8Oa21O190kq/UEM1L4
+	kog9I3UGzp0Mq4x4Ol3zmgVygnrv+qrWjYd4VFD8fVMf0+NnimzPCKDTlUptE1Yg7qDoXB
+	l3mMRhAZz05mY9ipm5rOVM0JulKWIRiR1ZIvEfJ+KYeb7lHfX7GWQeucfG0t4A==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1794242879;
+	s=2020e; t=1794243034;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WjCmpvBTBtjAAl5ks8xILiuJnGJaZE8yootAcNpntZg=;
-	b=zDcrh/E0c3Ts0L0CWB+Jv2CTG9QtpQQJ64ye3yZTlp8mPMNQw5byWSM6ik4azIjQ5nQ2eK
-	JhSjaWTyJmkuVKBw==
+	bh=2jRbhBw6baBMUmbh4XONHUrX7MOgp3Ir4bPIfNW4hEA=;
+	b=erKPWCqACE2DDb7rdPBq6Us6HYeHi9F9+sBIahjViG68IO7FHr+XFoL8QDPlynR5LivQ0j
+	rG6JXrS6vNIg2/AA==
 From: "Ahmed S. Darwish" <darwi@linutronix.de>
 To: sashiko-reviews@lists.linux.dev
 Cc: Clark Williams <clrkwllms@kernel.org>,
@@ -73,11 +73,11 @@ Cc: Clark Williams <clrkwllms@kernel.org>,
 	Luca Boccassi <luca.boccassi@gmail.com>,
 	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
 	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 07/10] kconfig-checker: Introduce overlays schema
-Message-ID: <avH5PftePd_0y6Lv@lx-t490>
+Subject: Re: [PATCH v1 09/10] Documentation: Describe kconfig-checker overlays
+Message-ID: <avH52flseJWwB_D1@lx-t490>
 References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-8-darwi@linutronix.de>
- <sashiko-outbox-202762@kernel.org>
+ <20261106091922.7560-10-darwi@linutronix.de>
+ <sashiko-outbox-202764@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -89,25 +89,33 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-202762@kernel.org>
+In-Reply-To: <sashiko-outbox-202764@kernel.org>
 
 On Sat, 07 Nov 2026, sashiko-bot@kernel.org wrote:
 >
-> > +# and a custom-overlay.yml:
-> > +#
-> > +# rules:
-> > +#  - name: CONFIG_DRM
-> > +#    expected: allow
->
-> [Severity: Low]
->
-> Should this example use "expected: allowed" instead of "expected: allow"?
->
-> base.yml restricts expected to y, n, or allowed, so an overlay written
-> from this example fails schema validation.
+> Could a commit message body be added to describe the new overlay
+> documentation and the schema file path updates?
 >
 
-Correct, it should be 'allowed' in that comment above; will fix.
+I'll add a filler.
+
+> >
+> >  The schema for these files is fully documented in::
+> >
+> > -   tools/kconfig-checker/schema.yml
+> > +   tools/kconfig-checker/base.yml
+> > +   tools/kconfig-checker/rules.yml
+>
+> [Severity: Low]
+> Are the schema file paths here missing the schemas/ directory component?
+>
+
+Correct, that's a documentation bug.
+
+It should indeed be:
+
+        tools/kconfig-checker/schemas/base.yml
+        tools/kconfig-checker/schemas/rules.yml
 
 Thanks,
 Ahmed
