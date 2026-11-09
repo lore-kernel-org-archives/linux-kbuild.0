@@ -1,67 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.11
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794267936;
-	b=w5w7E5DS8JVAY2HqtiOtH/XQpNHVib2MTn+71wWWtudP1+U8QvJlXEH5VkQQD+JFHAOD
-	 YauZ4PnqKCqcPzexmNhNTpGnytdWjhYb3SIA2vStUvuGA6s+NHDsqMfhA+mpDwiCtlQYc
-	 yoMgkhcv7LEYSKTIhpALALSMijg/l6o/b02Sgc38TZPY5qK1v27QUvvtAPK0spsLrSELF
-	 sdwxjFUUJVJGn+VCs1BeV9pAnlQr2CIT8CUNzMVx+q0nA+k7Y0bmFysR1/BMcIWjL/MLF
-	 dutNh5EqUlMqg9OukWkExl70Ao+6LbFnwfngmuU/e2YAVorQmCghclouRtrNRT0tjhw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794267936;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-Zoho-Virus-Status:X-Zoho-AV-Stamp:
-	 X-ZohoMailClient;
-	bh=10FbvBDq/04YgyEUghoAbXIiLNNEnt9De+mGX9CvheQ=;
-	b=l2TbgGm2SX0prjzdOwt+ryR8tV8x2jCm+IP9fgu7Yq1ArOn+F2Jb822siccKkHobDshg
-	 SgLrwwGlR7FCYbZv7Vn1epW+/nGqn0A1msR+p8G+Q0OMTyIeM7I4Takndh/6lIloiTOKP
-	 Qmuxm8x+jSrJDjgLQoOpFJWtmOtrIyh8DDZNmiRSXH3gS+oD4IWRPJHMCzpHk5y8hNZPL
-	 Fe68RR+h6TxLUxFm0X53bJmI0s+Zf/gSz9D/X1PwDUtnCOj3G3vAzVkhFNzxLc2TpvgMs
-	 LhiX2PWEHpEbG5Bj97LmD6pP2fcQBK82Pc/U7qIeFUC9PT0kA4Kn1r8ZZSJbvnruZbA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=collabora.com;
-	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=zohomail header.b=JwyIewsN;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.11
-Received: from sender6-op-o11.zoho.com (sender6-op-o11.zoho.com [165.173.180.11])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.177
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794268854;
+	b=bJ6efSdSdehBK9lPeZZqB01gop8+bwAri4wGYXoeDdsYFLjd1AwT868tkKllwZgvpyrg
+	 5zf30SRFLQ0bQ0sthycp8InkOXEQvXHsss0KFFF8BF+v+lfM3trDeEZrkMb2b+IyGaHop
+	 HX95rOcJcAQWPBkJzBwszc90TWOjjmBpUDHgASDKeSMBpGOInSzL0zo/hHv51EsuVLfHH
+	 HVWX5gWzoPVGk3CcQz6Rd8tkNqMV0dovC4Yx7M01b5V8rWqZ7BJsXctaE9L5eUryhuc9I
+	 /mrKmOhot+ycx+1j8oZA7Nf+Ow2shDZl2XuSu7cCAPS/QPVk2GeDyBdaZb1J5Ly1IyQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794268854;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=WFJKTttb+9w1SToDPMlK+ZhvhJNtUsRWKsncaoz5Paw=;
+	b=X3bosod+oNh5Kw1LlWslthoaVUNfdmV7Yq9Pbq8jzDc+Iurd7l5UtYtdLbOokGIUzCgj
+	 1IlfOKDRexYd8S2ssgEUD7gI62AqNh/lODcToWGN3nvyDfUDrPLRr/JlvUynBb/wrosFw
+	 d0Xiy1WWgnDUpHFEpDj9/S2unrLT5foVKLC9qZoDWl8HThfNu3D+dBphDjpvYH8/Jbxv8
+	 eNd38P1fabzZptdj3f6g7mx7KVke9gViwNVOEW1fmhNEyV5l8Bpq9p/q4zpwonS5rV47I
+	 z/4H0s63P+P38oRr6uHmF5+Qi2QXnX6KTXPEF1yBSRzKm0p23BHHCXnIanO/LxcfogQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qXUCJciS;
+	arc=none smtp.remote-ip=209.85.167.177
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9610D606A326;
-	Mon,  9 Nov 2026 23:45:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9610D606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BA6606A321
+	for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 00:00:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18BA6606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=zohomail header.b=JwyIewsN
-ARC-Seal: i=1; a=rsa-sha256; t=1794267902; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Jl31lSMvAzs/XqniX+ACHNNgLcxh0n7S+lz+DZr6SyBm3hDpGepwqcOki1h+cJrOeujxCTdmrLR7T0OCQs2HI1Ewjxsa99Slfot431Z6b6fhmzAZTzLVSUUYAdmtY0AfMAqeKTFlSTk8GtLsG7itieQyCU/ebpNF85GyW7uEsWs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1794267902; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=10FbvBDq/04YgyEUghoAbXIiLNNEnt9De+mGX9CvheQ=; 
-	b=fZ9ON26zuxGZhARbjFNbVx7i1uAOwOCPl8ewW7Pt2ECgx5HxpZrkoo7eEcXsSlctqO3NMum+6uULgxg/dofrsNkrAUezLlMuke1Vy2gPILXqDy3w0Fb29IJMUbTYSAps1zzrGcKBMock/OR+F28nI5rH+ZfdFY8fsOmNcfx5rM8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sebastian.reichel@collabora.com;
-	dmarc=pass header.from=<sebastian.reichel@collabora.com>
-DKIM-Signature: a=rsa-sha256; b=JwyIewsNStZ/Wt2NIM9abY1PQIynbu0eW2uT+bZ2g1vmq1HDPiJTpuRYWNzOr45UWTu18xgfkPJcLBzYOUmfRchjeMwZN5bbkXC9T1tW9paT6zSOP3f1HETZ3NmSaPQmG6F1vCPD6/e5xSakmeNvaMTvIGl/nXAvEcnBfwyHQP0=; c=relaxed/relaxed; s=zohomail; d=collabora.com; v=1; bh=10FbvBDq/04YgyEUghoAbXIiLNNEnt9De+mGX9CvheQ=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 1794267900917859.4909486908807;
-	Mon, 9 Nov 2026 15:45:00 -0800 (PST)
-Received: by venus (Postfix, from userid 1000)
-	id 33B26180313; Tue, 10 Nov 2026 00:44:57 +0100 (CET)
-Date: Tue, 10 Nov 2026 00:44:57 +0100
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Daniel Mack <daniel@zonque.org>, 
-	Russell King <linux@armlinux.org.uk>, Sasha Levin <sashal@kernel.org>, linux-input@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Input: apm-power - remove driver
-Message-ID: <avJZ291EhnpqMsbv@venus>
-References: <20261109080944.3802916-1-dmitry.torokhov@gmail.com>
- <8560bc0d-5687-4b77-ab07-3d6dda465537@app.fastmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qXUCJciS
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-53aa0802881so678069b6e.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 09 Nov 2026 16:00:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794268853; x=1794873653; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WFJKTttb+9w1SToDPMlK+ZhvhJNtUsRWKsncaoz5Paw=;
+        b=qXUCJciSL9bZkBJ8qtcVkDNIjvWdze1sW84sQMktjsWURrnxFYKdmz3ahEboofMG+p
+         SUtaHq3s2NhtRv+mp5UzikLrXYJfNM/5pWAf084oiHiSQVdqPZVlBeW/HXvtdB0kiETm
+         PSWkCi4CIg+Mx58fk9YM/EV/uQKhI0+a+2rVKziTgvPik4KaS3dYYzhFuRke/Y+kqLKP
+         I7luG/hCz1EhMOsTgnwplD6i2Lw8WyCriEK8KAHbONqhqOMssosqH6sPupApOL6nOWSt
+         CuENFDS5Z6VMwCL3H3cjn5nkHNfEbRB0hJySzxjmNdvZZZcItMAgNSX5UmmTMzeTRufS
+         zUVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794268853; x=1794873653;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WFJKTttb+9w1SToDPMlK+ZhvhJNtUsRWKsncaoz5Paw=;
+        b=XzE+Z3YFrAopWASJQvv22DMZhYycNxgmdMwRrko4gwpbUj1wdVKPLalLSkIb1EheBv
+         UHJV8xG1t3B0bRyvOf7pLKWUJemHGHpwloWKFkk1qEX6NAOpXLhCFwrQm7cOhM2QMA09
+         qAXHxU6hEHXygoKka8mRK5WRmC7OtAH9svHSeB1cA8jpR2taymiY8NtO6KRSzlnje0hh
+         Pj2qZJSybOE4KklIHDeYPIE9UnCckyPW+io2Y+W9pvXBDqLWCcgpr3Ejx9AKv67Ts/3h
+         IpyQ9+thDTKYA2s8LCmW8pf0gkidzdR7PGWVH3WbOs5MDTCBSPdSu5VZzHyAnO+HfDzS
+         UyfQ==
+X-Forwarded-Encrypted: i=1; AL+hErF10zB6gFk7zITkqdFzeVp6vadW8yfZP8EYATIiJX5Tw+ZveQp9ANVK7BCsFqbaV+OH6Pqna60tldjdtes=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/1pJcXXVFSkRul+3UTQIs89y56dJHhDhjUFHYOLEBOWf5TbvUS
+	ycIxzj49FuIgtR+0cw4hwXJgpMjYqEqJszc7JzENBjm3hWNJAasBUlLn
+X-Gm-Gg: AYBFou2wnq+5lWUk+DYeKezqWY218O/vHBxQjl80xICIU3JBjblXxgtB5SSlLC283Sw
+	/FO7+IEBPAXIVBxlrZAAJIQw5haQ2a9ZFHAQ+UYnHeo/Uhwsa4ErrSfsC4hJbAnT4uKVLZ8ytRz
+	PddF6vnYwuLSArBo/puotdcL3OZEEjCoUBeEZ8zHuAqsLWom4m245tu4M/WEVxP+MLwtJaCMun8
+	pXcL1qfooKoCIax9l7AxotyS4oXtcMhojrqaMda5i8OSvIESkuqCePl1acLwOavuTK8QNs9RwHh
+	+hfG5BdyfKsavY4KomDFqPk7qZNR+U32iYyucvYvz23wu9yODXYF8/zGiw406k61yrok6/crZRh
+	/Oc7m05Rn42vfD1ohZC5vbGEy+4FFEqlQtJgIif/aLRAfV0r5+bijZFayOdJ4himVrNJQgyDbuh
+	Of8L9zuLq/OARntxC0jrvUQ5r0IMPguCvgrNkNIQZywjBIa3l8wem/nPnAQmMZ6DcxE/6NwEtTL
+	iDUx1/8LNPJfgZis8x1iNL/sixPJTdriaXrMJS0QN7/ofJjjCBV/DP0lnOT3ZXGt9zcHvDVMKXv
+	v4G6rNuJ4RQ+0SviVuLaB+qaf4CtJ0qKsjUcLCSg/GA=
+X-Received: by 2002:a05:6808:148e:b0:4e9:69e9:59c3 with SMTP id 5614622812f47-5683df688dcmr796994b6e.67.1794268852828;
+        Mon, 09 Nov 2026 16:00:52 -0800 (PST)
+Received: from sheng2080.cmix.louisiana.edu ([130.70.15.5])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-56905735edasm623697b6e.7.2026.11.09.16.00.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2026 16:00:51 -0800 (PST)
+From: Leizhen Zhang <lzsx618@gmail.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: masahiroy@kernel.org,
+	ardb@kernel.org,
+	rostedt@goodmis.org,
+	hpa@zytor.com,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Leizhen Zhang <lzsx618@gmail.com>
+Subject: [PATCH v3 0/6] kbuild: fix UB hit by normal builds in host tools
+Date: Mon,  9 Nov 2026 17:59:57 -0600
+Message-Id: <20261110000003.1719966-1-lzsx618@gmail.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -71,54 +100,79 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="afsg2feyk35ak5d3"
-Content-Disposition: inline
-In-Reply-To: <8560bc0d-5687-4b77-ab07-3d6dda465537@app.fastmail.com>
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-0.2.13.1.5.4/294.259.76
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+
+This is v3 of the host tool fixes. The main change is what is left in
+it: following the feedback on my elf-parse series, I went back over
+every patch and kept only the ones a normal build or valid source can
+trigger. Each of the six below was re-checked on mainline as of
+b23545529c21 (the rc1 rebase changed no code) by doing a plain x86_64
+defconfig build (MODVERSIONS and MODULE_SRCVERSION_ALL enabled, 12
+modules) with the host tools built with sanitizers, and then rerunning
+the same step with the patch applied:
+
+  1/6 genksyms   'int a, f(int);' is valid C and makes genksyms loop
+                 forever; 'int a; int f(int);' is fine.
+  2/6 kallsyms   link-vmlinux.sh hands kallsyms an empty .syms file on
+                 every build (the .tmp_vmlinux0 pass), and both qsort()
+                 calls then get a NULL table. 2 UBSan reports -> 0, the
+                 generated tables are byte-identical.
+  3/6 modpost    read_text_file() rereads into the start of the buffer
+                 after a short read. Not something a local filesystem
+                 does in practice; shown with an LD_PRELOAD shim that
+                 caps read() at 64 bytes, under which modpost rejects a
+                 valid Module.symvers.
+  4/6 modpost    parse_source_files() does arithmetic on the NULL that
+                 strstr() returns for dependencies outside the module's
+                 directory. Reported on the build's own modpost
+                 invocation; Module.symvers is identical with the fix.
+  5/6 sorttable  the sort_needed address is computed by adding a kernel
+                 virtual address to a host pointer first. Reported on
+                 the real vmlinux.
+  6/6 tools      __get_unaligned_le32() shifts a byte >= 0x80 into the
+                 sign bit. Hit 4 times during the defconfig link, by
+                 sorttable.
+
+The 4/6 and 5/6 reports need clang's -fsanitize=undefined; GCC 12 does
+not instrument those two pointer-arithmetic cases, so they are silent
+with a GCC host build.
+
+The 2/6 and 6/6 reports reproduce unchanged on v7.4-rc2 (GCC host
+build, same config).
+
+Changes in v3:
+- Rebased onto v7.4-rc1. No code changes in the patches that remain.
+- Dropped "fixdep: fix out-of-bounds read on a comment ending with a
+  backslash": it needs a hand-written .d file; the compiler never
+  produces one.
+- Dropped "modpost: fix stack out-of-bounds read for unterminated PNP
+  ids": all 699 PNP ids in the tree are 7 characters, and the overflow
+  needs an 8-character one, which is not a well-formed PNP id.
+- Replaced the Assisted-by trailers, which checkpatch no longer
+  accepts, with a sentence in each changelog saying how the problem was
+  found and that an AI coding assistant helped prepare the fix.
+
+v2: https://lore.kernel.org/r/20261008164035.3668885-1-lzsx618@gmail.com
+
+Leizhen Zhang (6):
+  genksyms: fix infinite loop on declarations with parameter lists
+  kallsyms: do not call qsort() with a NULL table
+  modpost: fix handling of short reads in read_text_file()
+  modpost: fix pointer arithmetic on NULL in parse_source_files()
+  sorttable: avoid pointer arithmetic overflow when locating sort_needed
+  tools/include: fix signed shift overflow in 32-bit unaligned accessors
+
+ scripts/genksyms/parse.y           | 23 +++++++++++++++++++----
+ scripts/kallsyms.c                 |  6 ++++--
+ scripts/mod/modpost.c              |  6 +++++-
+ scripts/mod/sumversion.c           |  3 ++-
+ scripts/sorttable.c                |  2 +-
+ tools/include/tools/be_byteshift.h |  2 +-
+ tools/include/tools/le_byteshift.h |  2 +-
+ 7 files changed, 33 insertions(+), 11 deletions(-)
 
 
---afsg2feyk35ak5d3
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH] Input: apm-power - remove driver
-MIME-Version: 1.0
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.34.1
 
-Hi,
-
-On Mon, Nov 09, 2026 at 11:00:31AM +0100, Arnd Bergmann wrote:
-> I think we can follow the same logic for drivers/power/supply/apm_power.c
-> and remove that once my board removal lands: the only actual battery
-> that is ever registered with battery_desc.use_for_apm=1 is for the
-> OLPC XO1.5, and that one does not have CONFIG_APM_EMULATION, so that
-> can probably all go away.
-
-Sound good to me.
-
-Greetings,
-
--- Sebastian
-
---afsg2feyk35ak5d3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmryWvUACgkQ2O7X88g7
-+pqI/xAAqeRkQA+UJwRYt5dT8H6Yz6GBLiuHjjMxpo6wHfEaysnnRr0DTXs8O1hw
-XTPbkvWk4iJPLcPe6lV77roXb+mVOYzK3oQLia5iMBo3JsF9SupHHfP/TCdV2fdG
-ag2xTw+nWEawqiRtuSYdetqvv7KZG/LFwswuacMcm0Ab2pYbfAnjL0ppU2hRueaI
-VuUQZGw/hRRIng17OAXcXV3hqW2TMP2xqRjlE/x6G0WNd1qVqg1FyrpVF1ch+cVx
-KtLbtjThTIn+EktcPMS4f8S5VjcBqmItPK+D916Wj3TpX4by10KZerWuM2lwaQTC
-4+SfdiwsrgAwZSKdBO5OxcYd6Oavuk6xCcbK2XyEDu7eCAYJo4kEGR8hj/KnuFMP
-O/WGj9ojFN4W6xR/7f9A+JnxkH1DrWUX7ogH1Q9NKrdGi/niquj1SqMR9LYPFLnE
-euisogiejfT3UfUZekMOH44svDGLHkDOwBXhQV3jYoIgizORSdv+yGNjoptUwhfO
-ziczuPIQh3Q3AOFSvnvv3axZXPGB+qH7P9PAFkFIZL3fpipl3HjzqAkglDP0u4b1
-/5xgy55ItIHIRI0SiXNAWgkwWAtq/cTck0wg5M+eR8PUqih8hYMX7//3gyIQSRZ3
-Nh/khhBn6DIeZoSxMVOBOGShlJeruGksa5EZYV8oFx7vwOM87WE=
-=BZQT
------END PGP SIGNATURE-----
-
---afsg2feyk35ak5d3--
