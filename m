@@ -1,48 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794205536;
-	b=GErA3tU4wK8rtX3PFDcgcn2znMKfEaKthWCuvR/IE/0dkY614RMHu5CyoMPjla4XQjNB
-	 bVplv4kvgJBdDnBagu02C4qWtKJnqo8AjwEX9UcNO/Lp0SeaRhMLZGUujXzya9/T0uFQp
-	 jyUwAPffuvlQ5vgkOFEhdTxJO7VsXLLpXRAsMkPNGOxgLbvcEn39lwzu3QzQEqFmaWUO7
-	 jKSiHGXvz+6yhgxJ/lc5N5Ply7xTG0K9xOtnIar2ivIXpBEyC5noEO9AF6fEAvRNKZT9o
-	 /tNNavuo5ecrfuDUf99YEX+tFEycAE0kRT95+tb1ESKfXzO8PRDO7hESKeC03Lg6Zmg==
+	t=1794206811;
+	b=aQwynZ7XzSM5H6idbGalDygTZbWbuijeCxshWR81UnMIwLWIihmmzQuDNny2H20GpgTP
+	 6FnxXYzzWv/alhbvtGVUUDo1CifPrsqeamjgf5XFu/cY2XpIOqfDqY6+iSmSIx13Xdolv
+	 oEhnI0o6P4fc7ujDhJ3IN08p7UTACO4hkBJwh4Wlck9pJNFouFx6XLs/IfIXuNogGWCT2
+	 PR+ihgWESQ4fjQDDFuhV7wEhDF+gwiXbMH9lXnBfSkylzTMKY1ixOJNkftqKvhL7Xv13x
+	 J1Ah/fAbcSFibNfC8nFHv27ZcubwndpsPX6CsCzbgE8a4WrentFQZIb4YUFdRtC0xPg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794205536;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794206811;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=vxR0y8O6Yjfa9xBmupmiYjq0RBrrS/LkXi20mWxNVj4=;
-	b=MqmSNkSECLaCK512kwn1Tyl3nRbFR7H20qWgH7kri25qeaWdhcX4SVFmiJAHQbYQPdtr
-	 4qT0pwFBX/J52DetO92uaSZhWtt6JJCnkXPLF/wQaQCOceWISUlueAh2CRAZ8ZSYsmnSQ
-	 2+MrAXhoz8xaML8L8shzq+FqAFJcwuogWrbN26qiCEsHRFkB6KjD72BRTm1HrW8Mn4pRS
-	 bVJyOLdYHTcfX4t5R3shWL3hW35S3u/3PZcSUADdSKRkOkcLCfMrs+HvFn/lwoRau6EXz
-	 HFs6FYPqfrTl4vwNDf86F3lJvTNkdqxPp9zbiqm2k+JlPoRPNKOn65OL9LeWjb67hyA==
+	bh=djs195KZY/BJdEFCgcDSpeR4fu1pIHlWnSTsGITALWI=;
+	b=LNCxViZJOEFXlcdhlsW/HFCtIYIVB/vFl+3C7OMkFp2kLlzFH/M4fp70gdgHaj3dC7hl
+	 feV60+tL7ut+nEW3zUPR3e70m+22drK61SBdqGNib0ZpWW8+UF/9mXY9XMWBLzoouxRra
+	 zHj4+84slyxxly+s+qUuapuFeqggZPSVE95j/11MrzW+keBfh7TZDR/QswyXbP1JFA/M8
+	 XIY6JbGrQGhXVeIg1FL0O000has7edjFhUB46NyBpTj9BxWOfv2U46fk2L45JbhvFU52v
+	 TTzEfiwX+3TdHvrhzk2NsgF3kSQ30zUYl95AcKDpJnvp2dk60QMsdzLTyBftctph/vg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mLSKRX3B;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fctk7shm;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE951606A31C;
-	Mon,  9 Nov 2026 06:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E253606A31C;
+	Mon,  9 Nov 2026 06:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mLSKRX3B
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F41D1F008A1;
-	Mon,  9 Nov 2026 06:25:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fctk7shm
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5AE51F008A1;
+	Mon,  9 Nov 2026 06:46:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794205535;
-	bh=vxR0y8O6Yjfa9xBmupmiYjq0RBrrS/LkXi20mWxNVj4=;
+	s=k20260515; t=1794206810;
+	bh=djs195KZY/BJdEFCgcDSpeR4fu1pIHlWnSTsGITALWI=;
 	h=From:Date:Subject:To:Cc;
-	b=mLSKRX3BsieLi4GLeZuPq0+ZHK9kVNOPWSfwixBMn4rpaVkA9YsE6GmciW2bwB/GS
-	 jMhza4Hel1F/vyASKGubuDwP+evpOsrc42c52ET8aYW58TE+iULoJrwdd/xy8YfJ8N
-	 vVHhWt2HxsHQ977KH8nX5W7vFaxJgDf3xYqCrtasrntgUjWJobvAVJfeJZA7nlfTs3
-	 J/xwuPkpnRgIxT1U1chNy+FTjmyc+NUb8SvWstd4tbR4OcDpOaKn6V9BiiG7dJf/ue
-	 RCJ/169I/OKMg0/NZSKGz8dvpkuRtJNXMuO3YG8OFfaIlonagAG1jnnis8WrBsuT1p
-	 1AErDaT5zWuvw==
+	b=fctk7shmf9TRh1KwyKD0HX4xz2w8GL0ddf7yz2exNNrNwmmMGGMPC8JtzSwncsOWL
+	 65PqMPlxf5Abs+k4Udx5fTzm5Kp3PtlmMPOAQZM4sUTN7KO6j9DtJRxlZNYh3hD8r0
+	 AW0iGgkeAmFQN+aI9WfZyUioxx7ePizma7edDn15lmohKsv7LDMjCSJPUxJu14yFua
+	 hnIIhJoX12qRdWgPqmhOky02D/hTNWo3F7x/IsxHU7m3sGzB5Av2/AfKcc+fwAa2Qd
+	 ba+16walC9JU9xxmDYgkQUXO+16NG769FhnpJX9oXfZNb4JDQHbuDbXhwGVpKu7K6f
+	 /pd2y/ruiSwcw==
 From: Nathan Chancellor <nathan@kernel.org>
-Date: Mon, 09 Nov 2026 01:25:26 -0500
-Subject: [PATCH] Input: apm-power - Rename to apm-power-input
+Date: Mon, 09 Nov 2026 01:46:42 -0500
+Subject: [PATCH] ARM: kprobes: Rename test-kprobes.ko to
+ test-kprobes-arm.ko
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -54,43 +55,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261109-apm-power-input-rename-v1-1-0609e7b91825@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAA/yXMQQrCMBBG4auUWTuQpKLoVcTFtPnVEZqGSauF0
- rsbdfkt3lupwBSFzs1KhpcWHVOF3zXUPyTdwRqrKbhw8N6dWPLAeXzDWFOeJzYkGcASorSudXF
- /FKpxNtx0+Y0v17/L3D3RT98bbdsHPY5OwHoAAAA=
-X-Change-ID: 20261109-apm-power-input-rename-a2da3030d47a
-To: Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
- Nicolas Schier <nsc@kernel.org>
-Cc: linux-input@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+Message-Id: <20261109-arm-test-kprobes-rename-v1-1-663cdbbb90c7@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAA/yXMQQrCMBBG4auUWTuQCTVQryIu0vZXozQtM1EKp
+ Xc36vJbvLeRQROMTs1GineyNOcKOTQ03GO+gdNYTd75IOI6jjpxgRV+Ljr3MFbkOIFdcKMc0bX
+ BC9V6UVzT+jufL3/bq39gKN8d7fsHMRbZyHsAAAA=
+X-Change-ID: 20261109-arm-test-kprobes-rename-060d15e94621
+To: Russell King <linux@armlinux.org.uk>, Nicolas Schier <nsc@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Sasha Levin <sashal@kernel.org>, 
  Nathan Chancellor <nathan@kernel.org>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2220; i=nathan@kernel.org;
- h=from:subject:message-id; bh=Zm6n7DvPV/zt+FKqZ0sjzZv/v8rOmXG/Eq1yFEOyh8I=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFkf06P4DTnV9t09uXaJ3Ke8/TW6Tju3hRusifx3do2Z7
- aU1wbqbOkpZGMS4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBENGQZ/kqICBo7fTRZZ777
- w4NPJl9Pa0VflHazsZ69OyW15+r9djOG/4lb7zZZdBx9eVbQ4fqZ5YzrDniuiz2t2/D4wI3nwst
- E5/AAAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2513; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=d5ZqSkJGrlvMOK0yRJD5xyXF8O7G7+KdgShpcEY9QEE=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFkfc0KbbaJ37974TGDPg9ZPEllvr9XN+252cMH2B1ty8
+ kT4JIy1OkpZGMS4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBELPYw/BV70HuT21/DOPWA
+ jG3OvM+Xre6alN5O3dDAwiS0Ujnm2VVGhjeP1vEoBflvcJ39gHPH101b75Sfetip3D1V3FJ036E
+ 93HwA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
 When scripts/modules-check.sh is fixed to normalize the module's name
 like name-fix-token does in scripts/Makefile.lib before checking that it
-is unique [1], there is an error due to drivers/input/apm-power.ko and
-drivers/power/supply/apm_power.ko having the same module name.
+is unique [1], there is an error due to lib/tests/test_kprobes.ko and
+arch/arm/probes/kprobes/test-kprobes.ko having the same module name.
 
   error: the following would cause module name conflict:
-    drivers/input/apm-power.ko
-    drivers/power/supply/apm_power.ko
+    arch/arm/probes/kprobes/test-kprobes.ko
+    lib/tests/test_kprobes.ko
 
-  $ modinfo drivers/input/apm-power.ko drivers/power/supply/apm_power.ko | grep name:
-  filename:       drivers/input/apm-power.ko
-  name:           apm_power
-  filename:       drivers/power/supply/apm_power.ko
-  name:           apm_power
+  $ modinfo arch/arm/probes/kprobes/test-kprobes.ko lib/tests/test_kprobes.ko | grep name:
+  filename:       arch/arm/probes/kprobes/test-kprobes.ko
+  name:           test_kprobes
+  filename:       lib/tests/test_kprobes.ko
+  name:           test_kprobes
 
-Rename drivers/input/apm-power.c to apm-power-input.c to make the module
-name unique and clear up the error.
+Rename arch/arm/probes/kprobes/test-kprobes.ko to test-kprobes-arm.ko to
+make its module name unique and clear up the error.
 
 Reported-by: Sasha Levin <sashal@kernel.org>
 Closes: https://lore.kernel.org/20261108225808.1809266-1-sashal@kernel.org/
@@ -100,31 +100,37 @@ Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 We would like to take [1] for 7.5 in kbuild-next, so we would appreciate
 an ack to take this directly or a stable branch that we can pull in.
 ---
- drivers/input/Makefile                           | 2 +-
- drivers/input/{apm-power.c => apm-power-input.c} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/probes/kprobes/Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/input/Makefile b/drivers/input/Makefile
-index 2cd6e1c9a778..842a7e4f7b50 100644
---- a/drivers/input/Makefile
-+++ b/drivers/input/Makefile
-@@ -27,6 +27,6 @@ obj-$(CONFIG_INPUT_TOUCHSCREEN)	+= touchscreen/
- obj-$(CONFIG_INPUT_MISC)	+= misc/
- obj-$(CONFIG_INPUT_KUNIT_TEST)	+= tests/
+diff --git a/arch/arm/probes/kprobes/Makefile b/arch/arm/probes/kprobes/Makefile
+index 6159010dac4a..f909a47a01aa 100644
+--- a/arch/arm/probes/kprobes/Makefile
++++ b/arch/arm/probes/kprobes/Makefile
+@@ -3,14 +3,14 @@ KASAN_SANITIZE_actions-common.o := n
+ KASAN_SANITIZE_actions-arm.o := n
+ KASAN_SANITIZE_actions-thumb.o := n
+ obj-$(CONFIG_KPROBES)		+= core.o actions-common.o checkers-common.o
+-obj-$(CONFIG_ARM_KPROBES_TEST)	+= test-kprobes.o
+-test-kprobes-objs		:= test-core.o
++obj-$(CONFIG_ARM_KPROBES_TEST)	+= test-kprobes-arm.o
++test-kprobes-arm-objs		:= test-core.o
  
--obj-$(CONFIG_INPUT_APMPOWER)	+= apm-power.o
-+obj-$(CONFIG_INPUT_APMPOWER)	+= apm-power-input.o
- 
- obj-$(CONFIG_RMI4_CORE)		+= rmi4/
-diff --git a/drivers/input/apm-power.c b/drivers/input/apm-power-input.c
-similarity index 100%
-rename from drivers/input/apm-power.c
-rename to drivers/input/apm-power-input.c
+ ifdef CONFIG_THUMB2_KERNEL
+ obj-$(CONFIG_KPROBES)		+= actions-thumb.o checkers-thumb.o
+-test-kprobes-objs		+= test-thumb.o
++test-kprobes-arm-objs		+= test-thumb.o
+ else
+ obj-$(CONFIG_KPROBES)		+= actions-arm.o checkers-arm.o
+ obj-$(CONFIG_OPTPROBES)		+= opt-arm.o
+-test-kprobes-objs		+= test-arm.o
++test-kprobes-arm-objs		+= test-arm.o
+ endif
 
 ---
 base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
 base-tree: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-change-id: 20261109-apm-power-input-rename-a2da3030d47a
+change-id: 20261109-arm-test-kprobes-rename-060d15e94621
 
 Best regards,
 --  
