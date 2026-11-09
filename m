@@ -1,67 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794243037;
-	b=CMDo57/10HA6dEfiDYkddG8IfbQUi3juImuJHWdxezC9bkYx3fvqeJCcxAGVjuwGGZea
-	 AS1ccQDe0g7LGqUNJayWqcy9rmb2uru4jw9TavoiDbsyqY60DO5/uxe4WtEwmaVdPLrnD
-	 eTrG/HKcNYiixILAY81ipoPaHgtZeevDpMfl1B9URRiVAx5mMgPz/Qwpr5DpnWzGx5sUz
-	 965RpywXsMl3ZzW0S8UMQC0BGWPuM2fxa612ep8RMRIjxIOoMIl256d8k+RmbtjpQu0wM
-	 ntFDwZPzGqXc2jB0lt2oKULvmbUzVYjU/rWKd8FyJCfjSeRm5HNh6sCq75jCSsq26EA==
+	t=1794243157;
+	b=be+Ak3o092XEzY7m+8U7JPe5Q4LEiCJeOL7Aaq6iW8yUJREU+7EyDRwRftN1U4eznERt
+	 BQLT44aEYlXo3f6Fu0Q62M9vfL7j0V20/kwBXlQb7dUYIVHdErskhQhrZenKdptzrcZ8O
+	 SkeqLSUe43eUi0RwCVoG5vrySEzpTH4DFa7+U1qt6bAo40xS7QJ4sc/7sl6T1agWecG3+
+	 5gEJInbemUP0JpKXqq+ewfdeY1Yel9YcBx6cSQzZngXarfzpSwGBIkW1l0uQiAjwuIcA3
+	 OkTj5Mv5ung5+N7jzMI5h1GmhLnFJhGDcsXz0xJQXv3gdPQw5f+7MI49KGNQ40dKDkA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794243037;
-	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To;
-	bh=2jRbhBw6baBMUmbh4XONHUrX7MOgp3Ir4bPIfNW4hEA=;
-	b=hW0oYye9YmTsaQq5Klt/ynm33s6dTAC80tC+/CBPGDHi8C9s+ZA06tdlHmRUA6a4xmOl
-	 bPwcuvoUubEHjUFvbtNwozYIRREbhKU/9oQQEeiBiMIDggifq1aS8G3VIIKB9v0EoczCk
-	 VtcX4CoLUvXHNFmRxa2Fvy70sSFIObehE/d6PKkLuWpqoJZuDyIXXc2VCcWKDGnO46v6z
-	 C6ZS9evsyxv7Mdgen0eVVYFmoswEbD+GvRC48nALRCqu6yzlCLJO8BPii3cyCOyNlyEi7
-	 mG6nG7PNr9rYGmk8IcsHtWkEduclg1ugucwOgCSFa9GEuUC7PTZYI9R4BG2tH05xuMA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794243157;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To;
+	bh=F4x7I/eJDYyTNVsMVYbfqhXkVQVdTo3yCjuGDH6ZAmo=;
+	b=AaL8VjYhOXKTYFKU37QK1y2q9URQ+QPjQKIgiVI59cINtNZPTMV1jmeEfHqHQLhChEks
+	 l15K2SsGzWsiywLej9MSuqtNtn3152VO5VTCLTCDHPSwg8dPgsZyZvJdCxcR0LFRtDi+Y
+	 NBHKeVtcOae3kYKMTlbrFY51B4LATCZbFwmLviXYfJ2+o7G0dfZya8LMubya3n2yPUcvh
+	 BHyPCfw/4iBftK8qu0SY7zSFkaRCLnQV9kQ9OZbuP7YOiAieoV5wPF1omvJTaghqh4qA6
+	 kHe69YWL1nQRsy0FeLgSB+Rwu4i2xkByc7cN0PYSdtS0e7WSTX21mZcHrnE4/HnkEHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linutronix.de;
-	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=duGuiTyR;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=erKPWCqA;
-	arc=none smtp.remote-ip=193.142.43.55
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=n+cQ+oHs;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB320606A331;
-	Mon,  9 Nov 2026 16:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB320606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CE0606EE9C;
+	Mon,  9 Nov 2026 16:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=duGuiTyR;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=erKPWCqA
-Date: Mon, 9 Nov 2026 17:50:33 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1794243034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2jRbhBw6baBMUmbh4XONHUrX7MOgp3Ir4bPIfNW4hEA=;
-	b=duGuiTyRv+49YBjT1Ft6NT0W91FLB22eQnpH+F1L23o6keejZnKvacwq4/ZT5kZt7Ss1zb
-	Vxj8RYnMDpVRcYLl0hbYHVyVXwKWpV6rDngRRQeUxlZshzprcc4LY4pkzZphYekseoceqE
-	YbjfVnuIJURV4+vc4xG8xR3fVUvp4QqSSrtqNEkE43A/5O4j5N+u8Oa21O190kq/UEM1L4
-	kog9I3UGzp0Mq4x4Ol3zmgVygnrv+qrWjYd4VFD8fVMf0+NnimzPCKDTlUptE1Yg7qDoXB
-	l3mMRhAZz05mY9ipm5rOVM0JulKWIRiR1ZIvEfJ+KYeb7lHfX7GWQeucfG0t4A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1794243034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2jRbhBw6baBMUmbh4XONHUrX7MOgp3Ir4bPIfNW4hEA=;
-	b=erKPWCqACE2DDb7rdPBq6Us6HYeHi9F9+sBIahjViG68IO7FHr+XFoL8QDPlynR5LivQ0j
-	rG6JXrS6vNIg2/AA==
-From: "Ahmed S. Darwish" <darwi@linutronix.de>
-To: sashiko-reviews@lists.linux.dev
-Cc: Clark Williams <clrkwllms@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=n+cQ+oHs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AE451F008A3;
+	Mon,  9 Nov 2026 16:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794243157;
+	bh=F4x7I/eJDYyTNVsMVYbfqhXkVQVdTo3yCjuGDH6ZAmo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=n+cQ+oHs4cBbfMQFzvBzPg/8epEceBRPZMylsKnZiz3+Hwws89nXEICYALvf106wa
+	 Td/07w2Zz6wxTWemagw6Hro2OlOdFYtgNIG47m3nxdipRli+udvLStWhBoXyT+dviZ
+	 rS1eBYNcH4Re8jcrBgRC7T1U/sPqCwds69TvpevF0tKONV02vXJYggJ5/FGks0IOPP
+	 GqpykssCnax7xbcvBzFVkkyYax4OrULS/hn+V1Ztdu43ueCJAK5IuRVxswwP+nxdi0
+	 ELWNcxvxTd03fdV8O043AEfVmvWhoM/mhE8H0XdWfC+0Ois1m2yz+U04NXwUYXczuv
+	 4cjoDbQsYICCw==
+Date: Mon, 9 Nov 2026 11:52:30 -0500
+From: Nathan Chancellor <nathan@kernel.org>
+To: "Ahmed S. Darwish" <darwi@linutronix.de>
+Cc: Julian Braha <julianbraha@gmail.com>,
+	Clark Williams <clrkwllms@kernel.org>,
 	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Nicolas Schier <nsc@kernel.org>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Frederic Weisbecker <frederic@kernel.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -72,12 +57,14 @@ Cc: Clark Williams <clrkwllms@kernel.org>,
 	Daan De Meyer <daan.j.demeyer@gmail.com>,
 	Luca Boccassi <luca.boccassi@gmail.com>,
 	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 09/10] Documentation: Describe kconfig-checker overlays
-Message-ID: <avH52flseJWwB_D1@lx-t490>
+	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, arighi@nvidia.com
+Subject: Re: [PATCH v1 00/10] tools: Introduce a kernel configuration checker
+Message-ID: <20261109165230.GC1608140@ax162>
 References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-10-darwi@linutronix.de>
- <sashiko-outbox-202764@kernel.org>
+ <a20153cd-d148-4618-8089-ad81cb16fe23@gmail.com>
+ <20261109003745.GA3429615@ax162>
+ <avHxmCEdHgyRD7n0@lx-t490>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -87,35 +74,60 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-202764@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <avHxmCEdHgyRD7n0@lx-t490>
 
-On Sat, 07 Nov 2026, sashiko-bot@kernel.org wrote:
->
-> Could a commit message body be added to describe the new overlay
-> documentation and the schema file path updates?
->
-
-I'll add a filler.
-
+On Mon, Nov 09, 2026 at 05:15:20PM +0100, Ahmed S. Darwish wrote:
+> On Sun, 08 Nov 2026, Nathan Chancellor wrote:
 > >
-> >  The schema for these files is fully documented in::
+> > On Sun, Nov 08, 2026 at 06:59:26PM +0000, Julian Braha wrote:
+> > > I think the name will cause confusion.
+> > >
+> > > We already have some "kconfig checkers" in-tree, like
+> > > scripts/kconfig-sym-check.pl
+> > >
+> > > But actually, your tool is quite unrelated, because that one checks
+> > > 'Kconfig' source files, while yours checks the user's '.config' file.
+> > >
+> > > This has already caused some confusion in the past, for example in this
+> > > thread [2], someone misunderstood which one 'kconfig-sym-check'
+> > > actually checks.
+> > >
+> > > In addition to .config vs Kconfig, the name is similar to
+> > > 'kconfig-sym-check', but is not as descriptive about *what kind* of
+> > > checks it performs.
 > >
-> > -   tools/kconfig-checker/schema.yml
-> > +   tools/kconfig-checker/base.yml
-> > +   tools/kconfig-checker/rules.yml
->
-> [Severity: Low]
-> Are the schema file paths here missing the schemas/ directory component?
->
+> > Yeah, I had similar thoughts when this initially appeared in my inbox.
+> > As you mentioned in your email, this is basically a policy checker (“we
+> > need these configuration options enabled or disabled to meet our
+> > requirements”), so maybe config-policy-checker or something like that
+> > would be clearer?
+> 
+> I would've loved to keep "kconfig" in the name so that outside the kernel,
+> it's still clear it's about a kernel .config. For example, a Debian package
+> for this tool can be called "kconfig-checker", "kconfig-policy-checker",
+> etc.
 
-Correct, that's a documentation bug.
+Sure, that makes sense. Like Julian mentioned, kconfig is certainly an
+overloaded term but there is little we can do about that now :)
 
-It should indeed be:
+> What about kconfig-audit?  Something like:
+> 
+>    ./tools/kconfig-audit/audit.py -c .config -p PREEMPT_RT
+> 
+>    make POLICY=preempt_rt auditconfig
+> 
+> config-policy-checker does sound good, but it feels verbose.
+> 
+> Feedback appreciated.
 
-        tools/kconfig-checker/schemas/base.yml
-        tools/kconfig-checker/schemas/rules.yml
+Yeah, config-policy-checker is a little verbose and might not translate
+into make rules well. kconfig-audit does not sound bad to me, especially
+with the rename of RULES to POLICY; at the very least, it is on the
+right track.
 
-Thanks,
-Ahmed
+-- 
+Cheers,
+Nathan
