@@ -1,84 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794332133;
-	b=IQxeYl07Xt3VqZ+5kMN4PJoX4iAIDqXcmCt6ublTTyEDYI0sXD/v1NJhxeKEtu52tFfa
-	 hfAyHPf5NhBitz1E2dwAHtD7Ng2wRhIM5invP+/Ne8D7Th9arM/BRPGH924QtEvXwyYh6
-	 ZhoRrbWjpojeyqLq+qpF0Y6q7h+kJcZjXn2ZXMqJ+jfLH2rfXh2wLGegQITaaRLQxe05c
-	 w6DjWrBFSUChxS8TdWsaG3s7gDAyTwcSn5vko0KHI3RJCCUqdNFZ/a3/sm2xDLtwm6bC0
-	 7SSOO6mZuXNOLkIHJCAZP9s3v+RWdAjIHVXNT8R8kAoolTDPYztQXxDXLip9vPlZPNg==
+	t=1794332134;
+	b=M1OALTnk1vAjP6Ps7xti05CIPSGCeJZ646Gp3m3+yosHnXoAg412y/QEy9a6VGcEiZWK
+	 HnZFwIwnMz5wFWIb/wVpg7cucvRLcHYL1iR7EVrwMgJ1neyb1RcEpSFeMSys6sqWdW9Xn
+	 4GHrwbJAyk7c3nh+OKxaq1F+VnAqK4iIws1FGkYBXSex9f9BXC4UnXvPLICpKfOKTT0D3
+	 n8Jpwm014uxW9MiGeQ1JzpSM+KSWvGKQdOSOTNv4ehcfg0xnsaEe62LALQJ4RHR5PsMLM
+	 n35g5eCC6Dzk17IKQkEtNyD6ukjzz5SlC7rFGOJWXkfybpubBIRgM+7avHOzZRPggEQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794332133;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794332134;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Sender:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=VRe6DvGzMVEKtF/UjYGmmLxKrND1yOzI81LM0TfOFc4=;
-	b=zouo2mycc8rRRMvYx0Swa5EuAKuuZvaEsDoTEWI5tyI1lg3QftZWpTjNqi05We5F5yzU
-	 HkJgnM2Gfbttpu9zPP7XcQSB4Z4DoK+JDyou3ogJlkMuBvbn5KzmFcY54vA5HbCFxSoKi
-	 N5SWA9USfsAb+7Ps8zVaWWsXXx7/Jros653m96VecOhOiimM1JRqFI3hXC/Kp++5Fu676
-	 zJJhgkzfQdmc1tIC5kVxam0qlSJ26ddej3k3I6wgaM8RkkP+O4MYia3LoqkTZqTRvtSLR
-	 LaZkwfyEcZmq4FLZ70psfc4PjBL2Fv5KqVd8WRkqZgrDTzbrZgVqCAn4jpSW9w8Ootg==
+	 Sender:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=xpDhzH5Qx8/VLDHYrm11J0sajgb1E/uiBbLWkBFWCBk=;
+	b=m0nycntjrxPOSEQBSNS4x9jfwcqXObEnqjRPjciHRvUle63Sp+E0m4EfpOvi4t5Np0Ys
+	 V4HMpzPhu/7whb7Qdn200SWuvtf6tdiwWZdeJXZpsAVpU/jBfQB3FNmaOsB29FGFRQMOa
+	 0lS7PEx05pDr3MUk3QBmSRs6i5TfNJT5fYGFvFxJ7Juh7X/g2Zw3Nz3aGVleFDHlYLa+Q
+	 6jR3ZgCNx2LvgFdBJiYnMpCdsbzSIncKP/NPIixdT+P2fzEM14QsRdCsmMZbLom0rG6Tw
+	 nKnJ2ZQXT4rftEGEmBcMai+SONRyUUH8pAi26zS/4t2/Ct2ySBmCmkznp3Iur1a21oQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qCLSelHd;
-	arc=none smtp.remote-ip=209.85.221.51
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="N/ceMGKt";
+	arc=none smtp.remote-ip=209.85.221.43
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A4C606A31C
-	for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 17:35:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 49A4C606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EA0606A338
+	for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 17:35:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A8EA0606A338
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qCLSelHd
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-492f6b7f70dso1538643f8f.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 09:35:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=N/ceMGKt
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-492f0a1b685so1561888f8f.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 09:35:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794332131; x=1794936931; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=VRe6DvGzMVEKtF/UjYGmmLxKrND1yOzI81LM0TfOFc4=;
-        b=qCLSelHdSwkXDi7F+RK8rmmA8JQQ27OnfUgKyHi0/X6kr7m2KA8dGm7eRUAYrqbs51
-         D7TRDFJSEHBeni84txLs6nAwKtI2lABPTcjJh8BIczjVP/5VhJVfoSkDRM1e+8agSbys
-         S+pZfy8MzfwPQdYNctro7QYB7ppaWgtguEuRDyR3n1Ml1JKHFyn18zB6DUgPET+ymMlc
-         +4d5BZDoz6gW1VdsoGSZnm5sH2TvxF1vmD8mg/MbznEkheFS6YAVdQIj8RGAC0S8tkKX
-         myb04BMRp3e8bvAllXH1hpN/35c6bYS7piAZXKqXD9aqfzHKuxflD9Y02Ej6fER5yXun
-         xDKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794332131; x=1794936931;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1794332132; x=1794936932; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=VRe6DvGzMVEKtF/UjYGmmLxKrND1yOzI81LM0TfOFc4=;
-        b=bTRmj183O8Iyzi5VxBi2TjAIszRKb4Zs3p9MM6vN+792D/d9YLdNxEcV6GSDY1M8fg
-         MxhTyg+fuZs9fYTaHr1LBRh65ypDV+9e3fZuUPLKANUj1AJcoH+SVItyWfxsXyNFRDsV
-         iAniaINIpPVOQKWWW7NG4wJZICpsK100/tLcDY1WC+GcP5WNOMHErC2twSvIL4rtcVlf
-         7dNf26P1RdadFa3XLKlawpWN/7EXESENCGHaC1pqMPnon7US8BxH05SWU1ZYZEWV5fJs
-         JH2RFo2wlxFm9l8hk5BYcGYXOjry1B04BpGNTz4wO0gqhvZ4byW0a7+Yij2Y+8m9l+Q6
-         +cfg==
-X-Forwarded-Encrypted: i=1; AL+hErFLfYWoTwx0aqDVKV2aJfIkRcw2yrsl9Q7q3WxAxvBX06jRj0Q34PSVfkWlhRlc9tMnDXydNdtCdYo8hro=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+F8OAPdkngJhYkiEucoGwgk0ZIp1USnykl7vsp2MJ9PJrjNpkq
-	5gwJeV+qltVM89xKyt8e81tl5DKud15q16z4XtjNTrtS4743+xvmhJD1
-X-Gm-Gg: AYBFou29ilDqfylXnc3viMlIfH+ZCwfEVATpOBCSRAzAil9pPgdFLhb8kCB45WHN/DJ
-	/viJlE8Qh6ZoQkVrX78vPhL2rlR+EjAj3o9RMPrugYmQFNkOKBKiJ5yOs05k2WLlt3tdi93b1jK
-	Zf25uFlxRVdkJBKn1F8Z4cOO3zywSFotNYsQjMpqscpANIaNw1kzNHVyIJuBDH9rCL64Pj8cbdl
-	xS8TFBp66yWAPoRkoianTIyb+wUHYaXwmmtg0UDgtRUJ06PHojFpDk3JFUKrj4xoagHYWbb+S1/
-	N6JcgPVJS/bTbLqkMYQ2R5tr8a/Y7RgELlCokOxdVrKwWdSW/gjY01XmZFSkB1pEUQyKVDQ38VF
-	XJqWsUlZSF1+eDuDw36epExV1WZCAS9wVt6UD8RxkOSR6xSKf2Xy7EezxT8swBGi/XuIbMovg/n
-	ZZAkpkBkKeWsIumUVYTx1ftcMxQBC3hBQAXUBrxX0b0ow7FG5loMwglYMvQ+oiB2Uy0hFYeDCyZ
-	sfiTLtls31i6vnCooiqUM5s01446QwITnFkA3JUSwUgUu0TvFcbU6mVh1J5r7OjUHbwjthYeu+Z
-	vXf3CGWBWnAlbt1Q6gx3xvjPkdOsIPrSl1vXVksg88KS48Wk4+9KL6kM+HuyN14AKcbq8jkdlZ5
-	JqMrVohx52LeXzElb0Ss=
-X-Received: by 2002:a05:6000:420d:b0:48e:7a41:d78e with SMTP id ffacd0b85a97d-4982e7379b7mr6438321f8f.19.1794332130261;
-        Tue, 10 Nov 2026 09:35:30 -0800 (PST)
+        bh=xpDhzH5Qx8/VLDHYrm11J0sajgb1E/uiBbLWkBFWCBk=;
+        b=N/ceMGKtm+i6+xJoY9ITibg1IKT9/vxsdjK+ngauxjr0ae1Y7JjZGyDukNRKhbP7ED
+         s3VJ80RzGE1YDa5olmFvHx2oHsnzrAcI8w8RkH6qp/gTkFqdylf9LBs44eFvi9HMKydn
+         pDs9XnFbwxjFRI9kBCvwmfqSeU4ruP1ZbQOujrQ1wpnxRShtrDJ91RncqrI1CaZUUZax
+         zYHzR/1taog5P0miN5xqemiagnB4QfBLKaLFvWiOC6AvrqmROL7wgpoqr0SG5S6eUO/A
+         xTaWP1Q+gAoh8YfCXZWFXbrinXxzwsNvd+b7F3+5CXu/s7Yj7Ak3qHawQTY654pzTnHA
+         qlwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794332132; x=1794936932;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=xpDhzH5Qx8/VLDHYrm11J0sajgb1E/uiBbLWkBFWCBk=;
+        b=ZP3mSJMaHB9TDkI+S9caSMzEN5IGv6TWzlMAlJJwK2gfA5mQJ/eUQofPt6JfW03YLR
+         VgpR6CCPLGYpdlYtMn97RKrPDwzknWzMB5aKTtr0sThI747cTdz0XirsPN0TJjkn196Y
+         ywVIgeBc+RbEWzzmS4fNyJr2LeQtIfT+o9rMhJIOOMsxpYRhNCBsMDcZQzXs2UPWbh+P
+         azyb7FsgG+ZRLtCbNEb3pxE8ip/+RrK6h/VfXS8bH3ViE59HTjFE/C8iwJLJ4Qqb60bl
+         mCmMDIZMzFssdxHAP5rEfgfIkpoWfjJWABW7Xkt/r+ajHBnpam6n99cKj5l0EUn6RM0a
+         c0Eg==
+X-Forwarded-Encrypted: i=1; AL+hErHZDJFyfTJieXE0N+DtDvpl3gA/NGPuMEnFCb/VxuQhvAsp0TfafiTDCRjhDEbu4KrR2ClVaTy9UQyqymg=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9+OZdxAOpZfGcnVLQh9qGbxBGCBQxV2+FvWMXJPvK2xXaPRQoC
+	H+wURQD+56X5useQ2zRrYGbn7uZmvPZIqhvzXsh8yd0a5fu7/jupGdD3
+X-Gm-Gg: AYBFou2ODwozBJfdLeRhTE5yKI7zNE2TLEMFqAxADSOpq2lTbyA/9nVwhEL7uLTModb
+	R92l+rbgYvr/HAjug8zkFBcYtQdQKtHq6VDXwh5ggjALAi05/U2t4+SDiVBKLlVgoFdhCugTtn6
+	sSJkkQ+xpnlICIWqYCr+VvK8Nh9ZAcwcAY9bJi0WB2BBSrx/vA6pgqa15GayQ13cBwKVxj9jS/L
+	+f7BxwQpLgxB60foZc59R75vOPpnHXp+AmxIVkE0HISLhMiJ2xK62BKR/MVzyh/YcFRhiiy+VCz
+	FGqDrsbyesrS8ZGmiGbJ/UmYYrkN7dQdtqmcmnxo0hfYDYJcEr4y1CVt6Nhclp9z4eoPVDT8yjV
+	n6nSea+efRKF3pjvMXyI8gE4VHUZqoKLS9nA0LFOpWjRJNO44MRJ/wpPW2NpC2zlaYM4CvJ56LA
+	FTBqPFPTliYkKEW7Csk7TW3j+cuhXmGXpp8GlW5ngp7EYZj4+W1LG7YqSDFSNm89GQn5ALHlCIU
+	wTQjU2wW7oo3Uw9kCT/yXGSQCGKxvyX4ZHPw6Q4yFxrMqF8bR9a+rhYkabX1owYwhHTSOvsT2aM
+	QV+vkMTUiKuUaVcyoCFxRxyfy05mmIQo4xooRlhA4Tdtzxp4PKvDXrirOxOatMGL+Y33g5iwQ6m
+	gFEMpDmJA321NqVkgvg==
+X-Received: by 2002:a05:6000:40c8:b0:48d:ff06:c626 with SMTP id ffacd0b85a97d-498302fb9f3mr6993067f8f.35.1794332132102;
+        Tue, 10 Nov 2026 09:35:32 -0800 (PST)
 Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-498367ba82csm6445687f8f.50.2026.11.10.09.35.29
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-498367ba82csm6445687f8f.50.2026.11.10.09.35.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 09:35:29 -0800 (PST)
+        Tue, 10 Nov 2026 09:35:31 -0800 (PST)
 Sender: Julian Braha <julian.braha@gmail.com>
 From: Julian Braha <julianbraha@gmail.com>
 To: nathan@kernel.org,
@@ -93,10 +94,12 @@ Cc: ojeda@kernel.org,
 	linux-kernel@vger.kernel.org,
 	rust-for-linux@vger.kernel.org,
 	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH v2 0/3] kconfig: wrap long expressions in menuconfig
-Date: Tue, 10 Nov 2026 17:35:23 +0000
-Message-ID: <20261110173526.1548434-1-julianbraha@gmail.com>
+Subject: [PATCH v2 1/3] kconfig: print the output of expr_alloc_and() instead of printing '&&'
+Date: Tue, 10 Nov 2026 17:35:24 +0000
+Message-ID: <20261110173526.1548434-2-julianbraha@gmail.com>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261110173526.1548434-1-julianbraha@gmail.com>
+References: <20261110173526.1548434-1-julianbraha@gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -108,66 +111,49 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In an offline conversation, Miguel Ojeda reported that scrolling
-horizontally in menuconfig's search to read RUST's dependencies has been
-slowing down debugging.
+Clean up expression printing for 'select' and 'imply' (which ANDs the
+select/imply targets), to properly call expr_alloc_and() and print the
+output, instead of printing a literal ' && '. 
 
-Let's wrap expressions (like in the 'Depends on', 'Selected by', or
-'Range' sections) between tokens at the end of the window, such that each
-line begins with the same indentation. Ensure the '!' negation stays
-attached to the left side of the option symbol, and keep the value
-annotation attached to the right side when wrapping.
+This is necessary to ensure that any '&&' at the end of those lines can
+wrap properly.
 
-Additionally, write a '\' at the end of wrapped lines, to visually
-indicate to the reader that the line continues. 
-
-Patch 1 cleans up the existing expression printing for 'select' and
-'imply' (which ANDs the select/imply targets), to properly call 
-expr_alloc_and() and print the output of that function, instead of
-printing a literal ' && '. This is necessary to ensure that any '&&' at
-the end of those lines will wrap properly in patch 2.
-
-Patch 2 makes the wrapping change primarily in expr_print_gstr_helper(),
-which already handles writing expression tokens to a growable string, but
-now also keeps track of the wrapping info in the 'gstr' struct because
-this helper is called multiple times per expression. 
-
-Patch 3 adds a visible continuation '\' to the end of each wrapped line.
-This is because some line wraps are not otherwise obvious to the reader,
-for example if a line ends with a symbol instead of an operator.
-(Below example uses an 80-column terminal)
-
-Here, it would be less obvious without '\' (GPIO_TQMX86):
-    Depends on: GPIOLIB [=y] && (MFD_TQMX86 [=y] || COMPILE_TEST [=y]) \  
-                && HAS_IOPORT_MAP [=y]
-
-Note that the 'help' textbox uses the same expression printer as search,
-so this has the side effect of improving the formatting in 'help', too.
-
-In the future, we should consider a larger revamp that would wrap all text
-in the search window, allowing us to safely disable horizontal scrolling.
+Signed-off-by: Julian Braha <julianbraha@gmail.com>
 ---
-Changes since v1:
-- add '\' at end of wrapped lines to indicate continuation (self-review)
-- use expr_alloc_and() instead of printing literal ' && ' (self-review)
-- properly support trailing '!' and leading spaces (sashiko / Nathan)
+ scripts/kconfig/menu.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-Link to v1:
-https://lore.kernel.org/all/20261010095001.265759-1-julianbraha@gmail.com/
----
-Julian Braha (3):
-  kconfig: print the output of expr_alloc_and() instead of printing '&&'
-  kconfig: wrap long expressions in menuconfig
-  kconfig: show continuation at the end of wrapped lines
-
- scripts/kconfig/expr.c  | 33 ++++++++++++++++++++++++---------
- scripts/kconfig/lkc.h   |  6 +++++-
- scripts/kconfig/mconf.c |  2 +-
- scripts/kconfig/menu.c  | 24 +++++++++++++-----------
- scripts/kconfig/nconf.c |  2 +-
- scripts/kconfig/util.c  |  2 ++
- 6 files changed, 46 insertions(+), 23 deletions(-)
-
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 1a3ad09a92d2..2b2166edeb25 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -761,19 +761,16 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ static void get_symbol_props_str(struct gstr *r, struct symbol *sym,
+ 				 enum prop_type tok, const char *prefix)
+ {
+-	bool hit = false;
++	struct expr *expr = NULL;
+ 	struct property *prop;
+ 
+-	for_all_properties(sym, prop, tok) {
+-		if (!hit) {
+-			str_append(r, prefix);
+-			hit = true;
+-		} else
+-			str_printf(r, " && ");
+-		expr_gstr_print(prop->expr, r);
+-	}
+-	if (hit)
++	for_all_properties(sym, prop, tok)
++		expr = expr_alloc_and(expr, prop->expr);
++	if (expr) {
++		str_append(r, prefix);
++		expr_gstr_print(expr, r);
+ 		str_append(r, "\n");
++	}
+ }
+ 
+ /*
 -- 
 2.56.0
 
