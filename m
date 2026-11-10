@@ -1,88 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794334739;
-	b=sfTvGuTmqYX4ZU/Ps+XS1fb98xkUMe8FtwcuIKZA9IxFPi1asVIQkBrQh5u+KMdRSNC0
-	 QkPNMc0qN5LZ8rqb3Ac27B1Ocu9ETdoC7SW1xZ8Vl25AKehFExPu6tax1tvnpXrs4WQqN
-	 NsGKJoe/dECoUzvhUHkAdatbhXPCNo2/KG8J1jGa+6B57rM1e5sxtffysii2AUz/NQ0Lx
-	 gwpZQ17euALQmYjISZzpV6exb0L5wYZZd3LRm116fiIZgfjI5JHCfpjWIwr+aQcZouLFT
-	 cwqP3cPA70KlBn2nTzKMDVj9DkxRY0vw6gsDmAfq9lPjWOvuYsqc0Gtb6hzYg4mOSvQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794334739;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.215.179
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794342682;
+	b=EdffBQA8z2ItVDyTaIuK4GffosVpaGAujUt+364nh3HTudwV2RrfBojtzKBnwcrAYNCV
+	 qo7zJUTxWynDMn8cAF+BHEpQ8YocpByx05QoVohQ/tAwxy0lzg1vQIEQbdUUzlRpCg+jk
+	 XkVD0CTAGKEw9ZUnN3anzCVBZLKaKlXZMpr2PEVGU9Z26IxDrr5wTXGuZFAn2sWacWKeA
+	 zfUmQdKOv2K3rjz+5lnbgPDzYaxnqbMOBLMWumKxhyjzqLB/8BbIGHUEd86dD5i3EZcvI
+	 hrnEV8o2aUIENJHuVhxbGDrFCbj/su2ckVLzkLOfRwqh+0i/l2HqeP3IodW/2I92k8A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794342682;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Sender:Message-ID:Date:MIME-Version:User-Agent:From:Subject:To:Cc:
-	 References:Content-Language:In-Reply-To:Content-Type;
-	bh=SE2lrUu9zrSXQsWXpC9NEVG/yxx3i85b5haa93pV8Hw=;
-	b=On2sgUJ/N7rWBK0fhC9/8qW8lJiick29KYLfxHQWD/3xzWYf+BGpSKSDLjriqOSJ5oaD
-	 X1bWyqXVPY7xwv0h1gWYAgi5gAgayVf6gAbs258tue63N6kGhJjcN4XB7dqpLaTCOeV2r
-	 VjmNoO1exYqvEBdmojdU7K0UkVRKy2LnAMebTs6toEkNgX0vmoE68Lrlfc9Lrbr9/gWyY
-	 de0PxR8OCu0vKMj9rzN3r3fQKjA6cu3TmYdAggrtRIHv/UOw188RiGxrIqaGwlIx4dA9/
-	 Zfpm8TpFtRlN8K96Op/HSCfdR1Y3Lt/KxWDahNOv6ZmZjlgfhArAZ3YjPXykOWg0GqQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=euMDcLXwVyFRBye3EMDIFi0Mnp2snBdaowuxW7mbjUU=;
+	b=cOlHjAmaAVfANHtrvTJXcRdQDnaDvR98y7K8pGV6FLbzxNbI3Wf2YraNbqeXDa61thiC
+	 o2bTxRmPUGLJjeAiqbuCxDUMtAizixcmlgWew3zw3qzN96pnoYp9CvggBrcsaXyraMf34
+	 HPFL74Aqv2tKJWM1ZPSzNSP8JX0KQVNnhadO7Id3PcF5l4uZc0c94+Dw3+g39FtGvNtGj
+	 krm2I6CAK1fl9BPAZmLpYH/+vhtJHi1U2M33S7Vjwkb2J++YTMap8kekyS/hSu14Xqif8
+	 s7Faqgi490wvVPf+inw1nX9AT3syfQPL72QZ09KXO//rU1MgpvwW1UnoFFp89K4HIIg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SPZkqliz;
-	arc=none smtp.remote-ip=209.85.128.48
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k2tE9abR;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.215.179
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EE5606A339
-	for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 18:18:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0EE5606A339
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E451A606C8DF
+	for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 20:31:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E451A606C8DF
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SPZkqliz
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a4d7ae1ae9so21529915e9.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 10:18:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k2tE9abR
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-cdd77a90f51so184055a12.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 12:31:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794342681; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jYYMZuZ4dBOEQtye975W/+Tnheoi7kssFnh8ri2ohhduER7tkQKV1yReCw/Pq+d72w
+         n/VV8GchooXP3m8yGrx9TDheBVqKGpx7hVzD2IegvcC3fGTyhjCCzzST0nFPSWy/4ix0
+         uZtfh/emAkfZOxnz4W5FY5J/vukdrx28Ao5OPdKOhbpxJ3/y28HYg2JJmJ3c0QqJvmFA
+         /B3WvIIwNNIB3fOwmFWp9xDc39vpC32ZPfeeTDNYAj6fmki8+h4bZI439LNgef0ytFjT
+         1FXOPtrHM4b4vrd92D2jgHBLDX4mPhFcypN9a+5gIkG4hYVWLCnSKPp5ygEvmJtPeeaP
+         GhVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=euMDcLXwVyFRBye3EMDIFi0Mnp2snBdaowuxW7mbjUU=;
+        fh=ggeQ02IMXxPXPTRHNhMy+R/m2bKm08lRDWErE/KTsWU=;
+        b=HFzDRYrK+2rg2QuuvIR95EAR1OcN2HOUm8CoVTJJ7kNArClxu2Wn3V/bI/U6JS4xIV
+         BePGmLhQfX6K+zLusnzSekHLi6RO/K3F4atIBFKdgpa/frBGWs16H6LsTDCH3+z3hVDN
+         VYPVM3WwAhKeA3DCh9UI8vW0T9IMG7Cm8VqxSx2NhrsG+cKqFvhHvpQn5HzPN2wg/vOO
+         LRSmL3fa3DFKBobi6obRv5z0BBPO6418h83CevwNlY7CYXEcw8YCXdNDNzVzyavi/Ev1
+         HVcivrInIt6oxkFh/SkFL6QA94jhPmFvdKQNrURJKYx5I+1Ue/hFBK2mYpo1adv0w+oi
+         zh0Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794334737; x=1794939537; darn=vger.kernel.org;
-        h=content-type:in-reply-to:content-language:references:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:sender:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=SE2lrUu9zrSXQsWXpC9NEVG/yxx3i85b5haa93pV8Hw=;
-        b=SPZkqlizfa4It3AwLdPrXCHtu8hjP8QsFeAuGA6TzWaWCvEuPs6YRFrNxSLhGY6hGO
-         zEkoZN4sdOPDpp0fSVUec9WqjBjvtMVvrEQ65XF2Yed4K+/loVPoO9Ic5C/uFsZE8NIW
-         a7SuXA7nEFvGvWvLFPTq0Ynm5rdM5DLTPlMLycSJFkVrU8JWmlwSUfWDckahUOsYF0/H
-         actdhCUUDnOinRx9t8xsvvN84/pj8Dul9B7nDEmVjtEJdE1h/jhCN5DMjHk5kgAuLSBU
-         2XR0ZbSD1t6mqP82bCf1wjFydzdoOh5APY9FvvrzDfKRwdJ1NyIsBaSfqst7u6E0YpPm
-         teKg==
+        d=gmail.com; s=20260707; t=1794342681; x=1794947481; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=euMDcLXwVyFRBye3EMDIFi0Mnp2snBdaowuxW7mbjUU=;
+        b=k2tE9abRBySKHePpNw1+hoNwrpCgT9c1iMM92CBR/SFMFu9jyXbH2iCcyH+EmTQTiC
+         yBLJMfHXGvpr8xfRPVxQgfnzsDthjwfax2/Tnn6lH65+pgpZ0HNuhexFozmuzYNDgx1y
+         +ICdy5xZl5sBC6bwvrkn36HKWD07+HHxiPTqxB/C1Omj/my+bOWwBptkbM1GsQUlAwPd
+         k5iKPtFQZWvnr7YHFJcpDSPfMwZhKuL+MTgC+TsDNhb2aGfrhumIhozOSJlps1NyLDFl
+         5aulmNUtJ6KcGlw54fstXxrfYoWNLogwNTb77YvSuFf2tr3hJNYtNL4UfLVJ9xRwvNJ4
+         xX7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794334737; x=1794939537;
-        h=content-type:in-reply-to:content-language:references:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:sender:x-gm-gg
+        d=1e100.net; s=20260707; t=1794342681; x=1794947481;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=SE2lrUu9zrSXQsWXpC9NEVG/yxx3i85b5haa93pV8Hw=;
-        b=sr9hioGU+Jfoztr60zixs4CX+pfS1bfUsXznWHIYb86Wrqff2y0MzqfVuxNLnUjjSI
-         o4SbmCOPOrCEwfIzdWfIBB86kB1svfJkmrW36CV3QKkKjVTHJi3wtkmYWCtnYry4WnWD
-         SqqRxOQHPio9LsyGJ/uxbAK7Jne6c72ymJwij0LtZfYZtz+AZkmpSclvyKLCVfOISCBD
-         iST8zNeRZijDahYTFKajyHBiHL2Y16VFUwUHrS52NA3fIdUNikWgQvKCxU+5iygagTzj
-         1ZnobpFLN5p6wh90cpsjNDOfZ5XqCmQsKwcGzfjRE0JhwnVEk9pVajnbb7vNWMI3FkTK
-         RPBQ==
-X-Forwarded-Encrypted: i=1; AL+hErH5zNCeyyR5M3TeMgvlfyzispSt3J1V6miUPFa4NiOGh07cW3JnqKiC4XA0UTBLPHgj4qno4c3UNILdeVs=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+1Mo0QjJporCnLTj8wGx22SY/Lj64hlRVTd+uFS1pmd3VhNk9I
-	RdzbSIYKT46+mOKjNIpY+88OaFPmFOJdIjnozVgIeeYb20NnqNue41De
-X-Gm-Gg: AYBFou1YjBMlok7YmN9QzAT/eh0FQZN5BHahW33VjqP/85w3t9YY8EpkoocZFDoHvMp
-	LIF9O1H2mnVOq4iSYlpwC1uYWIjbIUkqjoVvtadJ52w6LAAHlPgPQ0QgOJWfeJB7SIqsazxj9fA
-	G+ahpSu5vSbcI6haBkR0RryOPhkTIUPzCNu9U1MKvx41kDdcKWIyTOqLv3sEnyMcwYjRV0+MvyO
-	hjn3U9IuLQf+bakjnDS8Lti/YYFPnMZ7LLEklyvfbx1ynFYpZomm2g4O1058XvpsQMpBXgx7/iN
-	tz8mjAmYHHxqtikBrGowcsZombYOHa1ucGXQOqYY5jZMZ1Xx+0xLy5LHSq/oIXAWium8w3H54Kd
-	xBI4RhFEJNPYMxZLPJjWysiBp4H9zPgQW9whryGj4YZGZOi2g/4MKu8I+yVEOmxOV0A9BOnE50e
-	1xqQ7EKAHS/oBGuZtZ3j0BJWuMK3DEluJ/ZNDIgmjbBibbCr+aHlcbViUEl2XxvOFwaY1kjXaSe
-	5qVGIcFa3JHWYySBsSDHetDdNRYWHhoGiUjSFE2jfHFPGp0yN/NZI32ythtlLDwyLpCZ66e52r+
-	WtUOuA3Y15CEX8gpTLQWNe0iRX7MTPBNOzfEN+CVt00rEls3iQA/7MSuLh22RFubGdVfsspaJtd
-	RQnQhgqWOeqBmbKjg790M0POOd07ThXRZmv1KEuLt0I4=
-X-Received: by 2002:a05:600c:34c7:b0:4a3:5a98:c279 with SMTP id 5b1f17b1804b1-4ba0233a41emr53483145e9.8.1794334736887;
-        Tue, 10 Nov 2026 10:18:56 -0800 (PST)
-Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba01fe63e6sm121456885e9.7.2026.11.10.10.18.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2026 10:18:56 -0800 (PST)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <c0ccddbc-539c-4987-8685-ec996285f746@gmail.com>
-Date: Tue, 10 Nov 2026 18:18:54 +0000
+        bh=euMDcLXwVyFRBye3EMDIFi0Mnp2snBdaowuxW7mbjUU=;
+        b=smXx68zzHrBAMegMesYX2Whl//MOQmfsap2EQfAHcGELEeZSpfK/AkWN7HJKbIpM+O
+         cKmG8+KvC++aYizBCHN32RZFuvX7Xu5JGPXsazjF4BhBeG9Ky7Qi+58HznbbyaC+63nS
+         C0f8/9IGwhzp9J9/K88m3zrWEBSAGCzEHCsk7zLVEI5zfGDQvYcdFhMswemdulMs4kKu
+         f25D70AnQ9H74mWUuhWyst4kHHpncoVEbA4PRSbRYojR7djcqBd0jkIzGfUkXjX74EDL
+         66ZkdPzqmjGw1rviWkeSl/qDNQXCv59JGzeW6jBdVIV3aKNPuwpxXueXXjJ/Aj4ivs04
+         NlKA==
+X-Forwarded-Encrypted: i=1; AL+hErG4vzwhNCB4ceEYNWLxsOkURjrBucxUzOSVZXvBrH8KwqYP1qX8w+TWdZcbN8UUAP61G03m81dzagliicM=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/PKx87C7CKhVd9UM0kvhzCDTatuYZSFT0NvMjPjQGGbxPQjrG0
+	lGkf7+kqsn+upzGqSr0p3IfNZszZeBr4PyIDhSa8Jqo3gI/WzSSke3iiDLKpbSWVoQN55RJ+QZF
+	ueghL6Prs6oxOb/mAdrqHJR+iOoastgQ=
+X-Gm-Gg: AYBFou1LuurEO0ss3Jo/OGtr1ye6eo3W+KIhhalcbDZpHjaMn8RUv5UNlgAt2YO4phq
+	gzXE4fKJoeG30d7zMvQtM4yiTAWRIg1pt7s1h59rpbIDACW/ihJPY4eGKhOU3Rfl0rwQkdZgTzF
+	Nh0E8a8VNsTkqaqqozgDGXsV3xqnStWwqVyrFkMu27UyiPOZU2wTkU//nYMnkzNRRur1MGH1bIb
+	+HBIzTrgYu1uxZtUkfHAhia9KwUR4KMWmGwhtVn7P0rkK5l1Awey/kLD6x2fc4e//1SB1sK+yAP
+	jKFDo6SGvWzqQJSbzSLjGE4oHFAUOv4bZENHm5ARdIOrr0q5YJxb0HDAfU3RgbNkV4gYaZhGccD
+	ASE2EVEoAb4FZD5SFl5p+ZmWWfAPi7BFzl8TgmdUhq3ukVT861hdDNLtnYrPxG9naQBUOcWc9CN
+	qse/suaSzC9LmDCMM9s+TWd+V/nLg08kv6QgnAZdYLU9OME7AjanlAvaKJiJ2swOHcg1NF4j3bu
+	cDqnHDrZzTRketf8NnA90r/pLjb2beBPgPMRPm8/jwMvgGYReIVYH4leA==
+X-Received: by 2002:a17:90b:4b0e:b0:3ab:be66:ddc5 with SMTP id
+ 98e67ed59e1d1-3b182f3642cmr189775a91.6.1794342681275; Tue, 10 Nov 2026
+ 12:31:21 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -92,150 +106,51 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Julian Braha <julianbraha@gmail.com>
-Subject: Re: [PATCH v1 00/10] tools: Introduce a kernel configuration checker
-To: "Ahmed S. Darwish" <darwi@linutronix.de>
-Cc: Clark Williams <clrkwllms@kernel.org>,
- Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Frederic Weisbecker <frederic@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jonathan Corbet <corbet@lwn.net>, John Ogness <john.ogness@linutronix.de>,
- Derek Barbosa <debarbos@redhat.com>,
- =?UTF-8?Q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
- Daan De Meyer <daan.j.demeyer@gmail.com>,
- Luca Boccassi <luca.boccassi@gmail.com>, linux-rt-devel@lists.linux.dev,
- debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, arighi@nvidia.com
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <a20153cd-d148-4618-8089-ad81cb16fe23@gmail.com> <avHroNa1vcxmCIOs@lx-t490>
-Content-Language: en-US
-In-Reply-To: <avHroNa1vcxmCIOs@lx-t490>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------mHZpGD8kyHvacYrtSD2O5A48"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------mHZpGD8kyHvacYrtSD2O5A48
-Content-Type: multipart/mixed; boundary="------------ULacv4ysiB0EGOGi4fngWV05";
- protected-headers="v1"; hp="clear"
-Message-ID: <c0ccddbc-539c-4987-8685-ec996285f746@gmail.com>
-Date: Tue, 10 Nov 2026 18:18:54 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Julian Braha <julianbraha@gmail.com>
-Subject: Re: [PATCH v1 00/10] tools: Introduce a kernel configuration checker
-To: "Ahmed S. Darwish" <darwi@linutronix.de>
-Cc: Clark Williams <clrkwllms@kernel.org>,
- Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Frederic Weisbecker <frederic@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jonathan Corbet <corbet@lwn.net>, John Ogness <john.ogness@linutronix.de>,
- Derek Barbosa <debarbos@redhat.com>,
- =?UTF-8?Q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
- Daan De Meyer <daan.j.demeyer@gmail.com>,
- Luca Boccassi <luca.boccassi@gmail.com>, linux-rt-devel@lists.linux.dev,
- debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, arighi@nvidia.com
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <a20153cd-d148-4618-8089-ad81cb16fe23@gmail.com> <avHroNa1vcxmCIOs@lx-t490>
-Content-Language: en-US
-In-Reply-To: <avHroNa1vcxmCIOs@lx-t490>
-
---------------ULacv4ysiB0EGOGi4fngWV05
-Content-Type: text/plain; charset=UTF-8
+References: <20261018175457.87803-1-ojeda@kernel.org>
+In-Reply-To: <20261018175457.87803-1-ojeda@kernel.org>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 10 Nov 2026 21:31:08 +0100
+X-Gm-Features: AclHuK_uckGpnRQludUiuJa2Hr3E-2Svi5DrMdfVjm-Nu4czLx7g97kWJ04gZ0I
+Message-ID: <CANiq72npfiOC2ZCan-zAe-h79kba_5jtWFAeAoigCs_hnO8gJA@mail.gmail.com>
+Subject: Re: [PATCH] x86/rust: use `-Zindirect-branch-cs-prefix` for RETPOLINE builds
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Sami Tolvanen <samitolvanen@google.com>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	stable@vger.kernel.org, Kent Overstreet <kent.overstreet@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 11/9/26 15:49, Ahmed S. Darwish wrote:
-> Hi Julian,
->=20
-> On Sun, 08 Nov 2026, Julian Braha wrote:
->> Cool tool =F0=9F=99=82
->>
-> Thanks!
->=20
->>> If no ruleset is specified, the target prints the available rulesets:=
+On Sun, Oct 18, 2026 at 7:55=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wro=
+te:
+>
+> The C compiler is asked to add a `cs` prefix to the `call` and `jmp`
+> instructions that go through the indirect thunks for the `r8`-`r15`
+> registers, which makes them 6 bytes long instead of 5. That gives
+> `patch_retpoline()` enough room to inline them, e.g. as `lfence; call
+> *%r11` for `spectre_v2=3Dretpoline,lfence`.
+>
+> However, Rust code does not get the prefix, e.g. for a
+> `CONFIG_MITIGATION_RETPOLINE=3Dy` build:
 
->>>
->>>     $ make checkconfig
->>>       Usage: make RULES=3D<profile> [OVERLAY=3D<overlay>] checkconfig=
+Any comments on this?
 
->>>       Available RULES: preempt_rt
->>>
->>> The overlay mechanism allows distributions, CI systems, and Board Sup=
-port
->> On the topic of distributions, this seems *a lot* like Canonical's
->> Annotations [1], albeit yours uses YAML and supports matching option
->> names with regex.
-> The difference is not only in the implementation details. Please see be=
-low.
->=20
->> As you say about PREEMPT_RT configuration not being
->> "one-size-fits-all", similarly there are 100+ Ubuntu kernels that need=
+If it helps, then I am happy to take it via one of the Rust trees with
+an Acked-by from x86.
 
->> to adhere to a configuration "policy".
->>
->> So this seems to be a real problem that others are having.
->>
-> Kernel configuration is definitely getting trickier.  That's why I've
-> contributed the PREEMPT_RT kernel configuration guide earlier:
->=20
->    https://docs.kernel.org/core-api/real-time/kernel-configuration.html=
+Thanks!
 
->=20
-> Regarding the Canonical tool, it's the first time I see it.  From that
-> announce e-mail, it seems that they're using it for generating a .confi=
-g:
->=20
->    Starting with 22.04 (Jammy Jellyfish), Ubuntu kernels are now using
->    only annotations to /generate/ their corresponding .config.
->=20
->    ...
->=20
->    $ ./debian/scripts/misc/annotations --arch amd64 --flavour generic >=
- .config
->=20
-> Yocto also provides a very light concept of .config generation:
->=20
->    https://docs.yoctoproject.org/kernel-dev/common.html#creating-
-> configuration-fragments
->=20
-> But this tool does not conern itself with generation.  That is, Canonic=
-al
-> can use this tool to validate that they've generated the right thing! =F0=
-=9F=98=89
-
-Yeah, Annotations also supports generation with --export.
-
-But it does support validating a config with a policy using --check [1]
-
-Anyway, the point was to provide context for the maintainers that this
-problem is bigger than PREEMPT_RT. I want to see this functionality /
-your tool in upstream.
-
-[1]
-https://git.launchpad.net/~arighi/+git/annotations-tools/tree/kconfig/run=
-=2Epy?h=3Dmain#n117
-
-- Julian Braha
-
---------------ULacv4ysiB0EGOGi4fngWV05--
-
---------------mHZpGD8kyHvacYrtSD2O5A48
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQT6qjll++tIFxF8TUPElYPCBXNxIAUCavNgDgUDAAAAAAAKCRDElYPCBXNxICmt
-AQCnoePBJmblDtx791LwMw6vMN74dOGbn1riSxrX5t4lFwEA9U+EgthEgVL036QIb6Xcl3PkwtNL
-NnsnRTbgzz+lNAI=
-=mw7w
------END PGP SIGNATURE-----
-
---------------mHZpGD8kyHvacYrtSD2O5A48--
+Cheers,
+Miguel
