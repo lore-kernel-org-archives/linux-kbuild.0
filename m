@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.226.149.38
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794398392;
-	b=VBtOxQNLGtN4kOwR8JZMqXLgKD0zLtyMH66Ig3z/kCOx9Kf9t00ehNLdmGy/d56c1fdN
-	 f6/nWqI7WtNnRJKfamhsD6BVuvbCXPK87Ap9/l4jQELroiUhddHPZVwy3atdUqXCZyekU
-	 zQyWo9kOUGQErXDncHJqYfQ6F3UgQTFMLo8suGVtQ+nZdNGWT3sV8GWa2KeXkV8D66elW
-	 FvgP+Whcdezog6IS5diFW5A8L9G1koAbt3pAU0XdvCZEj0f5KlmVkOh3mizmnKyV7KvsU
-	 7uEAr9igQm2XKT/MLG0Ak2LwXS1uhxLkRt3YN5M0h7XQcv7I3aoj5p/5p486Iep6/oA==
+	b=Q1PrEtO9g/vFuh992Wbir5AAsMUkHF4SKKBTKtttFxwOiJEUv0c/7g4Mp6omOa0Gzi/L
+	 opJq4RcBGTkkUV2ZYeJg4q8vDjBJiZt/6zabWOsN2YzfwBHaqLAmTDP6VC+uiRTN8/pVQ
+	 Ahc5R4lBWbfoWDzCtcPDnu44aDsldA2sHZRCogTz2xwiO3VgumFViM8DsWEtKF1T+ZMPq
+	 hdJ+DouIzI5+IYLJeu4r8NJSoQoFnlazvrVPIkJtSij+04rPn3m45Oitb0qLgtMSSv9/Z
+	 e6rkcWH8PtJ2Exl/SbUDeHs+ySGApDR0iLlNtD8iEDV9DRzyLJr+lY+AdIYokTWjSYg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794398392;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
 	 Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=5og5gbIFuLrK4odCnF2cFU+0oOHDzasvRkpi1DDbr2I=;
-	b=cLdCmvNp5mE6tMGUgSMLF09lNJ+/gPsvF7R/bI3IDnF1ebOlrdoj1nenvJgsbmhgDCk9
-	 lmwkrSGgk4o3gxxlQ/DQ0Gl1MIISPgwLYSH0cJAT7jiVRALw0E8E27gBP+qfO+uvM8I88
-	 HRMu3hBNWEASz9DsRNnv4iJ/K/PCWWsBcu91xtIqdxT+J1odNtS5PYdCcM2xjAHUhjNhU
-	 G1A1butx57lAj08bJmZiU7clfPaLZ5JtkvZ4VAkSwdrqvZLSo5iosYyrJ4oNIUN/ZMtZl
-	 bEXimbEiQVLKgHplUgoIH8p0jZ9d2IXy/cEePgbtE5KXnUfRmGdAxayATbU7jm/IVMw==
+	bh=IXIEde5crsRFlMCoYkqhCA6OV5jcK41Dm9/sWpoDzyU=;
+	b=d/iOlwttTaK5UpITlGNG9v2vDzljFA8h83uvDr2xAE1KMsjnk8BN77MXFLJ0edZMtmKV
+	 i7cmMOeUBmXPrDKLZ9sqFL+RFTPk6f3JtSnPu4aqa3UeQVanoyTNdNpmQwtEQoKbAJ7Fk
+	 X+pUgOT53vHL1kW1Wy3yLGE21twJHMvC8a/C0KE5MJEbHK4f5ZTwSejOM19NfiojTcb/O
+	 QUy+FcXfbBZMSFz01rVAjQL2vdgPsnBJxM87aBKoMSJrxsPjsmfzLj/ff7UUGB9eWwd3b
+	 zf30Ycjy1t1+Zntjrgyj241MMhhkYIBocDsO5zuX3NeVh0IYHKGCl6k6Lce5E2aMddA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=fail header.from=gmail.com;
 	spf=pass smtp.mailfrom=runbox.com;
-	dkim=pass header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=ChTyJA5y;
+	dkim=pass header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=BukWXFJh;
 	arc=none smtp.remote-ip=185.226.149.38
 Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD55B60A260C;
-	Wed, 11 Nov 2026 11:59:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DD55B60A260C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2965A60A2618;
+	Wed, 11 Nov 2026 11:59:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2965A60A2618
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=ChTyJA5y
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	dkim=pass (2048-bit key, unprotected) header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=BukWXFJh
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
 	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xR6zL-001rxD-RG; Wed, 11 Nov 2026 12:59:39 +0100
+	id 1xR6zQ-001ryq-5a; Wed, 11 Nov 2026 12:59:44 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=5og5gbIFuLrK4odCnF2cFU+0oOHDzasvRkpi1DDbr2I=; b=ChTyJA5y5+wuBM2O7bdH+tpas9
-	ql9IyalmR6cW5KkL5zGyIkVjpzJh6xlaP8WS8zOFkDEAyruBNFTacGUVvz8EhWxzsmvaWtGv+U2XM
-	peC0m4URPYOpy48YtVJW0/Bh95szz9AmL3ASsVIMiFLyZx08Zbbwoh9Mb4YH4y3V6vDXQ4wkNMtm3
-	hNKE6efIs+Vt91s0L1EJCMsQ3nXGwprGl0o/VxypEORoCCw0BPJtFGHN4xTEmajZD1XU8HqqT5TDa
-	PZKQ4mRzfEoBSLt3SIJBmIV1oEwDRJd3g9SMKbUSJPnVqjnqhw4KlX1sTFX9aRzKZ6zrrXaoyYTW7
-	7f8/7dSQ==;
+	bh=IXIEde5crsRFlMCoYkqhCA6OV5jcK41Dm9/sWpoDzyU=; b=BukWXFJhHBOGDYKg0CLyfHk5xc
+	G4L40XMUu6UAFE7EGxK+PjUWWAIsrivi3kGhOG5JU9sf/hzV6f9ZOiwY8RtYWDwVFf0aysja8X5+2
+	fPPJeTkD7ExwKhaEi7rJvFBBrSOzKOfpVh7oVZS3v5Dm08S6YC23sdEh+vPyKS5SZHgd7PMooBc3b
+	sGkpePrkxt6lCA0/ALejhHdNmYSsTafRnVZCINucOhre8xUwddd0rqIMVVcohx41924PW9TSKXQS0
+	bImsasYIVeR1O+qUEcZkusLtYOwIAr3UJ8SippjVUeBfN1zMPb2ObOfb/D1Z9NQWKSxCra8O56TvU
+	QFQ0x7mQ==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xR6zG-0000Uf-8m; Wed, 11 Nov 2026 12:59:34 +0100
+	id 1xR6zF-0004Jf-RV; Wed, 11 Nov 2026 12:59:33 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1xR6z4-001mRM-MH;
-	Wed, 11 Nov 2026 12:59:22 +0100
+	id 1xR6z5-001mRM-9j;
+	Wed, 11 Nov 2026 12:59:23 +0100
 From: David Laight <david.laight.linux@gmail.com>
 To: Petr Mladek <pmladek@suse.com>,
 	Kees Cook <kees@kernel.org>,
@@ -70,9 +70,9 @@ Cc: Luis Chamberlain <mcgrof@kernel.org>,
 	Andrii Nakryiko <andrii@kernel.org>,
 	Samuel Wu <wusamuel@google.com>,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v3 next 01/13] scripts/kallsyms: Avoid overrunning on-stack buffer
-Date: Wed, 11 Nov 2026 11:58:59 +0000
-Message-Id: <20261111115911.1142000-2-david.laight.linux@gmail.com>
+Subject: [PATCH v3 next 02/13] scripts/kallsyms: Improve error reporting
+Date: Wed, 11 Nov 2026 11:59:00 +0000
+Message-Id: <20261111115911.1142000-3-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261111115911.1142000-1-david.laight.linux@gmail.com>
 References: <20261111115911.1142000-1-david.laight.linux@gmail.com>
@@ -87,41 +87,336 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A maximum length symbol can be KSYM_NAME_LEN long (including the '\0').
-But the name being compressed contains a leading symbol type (e.g. T).
-So when the compressed name is expanded (after the hex is written out)
-the buffer needs to be KSYM_NAME_LEN+1 bytes long to allow to both the
-symbol type and the '\0'.
-But it is declared 'char buf[KSYM_NAME_LEN] so a maximal length name
-overwrites something on stack.
+Report fatal errors with err() not perror().
 
-Found by code inspection, seems to have been broken before the code
-was imported into git.
+Using err/errx() adds the program name to the output and allows rather
+more descriptive errors.
 
-I expect there aren't any maximal length symbols and/or the byte that
-is overwritten is something that is either zero or 'don't care'.
+Add fflush() calls before checking ferror(), use errx() for these
+since errno isn't valid.
+
+Use a single error check for the length of the compressed symbol.
+It must be shorter than the original length - but that isn't kept,
+so check against KSYM_NAME_LEN (allowing 1 for the symbol type).
+
+Move the usage() function to just before main().
+Remove the usage text from the top of file comment and put the info
+into the usage() output.
+Removes the need to keep two copies of the same text in line with
+the actual code.
+
+Add a --verbose option that outputs some timestamps.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
 
-Unchanged from v2.
+New patch for v3, subsumes the old patch 4.
 
- scripts/kallsyms.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kallsyms.c | 146 +++++++++++++++++++++++++++------------------
+ 1 file changed, 88 insertions(+), 58 deletions(-)
 
 diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index ecb444078c1c..140e888bf713 100644
+index 140e888bf713..aa3a8ec83fbb 100644
 --- a/scripts/kallsyms.c
 +++ b/scripts/kallsyms.c
-@@ -398,7 +398,7 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
- 	unsigned int best_idx[256];
- 	unsigned int *markers, markers_cnt;
- 	long bin_start;
--	char buf[KSYM_NAME_LEN];
-+	char buf[1 + KSYM_NAME_LEN];
+@@ -5,15 +5,7 @@
+  * This software may be used and distributed according to the terms
+  * of the GNU General Public License, incorporated herein by reference.
+  *
+- * Usage: kallsyms [--all-symbols] [--pc-relative] [--sysmap=out.map] in out.bin > out.S
+- *        kallsyms --sysmap=out.map in
+- *
+- *      in is vmlinux; an empty file stands for the first link, which has no
+- *  symbols yet, and gives an empty table. --sysmap also writes the symbols
+- *  in System.map format.
+- *
+- *      The byte tables go to out.bin and are pulled into out.S with .incbin;
+- *  wider tables stay assembler source for endianness and relocations.
++ * Generate asm source containing a compressed copy of the kernel symbol table.
+  *
+  *      Table compression uses all the unused char codes on the symbols and
+  *  maps these to the most used substrings (tokens). For instance, it might
+@@ -26,11 +18,13 @@
+  *
+  */
  
- 	printf("\t.section .rodata, \"a\"\n");
++#include <err.h>
+ #include <getopt.h>
+ #include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <time.h>
+ #include <ctype.h>
+ #include <limits.h>
+ #include <sys/stat.h>
+@@ -64,6 +58,7 @@ static struct sym_entry **table;
+ static unsigned int table_size, table_cnt;
+ static int all_symbols;
+ static int pc_relative;
++static int verbose;
  
+ /* A dynamic array of symbols, encoded by symbol index. */
+ struct sym_arr {
+@@ -81,6 +76,23 @@ static struct sym_arr token_syms[NR_TOKENS];
+ static unsigned char best_table[256][2];
+ static unsigned char best_table_len[256];
+ 
++static void stamp(const char *where)
++{
++	static unsigned long long prev;
++	struct timespec now;
++	unsigned long long delta;
++
++	if (!verbose)
++		return;
++
++	clock_gettime(CLOCK_MONOTONIC, &now);
++	delta = now.tv_sec * 10000ull + now.tv_nsec / 100000 - prev;
++	prev += delta;
++	if (where)
++		fprintf(stderr, "kallsyms: stamp %s %llu.%llu ms\n",
++			where, delta / 10, delta % 10);
++}
++
+ static unsigned int sym_arr_last(const struct sym_arr *arr)
+ {
+ 	return arr->cnt ? arr->sym_indexes[arr->cnt - 1] : UINT_MAX;
+@@ -110,14 +122,6 @@ static void sym_arr_free(struct sym_arr *arr)
+ 	arr->cap = 0;
+ }
+ 
+-static void usage(void)
+-{
+-	fprintf(stderr, "Usage: kallsyms [--all-symbols] [--pc-relative] [--sysmap=out.map]\n"
+-			"                in out.bin > out.S\n"
+-			"       kallsyms --sysmap=out.map vmlinux\n");
+-	exit(1);
+-}
+-
+ static char *sym_entry_name(const struct sym_entry *s)
+ {
+ 	return (char *)s->sym + 1;
+@@ -278,10 +282,8 @@ static bool file_is_empty(const char *path)
+ {
+ 	struct stat st;
+ 
+-	if (stat(path, &st)) {
+-		perror(path);
+-		exit(EXIT_FAILURE);
+-	}
++	if (stat(path, &st))
++		err(EXIT_FAILURE, "stat(%s) failed", path);
+ 
+ 	return st.st_size == 0;
+ }
+@@ -324,10 +326,8 @@ static long bin_pos(FILE *file)
+ {
+ 	const long pos = ftell(file);
+ 
+-	if (pos < 0) {
+-		perror("kallsyms: ftell");
+-		exit(EXIT_FAILURE);
+-	}
++	if (pos < 0)
++		err(EXIT_FAILURE, "ftell on bin.out file failed");
+ 
+ 	return pos;
+ }
+@@ -419,19 +419,10 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
+ 			markers[i >> 8] = off;
+ 		table[i]->seq = i;
+ 
+-		/* There cannot be any symbol of length zero. */
+-		if (table[i]->len == 0) {
+-			fprintf(stderr, "kallsyms failure: "
+-				"unexpected zero symbol length\n");
+-			exit(EXIT_FAILURE);
+-		}
+-
+-		/* Only lengths that fit in up-to-two-byte ULEB128 are supported. */
+-		if (table[i]->len > 0x3FFF) {
+-			fprintf(stderr, "kallsyms failure: "
+-				"unexpected huge symbol length\n");
+-			exit(EXIT_FAILURE);
+-		}
++		/* The length must be less than that of the original symbol. */
++		if (!table[i]->len || table[i]->len > KSYM_NAME_LEN)
++			errx(EXIT_FAILURE, "symbol %d has corrupt compressed length %d",
++			     i, table[i]->len);
+ 
+ 		/* Encode length with ULEB128. */
+ 		if (table[i]->len <= 0x7F) {
+@@ -465,6 +456,8 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
+ 
+ 	free(markers);
+ 
++	stamp("write compressed names");
++
+ 	output_label("kallsyms_token_table");
+ 	bin_start = bin_pos(out_bin_file);
+ 	off = 0;
+@@ -483,6 +476,8 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
+ 		printf("\t.short\t%d\n", best_idx[i]);
+ 	printf("\n");
+ 
++	stamp("write token table");
++
+ 	output_label("kallsyms_offsets");
+ 
+ 	for (i = 0; i < table_cnt; i++) {
+@@ -490,7 +485,7 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
+ 			long long offset = table[i]->addr - _text;
+ 
+ 			if (offset < INT_MIN || offset > INT_MAX) {
+-				fprintf(stderr, "kallsyms failure: "
++				errx(EXIT_FAILURE, "kallsyms failure: "
+ 					"relative symbol value %#llx out of range\n",
+ 					table[i]->addr);
+ 				exit(EXIT_FAILURE);
+@@ -505,6 +500,8 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
+ 	printf(".size kallsyms_offsets, . - kallsyms_offsets\n");
+ 	printf("\n");
+ 
++	stamp("write symbol values");
++
+ 	sort_symbols_by_name();
+ 	output_label("kallsyms_seqs_of_names");
+ 	bin_start = bin_pos(out_bin_file);
+@@ -515,6 +512,8 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
+ 	}
+ 	write_incbin(out_bin_name, bin_start, bin_pos(out_bin_file));
+ 	printf("\n");
++
++	stamp("write name index");
+ }
+ 
+ static unsigned int token_index(unsigned char first, unsigned char second)
+@@ -742,10 +741,13 @@ static void insert_real_symbols_in_table(void)
+ static void optimize_token_table(void)
+ {
+ 	build_initial_token_table();
++	stamp("build initial token table");
+ 
+ 	insert_real_symbols_in_table();
++	stamp("insert real symbols in table");
+ 
+ 	optimize_result();
++	stamp("optimize result");
+ }
+ 
+ /* guess for "linker script provide" symbol */
+@@ -822,6 +824,25 @@ static void sort_symbols(void)
+ 	qsort(table, table_cnt, sizeof(table[0]), compare_symbols);
+ }
+ 
++static void usage(void)
++{
++	fprintf(stderr,
++		"Usage: kallsyms [options] vmlinux out.bin > out.S\n"
++		"       kallsyms --sysmap=out.map vmlinux\n"
++		"           --all-symbols     Include all local symbols\n"
++		"           --pc-relative     Output symbols offsets\n"
++		"           --sysmap=out.map  Text map file\n"
++		"           --verbose         Extra diagnostic output\n"
++		"           vmlinux: File to read, can be empty\n"
++		"           out.S: Assembler source output file.\n"
++		"           out.bin: Binary data; included in out.S using .incbin\n"
++		"       In the second form only the symbol table out.map is generated,\n"
++		"       the compressed data is not generated.\n"
++		"       --pc-relative is required for all 64 bit kernels and relocatable\n"
++		"       32 bit ones.\n");
++	exit(EXIT_FAILURE);
++}
++
+ int main(int argc, char **argv)
+ {
+ 	const char *in, *sysmap = NULL, *out_bin_name;
+@@ -832,6 +853,7 @@ int main(int argc, char **argv)
+ 			{"all-symbols",     no_argument, &all_symbols,     1},
+ 			{"pc-relative",     no_argument, &pc_relative,     1},
+ 			{"sysmap",    required_argument, NULL,           's'},
++			{"verbose",         no_argument, &verbose,         1},
+ 			{},
+ 		};
+ 
+@@ -845,49 +867,57 @@ int main(int argc, char **argv)
+ 			usage();
+ 	}
+ 
++	stamp(NULL);
++
+ 	if (optind + 2 != argc && !(sysmap && optind + 1 == argc))
+ 		usage();
+ 
+ 	in = argv[optind];
+ 	if (sysmap) {
+ 		sysmap_out = fopen(sysmap, "w");
+-		if (!sysmap_out) {
+-			perror(sysmap);
+-			exit(EXIT_FAILURE);
+-		}
++		if (!sysmap_out)
++			err(EXIT_FAILURE, "failed to open sysmap output file %s", sysmap);
+ 	}
+ 
+ 	if (optind + 1 == argc) {
+ 		read_elf(in, sysmap_out);
+-		if (ferror(sysmap_out) || fclose(sysmap_out)) {
+-			perror(sysmap);
+-			exit(EXIT_FAILURE);
+-		}
++		fflush(sysmap_out);
++		if (ferror(sysmap_out) || fclose(sysmap_out))
++			errx(EXIT_FAILURE, "error writing sysmap file %s", sysmap);
+ 		return 0;
+ 	}
+ 
+ 	out_bin_name = argv[optind + 1];
+ 	out_bin_file = fopen(out_bin_name, "w");
+-	if (!out_bin_file) {
+-		perror(out_bin_name);
+-		exit(EXIT_FAILURE);
+-	}
++	if (!out_bin_file)
++		err(EXIT_FAILURE, "failed to open nin.out file %s", out_bin_name);
+ 
+ 	read_elf(in, sysmap_out);
+-	if (sysmap_out && (ferror(sysmap_out) || fclose(sysmap_out))) {
+-		perror(sysmap);
+-		exit(EXIT_FAILURE);
++	if (sysmap_out) {
++		fflush(sysmap_out);
++		if (ferror(sysmap_out) || fclose(sysmap_out))
++			errx(EXIT_FAILURE, "error writing sysmap file %s", sysmap);
+ 	}
++	stamp("read elf");
++
+ 	shrink_table();
++	stamp("shrink table");
++
+ 	sort_symbols();
++	stamp("sort symbols");
++
+ 	optimize_token_table();
++
+ 	write_src(out_bin_file, out_bin_name);
+ 
+ 	/* Write errors are latched in the stream, so one check at the end covers them all. */
+-	if (ferror(out_bin_file) || fclose(out_bin_file)) {
+-		perror(out_bin_name);
+-		exit(EXIT_FAILURE);
+-	}
++	fflush(out_bin_file);
++	if (ferror(out_bin_file) || fclose(out_bin_file))
++		errx(EXIT_FAILURE, "error writing out.bin file %s", out_bin_name);
++
++	fflush(stdout);
++	if (ferror(stdout))
++		errx(EXIT_FAILURE, "error writing output file");
+ 
+ 	return 0;
+ }
 -- 
 2.39.5
 
