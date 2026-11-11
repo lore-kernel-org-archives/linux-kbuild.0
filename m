@@ -1,53 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794379329;
-	b=epypi5hPWmpoRdWW86zro8faU+tFQ4JTPE0bpmJ3t6zcXuCAHds0BVYNwS2PSG/y5DAR
-	 d0xZmmOqCCwRVMpC+HlDm01KG2L5zRK80zWIPBb5AmZ/5dFLpyXHcpGVIWuS9cBnQUS/G
-	 Y2thSakx2/u8baWwpxhSvtUbz+rk/G8UVifCDHrqaC7gVn+OR0mgEklnALoWfnDmale1w
-	 z7qoKgO+xEXzYopcDbT20eA46JsyLiTLpPJEpUTIDXmTBT8bI3H9gbYrUBapzxvqwHJrz
-	 s3IGwe1w6HFwkU0Ok3bLcLL1DA4soS2RQcuAhB3KHB/KtaVhqmC9EYX9iBQKRn1fvCQ==
+	t=1794379332;
+	b=GisXD4OtKwM9IoRJFXnVOOKf7NVcjanKSYr1e3zzQAPWIwK1WpUSbiQP2DjqUNwm9Fhe
+	 wF0RlL0wT1jP9uWqIsf5BfFjLazLKqbQIBEGJmuP4yfiwNPbcuP+Kvg97pW8jn4eVK+ud
+	 kNJJO1W1LuJb6Lkp8NbgZAxPQN2Hfm/PcdBxF20qNMGkoshlgsaEXPRUJGnIzjFRuo2EN
+	 kRSUQdXWRU8WhWDsD+Awly8jEv/KCzjsf9EeaSzXrmSIBayxgan4XCg71EFwp04tZc1l+
+	 Q+q+Detg8HtdOGXhpl1C5mU6Dg7mmvjvdoWwJpsR2u18evOPjKfGGG6/DZuwWIgGUHQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794379329;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794379332;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 Mail-Followup-To:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=JMWXL0IXWU5URfYmUKPMvMiRfFnA0NQMxrEdYjaJgT0=;
-	b=4jBTT2nOU2BzKNWrM0Q/G03UHXefX/S6O0qG29ymHAXI3yWTK20zUVJn0yjDPgzxN8Cm
-	 Fuy2/Gr6D4LbSUEN8qFuN32wODQQSgLFEC8jnpmi7XSfq3qqU+BglwClcBg5GdSri3QqA
-	 dnVxgBdFjDyKlftNmJHhw7qIBHvvqXATUQbCU7q1iP6nTikmJFR7H33hNn5k7Hf8iuwoJ
-	 TTcc8ZYx9ouxxR+6mqk1VvWHVePU4oAlGhHxj4neBfeYVzpwZCP9G976ZnAlH3k5ISLh0
-	 udMitzPSRXa/d0nBAmd0FWKj4SVv4g28bsKUekFn5ZTAVHYHOF3zzWojacZ7casmMww==
+	bh=BqfUoDsUtJ55CvSWG39o66A+cikDrDRqEoXCzLkhX/E=;
+	b=zBEuFb/PpN5J1Hh6897G34jNEQoTekhvc5DGRnc5XdZR2n9qZVpeE/bEpyjcmap5MJz/
+	 +uU/kx/4gaDSQo6EWDVk0aPcL0owxJHEiXf4nZVlqS+zOnfPgmyLsmLfQT4iGaLs3P1r/
+	 6UhD/4p62S/1w+KvEoS4aNqKAabZGucvweYZR6RRBF7MmyHWmQInUoz+H/xFg9KfFeXzW
+	 4OZY47GeeD8sdB0oJpbuTCRw/+apYTLFrK0+YRI5PiTEfOE1eVWmn8OBeTbKK46I2xvoo
+	 dMQRxZ3diyr04b9T74L8vGKuBEES8oEps39UbSmwwEyZ7U4dPhQ0C0poMiJUEMRPSOg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="lA/icQm0";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NyQk0TRk;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74559606A31C;
-	Wed, 11 Nov 2026 06:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7B760A2607;
+	Wed, 11 Nov 2026 06:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lA/icQm0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81C4B1F00A06;
-	Wed, 11 Nov 2026 06:42:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NyQk0TRk
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6138B1F00A0A;
+	Wed, 11 Nov 2026 06:42:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794379329;
-	bh=JMWXL0IXWU5URfYmUKPMvMiRfFnA0NQMxrEdYjaJgT0=;
+	s=k20260515; t=1794379332;
+	bh=BqfUoDsUtJ55CvSWG39o66A+cikDrDRqEoXCzLkhX/E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lA/icQm03x4oFDQdKhJMDq5IkCpHPztAq1mDadT/f25IrRvYePGBJ6rXwORQ9u8WJ
-	 FP2za20qLk3AndaTGeBWDu+KgdQVNeUPaaF9wdPR2lJA/abLbOqdz0zVb6UsTgkMsj
-	 6VwrhKRYgCGX0XLSGP3IAfBAjiMSfGJzsuKAJsJUx54nCXKZxJH4asGSA5ijhTbWJ6
-	 iOHuVybSf3XXBSTlW6VkBRNnadLfOYeCwZIftMLKCBzoWBEcq8RzzD90MZIsXMW07p
-	 wf2yFpbl0j74NxApHQiiAyBcijZVSigYgleMnMP6mUW9e7KgYCMCn+npXBIZQaywZV
-	 XhOS4oA6YDm0w==
-Date: Wed, 11 Nov 2026 07:38:52 +0100
+	b=NyQk0TRkenFuaqwPAWagIphVBTiAsW2u5+fvVLCiAuFUzNGApWcgXnNqcphrXL9MG
+	 5PoxztFckKqVa2SYUm9QU6fRxI6lwTg+7Bz4pqEY+l+CJl7TrGJtFblPpmAWzUen0Y
+	 V8VUo/K1gFtD35waZ3gCfKv/eB83lR/R6WYDoDhoonlWw8xgMs217hN2YQUwkbqsDi
+	 K/aWZ+cKn8Eqb+Oi5frhHoMYh+qFp7yKQfMLo52/9H3x+fATkjJavQHgRCc20Zpq0x
+	 nV8Akp4XZqCZ9aBWbyB+twTjtkTsKLO9HxmPPRpOeIhbGBfBLkgIrEr6AEU7dnHth1
+	 0JsWUi+GuiGEg==
+Date: Wed, 11 Nov 2026 07:38:57 +0100
 From: Nicolas Schier <nsc@kernel.org>
 To: "Ahmed S. Darwish" <darwi@linutronix.de>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
-	Clark Williams <clrkwllms@kernel.org>,
+Cc: Clark Williams <clrkwllms@kernel.org>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Ingo Molnar <mingo@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Frederic Weisbecker <frederic@kernel.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -60,15 +59,14 @@ Cc: Nathan Chancellor <nathan@kernel.org>,
 	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
 	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 04/10] kconfig: Introduce checkconfig target
-Message-ID: <avQNfFbeoMImmtre@derry.ads.avm.de>
+Subject: Re: [PATCH v1 10/10] kconfig: Introduce OVERLAY= for make checkconfig
+Message-ID: <avQNgXSWhODyc5Fc@derry.ads.avm.de>
 Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
 	"Ahmed S. Darwish" <darwi@linutronix.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
 	Clark Williams <clrkwllms@kernel.org>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Ingo Molnar <mingo@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Frederic Weisbecker <frederic@kernel.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -82,10 +80,7 @@ Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-5-darwi@linutronix.de>
- <3dd2bb0d-8486-4630-b496-e92e4ac37c29@gmail.com>
- <20261109003909.GB3429615@ax162>
- <avHIOS9NHwCCMITd@lx-t490>
+ <20261106091922.7560-11-darwi@linutronix.de>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -97,45 +92,87 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <avHIOS9NHwCCMITd@lx-t490>
+In-Reply-To: <20261106091922.7560-11-darwi@linutronix.de>
 
-On Mon, Nov 09, 2026 at 02:18:49PM +0100, Ahmed S. Darwish wrote:
-> On Sun, 08 Nov 2026, Nathan Chancellor wrote:
-> >
-> > On Sun, Nov 08, 2026 at 06:59:45PM +0000, Julian Braha wrote:
-> > >
-> > > I think this tool may belong in scripts/ due to the kbuild integration,
-> > > as was mentioned in the past on another tool review:
-> > >
-> > > https://lore.kernel.org/linux-kbuild/20260428183101.GA3304253@ax162/
-> >
-> > Yeah, while I would prefer for the script to live in scripts/ due to
-> > being called from Kbuild, I am not sure if the rules/schemas belong
-> > there?
-> >
-> > It might be better to keep everything in tools/ for that reason,
-> > especially if this may be called externally, but I am open to other
-> > thoughts.
-> >
+On Fri, Nov 06, 2026 at 10:19:22AM +0100, Ahmed S. Darwish wrote:
+> For the kconfig checkconfig target, allow passing a rules overlay file
+> through an OVERLAY= parameter.  This is mostly intended for distribution
+> kernel packaging scripts, CI systems, and board support packages.
 > 
-> I would prefer to keep it under tools/ as well.  Because of the PREEMPT_RT
-> policy, and the possible extra policies from ELISA, etc.
+> Document this parameter at the kernel's administration guide.
 > 
-> This is why one of the development rules at the top of the Python script,
-> at patch 03/10, is:
+> Note, the detailed overlay semantics are already explained at
+> Documentation/tools/kconfig_checker.rst
 > 
->   The tool must not depend on being run inside the kernel source tree.
->   This simplifies invocation, testing and possible future packaging.
+> Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
+> ---
+>  Documentation/admin-guide/README.rst | 7 ++++++-
+>  scripts/kconfig/Makefile             | 6 ++++--
+>  2 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
+> index 77ffe4dcb85b..b62689bcda6b 100644
+> --- a/Documentation/admin-guide/README.rst
+> +++ b/Documentation/admin-guide/README.rst
+> @@ -263,7 +263,7 @@ The kconfig build system can validate the generated kernel ``.config``
+>  against a selected rules profile. Running ``make checkconfig`` prints
+>  usage information and the available profiles::
+>  
+> -  Usage: make RULES=<profile> checkconfig
+> +  Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig
+>    Available RULES: preempt_rt
+>  
+>  For example, to validate the current configuration against the PREEMPT_RT
+> @@ -278,6 +278,11 @@ selected rules profile. Each diagnostic includes a severity, such as
+>  Apply the reported changes as needed and run ``make checkconfig`` again,
+>  against the same rules, until no relevant diagnostics remain.
+>  
+> +The ``OVERLAY=`` parameter specifies an overlay file whose rules overrides
+> +the built-in mainline profile selected by ``RULES=``. It is intended for
+> +distributions kernel packaging scripts, CI systems, and board support
+> +packages.
+> +
+>  For more information, see Documentation/tools/kconfig_checker.rst
+>  
+>  Compiling the kernel
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index d67a23730259..faaa8c16ab03 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -126,6 +126,8 @@ testconfig: $(obj)/conf
+>  clean-files += tests/.cache
+>  
+>  checkconfig := $(PYTHON3) -B $(srctree)/tools/kconfig-checker/check.py
+> +checkconfig_overlay = $(if $(OVERLAY),-o "$(OVERLAY)")
+> +
+>  list_checkconfig_rules =						\
+>  	echo -n >&2 "Available RULES: ";				\
+>  	$(checkconfig) list-rules >&2;					\
+> @@ -134,7 +136,7 @@ list_checkconfig_rules =						\
+>  PHONY += checkconfig
+>  checkconfig:
+>  	$(Q)if [ -z "$(RULES)" ]; then					\
+> -		echo >&2 "Usage: make RULES=<profile> checkconfig";	\
+> +		echo >&2 "Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig"; \
+>  		$(list_checkconfig_rules);				\
+>  		exit 2;							\
+>  	fi
+> @@ -143,7 +145,7 @@ checkconfig:
+>  		$(list_checkconfig_rules);				\
+>  		exit 2;							\
+>  	fi
+> -	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)"
+> +	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)" $(checkconfig_overlay)
 
-Then, please move the argument checking from Makefile to the script
-itself.  Handling wrong arguments is good native feature for the script.
+Please add the optional overlay arguments right here:
 
-As far as I have seen when skimming through the kconfig policy checker
-code, it does not use any Kbuild variables.  So, if it is being placed
-below tools/ and does not use Kbuild at all, and is expected to be run
-w/o Linux tree context at all: why do we need an additional top-level
-Makefile target for it at all (alongside of
-'make tools/kconfig-policy-checker')?
+	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)" $(addprefix -o , "$(OVERLAY)")
+
+<bike-shedding>
+... or let kconfig-policy-checker read the 'OVERLAY' environment
+variable itself.
+</bike-shedding>
+
 
 -- 
 Nicolas
