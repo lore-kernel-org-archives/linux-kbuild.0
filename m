@@ -1,60 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.226.149.38
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794398392;
-	b=HbXJUwrKSj5CcrX1XffKsh7+2w1OwAJgiQ2+Rpjfy8C/lM7AJwLOkGMl9DZtM0WgT0LC
-	 fTLrgwBlvW36fGX6yDlhXkLrdKOk/se+OVKmCr2CEUwbyTqyBqIuWNco2I245JjY5UzDa
-	 sz0PyqjGpMpJgd8ciBXqnxs8scA8QDokoghssVpCMUibEYdygMlaA3kKkHYgy18iVjGHW
-	 YxZW2ktHhtau9/dEo+kA1IqIN+nNkT5bLSqJBRhVPc4E1oB03SBJnq74LriwXh8OjpOBk
-	 bB2GlyPDKmUDaFWbQ9oZKq/nufa+JoL8BNt3dW0QnEzcSTC9/xbjXSf5Z6YnAnyZjdw==
+	b=E/K+veXuOO1FGMuljdT6KazzbKVY2Kw6EHnOAGuTJBJ2k0ZMTyxrLA3bgt8ofe5LlCv9
+	 v/ZaFTqG/6TuvC9vpX3lFhM2tdnyPPGxG959EsW/4zjWH+PGyXbyPt6NhJ7al8UQ/QUDr
+	 /vIo3ioGdWApb0k1CEaopeUswvOVdHsRH2Xvm9cOfJXY5TgDee4vIYXMbERIzktrSGDWD
+	 7Fl+RZGApbIY4QsSray29i5lkA7nW8Gy3b2xjBP3Dv7wPGZisqMvGxq5S+7ChulhnTmT+
+	 igebZmB6rb/LmPw0BZg2BnPaPWy267Nf/QlMk1zo/VollRzh9Cqd0ojVjeXOqarNkww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794398392;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
 	 Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=F42lcRumFDtpy3odmo1wxO6UuJDNkbkiUxHz5CuV8Vk=;
-	b=N08YvsYXyVjAQn9yVkse76kYoHcMrKZQ4yPqV2hc+POK2MIO8mjinbVa+sM+cTKBx2gh
-	 ehgrHvdIyG+oPHYnUbWBZN5lMub91Er6JmlC89D/el49ELieVZpcylcxFtWAANcGI/uvi
-	 IKGiI6eUC230MW0/Nj1UvJanW4pCHXiBsUb/yy/gJQ+qvQyhlBLkhG+wokGDsreMxQULC
-	 J2YVjAiewmHshbsjrZRQI/XDN/2aNcP/dubpYrj44ChSFsjv/WTBhSM3/D3rQvzP17g7K
-	 OmNiEcdc2tbnn+cLQbEktW5JoC0B+a79wjz52jk5QBlz/cYMmLRapbmGrWeNLS0m/rQ==
+	bh=yhn8wScMRzd3oB4ma+bZ4trIlQBHGnnrBagYtK6G5Ik=;
+	b=C3iD5GojZ5HpszsF7X/EJJsoe9DAe61vHx/aIbDKwyky3KS+kXqbQE/+GqlPGC9f680n
+	 W5ggj5HEjtwJEfKmBv/4kLenLOhqltEe0Asx2ElNeuk5+aoHmxhDAtlWmYn595+6I8SL1
+	 D0hiCWRo18vsDFK5G0mj/ovoQk7UGLIGGgubNnU9gs+iBI8KigYByqzguLUORZbRk+YPj
+	 I8icDeHfNs/rZPzpBW0pznOe3rGN8TbR+rBfGoWhdF7uxUXqwh/gs2VROZ2jUHkx7/E/v
+	 soP21gSFSqeq5krxiUai54IzVDFlXlcF2oL7DYOHJKDj/SwtfObbMXKTchuV3rOiMIA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=fail header.from=gmail.com;
 	spf=pass smtp.mailfrom=runbox.com;
-	dkim=pass header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=ohbOP0Oc;
-	arc=none smtp.remote-ip=185.226.149.37
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	dkim=pass header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b="Hvi9C/Jq";
+	arc=none smtp.remote-ip=185.226.149.38
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4316D606A32A;
-	Wed, 11 Nov 2026 11:59:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4316D606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6AA60A260D;
+	Wed, 11 Nov 2026 11:59:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DD6AA60A260D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=ohbOP0Oc
+	dkim=pass (2048-bit key, unprotected) header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=Hvi9C/Jq
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xR6zL-001Sur-J8; Wed, 11 Nov 2026 12:59:39 +0100
+	id 1xR6zM-001rxF-1O; Wed, 11 Nov 2026 12:59:40 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=F42lcRumFDtpy3odmo1wxO6UuJDNkbkiUxHz5CuV8Vk=; b=ohbOP0OcsQeckpTjAtxhAvWslR
-	09SnYRqOihVRU5Ui497PvvRT/OiMoyIAhzzB/NJoYWZ71TOdDvAosV1RjXVO3Do9rxRuoXOZG/+sO
-	GzMRnnZXhFJdn2ozHqGM1sucGPgBFPcfbdnne4H2V15KGgaiZ2aTCFt0GTYNsKIDSWKpYrdKd2xaR
-	+VuHSVl/BuWovCYu7Wj+8pm2R9oUkQ36hJcqiZMP8cE5MpH38zsvxRY38zZz4vJ1h238/P42391BA
-	AsPtJ7bqq61gczm1V4pukTFNiMfU7/jCKfCDIwRtrtGFuHTiEow0mt+dOrybJmHMUr7ATExRP/dQs
-	rzeVh1Gw==;
+	bh=yhn8wScMRzd3oB4ma+bZ4trIlQBHGnnrBagYtK6G5Ik=; b=Hvi9C/JqmQi+/4PxW18TXMLnMT
+	l12eEszPuNsBXBOkX2pF1+IZ0Q6T1so21hqEJuIjA4a7NL81kEydNtfizwkFix7zoyuFrph4qLhb8
+	Kg9gIY3YzX/Y5hvxb601pvoWu3mFeGn+7vrZdSqwFQ8hzSxM++qyeIzB2Om2bNBitIGZufELaE1cV
+	Z3OdYb0mc9OxCRcryg24r4uJ4lbZZ4zjWYCrmobEYGr0ZbLYxMug7I8gSXPsqQ2vPEhdSsZX+NnQz
+	J7/kHpvXDmM0YedaBhbafFhMIKIRm//KMnhMWvpJNZhZ7TyciBm1fylaUtfyZjVovXORVQHJZ+foh
+	rb0/2d5Q==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xR6zG-0000Ub-2H; Wed, 11 Nov 2026 12:59:34 +0100
+	id 1xR6zF-0000UX-Kt; Wed, 11 Nov 2026 12:59:33 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1xR6z5-001mRM-TG;
-	Wed, 11 Nov 2026 12:59:24 +0100
+	id 1xR6z7-001mRM-6H;
+	Wed, 11 Nov 2026 12:59:25 +0100
 From: David Laight <david.laight.linux@gmail.com>
 To: Petr Mladek <pmladek@suse.com>,
 	Kees Cook <kees@kernel.org>,
@@ -70,9 +70,9 @@ Cc: Luis Chamberlain <mcgrof@kernel.org>,
 	Andrii Nakryiko <andrii@kernel.org>,
 	Samuel Wu <wusamuel@google.com>,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v3 next 03/13] scripts/elf-parse: add elf_map_big_endian() helper
-Date: Wed, 11 Nov 2026 11:59:01 +0000
-Message-Id: <20261111115911.1142000-4-david.laight.linux@gmail.com>
+Subject: [PATCH v3 next 05/13] kallsyms: Fix selftest startup delay
+Date: Wed, 11 Nov 2026 11:59:03 +0000
+Message-Id: <20261111115911.1142000-6-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261111115911.1142000-1-david.laight.linux@gmail.com>
 References: <20261111115911.1142000-1-david.laight.linux@gmail.com>
@@ -87,73 +87,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Returns 1 for big-endian, 0 for little-endian.
-While the tools are compiled for a specific architecture the target
-endianness isn't easily obtainable.
+The kallsym_selftest code clearly intends to sleep until initialisation
+is complete in order to get more reproducable timings.
 
-Use 'const Elf_Ehdr *ehdr' for the argument, change the argument of the
-very similar elf_map_machine() and elf_map_long_size() to be the same.
-All the callers either pass the correct type or 'void *'.
+Replace the schedule_timeout() calls with schedule_timeout_idle()
+so that the thread actually sleeps.
+Poll every second (not every 5) for SYSTEM_RUNNING and then wait
+another 10 seconds before starting the tests, otherwise the tests
+start as soon an init is executed.
 
-Will be used by kallsyms.
+This code is in the initial 2022 import of the tests.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
 
-New patch for v3.
+Previously patch 2.
 
- scripts/elf-parse.c | 13 +++++++------
- scripts/elf-parse.h |  5 +++--
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ kernel/kallsyms_selftest.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/elf-parse.c b/scripts/elf-parse.c
-index ce1c2a670244..24d99ab9adc0 100644
---- a/scripts/elf-parse.c
-+++ b/scripts/elf-parse.c
-@@ -170,20 +170,21 @@ static int elf_parse(const char *fname, void *addr, uint32_t types)
- 	return 0;
- }
- 
--int elf_map_machine(void *addr)
-+int elf_map_machine(const Elf_Ehdr *ehdr)
+diff --git a/kernel/kallsyms_selftest.c b/kernel/kallsyms_selftest.c
+index 8f6c4e9b3a1c..0db79237fe54 100644
+--- a/kernel/kallsyms_selftest.c
++++ b/kernel/kallsyms_selftest.c
+@@ -411,9 +411,11 @@ static int test_entry(void *p)
  {
--	Elf_Ehdr *ehdr = addr;
--
- 	return elf_parser.r2(&ehdr->e32.e_machine);
- }
+ 	int ret;
  
--int elf_map_long_size(void *addr)
-+int elf_map_long_size(const Elf_Ehdr *ehdr)
- {
--	Elf_Ehdr *ehdr = addr;
--
- 	return ehdr->e32.e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
- }
++	pr_info("waiting\n");
+ 	do {
+-		schedule_timeout(5 * HZ);
++		schedule_timeout_idle(HZ);
+ 	} while (system_state != SYSTEM_RUNNING);
++	schedule_timeout_idle(10 * HZ);
  
-+int elf_map_big_endian(const Elf_Ehdr *ehdr)
-+{
-+	return ehdr->e32.e_ident[EI_DATA] ==  ELFDATA2MSB;
-+}
-+
- static void *__elf_map(char const *fname, size_t *size, uint32_t types,
- 		       bool writable)
- {
-diff --git a/scripts/elf-parse.h b/scripts/elf-parse.h
-index c5ad754da254..72c78da5cb3a 100644
---- a/scripts/elf-parse.h
-+++ b/scripts/elf-parse.h
-@@ -318,8 +318,9 @@ static inline void w8le(uint64_t val, uint64_t *x)
- void *elf_map(char const *fname, size_t *size, uint32_t types);
- void *elf_map_ro(char const *fname, size_t *size, uint32_t types);
- void elf_unmap(void *addr, size_t size);
--int elf_map_machine(void *addr);
--int elf_map_long_size(void *addr);
-+int elf_map_machine(const Elf_Ehdr *ehdr);
-+int elf_map_long_size(const Elf_Ehdr *ehdr);
-+int elf_map_big_endian(const Elf_Ehdr *ehdr);
- 
- /* A mapped file with its section headers, section names and symbol table. */
- struct elf_file {
+ 	pr_info("start\n");
+ 	ret = test_kallsyms_basic_function();
 -- 
 2.39.5
 
