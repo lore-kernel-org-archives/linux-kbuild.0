@@ -1,57 +1,50 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794355275;
-	b=j5IAdM6cBs09Obe0y1ZOOc5Uwkw9sHdxu0oBiLUunHxMmhaxhwMOMYuU/nr3JELJgKr/
-	 HHLBlhoQYbPeWVQa9050c97qAksPObIXouNMmrIDovBc2KU+F7ez7lYoVEpw1E4jS7uvD
-	 +Ox6PY/q9YZfunfthr/s+betWiH/sCt7UPknW/VOv1ig5Jm7M4tj1E++BmEagZyc5tTm0
-	 XSRjiM3HRZYAONqLwDDbtY4KBTKlupTMPY1oJUj+SSxE+dBdqBKnjt4ygBmdKEBWrIj4s
-	 xWtPe0Vli1zDadCYkr4CeZWaI8NdJi8QK9Pb/TfLkp0vNhbx7GdadxE5zq2B0xlXjLw==
+	t=1794375775;
+	b=nPTbIU7uvRrTE8M9ef7PBQsQSp/zs/BZrt0Pznx+T+Y62XyZ0QqNbhFC/6l2gvYQ2cnu
+	 wD/DI639BXLG/bw9W/OyDxccwKynm73ZkGwqhxIdcZCtL5ouDI9W78pyxkHyF5n04pHjS
+	 3SPb2ZWZ4kQY+Pyt86EUQS5TYnl9pZSJc6nLfra0Tupzb+Lw7f7+bDzx4r4AKKdTvfWFg
+	 wUcz5Wmpow/rp0Gq/C/RSY6++FXUda6H40C/pgwMyEhj6VB6QbvDf0JN9aYdgledIuWoS
+	 3Fhhu7WKTH8tFeL7OLyi/1NuXIkH9HjKoFmWI4rwVHInSUJRaUGhRC7duYKbtgBTu8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794355275;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=4EQhYPyXvgCmzyOp93TmW0Sui1/AxR4wHC7lOiswods=;
-	b=GW9FmbHOGYyiHp+YkCeHV0osLfLy0RdTgatw7gP7ZbdcsvnVtciFtKj+ENeXkU8mjfmp
-	 LtOUxYlyXKs6neZvl14yxYJjeKmIT4WJGU0eZAT2qhAIGz/+vJStKslCbroBre2kRyuL/
-	 /0H+tCQTvCzzywQFbPd1nDIyQB7tZmaozaVGD+f+SKCkftwKyG8g+EXL1f89dhqpYKLgF
-	 X0qGmqgk2cGuxlufygfJKaXCZ37dfyCjrKYlucT1GvLsgAsFBnE2JUEhWH42OIydM8yfm
-	 +drQnBwhMnUD4fvxZv+0BZ0MRe+nofAB4GDz5zQnvjjUZ16Bzt0uVgzTTQTZcwBSYCw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794375775;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=nORocrAayItrBzyQnIC82VLVgHUTeYt27rYJZ4ki2bg=;
+	b=CmoIn6m8cGtFLfbTR/A93UhhSZtcrJTMKWwD5Oqvn9ybNN7re99fm/3znWlyOqjoZuwh
+	 DYlZe8WzuL+AmQjpR+PRHCuq/xwmCMG5bVtzCOeMZsZ3dh4u9hrSr3Gf7hvC8f04586ap
+	 38+kSKsbUDIXzYQ02XJ9NfWn5C9g9/eId2zahXXEsnpL3IQae6TN0qXhNy1KPXF+Vmcw0
+	 hal60OXARv+8iTjEs92wrZP+2KkrJHB6CyuHB0t6v6VmUzAe6/tZO062bp4S/pYi2Z+G2
+	 c09VmNjpm7vK2L3AKZosvJJMWBlfz8Cc7XX+wncwjvERH/Sdx0afBAaFPDmN+xNf28w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JUvENXyL;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JDGfmDVJ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53400606A31C
-	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 00:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8224D606A31C;
+	Wed, 11 Nov 2026 05:42:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JUvENXyL
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E3F1F0089F;
-	Wed, 11 Nov 2026 00:01:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JDGfmDVJ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD711F0089F;
+	Wed, 11 Nov 2026 05:42:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794355275;
-	bh=4EQhYPyXvgCmzyOp93TmW0Sui1/AxR4wHC7lOiswods=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=JUvENXyLfOP6HrdvS24fQILhiulc3PzH5MoPEsq3xJTgBgel+x7L+MI/EVA1Bp0Cc
-	 JRIF6VXrnFBNDRXLoM73O2S9t+oUb32K/y85qFdWVKzalS2FxRC9zEjC7OB66GKApc
-	 Cqn4/N1SQ45cPbZF+V3JIvk44RUzLtjV3w4UA70zYkCDLuqnGSM2ZV9DCsIm1tXHRQ
-	 VzyAlU5FD/jhX0nRU6p9JmrjpjgdrU6x9wPy766ccvc1/oSRGbvf1YtCt9VdimkF4C
-	 T4loq82k3db2WP2H8jFK/pF6y8eHzF9AQgm75rnck6Bag+QvJP/bxoXp7Ke/e79Ehd
-	 wSBXHHzSnH2og==
-Message-ID: <sashiko-outbox-207990@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 1/6] genksyms: fix infinite loop on declarations with
- parameter lists
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Leizhen Zhang" <lzsx618@gmail.com>, nathan@kernel.org, nsc@kernel.org
-Cc: masahiroy@kernel.org, ardb@kernel.org, rostedt@goodmis.org, hpa@zytor.com, linux-kbuild@vger.kernel.org
-In-Reply-To: <20261110000003.1719966-2-lzsx618@gmail.com>
-References: <20261110000003.1719966-1-lzsx618@gmail.com>
- <20261110000003.1719966-2-lzsx618@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Nov 2026 00:01:14 +0000
+	s=k20260515; t=1794375775;
+	bh=nORocrAayItrBzyQnIC82VLVgHUTeYt27rYJZ4ki2bg=;
+	h=From:Subject:Date:To:Cc;
+	b=JDGfmDVJ+hex/qOsctXp7GyByz7YHo7fs1BeF6Q9+rBnzTH9/zxobfEAYDngXnZCl
+	 hpc/ZHulZggoFozOnyby/57FnTzBYci6oYZta5NksFvZH6CmQeRKH7wAWG/YqSB2Ss
+	 +RDHECahClpspPZ5H6SaiF+mH7ZR92Zisi1WUQIIXj7WuH1q5XgJHJNkvYEq1rCAHB
+	 HnYfpPnGj2eXe7cGrkYeL8YVog8Uwv2zRinHrSJhEUDJMwox6gHrpnoDDuK66LvGV+
+	 Up0c6cpiDeBbpUM9PtWHELrAWs9cKetLnYsh6kE/vrxaaMcskpD5D1Zg2vfjhDy8QR
+	 34gRGCDzOtEeA==
+From: Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 0/4] scripts/Kconfig.toolchain: Document minimum supported
+ versions for dynamic checks
+Date: Tue, 10 Nov 2026 23:42:39 -0600
+Message-Id: <20261110-kconfig-toolchain-updates-v1-0-6d4fb636290e@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -60,65 +53,72 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAA/yXMQQrCMBCF4auUWTuQaakVryIu0mRSp0pSMmkRS
+ u9u1OUH7/07KGdhhWuzQ+ZNVFKsoFMD7mHjxCi+GlrTnonI4NOlGGTCktKrLiTiunhbWNFfxq6
+ nbjC2D1D/S+Yg71/7dv9b13FmV75BOI4P1EV+DH0AAAA=
+X-Change-ID: 20261110-kconfig-toolchain-updates-d8b351370a5f
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: Julian Braha <julianbraha@gmail.com>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>, 
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ llvm@lists.linux.dev
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2057; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=xzuUcXk4zdCkNBnPsLRFjsTKL6wCPr7JTtKujp6wM9s=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFlfGMKdg4obC6/N022/dPDzFq0Pmx493ro6es2ChgVnd
+ 6vdOOi9taOUhUGMi0FWTJGl+rHqcUPDOWcZb5yaBDOHlQlkCAMXpwBMpHURI8P226kM+zvOvmLn
+ sGblvCMel/uCdcPi/PbjKm9KHtdJn9Zh+B9lO2nST9/29TfYvWemLNP6yZd+a3HCjQqhyNBJ0n7
+ PfvIAAA==
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] genksyms: unresolvable ambiguous 12-char SHA in Fixes trailer
---
+Hi all,
 
-commit e896d8ddfccae8b5749722baf42845ecf75f09be
-Author: Leizhen Zhang <lzsx618@gmail.com>
+Now that we have a fairly unified location for compiler and linker
+feature checks in scripts/Kconfig.toolchain, we should make it easy to
+clean up the checks as they become obsolete through minimum supported
+version bumps by documenting when they were first supported. I somewhat
+modeled this after the documentation in compiler_attributes.h but I did
+not want it to be as verbose.
 
-> genksyms: fix infinite loop on declarations with parameter lists
->
-> decl_specifier_seq updates the global decl_spec, which is used by the ','
-> action of init_declarator_list to give each further declarator the
-> specifiers of the declaration. However, decl_specifier_seq is also used
-> for parameter declarations, so for a declaration such as
->
->   int a, f(int);
->
-> decl_spec is clobbered by the specifiers of the parameter "int" by the
-> time the ',' action runs. The action then links the parameter's own token
-> node back into its chain, creating a cycle, and copy_list_range() loops
-> forever while allocating memory:
->
->   $ printf 'int a, f(int);\n' | scripts/genksyms/genksyms
->   (hangs)
->
-> Before commit 45c9c4101d3d ("genksyms: fix memory leak when the same
-> symbol is added from source") the same corruption did not hang but
-> silently recorded a wrong type for subsequent declarators (e.g. for
-> "int f(long), a;" the type of "a" was recorded as "int f ( long a").
->
-> Only set decl_spec in decl_specifier_seq_opt, which is used at the
-> declaration level, and let decl_specifier_seq just return the last
-> specifier. Struct and union member declarations use a new
-> member_decl_specifier_seq_opt that does not touch decl_spec, so a
-> struct body nested in a parameter list cannot clobber it either.
->
-> The generated symtypes and CRCs for 149 preprocessed kernel source files
-> (1128 exported symbols) are unchanged, and no new bison conflicts are
-> introduced.
->
-> Found by fuzzing genksyms with ASan/UBSan.
->
-> The problem was found with ASan and UBSan, and the analysis and fix were
-> prepared with the help of an AI coding assistant; I reviewed and
-> tested the result.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
+In doing this archaeology, I developed a few prerequisite clean up
+patches. The first cleans up CONFIG_CC_HAS_NO_PROFILE_FN_ATTR since it
+is always 'y'. The second cleans up '-fno-addrsig' handling, as this is
+an always supported clang option for a clang specific feature. The third
+unifies the GCC specific "no allow store data races" flag.
 
-[Severity: Low]
-In the kernel repository, the 12-character prefix 1da177e4c3f4 is ambiguous
-because it matches both 1da177e4c3f41 ("Linux-2.6.12-rc2") and
-1da177e4c3f47 ("docs: git SHA prefixes are for humans"), so git cannot
-resolve the Fixes tag.  Should this use at least 13 characters, or
-reference 45c9c4101d3d ("genksyms: fix memory leak when the same symbol is
-added from source") which introduced the copy_list_range() call that loops
-forever?
+I tried to add some commentary when the option was unsupported by a
+particular implementation but I am on the fence about whether that is
+actually useful or not, especially since they might go stale if the
+other implementation starts supporting them. However, I included it
+anyways since compiler_attributes.h can have the same problem and folks
+can check before removing or adjusting the option. If people don't like
+it, I am fine with dropping them and only documenting the supported
+versions.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261110000003.1719=
-966-1-lzsx618@gmail.com?part=3D1
+---
+Nathan Chancellor (4):
+      scripts/Kconfig.toolchain: Remove CONFIG_CC_HAS_NO_PROFILE_FN_ATTR
+      scripts/Kconfig.toolchain: Do not dynamically probe '-fno-addrsig'
+      scripts/Kconfig.toolchain: Clean up '-fno-allow-store-data-races' handling
+      scripts/Kconfig.toolchain: Document minimum supported versions for dynamic checks
+
+ Makefile                  |  5 -----
+ kernel/gcov/Kconfig       |  1 -
+ scripts/Kconfig.toolchain | 45 ++++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 36 insertions(+), 15 deletions(-)
+---
+base-commit: 7f705c0ad1c7cab3d8de99a3a67937bc82fc8481
+base-tree: git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+change-id: 20261110-kconfig-toolchain-updates-d8b351370a5f
+
+Best regards,
+--  
+Cheers,
+Nathan
+
