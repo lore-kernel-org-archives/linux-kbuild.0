@@ -1,86 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.153
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794379332;
-	b=GisXD4OtKwM9IoRJFXnVOOKf7NVcjanKSYr1e3zzQAPWIwK1WpUSbiQP2DjqUNwm9Fhe
-	 wF0RlL0wT1jP9uWqIsf5BfFjLazLKqbQIBEGJmuP4yfiwNPbcuP+Kvg97pW8jn4eVK+ud
-	 kNJJO1W1LuJb6Lkp8NbgZAxPQN2Hfm/PcdBxF20qNMGkoshlgsaEXPRUJGnIzjFRuo2EN
-	 kRSUQdXWRU8WhWDsD+Awly8jEv/KCzjsf9EeaSzXrmSIBayxgan4XCg71EFwp04tZc1l+
-	 Q+q+Detg8HtdOGXhpl1C5mU6Dg7mmvjvdoWwJpsR2u18evOPjKfGGG6/DZuwWIgGUHQ==
+	t=1794381913;
+	b=yXLLfO1oW2UB2YLkY6IIoOuFXh5deHA7Wm9iHQpNND1eYJuR8xAxLZZWr2SYRXpBkbjY
+	 aHmme5c/nCT6PtCsR4LqQALnDRfJ6+tDrNlMmhcHR6qJ3pjgtkMjcxGojbNJ5I5mnYda6
+	 zMcyKjNm2D7pHMK3x0hijo7L3tV9cBiByDVsV/EUwH45EAvVoz7mft8ewKl3kAEwedNI2
+	 IZ0iEjyMbxdSuidgeThKL1tmHCT0atPC2QSztVI32wdWozmKxWNSL+mchuT0JRz2obqdT
+	 jwnsWtwFAbOCyt3QF1lALZCPEEZ3ZXQojVpeaRe3V3mCVQChlFgQLAuucMQBxVALuVQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794379332;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=BqfUoDsUtJ55CvSWG39o66A+cikDrDRqEoXCzLkhX/E=;
-	b=zBEuFb/PpN5J1Hh6897G34jNEQoTekhvc5DGRnc5XdZR2n9qZVpeE/bEpyjcmap5MJz/
-	 +uU/kx/4gaDSQo6EWDVk0aPcL0owxJHEiXf4nZVlqS+zOnfPgmyLsmLfQT4iGaLs3P1r/
-	 6UhD/4p62S/1w+KvEoS4aNqKAabZGucvweYZR6RRBF7MmyHWmQInUoz+H/xFg9KfFeXzW
-	 4OZY47GeeD8sdB0oJpbuTCRw/+apYTLFrK0+YRI5PiTEfOE1eVWmn8OBeTbKK46I2xvoo
-	 dMQRxZ3diyr04b9T74L8vGKuBEES8oEps39UbSmwwEyZ7U4dPhQ0C0poMiJUEMRPSOg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794381913;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
+	 References:Subject:Content-Type:Content-Transfer-Encoding;
+	bh=NVcjCF7rhlArp5otZJmKV4IJZw6ysmYorRuSaEeq39g=;
+	b=EJ/klaxYcQITPU3rr1Q1jGQOjZzeLWKfT25gm4hdCeCaLxwwzAbZmgjqvqenHIERr7BI
+	 lQegF0oArxqN0OupqdgNQKJGFz1+HNDtHx8fOMU3TBcyqy+tSfKd2DSPW6CGHk/LFFvhO
+	 Y1F00sUVFwd8SpCSlntMsFfnLGZgPGp0RXTWG/aLytXBSowh3NpgHcTovJyKnkC0MRtNf
+	 tcUE3/4Cc/V6iCr2jCRgwe7rXtWwzSteSyuCBazQ/a6anlrhtORCYFiO/fif2wpJSkcIw
+	 QRaRnn8wGSCoygyPtp2MWnMKNGk04iADFYF8HIqi+P0I0fuQb8l97Nr3MAcUpd+pJbg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NyQk0TRk;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=arndb.de;
+	spf=pass smtp.mailfrom=arndb.de;
+	dkim=pass header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=L6KxIxNR;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=z3G7NLTa;
+	arc=none smtp.remote-ip=103.168.172.153
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7B760A2607;
-	Wed, 11 Nov 2026 06:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01390606EDC1
+	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 07:25:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01390606EDC1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NyQk0TRk
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6138B1F00A0A;
-	Wed, 11 Nov 2026 06:42:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794379332;
-	bh=BqfUoDsUtJ55CvSWG39o66A+cikDrDRqEoXCzLkhX/E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=NyQk0TRkenFuaqwPAWagIphVBTiAsW2u5+fvVLCiAuFUzNGApWcgXnNqcphrXL9MG
-	 5PoxztFckKqVa2SYUm9QU6fRxI6lwTg+7Bz4pqEY+l+CJl7TrGJtFblPpmAWzUen0Y
-	 V8VUo/K1gFtD35waZ3gCfKv/eB83lR/R6WYDoDhoonlWw8xgMs217hN2YQUwkbqsDi
-	 K/aWZ+cKn8Eqb+Oi5frhHoMYh+qFp7yKQfMLo52/9H3x+fATkjJavQHgRCc20Zpq0x
-	 nV8Akp4XZqCZ9aBWbyB+twTjtkTsKLO9HxmPPRpOeIhbGBfBLkgIrEr6AEU7dnHth1
-	 0JsWUi+GuiGEg==
-Date: Wed, 11 Nov 2026 07:38:57 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: "Ahmed S. Darwish" <darwi@linutronix.de>
-Cc: Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 10/10] kconfig: Introduce OVERLAY= for make checkconfig
-Message-ID: <avQNgXSWhODyc5Fc@derry.ads.avm.de>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	"Ahmed S. Darwish" <darwi@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <20261106091922.7560-11-darwi@linutronix.de>
+	dkim=pass (2048-bit key, unprotected) header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=L6KxIxNR;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=z3G7NLTa
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id DFEF11400139
+	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 02:25:11 -0500 (EST)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Wed, 11 Nov 2026 02:25:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1794381908;
+	 x=1794468308; bh=NVcjCF7rhlArp5otZJmKV4IJZw6ysmYorRuSaEeq39g=; b=
+	L6KxIxNRMIcT1yT8IYRVjrM1dMK0OHipnX7SBWFUu71YQOzhbqw8kD32AMagYsxM
+	/7q9FfW+vjnU2GeG47XwS8Cj+1W9W3BFw81X7owPMUTKvd0avsi6g8cSmSWUdasV
+	yRDoGtF4tDgp+Yj5fcC1bPxc8D3Tmy+zo2EcAEvjj5Ljoe/gCiVRQ6aCPFtgkhfz
+	Omu0cVoMvngHHLJdx909PloYIcGENdAcvuHiM69SsCEy3lpcsBqn3wWKht+p6DwY
+	XjyQYMDyvg1ubEI3cjmCFJdqYsyARcfKMc550mnu5eCnXRUO7uUlvo3WfLtDJP+2
+	H8JKN1TGRG3Qm5JkB4xRwQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1794381908; x=
+	1794468308; bh=NVcjCF7rhlArp5otZJmKV4IJZw6ysmYorRuSaEeq39g=; b=z
+	3G7NLTaXAr257e6nfrvQiJ5KtR0mo50tUYXwPqZxFPIJA2+Fzxmq6CzX9KR8kY9V
+	J2nipRlboQBEde/WLECAOPHSV1TJJa+WVzzj0YUXZ0ihlFCS9YLxmjIlFcOzeAX3
+	Zkz46DdVhXa2qIslJxh3RaQL850oJ66nD5VUX5O+6ua/iPxPo27m8WG+igO0ldwn
+	ImTYGbAm+P6FF9RwLmZeYt9RVzK44EBznOvz5EV3saKweGJsRaK+FlCmnpMLzDH7
+	Khs26XQk8DP/D6gdlwCCgBUsoABuUpaJU92y3O5hjNR/dwCx0Jpc9fKxEqEWScVY
+	aWVHebOUAUoIVWVZGsKDg==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=arndb.de a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1794381908; d=arndb.de;
+	mf=PGFybmRAYXJuZGIuZGU+;
+	rt=PGxpbnV4LWtidWlsZEB2Z2VyLmtlcm5lbC5vcmc+;
+	s=fm2:rsa-sha256:CSDRG9ur9peW5/I7b2hvGNbmqU8ket9WCJ9hFlMN8hfT6X9
+	/sFgpIcaWbquDKwaJqIyBj/2rXiIjn2lMmndb4XdqkMHMxwJLUkIOM9pmz6cIa4K
+	Ns/i5Ar8pUFnXseP8KQMUlUBRF6T/osDRlDjR5hSHKbfA3CwPDbMyTDr2RP9rkWX
+	ZRnOYuwam/bpVtBm92QsjTOjjwn+iYi1vHbLxPxerDKAawcC/IO30lUThLBp4zUo
+	10HOIBs6oN5iNurj1vGrapGnMth3rOBOOIyoj8g6HfyHSkMgF6ZeXvstyD0CWxns
+	tIWZU6qjbFpV/DZZFA1BwacGFJUnyAWiQZvEo/Q==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=12;
+	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
+	from,in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:aOfYtNPU96Z48LF9ydAMuDHYASQYrZPzhjyCB5ZCr1c=:2yjuHutRCW9OHoxGJi/02rI6GR6G1quC71CFLlLGLq4=;
+X-ME-Sender: <xms:URj0atABPQVf9F9exXwZzYSqEnJ9f-pxWVMiy9pfQdvjEQIRgk5Q8A>
+    <xme:URj0amV56fGn6DWP25wI5vi7z2YWvQXZHL1-cML8p1OF0BDTdUVfBTExwA25iC1sm
+    Z8Te1SgtuaUoH0NXiq4SSLLxgeaN47thJEyuRd_VbURXx_E7NHMTsE>
+X-ME-Proxy-Cause: dmFkZTF7R6okZh2Um8O2WFtGaPAzaWVyclW81RVuzBi6m9cZ7TmARRe/JEnJbrNlQQQItw
+    loi6AILktE/emObVpnQOoJts39kbNO1tE9lDjVx7eBlNPDZcfgBtPhHI3gUzBX1klyBSPO
+    m6wo3qyh4zLIjDtKLWuqShj+TyOAqZ1v7Q59pZa+MRJi70q1m10xXXOnjOuHBwh8BdGtZX
+    wBfT3GIm3IRhkBPNEN08cAsscmQrJAEEGmmw4+yOHAVXTj+TMYx50JKq2fPV2177t7u1Vf
+    WVqJ3r+WUsPyWckx9pQux4tjABMOv7+kiwRfFGlX/GNxjIHpQDzrrLJGKc6LFG6ajvAPJ5
+    Md6xNFl92qKVOA0xTnzKgygItofKMsYM55O/5UyjPG9pyCTktHg3Sc50fWnr6IoKR6x9B8
+    wjlc7OohIm/BnEx5XUudMFUoGMRiZE7UtKpzd7/9ZYz2ri81eE1Vy0GNSjhXEtFtaHOJRX
+    qYsSTjFUjq4o1UUV/VjotQu+YrIYkBUzWp4ve48LTdJlOQvcod01SGgrVol8ayMykdGm09
+    AcHZ0cz0NGrBkOYDmG2Yjmk93K+Vp4/479OATgyw29KkniRs5I7Y5pBfveunfckfp4BQMO
+    x+4Blg8R1FLPw6Sz5a7EhCLM99FFHZWnDeo4IlFjHjoMFdpNPw2IAnZ/sqUg
+X-ME-Proxy: <xmx:Uhj0avU8SAPt3d4gASF4NFBLkMm8amAYgIXuNDXK8So34t3xOeb-Gg>
+    <xmx:Uhj0ahkwS2kIQ_Q6ALLD1IiQ3TrGc19mEahy2EkZxQe5hYbgnzGALQ>
+    <xmx:Uhj0aiB_hI8ws9ayA3Xhf7y-QnRgJq-z1b53kgAshEejKAm5CPBgRA>
+    <xmx:Uhj0aoje2PeJLHbkBCrJ7dsGlL4Us62S-Sqmz8hdwrKPt4drqbPq2w>
+    <xmx:VBj0ajZRqbiMqgfKsse5I8mHR6L9OtNHjFFh_fe-bgeC5_H-4UVFpH2q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 27A2332A0097; Wed, 11 Nov 2026 02:25:05 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -90,89 +115,43 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261106091922.7560-11-darwi@linutronix.de>
+X-ThreadId: A3PuoE8hdPmN
+Date: Wed, 11 Nov 2026 08:24:44 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Nathan Chancellor" <nathan@kernel.org>,
+ "Russell King" <linux@armlinux.org.uk>, "Nicolas Schier" <nsc@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "Sasha Levin" <sashal@kernel.org>
+Message-Id: <09d5963c-4255-4da0-8c36-5624696ab633@app.fastmail.com>
+In-Reply-To: <20261109-arm-test-kprobes-rename-v1-1-663cdbbb90c7@kernel.org>
+References: <20261109-arm-test-kprobes-rename-v1-1-663cdbbb90c7@kernel.org>
+Subject: Re: [PATCH] ARM: kprobes: Rename test-kprobes.ko to test-kprobes-arm.ko
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 06, 2026 at 10:19:22AM +0100, Ahmed S. Darwish wrote:
-> For the kconfig checkconfig target, allow passing a rules overlay file
-> through an OVERLAY= parameter.  This is mostly intended for distribution
-> kernel packaging scripts, CI systems, and board support packages.
-> 
-> Document this parameter at the kernel's administration guide.
-> 
-> Note, the detailed overlay semantics are already explained at
-> Documentation/tools/kconfig_checker.rst
-> 
-> Signed-off-by: Ahmed S. Darwish <darwi@linutronix.de>
-> ---
->  Documentation/admin-guide/README.rst | 7 ++++++-
->  scripts/kconfig/Makefile             | 6 ++++--
->  2 files changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/README.rst b/Documentation/admin-guide/README.rst
-> index 77ffe4dcb85b..b62689bcda6b 100644
-> --- a/Documentation/admin-guide/README.rst
-> +++ b/Documentation/admin-guide/README.rst
-> @@ -263,7 +263,7 @@ The kconfig build system can validate the generated kernel ``.config``
->  against a selected rules profile. Running ``make checkconfig`` prints
->  usage information and the available profiles::
->  
-> -  Usage: make RULES=<profile> checkconfig
-> +  Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig
->    Available RULES: preempt_rt
->  
->  For example, to validate the current configuration against the PREEMPT_RT
-> @@ -278,6 +278,11 @@ selected rules profile. Each diagnostic includes a severity, such as
->  Apply the reported changes as needed and run ``make checkconfig`` again,
->  against the same rules, until no relevant diagnostics remain.
->  
-> +The ``OVERLAY=`` parameter specifies an overlay file whose rules overrides
-> +the built-in mainline profile selected by ``RULES=``. It is intended for
-> +distributions kernel packaging scripts, CI systems, and board support
-> +packages.
-> +
->  For more information, see Documentation/tools/kconfig_checker.rst
->  
->  Compiling the kernel
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index d67a23730259..faaa8c16ab03 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -126,6 +126,8 @@ testconfig: $(obj)/conf
->  clean-files += tests/.cache
->  
->  checkconfig := $(PYTHON3) -B $(srctree)/tools/kconfig-checker/check.py
-> +checkconfig_overlay = $(if $(OVERLAY),-o "$(OVERLAY)")
-> +
->  list_checkconfig_rules =						\
->  	echo -n >&2 "Available RULES: ";				\
->  	$(checkconfig) list-rules >&2;					\
-> @@ -134,7 +136,7 @@ list_checkconfig_rules =						\
->  PHONY += checkconfig
->  checkconfig:
->  	$(Q)if [ -z "$(RULES)" ]; then					\
-> -		echo >&2 "Usage: make RULES=<profile> checkconfig";	\
-> +		echo >&2 "Usage: make RULES=<profile> [OVERLAY=<overlay>] checkconfig"; \
->  		$(list_checkconfig_rules);				\
->  		exit 2;							\
->  	fi
-> @@ -143,7 +145,7 @@ checkconfig:
->  		$(list_checkconfig_rules);				\
->  		exit 2;							\
->  	fi
-> -	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)"
-> +	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)" $(checkconfig_overlay)
+On Mon, Nov 9, 2026, at 07:46, Nathan Chancellor wrote:
+> When scripts/modules-check.sh is fixed to normalize the module's name
+> like name-fix-token does in scripts/Makefile.lib before checking that it
+> is unique [1], there is an error due to lib/tests/test_kprobes.ko and
+> arch/arm/probes/kprobes/test-kprobes.ko having the same module name.
+>
+>   error: the following would cause module name conflict:
+>     arch/arm/probes/kprobes/test-kprobes.ko
+>     lib/tests/test_kprobes.ko
+>
+>   $ modinfo arch/arm/probes/kprobes/test-kprobes.ko 
+> lib/tests/test_kprobes.ko | grep name:
+>   filename:       arch/arm/probes/kprobes/test-kprobes.ko
+>   name:           test_kprobes
+>   filename:       lib/tests/test_kprobes.ko
+>   name:           test_kprobes
+>
+> Rename arch/arm/probes/kprobes/test-kprobes.ko to test-kprobes-arm.ko to
+> make its module name unique and clear up the error.
+>
+> Reported-by: Sasha Levin <sashal@kernel.org>
+> Closes: https://lore.kernel.org/20261108225808.1809266-1-sashal@kernel.org/
+> Link: https://lore.kernel.org/20261103110411.11698-1-info@daylightlinux.ch/ [1]
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-Please add the optional overlay arguments right here:
-
-	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)" $(addprefix -o , "$(OVERLAY)")
-
-<bike-shedding>
-... or let kconfig-policy-checker read the 'OVERLAY' environment
-variable itself.
-</bike-shedding>
-
-
--- 
-Nicolas
+Acked-by: Arnd Bergmann <arnd@arndb.de>
