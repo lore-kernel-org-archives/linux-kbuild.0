@@ -1,61 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794404271;
-	b=rwqLQ0yEzbpaeEoV1HARC/MMHh35D8TRnx8LmjD8Q8l+KnzeztdwNy578GE5eKvHmDbf
-	 narFh8wzQUWcyGJ46YZVWN6uy2+6m6JV//DGRClc+yboOxSYYQuBWiWs3u+fGkhSTsV8e
-	 Sr6iz2P1JlC+LjS9QZshy3v9uEq/U7MgPU03ubMl9xvoIiF/E1kf5RA3ervJEMeimBvwG
-	 F3UZo/mwCZjAR/3hkGUjD3e8CFPJDceQFPnjBqFrqBSh/6j2pPVetkk3WUwuvYdfNNzJ4
-	 7NnCp/yKfS/zxWbBHXMdR1nq1Ez4iLMc21ojwApvRNKItkPBSEa4P+nTUvWPs3RP11w==
+	t=1794404478;
+	b=v768SQb7G06OiHVAu082gbV9SH/xe1HDjR9enfBEvhkIR3yWIX2QnEmZ8bH5li5gZ1Vo
+	 WNEpbQoZwdRtoGSLGUrt57YmtEAtLtPE6fG3zSnuh6gd0oNNRPWdDQ6zxAm2tiJ7mqitE
+	 OtSTIo7GWF2CaaRA+aTV5BT4HZJO+BCHzz+1IX291MxLcudhmn7zSCaINfbaumENDnI3x
+	 Juk3X5djIeXv9MvULB+FuICkfZBsfCZEES2RAoFlh3kun12F/QB7WZQ6OpVdzV8DUGjLl
+	 sb3/3lrXuIdxmww5BYw8+INAWytfJ9yCQPO765oN53QF/0t2Gb2rt+fO8s9wjqxKyVA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794404271;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=AR5YsUUmvUA8tIYtuqC5XeoOdiPG47ht+rYE45AwySc=;
-	b=VpvF2aaYX875bMGsknFcYmSWl797aVNlUs3adT9AIZy7hqx7msJ4mqbx4uZLJOFamSpR
-	 rzHZU5+oq/68I23mYhEx2No+HCwjbgtWZ+JTudqYgucJhE3jhV82iywIHiKrdLjbS7nvm
-	 2lHPqwFS/8Yff7GcQFPrDhcgXwRWB3Pm1lyWkLeyJdcsenf/n2Ow85cGlNonBJh4JvKBj
-	 B2IvKhkIDpYkF2fWBTFigqZ4OJXRj+9VTezI0E6eI/Gem0SVujGVMQmEssjIsfcvk2N98
-	 mreMTY3ICwco5FhMdQ5Z3Ifdi5Dkp82RggBhwLaZjWJrRVVyhqMgaRaoMV3x8rPq1Gg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794404478;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=Wf6GC0pos7NagAI8bEw9egY7U0gPHI7FXFb0Thd1+L0=;
+	b=u3VcrEyx4BgUp4sMCaegN/Bp9+KsNVWCb/U4zXHakL6xkX/S5d1vUVKsL99b51+xvu0+
+	 2xqPO1flBlWQDHsGb+dHNus7BL4HzVfEjNpY3BuO+EM05ZUa2aUMOKOr0XpjRb6D5D2gF
+	 S9hmiaOqZYwuWXr6GUX52O8rU/zZ45vROMLs0RbkW7f/UiUBxYeYdyR3dv8yHxFIZ5b/v
+	 YC7B7/Xdntcjqy75V8DXqdlztG5ukMSkXtJrQX40Ez280B3/mUj7qjnf3k9tFy35bp0Wv
+	 11MvFOq8P8oA/llji0ovzirwBIV40CWskGqF38ETbOztv5CYKg3566E/OA7LvubnW2Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TXHTRiN1;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BPoEitQX;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530B5606A31C;
-	Wed, 11 Nov 2026 13:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CBE606A31C;
+	Wed, 11 Nov 2026 13:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TXHTRiN1
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 686C21F00A06;
-	Wed, 11 Nov 2026 13:37:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BPoEitQX
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2121D1F00A05;
+	Wed, 11 Nov 2026 13:41:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794404271;
-	bh=AR5YsUUmvUA8tIYtuqC5XeoOdiPG47ht+rYE45AwySc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=TXHTRiN1HAtBNmzusFJ6ayIyK8a0YoucU5ZEF8p1Ki+NJUC5RbbD54/U1rZj3Rg6y
-	 8qjxX38BMXU0kLPoE4XMH2yWCFrfrZiZoxyyEIlCIihlb1J0dXO5E5joSjEbQhI9Ir
-	 TAsfd5ZJZTcis1PvyHqNOYs80LzOqHy0/WbA97Zo4pY0/LSz7LDptBd6kxU35berq7
-	 fY7hh+18P7d8tEEftQEzgTA4nW+sCj4cuFTvmh/m7bCFZm6m/YshHbOmQoaUpLF7Zs
-	 zqNRGUgzOSqCTmN40bfBPlGvrH+e7CveI8fjzbaCsYyywUkofwL7k0hKGHGLBK4Wyb
-	 nC/VC8eZMeTrw==
-Message-ID: <sashiko-outbox-209079@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 next 13/13] scripts/kallsyms: Reuse little-used
- compression tokens
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "David Laight" <david.laight.linux@gmail.com>, "Petr Mladek" <pmladek@suse.com>, "Kees
- Cook" <kees@kernel.org>, linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, "Jim
- Cromie" <jim.cromie@gmail.com>, "Lorenzo Stoakes" <ljs@kernel.org>
-Cc: "Luis Chamberlain" <mcgrof@kernel.org>, "Andrey Grodzovsky" <andrey.grodzovsky@crowdstrike.com>, "Steven
- Rostedt" <rostedt@goodmis.org>, "Andrii Nakryiko" <andrii@kernel.org>, "Samuel
- Wu" <wusamuel@google.com>, nathan@kernel.org, nsc@kernel.org
-In-Reply-To: <20261111115911.1142000-14-david.laight.linux@gmail.com>
-References: <20261111115911.1142000-1-david.laight.linux@gmail.com>
- <20261111115911.1142000-14-david.laight.linux@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Nov 2026 13:37:49 +0000
+	s=k20260515; t=1794404478;
+	bh=Wf6GC0pos7NagAI8bEw9egY7U0gPHI7FXFb0Thd1+L0=;
+	h=From:Subject:Date:To:Cc;
+	b=BPoEitQXjGmdN5KW2c0UNs8lVzZgLqtiUG62LOacpVojt9wHT47QNOAEaFgmxQuOT
+	 LcZQV1Rmpa0SFXblA/pTGc32JglFfvU8aiKyEumqd3dS9/eS3lIfW14vZDYpWHzIjU
+	 YV0wTPf1ps+1mvFgAGcu0Igov5ACwHbDb15HJKk4fHmJcekamygvulndI/Zzl6sIW1
+	 1zT29CX5JpyNoCgNfPIDQyLF+fv0whc3CXkgUiMdPCuQM8N0QKtdgCRelmn3I3VZrY
+	 rPmuUvk/31ofqvBaA2u4g98M9Ej4T/X8jOFCN//B3+T9MpEIf4Jh1nEMUPw2IdvHzx
+	 td5j2mqW8Pl2w==
+From: Vincent Mailhol <mailhol@kernel.org>
+Subject: [PATCH 0/3] kbuild: reduce single-build dependencies
+Date: Wed, 11 Nov 2026 14:41:02 +0100
+Message-Id: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -64,178 +52,98 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/y2N3QqCQBBGX0XmuiGVWshXCS9099OmdLX9CUF89
+ zZtboYDH+es5OEEnqpsJYePeJlsguKUkX40tgeLSUxlXqoiHTuYqMFebD+A2yiDYYMZ1sDqZOK
+ bUuqiuvLa5JqSZnboZNkT9/pgH9sndPh5/wuHd0ztcMyobTxYT+Moocpee+R8PLZYAtXb9gW6p
+ ZDJugAAAA==
+X-Change-ID: 20261111-reduce-single-build-dependencies-966646f25a0c
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ Vincent Mailhol <mailhol@kernel.org>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2245; i=mailhol@kernel.org;
+ h=from:subject:message-id; bh=ayFwgbyzCc4jEX+AV8iN6VwSnjdMzA1UPAmivFUt1tc=;
+ b=owGbwMvMwCV2McXO4Xp97WbG02pJDFlfCirKvuuFvvz37cRqRikucUmpqQLHnibsj/fY2f3Yj
+ +HZ7c7mjoksDGJcDJZiiizLyjm5FToKvcMO/bWEmcPKBDJEWqSBAQhYGPhyE/NKjXSM9Ey1DfUM
+ gQwdIwYuTgGY6ohdjAxTH/g0Km0yO39w09UoZq9t0Sp7MhbuMlfgnqe5woRFVMCFkeGa+fWV+U/
+ mC83zaIltYly2d9ZWt+1iP/b6JgXsWsv+uYgbAA==
+X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
+ fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 
-Thank you for your contribution! Sashiko AI review found 3 potential
-issues to consider:
-- [Medium] scripts/kallsyms: missing syms update on split in
-  uncompress_symbols()
-- [Low] scripts/kallsyms: premature 3-char token disqualification in
-  split_token()
-- [Low] scripts/kallsyms: unreset syms.cnt and splits in
-  sym_arr_free_all()
---
+Building a single .o file depends on the prepare target which contains a
+lot of dependencies. Some of those preparation dependencies are not
+needed for a single .o build.
 
-commit f874410df5dfe77ff678c52a66379728c6ebf5ba
-Author: David Laight <david.laight.linux@gmail.com>
+This is a small annoyance because a modification of the compilation
+flags causes several prepare dependencies to rebuild. Consequently,
+single-build incurs an artificial penalty.
 
-scripts/kallsyms: Reuse little-used compression tokens
+Move the generic preparation checks and scripts/mod out of the
+single-build preparation path. The first patch is a preparation change
+to make rq-offsets-file an explicit prepare dependency. The second
+addresses missing-syscalls check and atomic-checks. The third and last
+patch addresses scripts/mod.
 
-This commit reuses compression tokens that have few remaining references by
-expanding their occurrences in the symbol table back into their component
-tokens when a more common token pair is available.
+== Illustration ==
 
-> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> index 95ccde80359f2..dc69b802478ad 100644
-> --- a/scripts/kallsyms.c
-> +++ b/scripts/kallsyms.c
-[ ... ]
-> @@ -850,6 +894,123 @@ compress_symbols(unsigned int token_idx, int compre=
-ssed_chr)
->  	return subs;
->  }
-> =20
-> +/* Change every occurance of idx back to token_pair/triple.
-> + * This extends all the symbol table entries but frees up a token. */
-> +static __attribute__((noinline)) void
-> +uncompress_symbols(unsigned int token_pair, int idx)
-> +{
-> +	struct best_table *bt =3D best_table + idx;
-> +	unsigned int sym_idx, len;
-> +	unsigned char *sym, *p, *end;
-> +	unsigned int substitutions;
-> +	unsigned int third_char;
-> +
-> +	third_char =3D token_pair >> 16;
-> +	token_pair &=3D 0xffff;
-> +
-> +	for (int j =3D 0; j < bt->syms.cnt; j++) {
-> +		sym_idx =3D bt->syms.sym_indexes[j];
-> +
-> +		sym =3D table[sym_idx]->sym;
-> +		len =3D table[sym_idx]->len;
-> +		end =3D sym + len;
-> +
-> +		for (p =3D sym; (p =3D memchr(p, idx, len)); p +=3D 2) {
-> +			len =3D end - p - 1;
-> +			if (len) {
-> +				if (third_char) {
-> +					/* Adding three characters */
-> +					adjust_profit(sym_idx, idx, third_char, p[1], p[1]);
-> +					memmove(p + 3, p + 1, len);
-> +				} else {
-> +					adjust_profit(sym_idx, idx, token_second(token_pair), p[1], p[1]);
-> +					memmove(p + 2, p + 1, len);
-> +				}
-> +			}
-> +			if (p !=3D sym)
-> +				adjust_profit(sym_idx, p[-1], p[-1], idx, token_first(token_pair));
-> +			token_add_symbol(token_pair, sym_idx);
-> +			p[0] =3D token_first(token_pair);
-> +			p[1] =3D token_second(token_pair);
-> +			end++;
+These are the build steps triggered when changing the compilation
+flags (here: adding W=1).
 
-[Severity: Medium]
-Does uncompress_symbols() need to add sym_idx back to the .syms arrays of
-multi-character component tokens when expanding idx into token_pair?
+Before this series...
 
-If a multi-character component token was previously split (clearing its
-.syms.cnt) and later re-compressed so that first->str and second->str
-again concatenate to bt->str across a different subset of symbols,
-restoring token_first(token_pair) or token_second(token_pair) into
-table[sym_idx]->sym without adding sym_idx to its best_table[].syms array
-leaves that symbol untracked.  A subsequent split of that component token
-will then miss table[sym_idx]->sym and leave stale token bytes behind when
-the slot is reassigned.
+  $ time make W=1 init/main.o
+    CC      scripts/mod/empty.o
+    MKELF   scripts/mod/elfconfig.h
+    HOSTCC  scripts/mod/modpost.o
+    CC      scripts/mod/devicetable-offsets.s
+    HOSTCC  scripts/mod/file2alias.o
+    HOSTCC  scripts/mod/sumversion.o
+    HOSTCC  scripts/mod/symsearch.o
+    HOSTLD  scripts/mod/modpost
+    CC      kernel/bounds.s
+    CC      arch/x86/kernel/asm-offsets.s
+    CC      kernel/sched/rq-offsets.s
+    CALL    scripts/checksyscalls.sh 
+    DESCEND objtool
+    CC      init/main.o
+  
+  real	0m3.603s
+  user	0m2.839s
+  sys	0m0.959s
 
-> +			if (third_char) {
-> +				token_add_symbol(token_index(p[1], third_char), sym_idx);
-> +				p[2] =3D third_char;
-> +				end++;
-> +				p++;
-> +			}
-> +		}
-> +		table[sym_idx]->len =3D end - sym;
-> +	}
-> +
-> +	substitutions =3D bt->refs;
-> +
-> +	bt->refs =3D 0;
-> +	bt->syms.cnt =3D 0;
-> +	sym_arr_free_all(idx);
+... and after:
 
-[Severity: Low]
-Should sym_arr_free_all() reset best_table[ch].syms.cnt and
-best_table[ch].splits instead of only clearing bt->syms.cnt here?
+  $ time make W=1 init/main.o
+    CC      kernel/bounds.s
+    CC      arch/x86/kernel/asm-offsets.s
+    CC      kernel/sched/rq-offsets.s
+    DESCEND objtool
+    CC      init/main.o
+  
+  real	0m2.060s
+  user	0m1.505s
+  sys	0m0.732s
 
-When optimize_result() frees a zero-reference token via sym_arr_free_all():
+(done on an x86_64 cpu).
 
-scripts/kallsyms.c:optimize_result() {
-    ...
-		if (!(first->refs -=3D refs) && first->len > 1)
-			/* There are no references left, reuse the token. */
-			to_process[idx++] =3D sym_arr_free_all(token_first(best));
-		if (!(second->refs -=3D refs) && second->len > 1)
-			to_process[idx++] =3D sym_arr_free_all(token_second(best));
-    ...
-}
+Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+---
+Vincent Mailhol (3):
+      kbuild: make rq-offsets-file an explicit preparation dependency
+      kbuild: move preparation checks out of single-build
+      kbuild: move scripts/mod target out of single-build
 
-best_table[ch].syms.cnt and best_table[ch].splits retain their values from
-the old token.  When that slot is reused by compress_symbols(), new symbol
-indices are merged into the stale .syms list (causing uncompress_symbols()
-to scan unrelated symbols if the new token is later split), and the new
-token inherits the prior token's split count (which may already be
-max_splits).
+ Kbuild   |  7 +++++--
+ Makefile | 11 +++++++----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261111-reduce-single-build-dependencies-966646f25a0c
 
-> +
-> +	token_profit[token_pair] +=3D substitutions;
-> +	best_table[token_first(token_pair)].refs +=3D substitutions;
-> +	best_table[token_second(token_pair)].refs +=3D substitutions;
-> +
-> +	if (third_char) {
-> +		best_table[third_char].refs +=3D substitutions;
-> +		token_profit[token_index(token_second(token_pair), third_char)] +=3D s=
-ubstitutions;
-> +	}
-> +}
-> +
-> +static int split_token(unsigned int profit)
-> +{
-> +	struct best_table *bt, *first, *second;
-> +	const unsigned int max_splits =3D 10;
-> +	unsigned int i, best_token;
-> +	int best_ch =3D -1;
-> +
-> +	for (i =3D 0; i < 256; i++) {
-> +		bt =3D best_table + i;
-> +
-> +		if (bt->len =3D=3D 1 || bt->refs >=3D profit || bt->splits >=3D max_sp=
-lits)
-> +			continue;
-> +
-> +		/* Ignore tokens where the original parts have been reused ... */
-> +		first =3D &best_table[token_first(bt->token)];
-> +		second =3D &best_table[token_second(bt->token)];
-> +		if (bt->len !=3D first->len + second->len ||
-> +		    memcmp(bt->str, first->str, first->len) ||
-> +		    memcmp(bt->str + first->len, second->str, second->len)) {
-> +			/* ... unless they are three characters. */
-> +			if (bt->len !=3D 3 || bt->refs * 2 >=3D profit) {
-> +				/* Don't consider again */
-> +				bt->splits =3D max_splits;
-> +				continue;
-> +			}
+Best regards,
+--  
+Vincent Mailhol <mailhol@kernel.org>
 
-[Severity: Low]
-Does setting bt->splits =3D max_splits when bt->len =3D=3D 3 and
-bt->refs * 2 >=3D profit permanently disqualify 3-character tokens that only
-lost to a better candidate in the current scan?
-
-As the loop iterates, profit is lowered to the best candidate's cost
-(bt->refs or bt->refs * 2).  Any later 3-character token whose original
-components were reused and whose bt->refs * 2 is not strictly less than
-that running minimum gets bt->splits set to max_splits, preventing it from
-being split on subsequent calls to split_token().
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111115911.1142=
-000-1-david.laight.linux@gmail.com?part=3D13
