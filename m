@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794439028;
-	b=xnPPkC4d9b9+RBm/RHiaK5f18gpeoihslyYwHNVi3dJdfl1g1ehgaAWtin1N47A2E5AL
-	 oxN/iaEuFr6RiMHWnZ9lZo7DlIy3VWqTxPHfIZ6L+S8u5MCDouc97GxXqQ8ASHeJ36wFF
-	 a2fHHkmW7w1/FRhOeVsGyMPOynWEwt6/qHMRrWPHilC9zDwGLEyzBQBreT2MgmgLyVpRW
-	 tu5EpHaTCP+QXrTmP/ZnkujMyQfATmmGliPh22wDEtNMsJTjqJc0scMr3VHtdZoiN5zoa
-	 tADtmqnvaWhAdmfYTKtKOmYwePCccw60DoHpU+JSr32u4ISne/bHy5YwgFbga/N4FKw==
+	t=1794440037;
+	b=ZfbisPgtINSprN/alSa/NRBQDOz5WaoogFxTcwWEIcDJKQr/BT8AGC4l2Pz+IyU+uNv4
+	 L6s2uxjOLFGhteGFGbmEIwTA6/iPCbV1WF9dy7o3omVyv3jqkTq7u8h7fiPGjzI/7Y+uF
+	 4kTUUlLd4UKIwr7ZCMPvSh8m9JOudGRlIaueB+Fra0q4ltwiElN4kNUwB7ruKe7PXPFOK
+	 0s4A07SB3HGTbkKYyf9mp4tUxIuiPFfbuzNeUpUpleJYf/VMkzTYxcDfzYNtg2CCivLEz
+	 U2jEuU9XxifsU0zEJoBD17kxhO8HIAJn49Ci07ZW0xmysu9qHL+0Vr5dKWzQX03Iu+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794439028;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794440037;
 	h=Received:DKIM-Signature:Content-Type:MIME-Version:Message-Id:
 	 In-Reply-To:References:Subject:From:To:Cc:Date;
-	bh=+TLwaXUoFypgKqCxSI5029UeGIHv1KTyx47LLo41gQg=;
-	b=UKNLPcaxOr1O3kazJmta1u24HmMKVETiOGibNMafhWHYhLTtElWzmR4gNoebYjc/90bh
-	 QjOaCnbtb56XmBPDT047F8a5JHHpb0Fvbo/nUicxtNeIbZdpgn2fWH+D8CjpOzhMR5pRj
-	 3aEApRgHLSafYHy5xe6jAq3+at502jHh+DdJfzUgNfP8EcDJAtgmZeiT4COuT5ck3JiDz
-	 GiOPNRKENxcvC5E9rmbwtJjkbVvX2WXASvhXS1JUwCRtH1P1ncWVauCBCkHIB2o+Q/BtE
-	 onhIBjsQf399xBy8l6WAsgGlPctS8MwZOEjN2lZ6X9xoYaMVR4KZ4kYzKMI5V7Y4RJQ==
+	bh=F/OlDFQVTHa/HqTgHT3xJ6pLof0fezmulOfP0vkr8Hk=;
+	b=uO5hmu+ifK0v710iqQvYee8g+MV26mzaQMrW+6Vpuu/BEFk00LB/XP8t4y7e2yAMZWV0
+	 O3jgz38qHTICp8LfeiFeXQuixooIkSyU7J4RF+rge71aPhNm2r9Z3PIbhV+Ib6OF/Y3YK
+	 JWRTH9Upzqk1ZqNuaWEzVrDzzjgEL3QjC+lmjgXjIKG0rYBS4EEOyoZYec+bntCtQVKcX
+	 HFFfOFWVKvhtexEJ0mihC+2AVL7v0WHN4lc5SLEMdVltJWbNy2Dm3EJU5wUFrm5+HKSIe
+	 jvbaFY5NoNu5L5C881++x4pg5YAnPzOZqrAMG9B2d4/5gWCI+92AoOOV9jHonCk44lw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CuaLLmFd;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dUMv2gVi;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D4D606A335;
-	Wed, 11 Nov 2026 23:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CE7606A327;
+	Wed, 11 Nov 2026 23:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CuaLLmFd
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E53F01F00A06;
-	Wed, 11 Nov 2026 23:17:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dUMv2gVi
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C957E1F00A05;
+	Wed, 11 Nov 2026 23:33:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794439027;
-	bh=+TLwaXUoFypgKqCxSI5029UeGIHv1KTyx47LLo41gQg=;
+	s=k20260515; t=1794440036;
+	bh=F/OlDFQVTHa/HqTgHT3xJ6pLof0fezmulOfP0vkr8Hk=;
 	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=CuaLLmFdlotIZ/MQZfwIJdPO1l8LhkY8K8p348uATuGNigv9peV62ilcZoT/cYjCD
-	 TytY1OFXeVVrydyzL0RdCOALiOLm9Y092xnzr+zlNI+QxpqvYEOB3j/0cyB9RLyKg1
-	 uQupBgMLvSaEkNC2dZq4q2ccIKY4Mk2d3c65z+bggUDiSIeXPEeidQsLkP1TMjDXgH
-	 XuXHzjQmTzZySueQ3FTrI1evqrakgG2Qx4f+gWp+Kt09rRkDgRY6uP5U7AVOSaQNW9
-	 novC88weh8eM5EgRypovbZ6/Hn0+X2zg1MIl2+so+FoOeHErcrSHrL9v0Xca/c2EQi
-	 q+7WKO6L7Q28w==
-Content-Type: multipart/mixed; boundary="===============0184974593136184740=="
+	b=dUMv2gVi4S1+5o680lSqLmtrZyt8TESvWzh4qz6rJrzK9Bd/LYIr1/xsobcq9F9uA
+	 aHVyuOCOtpWzyI2awA+OcScSHbXZ+X85xbGBTD7OblNZhQcA9E9iBoFX22/bBT/lkv
+	 k/hFEacwx6XTPk1kRPWED/2v/8wRPiP15dVmWrNPs+k28jiLh/3IUc36QNAmXTcive
+	 Yy1WNge2cReeu7RhaDTiOpwRMu874xaGZw/VwVuBPztZKcQtTTWqsxePkJ6xIySuIS
+	 yfmPb7iR8jROle9mEGZOBGndmTP+TB61gQTDSP2HgDVJbm1x21jEjxYI+WXlLao8/1
+	 /2B0SVJaJ6ctQ==
+Content-Type: multipart/mixed; boundary="===============5782755922972440684=="
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -49,79 +49,85 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Message-Id: <54d7eddad4b50bbaa72bc31ea3219ce9a944548da1fef3eabbc1e7337d37e5f2@mail.kernel.org>
-In-Reply-To: <20261111115911.1142000-7-david.laight.linux@gmail.com>
-References: <20261111115911.1142000-7-david.laight.linux@gmail.com>
-Subject: Re: [PATCH v3 next 06/13] kallsyms: Improve selftest test_perf_kallsyms_lookup_name() output
+Message-Id: <8c6f9e7d8a4cb037b480c22ba2b6866133292bbd68ebdc777e385373950b793f@mail.kernel.org>
+In-Reply-To: <20261111115911.1142000-3-david.laight.linux@gmail.com>
+References: <20261111115911.1142000-3-david.laight.linux@gmail.com>
+Subject: Re: [PATCH v3 next 02/13] scripts/kallsyms: Improve error reporting
 From: bot+bpf-ci@kernel.org
 To: david.laight.linux@gmail.com,pmladek@suse.com,kees@kernel.org,david.laight.linux@gmail.com,linux-kernel@vger.kernel.org,linux-kbuild@vger.kernel.org,bpf@vger.kernel.org,jim.cromie@gmail.com,ljs@kernel.org
 Cc: mcgrof@kernel.org,andrey.grodzovsky@crowdstrike.com,rostedt@goodmis.org,andrii@kernel.org,wusamuel@google.com,linux-kselftest@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
-Date: Wed, 11 Nov 2026 23:17:06 +0000 (UTC)
+Date: Wed, 11 Nov 2026 23:33:55 +0000 (UTC)
 
---===============0184974593136184740==
+--===============5782755922972440684==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-> kallsyms: Improve selftest test_perf_kallsyms_lookup_name() output
+> scripts/kallsyms: Improve error reporting
 
-TL;DR: Commit message only: it says 4 functions get noinline_for_stack but the
-patch marks 5, and it omits the compression-ratio output format fix; maybe
-split that into a separate patch.
+TL;DR:
+- Error message for failing to open the output file says "nin.out", likely a
+  typo for "out.bin"
+- usage() text for --all-symbols may be inaccurate: it covers all sections,
+  not just local symbols
 
-> kallsyms: Improve selftest test_perf_kallsyms_lookup_name() output
->
-> - Improve the test stability/reproducability by taking the faster of
->   two calls to kallsyms_lookup_name().
-> - Check that kallsyms_lookup_name() returns the expected address
->   unless the symbol is duplicated.
-> - Report the names of the min/max symbols.
-> - Output an 8 line 64 entry histogram of the times taken.
-> - This shows there is a reasonably normal distribution with a small
->   number of much slower outliers that don't really affect the average.
->
-> Additionally:
-> - Add a very long symbol to check the handling of two byte lengths.
-> - Do the test_perf_kallsyms_lookup_name() last because it can take long
->   enough that the CPU frequency changes and the times reported by the
->   other tests can change.
-> - Mark the 4 test functions noinline_for_stack since they all have a
->   quite large on-stack structure.
->
-> Example output (after all these patches)
-> kallsyms_on_each_symbol() traverse all: 7742950 ns
-> kallsyms_on_each_match_symbol() traverse all: 951 ns
-> kallsyms_lookup_name() looked up 123312 symbols, average 200 ns
->         fastest 60 ns (_rs.0)
->         slowest 662 ns (The_time_has_come_the_Walrus_said_To_talk_of_many_things_Of_sho)
->         Distribution, 20ns per column, 2916 counts per *:
->         |         **
->         |        ****
->         |        ****
->         |        ****
->         |       ******
->         |       *******
->         |      *********
->         |   ******************  **    * * *
->
-> Signed-off-by: David Laight <david.laight.linux@gmail.com>
->
+> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> --- a/scripts/kallsyms.c
+> +++ b/scripts/kallsyms.c
 
-The changelog says 4 test functions are marked noinline_for_stack "since they
-all have a quite large on-stack structure", but the patch marks five:
-test_kallsyms_compression_ratio(), test_perf_kallsyms_lookup_name(),
-test_perf_kallsyms_on_each_symbol(), test_perf_kallsyms_on_each_match_symbol()
-and test_kallsyms_basic_function().
+[ ... ]
 
-test_kallsyms_compression_ratio() has only seven u32 locals and no large
-on-stack structure, so the stated reason does not cover it.
+> @@ -822,6 +824,25 @@ static void sort_symbols(void)
+>  	qsort(table, table_cnt, sizeof(table[0]), compare_symbols);
+>  }
+>  
+> +static void usage(void)
+> +{
+> +	fprintf(stderr,
+> +		"Usage: kallsyms [options] vmlinux out.bin > out.S\n"
+> +		"       kallsyms --sysmap=out.map vmlinux\n"
+> +		"           --all-symbols     Include all local symbols\n"
 
-The same function also changes its output format from "%2d.%-2d" to
-"%2d.%02d", which fixes how the fractional part is printed (12.05 used to show
-as "12.5 "). The changelog does not mention this.
+This isn't a bug, but is this description of --all-symbols accurate?
 
-Could the changelog give the right count and mention the format fix, or should
-the compression-ratio changes go in a separate patch?
+In symbol_valid() the option only disables the text range filter:
+
+    if (!all_symbols) {
+        ...
+        if (symbol_in_range(s, text_ranges,
+                            ARRAY_SIZE(text_ranges)) == 0)
+            return 0;
+
+so symbols from the data, rodata and bss sections are included, global and
+local alike.  Local text symbols are already kept without the option.  This
+also matches the CONFIG_KALLSYMS_ALL help text, "symbols from all sections".
+
+Would something like "Include symbols from all sections, not only text" be
+closer to what the code does?
+
+[ ... ]
+
+> @@ -845,49 +867,57 @@ int main(int argc, char **argv)
+[ ... ]
+>  	out_bin_name = argv[optind + 1];
+>  	out_bin_file = fopen(out_bin_name, "w");
+> -	if (!out_bin_file) {
+> -		perror(out_bin_name);
+> -		exit(EXIT_FAILURE);
+> -	}
+> +	if (!out_bin_file)
+> +		err(EXIT_FAILURE, "failed to open nin.out file %s", out_bin_name);
+
+Is "nin.out" a typo here?  usage() and the close-time message in main(),
+
+    errx(EXIT_FAILURE, "error writing out.bin file %s", out_bin_name);
+
+both call this file "out.bin".
+
+The string is changed later in the series by 317dc01f3774 ("scripts/kallsyms:
+make use of binary data output optional") to "failed to open bin.out file
+%s", which still differs from the "out.bin" used by usage() and the
+close-time message.
 
 
 ---
@@ -129,4 +135,4 @@ AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
 See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
 CI run summary: https://github.com/kernel-patches/bpf/actions/runs/43116767394
---===============0184974593136184740==--
+--===============5782755922972440684==--
