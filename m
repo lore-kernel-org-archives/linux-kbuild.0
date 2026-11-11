@@ -1,71 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794377993;
-	b=1QDsCZla8w+4j5hDuf62zdjgq4EClpz7fobB7sxYxZoENa8tioSydUO6pS+257IIPfxz
-	 0KwiTAEsTaG8/SDgi8z2/DRXUS0ushN/Zt3z3yKV4omy+x4oljgpuw8QYV0MxSmKEx+II
-	 iwbiOWrHej5Q+mbfxCjexMFbzpRedvcO2E3xpewCVNMJkCWUudIB70FLHR3R5Iq6TcpUY
-	 CJ3StKG/YNuLTHV4FqiFfY3LLudKORMOxGofHlbgeBLybfhvXAFBdC3Wza+I59gmu7Xne
-	 k+iXNiZHZD56GCAQD9ReTHGxjjvnSWPUz/LQPjbfYpkfsRX/BmTOqtnNM3NncHcu3yg==
+	t=1794378262;
+	b=083Jqf+jsS0h+IHoBBaKyWs8xUAP4OMYvUMSZusXkbzSLfaRhj++1qHm4cm7ce6H1Scg
+	 aQ212uyjg8H7lt2GNZ3n8CsYX+zz+Li9UtBhQq8FGps420dW6ndcT+2VQuXEdjZEYaFe7
+	 3Ear+wR500yEW866EjKND5ry8ZcLp6eVuDM8rq7gBe1mdu3Kbu6ue0obNTvLUZeUgs6Vu
+	 L0NygCRndu7VlSmPfmvCnj8/Sw5rvNx7sc++Bvq1unlReOhoTRxwAYUmycoCf0ayG0L+R
+	 ptuUkxSIlRdQsmZfDMkq+C8th1HMIztiOOxLrGRJYYnR8RX6GfBQRIfuhJnePFuQhAw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794377993;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=lbTuAzuPKByX5dC0q3vuXiQlAi3AAATOhhibWeU5cGc=;
-	b=Pr/Cx6iO/nIbNJe62odvZuDsGZxp5DQF5nVnjCOlTybBxxdH+WBWRSZRdbLIi6S9+CK0
-	 kglkrHFod3n1T/dNjFA13OpO65hysD3+9la0LE9pW96TR9PuET7sippLSlENeCMptqmlP
-	 ptSc8y7cz6giSRpfk9yJ6tWmxjghBdsC1S94rk2bKX2+Z9kus3R0k5LRv0lqCi4gwez7M
-	 2gz6VzwS5vPY8vASTYJLqkNEjc0wGSELANtYWE3FGc14TJxaabSKbt2S3IzUndMdWUKsp
-	 UBniRhBO+DO0DImeCvvGoFt0o368k0aP5pKC/38rm7+mkPumGL5qovONKthha/1skkg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794378262;
+	h=Received:DKIM-Signature:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
+	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=JOxuYyfrb9gbgDfv5K62rv8MvE5D5nz7Dj7W0Dso62I=;
+	b=h3nlc+zEhqfnEFKqk2UmlYBQtCjYEN0TK7eJ/vhdqjghbPxvg7pJ5b15v0dDLDLdz5id
+	 qvZ6kdvZScs4mHKH5eZZjbwaniC+Z5SHOPq9nn1xTxKnko5mn2WkPNMQYnThoiZMNOjV5
+	 X6wWxIYhpRiRI9O6VaGtO41W75Up3RQJRJxMSzRhVv6G2ehPzL91GWnThl2vV7lueo4Yw
+	 NIXbljbcYU7OWsytmKx/aM8aLHNam5coHbsbyIMXdPCifNyp5bQeN/faXrpkM/yUZj3ql
+	 tW6zz/hiNr1dXyQHxE92VNkdqjkqJYcY7Hwi+avfgfQ/n7zLQwCpckhUnlz0qEPajuA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="m+qI10S/";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aSc4GRMG;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB3F606A320;
-	Wed, 11 Nov 2026 06:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAE9606A320;
+	Wed, 11 Nov 2026 06:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m+qI10S/
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD1AF1F00A05;
-	Wed, 11 Nov 2026 06:19:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aSc4GRMG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BA4B1F00A05;
+	Wed, 11 Nov 2026 06:24:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794377993;
-	bh=lbTuAzuPKByX5dC0q3vuXiQlAi3AAATOhhibWeU5cGc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=m+qI10S/4af8hO8ERcdUo86cHJO+aAGufuIbj3GtRZ5oZb363CpJx41beMeiYJwZd
-	 qyO60G2PW1YYDKC8RUTMLF67y9nTjGpfESiM0DhiTTVn3nCpb9mt25LNl2ImO5mJ3j
-	 jJVmCl2Ubohq2xbaJgo3E2JitJfR0ngy1176DPuGFs4Exkd8F2N6z+3k77aAZKeZXh
-	 KS9YO1BwGxe20TEFkZ2xCp7zji07TK9XQ5puK8oRnQfTmIBcjqIcwMoRa1lr0MTCr2
-	 ieK747rlbuXrLbSojzLzVvuMa34kFbZQw8XK6fvQ6kAHM/niCYX7SoG/2uU5OEpES7
-	 lgOgphURVt97A==
-From: Nathan Chancellor <nathan@kernel.org>
-To: llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
- Rong Xu <xur@google.com>, Han Shen <shenhan@google.com>, 
- Nicolas Schier <nsc@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
- Douglas Anderson <dianders@chromium.org>
-Cc: Yabin Cui <yabinc@google.com>, Han Wang <nesthanwang@google.com>, 
- Nilanjana Basu <nilanjana.basu87@gmail.com>, 
- Snehasish Kumar <snehasishk@google.com>, stable@vger.kernel.org, 
- Alexandre Courbot <acourbot@nvidia.com>, Alice Ryhl <aliceryhl@google.com>, 
- Andreas Hindborg <a.hindborg@kernel.org>, Benno Lossin <lossin@kernel.org>, 
- Bill Wendling <morbo@google.com>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Boqun Feng <boqun@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Danilo Krummrich <dakr@kernel.org>, Gary Guo <gary@garyguo.net>, 
- Justin Stitt <justinstitt@google.com>, 
- Masahiro Yamada <masahiroy@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- Tamir Duberstein <tamird@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org
-In-Reply-To: <20261106113800.v2.1.I0b27923381ef34cc99cdf8b65fea2e1bafce6370@changeid>
-References: <20261106113800.v2.1.I0b27923381ef34cc99cdf8b65fea2e1bafce6370@changeid>
-Subject: Re: [PATCH v2] kbuild: AutoFDO: Disable Profi
- (-fno-sample-profile-use-profi)
-Message-Id: <179437796877.3770401.4019375927592079703.b4-ty@b4>
-Date: Wed, 11 Nov 2026 00:19:28 -0600
+	s=k20260515; t=1794378262;
+	bh=JOxuYyfrb9gbgDfv5K62rv8MvE5D5nz7Dj7W0Dso62I=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=aSc4GRMGiQX5m+E/yAsFP160niIfgExLMEAy3NLMRiwsghKII3dWbbkWu9qgkPQCN
+	 j0d8vXiLkdgTWXnfIM0C956uyrHtD3KHXXQ7gTVdGsoscT7jdwaf1B4i8WI+vqQQ8A
+	 XBq5+S5X61DQpqbQZz4SHYXpIjvy9Wg1/hNFLkBJs7f6kpxyBDNxhJzJHOHf0eWFR6
+	 kuOEeo3IKGzYTIJK+2OYQmMqg5TiG4HRUAeH52NbywqkXXv5YO6UtQNnL+DQg1eaBB
+	 2e72bUcht0tn0hKYP5McBXyb8kHf35p9z53H50gmsumYHtOs8muaUvuHnrxIxINMdN
+	 ZwIec3TI0d53g==
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -77,37 +51,50 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] check-uapi: avoid truncating the failure count in the
+ exit status
+From: Nathan Chancellor <nathan@kernel.org>
+To: Hamdy Abou El Anein <info@daylightlinux.ch>
+Cc: nathan@kernel.org, nsc@kernel.org, arnd@arndb.de, 
+ quic_johmoo@quicinc.com, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, hamdy.aea@protonmail.com
+In-Reply-To: <20261107191355.151276-1-info@daylightlinux.ch>
+References: <20261107191355.151276-1-info@daylightlinux.ch>
+Date: Wed, 11 Nov 2026 00:24:13 -0600
+Message-Id: <179437825358.3770401.4695368955990838276.b4-review@b4>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=754; i=nathan@kernel.org;
- h=from:subject:message-id; bh=8AeJkqx5Jw0PBwVRgQcq+5k3vNCrVemeTf4e0yDe/Jw=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFlfOP7//eRg7XDwzYwTgSku8h/8/xbluR/ps/r+SMs76
- QqfvK5ZRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZjIH2+G32zu7d/S8pnMsmbV
- 9lnrJ4XPZJPJ1X2ZcZZn94OqdP97Bxn+l+w7JtC/iNva992mDG3BptLctovq6tuW256+vDzYsPg
- lCwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=948; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=RFEPffWlAg9ClLarAUVGl5FRKtWYIBEKsarqpL64/DY=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFlfuAQC7k2buF93+VazZV7tK5piHh+bXhHy7+Tj+GxLI
+ xXRW+/bOkpZGMS4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEsuwZGd5df1zi5Ct54NuN
+ mIfptomrL/hnML8/Mrl4e8nzr/xbDf4x/JW7IlOSqJiwQGyi5JWphn2Fze3tGZOFih7EByh+OLw
+ mix0A
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Fri, 06 Nov 2026 11:38:01 -0800, Douglas Anderson wrote:
-> kbuild: AutoFDO: Disable Profi (-fno-sample-profile-use-profi)
+> check_uapi_files() returns the number of failed header checks as its
+> status. Bash truncates this to eight bits, so 256 failed checks return
+> zero. run() then treats the ABI check as successful. With -q, the error
+> diagnostics are hidden as well.
+> 
+> Return a boolean status instead, while keeping the full failure count
+> in the existing summary.
+> 
+> Tested the complete CLI with fixture Git trees containing 0, 1, 255,
+> 256, 257 and 512 removed headers, plus -j 1 and -q. The 256- and
+> 512-failure cases now exit 1 instead of 0.
+> 
+> AI assistance: ChatGPT/Codex identified the issue and prepared the
+> change, commit message and executable regression tests.
+> 
+> Fixes: 1f7f31bf7202 ("check-uapi: Introduce check-uapi.sh")
+> Signed-off-by: Hamdy Abou El Anein <hamdy.aea@protonmail.com>
 
-Applied to
+Seems a little contrived but the fix is simple so:
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git kbuild-fixes-unstable
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
-Thanks!
-
-[1/1] kbuild: AutoFDO: Disable Profi (-fno-sample-profile-use-profi)
-      https://git.kernel.org/kbuild/c/3df238d7a9f5a
-
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped or
-reverted. Patches applied to an "unstable" branch are accepted pending
-wider testing in -next and any post-commit review; they will generally
-be moved to the main branch in a week if no issues are found.
-
-Best regards,
 -- 
 Cheers,
 Nathan
-
 
