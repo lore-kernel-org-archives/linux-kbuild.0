@@ -1,111 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.153
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794381913;
-	b=yXLLfO1oW2UB2YLkY6IIoOuFXh5deHA7Wm9iHQpNND1eYJuR8xAxLZZWr2SYRXpBkbjY
-	 aHmme5c/nCT6PtCsR4LqQALnDRfJ6+tDrNlMmhcHR6qJ3pjgtkMjcxGojbNJ5I5mnYda6
-	 zMcyKjNm2D7pHMK3x0hijo7L3tV9cBiByDVsV/EUwH45EAvVoz7mft8ewKl3kAEwedNI2
-	 IZ0iEjyMbxdSuidgeThKL1tmHCT0atPC2QSztVI32wdWozmKxWNSL+mchuT0JRz2obqdT
-	 jwnsWtwFAbOCyt3QF1lALZCPEEZ3ZXQojVpeaRe3V3mCVQChlFgQLAuucMQBxVALuVQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794381913;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
-	 References:Subject:Content-Type:Content-Transfer-Encoding;
-	bh=NVcjCF7rhlArp5otZJmKV4IJZw6ysmYorRuSaEeq39g=;
-	b=EJ/klaxYcQITPU3rr1Q1jGQOjZzeLWKfT25gm4hdCeCaLxwwzAbZmgjqvqenHIERr7BI
-	 lQegF0oArxqN0OupqdgNQKJGFz1+HNDtHx8fOMU3TBcyqy+tSfKd2DSPW6CGHk/LFFvhO
-	 Y1F00sUVFwd8SpCSlntMsFfnLGZgPGp0RXTWG/aLytXBSowh3NpgHcTovJyKnkC0MRtNf
-	 tcUE3/4Cc/V6iCr2jCRgwe7rXtWwzSteSyuCBazQ/a6anlrhtORCYFiO/fif2wpJSkcIw
-	 QRaRnn8wGSCoygyPtp2MWnMKNGk04iADFYF8HIqi+P0I0fuQb8l97Nr3MAcUpd+pJbg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arndb.de;
-	spf=pass smtp.mailfrom=arndb.de;
-	dkim=pass header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=L6KxIxNR;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=z3G7NLTa;
-	arc=none smtp.remote-ip=103.168.172.153
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.49
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794382814;
+	b=o+6Zofs4E1jMTpJ3ydL921E3SGEhmgqKtNyN7uEHYwqrnd+D93XENLR2IO4ob+HBBqLj
+	 lyo+7qa6y9/uFOu9fChuuvfWYws28QqHD8bwdYxTyfHBQywMs7mQXYhRQ/6C9oh9c9qL1
+	 iKPc/TsU3N8pEy63/FeAz/z61mMU9WNi81sZzy/BgiMEDfjP9uBdx2HM6Toges10ygwf3
+	 yO6ZuRiHKIcQkELPqYDqBw9KF5XXxTC9TrPXWcH7uBi41qTQIDtpeb07Z5vOLoHXfTXE4
+	 mtPKQF+t7CE6KcvfHlG/6z+YAz6OfCWaLFUJY0X71/zk+KmifmxUxbgyEnBvU2Ij/ww==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794382814;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=UE+ZO+LDbUQkJMK6amSVRY89ivr6MWd0ox+os4xr0eo=;
+	b=wKhp+Sw06jqsz7zYn9zf6PgJTSaRNm3F+pnGxo4gZ2c3eo/q3EODpIUqJV6tV+J5SSdG
+	 0uAXJ65pLfGig2YiUGDeYNfaWfQDwQRE3JVts8dKGzUQh3c1AHYnwNmyt48z5OHeRcx3g
+	 4a77i40hp4jcLY6Z8g6lBrMoN7mwHiexhDhwEe+myewW+YiRKHHsAqvaVCrUBLv8nK17j
+	 QgawaEqGFUmd+v1EUxxpyLi8RxKWpfVQiTyRatUg7Uxfl7HB8ap95qvAgfDVDI3AFyFCH
+	 Irv+pKfI+YY5wd6zNeq6lJWUWCK8fjpm9eJkm5RUFQYLoDnSUq8MRSs4CnXuRD6IyvQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VCD6QF64;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.49
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01390606EDC1
-	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 07:25:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01390606EDC1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB1C606A32D
+	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 07:40:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CAB1C606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=L6KxIxNR;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=z3G7NLTa
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id DFEF11400139
-	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 02:25:11 -0500 (EST)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Wed, 11 Nov 2026 02:25:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1794381908;
-	 x=1794468308; bh=NVcjCF7rhlArp5otZJmKV4IJZw6ysmYorRuSaEeq39g=; b=
-	L6KxIxNRMIcT1yT8IYRVjrM1dMK0OHipnX7SBWFUu71YQOzhbqw8kD32AMagYsxM
-	/7q9FfW+vjnU2GeG47XwS8Cj+1W9W3BFw81X7owPMUTKvd0avsi6g8cSmSWUdasV
-	yRDoGtF4tDgp+Yj5fcC1bPxc8D3Tmy+zo2EcAEvjj5Ljoe/gCiVRQ6aCPFtgkhfz
-	Omu0cVoMvngHHLJdx909PloYIcGENdAcvuHiM69SsCEy3lpcsBqn3wWKht+p6DwY
-	XjyQYMDyvg1ubEI3cjmCFJdqYsyARcfKMc550mnu5eCnXRUO7uUlvo3WfLtDJP+2
-	H8JKN1TGRG3Qm5JkB4xRwQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1794381908; x=
-	1794468308; bh=NVcjCF7rhlArp5otZJmKV4IJZw6ysmYorRuSaEeq39g=; b=z
-	3G7NLTaXAr257e6nfrvQiJ5KtR0mo50tUYXwPqZxFPIJA2+Fzxmq6CzX9KR8kY9V
-	J2nipRlboQBEde/WLECAOPHSV1TJJa+WVzzj0YUXZ0ihlFCS9YLxmjIlFcOzeAX3
-	Zkz46DdVhXa2qIslJxh3RaQL850oJ66nD5VUX5O+6ua/iPxPo27m8WG+igO0ldwn
-	ImTYGbAm+P6FF9RwLmZeYt9RVzK44EBznOvz5EV3saKweGJsRaK+FlCmnpMLzDH7
-	Khs26XQk8DP/D6gdlwCCgBUsoABuUpaJU92y3O5hjNR/dwCx0Jpc9fKxEqEWScVY
-	aWVHebOUAUoIVWVZGsKDg==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=arndb.de a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794381908; d=arndb.de;
-	mf=PGFybmRAYXJuZGIuZGU+;
-	rt=PGxpbnV4LWtidWlsZEB2Z2VyLmtlcm5lbC5vcmc+;
-	s=fm2:rsa-sha256:CSDRG9ur9peW5/I7b2hvGNbmqU8ket9WCJ9hFlMN8hfT6X9
-	/sFgpIcaWbquDKwaJqIyBj/2rXiIjn2lMmndb4XdqkMHMxwJLUkIOM9pmz6cIa4K
-	Ns/i5Ar8pUFnXseP8KQMUlUBRF6T/osDRlDjR5hSHKbfA3CwPDbMyTDr2RP9rkWX
-	ZRnOYuwam/bpVtBm92QsjTOjjwn+iYi1vHbLxPxerDKAawcC/IO30lUThLBp4zUo
-	10HOIBs6oN5iNurj1vGrapGnMth3rOBOOIyoj8g6HfyHSkMgF6ZeXvstyD0CWxns
-	tIWZU6qjbFpV/DZZFA1BwacGFJUnyAWiQZvEo/Q==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=12;
-	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
-	from,in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:aOfYtNPU96Z48LF9ydAMuDHYASQYrZPzhjyCB5ZCr1c=:2yjuHutRCW9OHoxGJi/02rI6GR6G1quC71CFLlLGLq4=;
-X-ME-Sender: <xms:URj0atABPQVf9F9exXwZzYSqEnJ9f-pxWVMiy9pfQdvjEQIRgk5Q8A>
-    <xme:URj0amV56fGn6DWP25wI5vi7z2YWvQXZHL1-cML8p1OF0BDTdUVfBTExwA25iC1sm
-    Z8Te1SgtuaUoH0NXiq4SSLLxgeaN47thJEyuRd_VbURXx_E7NHMTsE>
-X-ME-Proxy-Cause: dmFkZTF7R6okZh2Um8O2WFtGaPAzaWVyclW81RVuzBi6m9cZ7TmARRe/JEnJbrNlQQQItw
-    loi6AILktE/emObVpnQOoJts39kbNO1tE9lDjVx7eBlNPDZcfgBtPhHI3gUzBX1klyBSPO
-    m6wo3qyh4zLIjDtKLWuqShj+TyOAqZ1v7Q59pZa+MRJi70q1m10xXXOnjOuHBwh8BdGtZX
-    wBfT3GIm3IRhkBPNEN08cAsscmQrJAEEGmmw4+yOHAVXTj+TMYx50JKq2fPV2177t7u1Vf
-    WVqJ3r+WUsPyWckx9pQux4tjABMOv7+kiwRfFGlX/GNxjIHpQDzrrLJGKc6LFG6ajvAPJ5
-    Md6xNFl92qKVOA0xTnzKgygItofKMsYM55O/5UyjPG9pyCTktHg3Sc50fWnr6IoKR6x9B8
-    wjlc7OohIm/BnEx5XUudMFUoGMRiZE7UtKpzd7/9ZYz2ri81eE1Vy0GNSjhXEtFtaHOJRX
-    qYsSTjFUjq4o1UUV/VjotQu+YrIYkBUzWp4ve48LTdJlOQvcod01SGgrVol8ayMykdGm09
-    AcHZ0cz0NGrBkOYDmG2Yjmk93K+Vp4/479OATgyw29KkniRs5I7Y5pBfveunfckfp4BQMO
-    x+4Blg8R1FLPw6Sz5a7EhCLM99FFHZWnDeo4IlFjHjoMFdpNPw2IAnZ/sqUg
-X-ME-Proxy: <xmx:Uhj0avU8SAPt3d4gASF4NFBLkMm8amAYgIXuNDXK8So34t3xOeb-Gg>
-    <xmx:Uhj0ahkwS2kIQ_Q6ALLD1IiQ3TrGc19mEahy2EkZxQe5hYbgnzGALQ>
-    <xmx:Uhj0aiB_hI8ws9ayA3Xhf7y-QnRgJq-z1b53kgAshEejKAm5CPBgRA>
-    <xmx:Uhj0aoje2PeJLHbkBCrJ7dsGlL4Us62S-Sqmz8hdwrKPt4drqbPq2w>
-    <xmx:VBj0ajZRqbiMqgfKsse5I8mHR6L9OtNHjFFh_fe-bgeC5_H-4UVFpH2q>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 27A2332A0097; Wed, 11 Nov 2026 02:25:05 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VCD6QF64
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6b757029223so1830772a12.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 10 Nov 2026 23:40:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794382812; cv=none;
+        d=google.com; s=arc-20260327;
+        b=lTta7Co7h+wRGab4euPZWmaVmDgYyUGGvINUpVVXhVSZHUV9YG83QTnYNKtTYlikz3
+         QVMM8q5nZN63+CJVpZteTJZDjCtZJ3rOyaOqVkeRALjPHtuFiOCgQuBioiE6wIyXe1E4
+         0UzytPU2pJxUjqmcZb4V3iDHJqZbaBQE6PeXHNxPY6fCOgzwJaWYDy+/Tw+A3bZTZ7DT
+         eXkWGxyoKhjGDdAwRByWk9ehJOCqMXN0ES1CsZwige6y5i1hJdAbxfOWDc09UNJW5fuH
+         9k2R0ZnQgFLOo/N0OVqYnsOg25s98Dv/kp7/mGLreCOo06NI+dvjW2H/5bTe4Uzi91Pg
+         cc2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UE+ZO+LDbUQkJMK6amSVRY89ivr6MWd0ox+os4xr0eo=;
+        fh=GThxozOZ3jvc3+hZkYvkZpvwNCTIH41Axe2QGQGZJJQ=;
+        b=EIDfUJjguUGbeuOeg/an/rbY2/eBuIAmkSxt1VuQyOs+OOhYMh/90FRp4m+OwscBf0
+         2XBugx+dsIZ+dVKdKa22j2I2n0tvWYRQc3siM9BL3PJ4f2WECmnLAQ8cXYuljT9S1rzv
+         ilUykrPXb7tCW4reAUbwlHeRLX9TIGUan5FkLtkxDgTFfwFheOqqI9AuxkymR3Ifhef3
+         pv4YgSiOfe5Xahq0OJqM+NQ+7O5Odz7ilJ8XngqZYa4IVOYYuv5vLz5S1YJw3tpr2pzb
+         H9LP0EfPtrgf14f8wowBDDiDxrYI8vF9U6WngL+O7BHoW3/NwvAtl3mGRSbxW9T53j8D
+         XhKw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794382812; x=1794987612; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=UE+ZO+LDbUQkJMK6amSVRY89ivr6MWd0ox+os4xr0eo=;
+        b=VCD6QF64cq+6EajKVeH2KGvi/U5cBgOq2QaZUPujN9TUpScC8tW0bSWQt0oDUSy4JW
+         S6Z8D6nWlIJvYo0C12W4DfrOkGdol86fJwYUUTyy4O1KRs5ZZZUMVLH5TcN2PkElzTMC
+         CDPcO/9EjC2evHTSCepGDSbwuoSelf7KCGcOupsWhHmqIXstiHNkS+oNFTvRiDsE9USX
+         LiWsrb9RYjjdGp3t/FMvX1MXOCXDbkNCM98PDcj50ceTD5evbGSrKBzvVmJsknTflsiz
+         goYBb6lxDQzfivXfrbKsifTYJfLVgLYCutTWcyI9Jo7kHyPrf094IrOod562TSGGHij3
+         JFcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794382812; x=1794987612;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UE+ZO+LDbUQkJMK6amSVRY89ivr6MWd0ox+os4xr0eo=;
+        b=L8tFDqbSegyilwwDFVJHr0oYxctUKPE7bpg+x7ogQZ7Uh3SdIIsF8b4NtpLZRmoV8Q
+         ybG6soqrbYQR6fwjskNFSub7MdVV3WmGG90+A0ItkKBFng7cl3Bg2U3yqr+aPdcHuAJX
+         0feJtMcjKdpMsbSGop+bIbsV7X8JpN6hZrJJb8zE1SO4sW7HRwhoR4GHGyTgUWHEyBb8
+         cnFMGyGoYkQxUrSkSNO5rw+PrZ9jLNZpuxTAH4C2fjfN2Pm/paDlHynI5GCAmI5JzK0r
+         0JVhP9U91Ep/N6py0X3gxkxC61WDdtVGHv4X+SQhBzY8T2zRfUb/RE9wy8ts570/jvnQ
+         e1vw==
+X-Forwarded-Encrypted: i=1; AL+hErFeaZTJxXtvPBET1xGWOcujM1tm1PKTxzzEEz203cInLPFWF4GP2bnoeSyuY8222cSmvJLpWMP1TRqXtU0=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+gRgny7pkrOLswXRY6mdA8ZZwmhb90GehXoxD24YoUa+we9BHN
+	H8xgbeuwbx0BSuzfPDf4vtpG/p5N5Z/CtLWCho2YiloIcXfLjPQlTM9Pw2oTvjNwS4xJu99Ocs3
+	5cGK4adTO6gKZ3Nebs08Gbbt4YG2w+Pk=
+X-Gm-Gg: AYBFou2HpylNm9RyUIOcuGnoq6aNiFIRN2ORHhJ4B5kH7t4HkzAFiPv5+Jtx2u1Xwy8
+	J5fM/lhsoFJFB2EdirTPNhaJU9uxddWdftrHEr3f6JniCrWT6N6C218koy/4/e814nazx4PUIWb
+	zbcRpKOum+4Osq9C/8cBEPMiybR0LNgwX7blVZd00O13lqC16Hx+VOra8+HdL/7BYoy1YFsmLtZ
+	jCp1LnMqaoTM1WOCvrYWhQbptauKfYplk5dQqMfmNHZbEXipUBpsfVSgKp2F9IrWO7mo1Eg+UMz
+	dPFF1jpYGMQcHPqs4j4eFnswosyOksmupJpgF8VZ07IpmHhe75xH9H/BSg4u1fAiGAiD6pnLb82
+	NikBXzTef1/7GWlVPyGlram0+fFT83vzMmP/Y6SUivjESOJm4wv4yWbZGQYI+ckp4NXnguQ==
+X-Received: by 2002:a05:6402:a614:b0:6b4:2aa6:2bf7 with SMTP id
+ 4fb4d7f45d1cf-6b7773fba00mr814626a12.17.1794382812113; Tue, 10 Nov 2026
+ 23:40:12 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -115,43 +104,75 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-ThreadId: A3PuoE8hdPmN
-Date: Wed, 11 Nov 2026 08:24:44 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Nathan Chancellor" <nathan@kernel.org>,
- "Russell King" <linux@armlinux.org.uk>, "Nicolas Schier" <nsc@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
- linux-kernel@vger.kernel.org, "Sasha Levin" <sashal@kernel.org>
-Message-Id: <09d5963c-4255-4da0-8c36-5624696ab633@app.fastmail.com>
-In-Reply-To: <20261109-arm-test-kprobes-rename-v1-1-663cdbbb90c7@kernel.org>
-References: <20261109-arm-test-kprobes-rename-v1-1-663cdbbb90c7@kernel.org>
-Subject: Re: [PATCH] ARM: kprobes: Rename test-kprobes.ko to test-kprobes-arm.ko
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+References: <20261105-tonyk-syscall_table-v9-0-8d1275885d9c@igalia.com> <20261105-tonyk-syscall_table-v9-10-8d1275885d9c@igalia.com>
+In-Reply-To: <20261105-tonyk-syscall_table-v9-10-8d1275885d9c@igalia.com>
+From: Magnus Lindholm <linmag7@gmail.com>
+Date: Wed, 11 Nov 2026 08:40:00 +0100
+X-Gm-Features: AclHuK-efo-IN8C0PeBM3H51GRM-qrC5WxHB8slQK0l-tYnt6GeST1OC-lb_0Yw
+Message-ID: <CA+=Fv5RNznnVyh4AM_ZTdwyK4iv-8TEO5Ejx0_81sf5CTeoGgw@mail.gmail.com>
+Subject: Re: [PATCH v9 10/15] alpha: Define entry point for
+ set_mempolicy_home_node syscall
+To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>, 
+	Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, kernel-dev@igalia.com, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, linux-alpha@vger.kernel.org, 
+	linux-s390@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	soc@lists.linux.dev, linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 9, 2026, at 07:46, Nathan Chancellor wrote:
-> When scripts/modules-check.sh is fixed to normalize the module's name
-> like name-fix-token does in scripts/Makefile.lib before checking that it
-> is unique [1], there is an error due to lib/tests/test_kprobes.ko and
-> arch/arm/probes/kprobes/test-kprobes.ko having the same module name.
->
->   error: the following would cause module name conflict:
->     arch/arm/probes/kprobes/test-kprobes.ko
->     lib/tests/test_kprobes.ko
->
->   $ modinfo arch/arm/probes/kprobes/test-kprobes.ko 
-> lib/tests/test_kprobes.ko | grep name:
->   filename:       arch/arm/probes/kprobes/test-kprobes.ko
->   name:           test_kprobes
->   filename:       lib/tests/test_kprobes.ko
->   name:           test_kprobes
->
-> Rename arch/arm/probes/kprobes/test-kprobes.ko to test-kprobes-arm.ko to
-> make its module name unique and clear up the error.
->
-> Reported-by: Sasha Levin <sashal@kernel.org>
-> Closes: https://lore.kernel.org/20261108225808.1809266-1-sashal@kernel.org/
-> Link: https://lore.kernel.org/20261103110411.11698-1-info@daylightlinux.ch/ [1]
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+Hi Andr=C3=A9
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+On Thu, Nov 5, 2026 at 9:06=E2=80=AFPM Andr=C3=A9 Almeida <andrealmeid@igal=
+ia.com> wrote:
+>
+> Instead of explicitly defining set_mempolicy_home_node as sys_ni_sycall i=
+n
+> the syscall table, define it as the real syscall entry point,
+> sys_set_mempolicy_home_node. As per commit fdb7d9b7acd0 ("alpha: remove
+> DISCONTIGMEM and NUMA"), alpha doesn't have NUMA support, so none of the
+> mempolicy sycalls will ever be compiled for alpha, resulting in the
+> COND_SYSCALL() fallback being used to result in the sys_ni_syscall.
+>
+> There's no function change here, but this step helps to unify the syscall
+> tables and create a common table to rule them all.
+>
+> Acked-by: Magnus Lindholm <linmag7@gmail.com>
+> Signed-off-by: Andr=C3=A9 Almeida <andrealmeid@igalia.com>
+> ---
+>  arch/alpha/kernel/syscalls/syscall.tbl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/alpha/kernel/syscalls/syscall.tbl b/arch/alpha/kernel/s=
+yscalls/syscall.tbl
+> index 52e3538cc7df..8fc4701a6328 100644
+> --- a/arch/alpha/kernel/syscalls/syscall.tbl
+> +++ b/arch/alpha/kernel/syscalls/syscall.tbl
+> @@ -489,7 +489,7 @@
+>  # 557 reserved for memfd_secret
+>  558    common  process_mrelease                sys_process_mrelease
+>  559    common  futex_waitv                     sys_futex_waitv
+> -560    common  set_mempolicy_home_node         sys_ni_syscall
+> +560    common  set_mempolicy_home_node         sys_set_mempolicy_home_no=
+de
+>  561    common  cachestat                       sys_cachestat
+>  562    common  fchmodat2                       sys_fchmodat2
+>  563    common  map_shadow_stack                sys_map_shadow_stack
+>
+> --
+> 2.56.0
+>
+
+My Acked-by already in this patch still stands.
+
+I tested the series against my Alpha for-next, with the integration
+adjustments described in my replies to patches 11 and 12. Full GENERIC
+SMP and DP264 UP builds passed.
+
+The generated dispatch table changes syscall 560 to
+sys_set_mempolicy_home_node as intended. Alpha has no NUMA support,
+so this still resolves to the sys_ni_syscall fallback.
+
+Thanks,
+Magnus
