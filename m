@@ -1,102 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.173
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794422911;
-	b=5SLDFTUBnmm9POmSBlN9rNCL4kizgXPI9+KxPeRiBOMaw2VKTLICRE6IEk6Hp/rAnAK7
-	 R15v5nXv/Qgij7BN98WvLhMJVY92YNvFQ9XHRQDpX4jV8hwiwcALsAUZHE780YG4fR0Cp
-	 SZiWMI+7AiwasYjZB1FavlsRc8JY3psj07/ej2qbM+j5kqGJi5EZELwcVCqeT7wuoZZQ7
-	 9cIgVH19Cans6ekL3dgj5itjKp2+gx5CEWJMwHj64p3ptPG6oEnx/hP69tKXI1u0RCJ1F
-	 NPUq1rn/1wnkpfoVdC5f2WLf7xdWXWM0Yhwrls803yu9p6K9vN/J4kTM/gc3BZPPjBA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794422911;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794423684;
+	b=OIRQt7XTmu4RsCZP1SGKCl97N4qttTyexndYAgJD/PoelvLldq80SIXphNnKz8K3U4lO
+	 oo7cxaGgZvnjV1gwkU5IYWe8Fps0WsqkQbYjCxsJvU9+lNI6EFReJ4SDobhvlpntetSNn
+	 XshL4dHM0dj2OsXTydzJ9w/7uHlx+/dFO3IOX+lXb4mar+SYoGaCwpyM5mNXBan1pZK0q
+	 WVzS9e2BkmWeXUG2dP6+y4NwPBf3iiRYWA8nN5V+oafukX6/IMojNvHPOOYnqNjvE64+T
+	 /Spsk4HM4tnu20BxgbUd9gnPd68i9ggwdAqFDcNypYyzjWPFIW6AQ7iLYmPAUamehMQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794423684;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=Xlc03iFGV9jOFXUn7/nevfuevA4V1xlT8nxZ6nmNEW4=;
-	b=2nCaNwcTGiYAIFAtE4j80cWBAD8VdIDBaiqAyUMu36UGDG6GkNJEC0MQ7quRangvHWlN
-	 1sYkIfQuCaZ9bIWFWnxDBH+oFsNHv11/bZTbpYBSRANWLOQSHjAqO5M37cVao27e4Mmoi
-	 4tAO07EuAu5NxyoD3NmDHfpLslIzUQHDSotZMC3T3AixYfak68+Ujbuf8ZIx/qHk7VAjo
-	 quGkuCNlTt4HJw7thrWodKiDrB4VIVoGl5nTtS23ZerualpKFmdnzZmFBFuw8qq+l7K+d
-	 NVRqEm1frA6NzfBppPzL1C4Rfm4IsrDr3SaYfwiSXL/wdJ/PQE4+T8o09gp+W81ITrQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Sender:Message-ID:Date:MIME-Version:User-Agent:From:Subject:To:Cc:
+	 References:Content-Language:In-Reply-To:Content-Type;
+	bh=ibbZxZ0AUA89ICzojImIUdj4mBfVP5cQ49POtiuj0Pg=;
+	b=nhYnVNCDul+ZY2rcmBoP0PSEdwUv41owhKe8phN+uO24uiagIDwkeLpZiwYwt71ACErW
+	 zsMYptRzoSy0aIhdliHuLz7TdKGX+JuNjfLjJEYaC2wSmsNkCkeb6Y/Lphkdd46rnnxuz
+	 RT1fj4YAle4Toto9xoBTcD21TBwzhm4bqL7e7EVoLaZUL7DCMIUMznTLUGv1juWMt7XiF
+	 OdOjkl1e/EGCQ/mt0J1SsxHcrW6Ovcx/siK4jvmAdAbf7KUnO903GhMhGtNXQi1LHF8eE
+	 27RIPlzdaseVjXVb9ffJnXStbPm2P7EyyC37ePFpFZWuhymtI15opfyXQ2Id+ZTOMwA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PQvGP9hf;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.173
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hTwRSKHv;
+	arc=none smtp.remote-ip=209.85.221.43
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D386606A882
-	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 18:48:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D386606A882
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF58D606A337
+	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 19:01:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF58D606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PQvGP9hf
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-36e90071735so138604eec.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 10:48:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794422910; cv=none;
-        d=google.com; s=arc-20260327;
-        b=b4zWzI0hAj1iKTms/XDmK0XChk7r1VpvvC+WIGF/HvaVZBlitAnt6G0VALzAHDAZkP
-         rwxlZhpb6R3YmrrDNvOSJiO72S8l5HsWJEBYDAfk0o3bX9Nt5gT/cn0fJgt/JdwTwlFZ
-         3sCu2UXg9VhAOpXqv+W0K/n6wqnh76nS0Fu256WI0VGawnDo1KZuglCaA6nflyWuSMcz
-         hVT77XBf0xdrcGBXhBuhY5FgsY8Xfr8sAS2fVe0zJwMCwyzD5khv3nxuRt4m1h9sP0gE
-         w99CiokQDMkjxFF+Z7GUvY1wXm5t3iOdFLGLu24oMKQsb8aEPRGSlYSMwcZTThXNPN8G
-         SWlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Xlc03iFGV9jOFXUn7/nevfuevA4V1xlT8nxZ6nmNEW4=;
-        fh=gsdjIv2a4c+bljQsZOEpsOZQ+0Ek8yDYXihsPZISww4=;
-        b=lhoFpIpXlFp8oL6Jcz/CL3Do9jpswo9L2CuPEC1gjIrk93dXjQtD0xMil9QD/tmUld
-         r7bpIBqB/6ZA7AYeKBf6ApY4LymuaK1pc0V6K0NcpCnmtmALrq3FmiuLHrrXVlz3mLDB
-         0IxExye5E4xoVZrvHNUmHe3F+/7+P5jmzoo0/Wfozed9aAGjXDbODB91qnTCqvECQfOW
-         6YxCUBam+NVetokLhKqG7FC6rC+jat4qsbkAK0Z2T2FVkV0MrQd/Vj6DiW1wOPMRT0S8
-         CkPYcyvXSUm4hjlfBu519wNHwpz7OPDWURirGxt60j1k2416jcpkphgacUjA0cR2zNSz
-         TmXw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hTwRSKHv
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-49318428d98so1909568f8f.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 11:01:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794422910; x=1795027710; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Xlc03iFGV9jOFXUn7/nevfuevA4V1xlT8nxZ6nmNEW4=;
-        b=PQvGP9hfxyl7gyWzaV5E6lfNLMerBHS1TFQeqNTFlBRgy1u2mHjTPPrcCd91suTPNw
-         q6Uaf4dfQ10dB87Jez9cMUGPN2gIfnP8MYt4fvSB02tD98zGsncssuArw8oLO8qQtcLp
-         44smcorCOoOla3ApsviUxCt5qQlre1HcPD1CCXW1rVJH/qsAwOgwDnYiSivdmVp0xx7L
-         wBCpz75zey138eMCPfYNHtAFbF55MWh3FJ9DeyUoLw64eufFG/QR3X/fHQG3aoNdfuHi
-         X5IJjIOOyJP1lrz7jfv+HjWLvw4QJiYpCd+oQQEZvYr1Ngdvdq6KHAniGxemBtyICNhx
-         xxcg==
+        d=gmail.com; s=20260707; t=1794423682; x=1795028482; darn=vger.kernel.org;
+        h=content-type:in-reply-to:content-language:references:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:sender:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ibbZxZ0AUA89ICzojImIUdj4mBfVP5cQ49POtiuj0Pg=;
+        b=hTwRSKHvMZ+lrvIeKoIurIC1KIKFKDhCwpsHCg4SFuXuE9FKXnLWr57eDNeolSoOom
+         eqV/p+t7TWIdATJfv//mUGngAxsfG1Ud5OIHDZ114PVIAd9qHQJ/nvDX9IDcJFgw+jNF
+         RsxN9HGM9/ycJLIbp4H+gxYLr2kBFW7rB/uWjQk6MV0ZvTvknIOsO8RwYyaMKQeIiDqH
+         BxiEkvwU6YJ3hMq9QDsjHUBOZv+Qa10c8k/iXMPGoBHQNQzRR84DZr6lj5wl4gV5bZiG
+         kR2L2HYLN2nvJpfQ0mWf61MNewSZZKxyBikLrF/zKFPbCJkn6UugfPLdyzosaCaz7/I7
+         NehA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794422910; x=1795027710;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20260707; t=1794423682; x=1795028482;
+        h=content-type:in-reply-to:content-language:references:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Xlc03iFGV9jOFXUn7/nevfuevA4V1xlT8nxZ6nmNEW4=;
-        b=d7cQZzklgtaVXsmSXkdHIBTEAinhqjw26TKIp/Yyf5PI8ioGT7KM8Q5mUAaVIMpohq
-         VwfCI62Rz0Euv2X2CHaZS3D068YzrtoJvqqT1gid/ph2eD2XkfmMY6QJvfL91XuyEM6t
-         WRseNTYMmF4iPp3H2Ra4rB2QzOFe6UHfcJZfcrqaPFk+k6oGyIAWeteCq20/8RGEHXm9
-         S4RWqsB71/8VyLwC61LhrBFYFkKSa3lR4erTIdM0STrAZjpSgoiRv/nCYxIc8fzjgiDG
-         vamuY6Y2luu65iY8wkzl0fOYgci/HKcJpBYj4iCn9HgxBA3AqyjpL7xWqHIASmxYh1ND
-         Rw+Q==
-X-Forwarded-Encrypted: i=1; AL+hErHAlTygeh7c2xQcEMrnKtCkCugpxyp6+jZEI9FoZZ06fhF2ZBJIBUv5vZbDc+j44zMh3gi4idTS1kqaHbk=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+HkBqUKXOSxzTnyCUX5opEk/9YKESbKY71CTQfXVkcPaXc5+Gi
-	3n+BkkANFTST/rQ27N+kSg15WNQ3tbIdsQhDi+xRvPYomWrPQWsbxduS+4zxoG8XGHOdGRlwAM4
-	bFAbFQD8BiuZQokocXuh48WKyq5+c5Ww=
-X-Gm-Gg: AYBFou24NEr3sr9Ua9yHxxZQ8QmOThFYh6AQtYsG7NzosCf2m538+ulkVVStsBDTiDa
-	UfApYacxH24nO/5xKMJ9ONiJZn815C+v43BkVrpQC+0xGZd752709XEcIbCLh7Ww3g5cxBFD+Vu
-	RbF3YyCvd8IwV7Q06UWdHhMUEteyut4u+ZCPw6D8cXlRFUaciEnt/Y25i16mohNw1uPgnNCnTHL
-	WHidBYDGu9MB5apd6hJBQ4iYeuCh+4gKFploFlqPx0reY5Y2ocsf68GRiQN9iGIsWqBh2m3JxQu
-	F16G+O61A76nkYcLLrpHc6fMCKT7zSmxKNntfF9AoaetHyaiXQJaX9d9UMsW8uMttGALYy6vCPx
-	+jyTod3e8I1WlRXLzeOZR6+GzFlUnA8BJDdP4XAQkKl0QdjaWe3ju4Ml8fa3td4pIJmRfCEC4+h
-	aExnHWtHBXrei9O8txnhCU8W1XxtGAeDZDKOPAiDJHRwRE/Ny2nYQOFN3hhC5heDSXdg80NzwVe
-	/7lQVcSTTGJ054yJI3Dj8/tltWDJjbwclA=
-X-Received: by 2002:a05:693c:26c5:b0:35e:d21c:f33e with SMTP id
- 5a478bee46e88-3768460b9dbmr4877420eec.1.1794422910327; Wed, 11 Nov 2026
- 10:48:30 -0800 (PST)
+        bh=ibbZxZ0AUA89ICzojImIUdj4mBfVP5cQ49POtiuj0Pg=;
+        b=lBSUT5SMw5XoOc7ZpCz0fY7XjeMolWsoYQzMLgIjYWQhljJ7ska33h07GaX1CpHtxv
+         L/LZge2L/4GvxIrt6Xk322JK7K9ugUVf5WxB1tCUTWq+w0hzpOoxJikwpBZF0LSAMD1I
+         bOJmUz/rY6m8Ug2764VkOhFJzBHWx7f38sR05nWTB9d3+bqrhlCF9GCu6iYeedP+iDfY
+         iorpGq3aRyVw5YSVewbddMw+S9AYbRoQQBLzW2Nkjlueas91Nvg8U44NVsbl+RvF4jOj
+         kQ8EyC2YkRDAE+qrOFuROe0sSJei+mOF1KDl9zGs8932SbZxL98zAlFgTm2zapUwI1mM
+         W7PQ==
+X-Forwarded-Encrypted: i=1; AL+hErFcMwdvxVIYcBZqSqh2w7WsjM0ZaLqPNxdqJPMpxHzAJfilyPGEHFX9p+YufUUnNue+haQfHCakUHBFOE8=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/fSQm6kgekvTQ95zX79NlVx3rBljmEFwecZyNSEdEgE1U48h6R
+	X9pB9TUp3T9bVUh9P/LZ1s1Hx8s+DNb/+pUPOyBxufpDHHlSA9+ZHmLw
+X-Gm-Gg: AYBFou36mLzADhRPmShwH18NxkGuFQxy5mGI/hCUHr3x9aSl/Hv4RR3TRIRXErXUztt
+	PPx/na9DHUmFql4WakKydtkurboeUGR5RMUauzkSH1WMJXy6S+VFZNHMKCOQGoH3FKoqmP+4Ner
+	IearWaRDmI5lhnh+oRmhiq8Fp3TUVwkvA1br0XPH+FfoDIBKFqsGaVYqNNdWuGZwEBa4SYcgzWK
+	MUSrSXzSAQxwxmfCsSV54Cz8/yRLu3FftbSucRE6FiXBUywxxA4S6nNG3ncRZwXUTSR1Z83Gj8G
+	CkFmqWl1ZQuYagc66JOT1kyuEMfjQUEEeKCTgZ921Rluu9cjYPDm3Agb13CvMT8etY0YPRIdnfi
+	RV8rNqkRtHs1ggUBaSTrLMOptep5slkdOa3bwTqSt6EMFPLq9BWcl9hkH8tLDlj9x6sQDSKNxk9
+	KAKh4L+7pn/u2H5axcRq7XOeIvDEnHyP7XZ1zqk/FLCnyc66DXJQTNG6k/e5ycO4CU6mmgE0e+s
+	evFwPAuLPFhEVkylGTMrI9sKH5gWeMwmjtqMGyXhlRnPLN0ODQau9FkPayrz6ZbegB+U+MPMMQ/
+	m5T/k9m63VQ94Zfu4GqPD8FNbRnQItyrPUbjfkBRuvdzsnA9BPkmIZ6qKrTQVYK76FTf+d89CWh
+	Grfzc8/2ywYY2eRU4hKFWzQ==
+X-Received: by 2002:a05:6000:2301:b0:48e:5071:420 with SMTP id ffacd0b85a97d-499c38baf65mr6310015f8f.2.1794423681839;
+        Wed, 11 Nov 2026 11:01:21 -0800 (PST)
+Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4988bdef64dsm11095632f8f.20.2026.11.11.11.01.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Nov 2026 11:01:21 -0800 (PST)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <6d7d25fa-69ef-42b0-b7f2-bb59ebf0eb2f@gmail.com>
+Date: Wed, 11 Nov 2026 19:01:19 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -106,46 +92,271 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261031030807.4101384-1-jenhaochen@google.com>
-In-Reply-To: <20261031030807.4101384-1-jenhaochen@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 11 Nov 2026 19:48:17 +0100
-X-Gm-Features: AclHuK9PxmaMrHpe5K4M3MU9aV3mfSN5iKc2YgWLgeAIQXIiJu5uOX8RyqAehXg
-Message-ID: <CANiq72=zg8WeupV5TPTr2tUxAt7imSZXacw=CBf75MdfcAv-rA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: rust: pass AutoFDO flags to Clang with inline helpers
-To: Jenhao Chen <jenhaochen@google.com>, Rong Xu <xur@google.com>, Han Shen <shenhan@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Matthew Maurer <mmaurer@google.com>, 
-	Sami Tolvanen <samitolvanen@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Qais Yousef <qyousef@google.com>, Ben Wei <benwei@google.com>, 
-	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+From: Julian Braha <julianbraha@gmail.com>
+Subject: Re: [PATCH 4/4] scripts/Kconfig.toolchain: Document minimum supported
+ versions for dynamic checks
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ llvm@lists.linux.dev
+References: <20261110-kconfig-toolchain-updates-v1-0-6d4fb636290e@kernel.org>
+ <20261110-kconfig-toolchain-updates-v1-4-6d4fb636290e@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20261110-kconfig-toolchain-updates-v1-4-6d4fb636290e@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------OXKw02O0ZQVKPdopabmDPVkH"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------OXKw02O0ZQVKPdopabmDPVkH
+Content-Type: multipart/mixed; boundary="------------AiKmJ8XeW8CJXxcJsL6rEg05";
+ protected-headers="v1"; hp="clear"
+Message-ID: <6d7d25fa-69ef-42b0-b7f2-bb59ebf0eb2f@gmail.com>
+Date: Wed, 11 Nov 2026 19:01:19 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Julian Braha <julianbraha@gmail.com>
+Subject: Re: [PATCH 4/4] scripts/Kconfig.toolchain: Document minimum supported
+ versions for dynamic checks
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ llvm@lists.linux.dev
+References: <20261110-kconfig-toolchain-updates-v1-0-6d4fb636290e@kernel.org>
+ <20261110-kconfig-toolchain-updates-v1-4-6d4fb636290e@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20261110-kconfig-toolchain-updates-v1-4-6d4fb636290e@kernel.org>
+
+--------------AiKmJ8XeW8CJXxcJsL6rEg05
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 31, 2026 at 4:08=E2=80=AFAM Jenhao Chen <jenhaochen@google.com>=
- wrote:
->
-> Factor out _autofdo_c_flags in scripts/Makefile.lib (preserving per-file
-> and per-directory AUTOFDO_PROFILE opt-outs) and pass it to the
-> post-llvm-link $(CC) invocation in scripts/Makefile.build and
-> rust/Makefile.
+On 11/11/26 05:42, Nathan Chancellor wrote:
+> To make it easier to clean up unnecessary dynamic checks when the
+> minimum supported version of a toolchain component is updated, add
+> comments documenting when features were first supported. Request that
+> future additions document this as well.
 
-This sounds reasonable, but my LLM spotted that Clang will run
-`AddDiscriminatorsPass`  again, i.e. on the optimized bitcode that
-`rustc` produced. So the profile ends up indexed by Clang's renumbered
-discriminators, and then the build that uses the profile will not find
-a match for some code (depending on inlining decisions), i.e. that
-part of the profile is silently dropped.
+Love, love, love this!
 
-It proposes `-mllvm -no-discriminators` in
-`CC_FLAGS_RUST_INLINE_HELPERS` so that Clang doesn't add them, i.e.
-using the `rustc` ones.
+I tested the bounds and replicated nearly all of your results, but had a
+few notes:
 
-Rong, Han: is that expected?
+>=20
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+>  scripts/Kconfig.toolchain | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+>=20
+> diff --git a/scripts/Kconfig.toolchain b/scripts/Kconfig.toolchain
+> index 26a62b15e9ab..3a9eb8317d59 100644
+> --- a/scripts/Kconfig.toolchain
+> +++ b/scripts/Kconfig.toolchain
+> @@ -1,4 +1,9 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+> +# When adding a new dynamic check (such as {cc,ld}-option{,-str} or te=
+sting a
+> +# small program), please add a comment documenting the first version o=
+f the
+> +# tool that supported the feature being tested. For cc-option{,-str}, =
+note the
+> +# "beware" comment below.
+> +
+>  config CC_VERSION_TEXT
+>  	string
+>  	default "$(CC_VERSION_TEXT)"
+> @@ -118,6 +123,7 @@ config GCC_ASM_GOTO_OUTPUT_BROKEN
+>  config CC_HAS_ASM_GOTO_OUTPUT
+>  	def_bool y
+>  	depends on !GCC_ASM_GOTO_OUTPUT_BROKEN
+> +	# supported since clang-10 and gcc-11
 
-Cheers,
-Miguel
+'asm goto' failed for me with clang 10. Seems it was added with
+clang 11 [1]
+
+>  	depends on $(success,echo 'int foo(int x) { asm goto ("": "=3Dr"(x) :=
+:: bar); return x; bar: return 0; }' | $(CC) -x c - -c -o /dev/null)
+> =20
+>  config CC_HAS_ASM_GOTO_TIED_OUTPUT
+> @@ -129,6 +135,7 @@ config TOOLS_SUPPORT_RELR
+>  	def_bool $(success,env "CC=3D$(CC)" "LD=3D$(LD)" "NM=3D$(NM)" "OBJCOP=
+Y=3D$(OBJCOPY)" $(srctree)/scripts/tools-support-relr.sh)
+> =20
+>  config CC_HAS_ASM_INLINE
+> +	# supported since clang-11 and gcc-9
+>  	def_bool $(success,echo 'void foo(void) { asm inline (""); }' | $(CC)=
+ -x c - -c -o /dev/null)
+> =20
+>  config CC_HAS_ASSUME
+> @@ -161,6 +168,8 @@ config CC_HAS_ASSUME
+>  #    pitfall.
+> =20
+>  config CC_OPT_ZERO_INIT_PADDING_BITS
+> +	# supported since gcc-15. not needed for clang, as it does this by de=
+fault since clang-20
+> +	# https://github.com/llvm/llvm-project/
+> commit/7a086e1b2dc05f54afae3591614feede727601fa
+>  	def_string "$(cc-option-str,-fzero-init-padding-bits=3Dall)"
+> =20
+>  config CC_OPT_NO_ADDRSIG
+> @@ -168,12 +177,15 @@ config CC_OPT_NO_ADDRSIG
+>  	def_string "-fno-addrsig" if CC_IS_CLANG
+> =20
+>  config CC_OPT_DIAGNOSTICS_SHOW_CONTEXT
+> +	# supported since gcc-16, not supported by clang
+>  	def_string "$(cc-option-str,-fdiagnostics-show-context=3D2)"
+> =20
+>  config CC_OPT_DIAGNOSTICS_SHOW_INLINING_CHAIN
+> +	# supported since clang-23. not needed for gcc, as it does this by de=
+fault
+>  	def_string "$(cc-option-str,-fdiagnostics-show-inlining-chain)"
+> =20
+>  config CC_OPT_STRICT_FLEX_ARRAYS
+> +	# supported since clang-16 and gcc-13
+>  	def_string "$(cc-option-str,-fstrict-flex-arrays=3D3)"
+
+Clang 15 supports '-fstrict-flex-arrays' [1] so the check seemingly
+passed, but support for level 3 wasn't actually added until clang 16.
+
+I think this needs a:
+    'depends on !CC_IS_CLANG || CLANG_VERSION >=3D 160000'
+so the option evaluates as empty string when these deps are unmet.
+
+> =20
+>  config CC_OPT_NO_ALLOW_STORE_DATA_RACES
+> @@ -181,51 +193,67 @@ config CC_OPT_NO_ALLOW_STORE_DATA_RACES
+>  	def_string "$(cc-option-str,-fno-allow-store-data-races,--param=3Dall=
+ow-store-data-races=3D0)" if CC_IS_GCC
+> =20
+>  config CC_HAS_MNOP_MCOUNT
+> +	# supported since clang-10 and gcc-9 but option is architecture speci=
+fic
+>  	def_bool $(cc-option,-mnop-mcount)
+
+'-mnop-mcount' worked for me on x86 with gcc 5 [3], but it seems s390
+support came later in v9 [4]
+
+> =20
+>  config LD_OPT_FORCE_GROUP_ALLOCATION
+> +	# supported since ld.lld 19 and GNU ld 2.29
+>  	def_string "$(ld-option-str,--force-group-allocation)"
+> =20
+>  config LD_OPT_NO_WARN_RWX_SEGMENTS
+> +	# supported since GNU ld 2.39, not supported by ld.lld
+>  	def_string "$(ld-option-str,--no-warn-rwx-segments)"
+> =20
+>  config CC_OPT_WNO_ADDRESS_OF_PACKED_MEMBER
+> +	# supported since clang-4 and gcc-9
+>  	def_string "$(cc-option-str,-Wno-address-of-packed-member)"
+> =20
+>  config CC_OPT_WNO_FORMAT_OVERFLOW_NON_KPRINTF
+> +	# supported since clang-18, not needed for gcc
+>  	def_string "$(cc-option-str,-Wno-format-overflow-non-kprintf)"
+> =20
+>  config CC_OPT_WNO_FORMAT_TRUNCATION_NON_KPRINTF
+> +	# supported since clang-18, not needed for gcc
+>  	def_string "$(cc-option-str,-Wno-format-truncation-non-kprintf)"
+> =20
+>  config CC_OPT_WNO_DEFAULT_CONST_INIT_UNSAFE
+> +	# supported since clang-21, not needed for gcc
+>  	def_string "$(cc-option-str,-Wno-default-const-init-unsafe)"
+> =20
+>  config CC_OPT_WNO_DANGLING_POINTER
+> +	# supported since gcc-12, not needed for clang
+>  	def_string "$(cc-option-str,-Wno-dangling-pointer)"
+> =20
+>  config CC_OPT_WVLA_LARGER_THAN
+> +	# supported since gcc-7, not supported by clang
+>  	def_string "$(cc-option-str,-Wvla-larger-than=3D1)"
+> =20
+>  config CC_HAS_WSTRINGOP_OVERFLOW
+> +	# supported since gcc-7, not supported by clang
+>  	def_bool $(cc-option,-Wstringop-overflow)
+> =20
+>  config CC_OPT_WNO_UNTERMINATED_STRING_INITIALIZATION
+> +	# supported since gcc-15 and clang-21
+>  	def_string "$(cc-option-str,-Wno-unterminated-string-initialization)"=
+
+> =20
+>  config CC_OPT_WERROR_DESIGNATED_INIT
+> +	# supported since gcc-5, not supported by clang
+>  	def_string "$(cc-option-str,-Werror=3Ddesignated-init)"
+> =20
+>  config CC_OPT_WENUM_CONVERSION
+> +	# supported since clang-3.2 and gcc-10
+>  	def_string "$(cc-option-str,-Wenum-conversion)"
+> =20
+>  config CC_OPT_WNO_PACKED_NOT_ALIGNED
+> +	# supported since gcc-8, not supported by clang
+>  	def_string "$(cc-option-str,-Wno-packed-not-aligned)"
+> =20
+>  config CC_OPT_WNO_FORMAT_OVERFLOW
+> +	# supported since gcc-7 and clang-18
+>  	def_string "$(cc-option-str,-Wno-format-overflow)"
+> =20
+>  config CC_OPT_WNO_STRINGOP_TRUNCATION
+> +	# supported since gcc-8, not supported by clang
+>  	def_string "$(cc-option-str,-Wno-stringop-truncation)"
+> =20
+>  config CC_HAS_COUNTED_BY
+> @@ -252,14 +280,18 @@ config CC_HAS_BROKEN_COUNTED_BY_REF
+>  	default y if CC_IS_CLANG && CLANG_VERSION < 220100
+> =20
+>  config CC_HAS_ALLOC_TOKEN
+> +	# supported since clang-22, not supported by gcc
+>  	def_bool $(cc-option,-falloc-token-max=3D123)
+> =20
+>  config CC_HAS_MULTIDIMENSIONAL_NONSTRING
+> +	# supported since gcc-15 and clang-21
+>  	def_bool $(success,echo 'char tag[][4] __attribute__((__nonstring__))=
+ =3D { };' | $(CC) $(CLANG_FLAGS) -x c - -c -o /dev/null -Werror)
+> =20
+>  config CC_OPT_INLINE_MEMSET
+>  	string
+> +	# supported since gcc-14
+>  	default "-finline-stringops=3Dmemset" if $(cc-option,-finline-stringo=
+ps=3Dmemset)
+> +	# supported since clang-22
+>  	default "-mllvm -max-store-memset=3D4294967294" if $(cc-option,-mllvm=
+ -max-store-memset=3D4294967294)
+> =20
+>  config LD_CAN_USE_KEEP_IN_OVERLAY
+>=20
+> -- 2.56.0
+>=20
+
+[1]
+https://releases.llvm.org/11.0.0/tools/clang/docs/LanguageExtensions.html=
+
+[2]
+https://releases.llvm.org/15.0.0/tools/clang/docs/ReleaseNotes.html#major=
+-new-features
+[3] https://gcc.gnu.org/gcc-5/changes.html#x86
+[4] https://gcc.gnu.org/gcc-9/changes.html#s390
+
+- Julian Braha
+
+
+
+
+--------------AiKmJ8XeW8CJXxcJsL6rEg05--
+
+--------------OXKw02O0ZQVKPdopabmDPVkH
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQT6qjll++tIFxF8TUPElYPCBXNxIAUCavS7gAUDAAAAAAAKCRDElYPCBXNxIFXd
+AP97y3g2Ub97AFzCrczSMb4sT2GyzxZRrL1efJ7+kCebegD/VQABtAUuVtuD5BEo+mLgOmJTvZhP
+ejIUhi9yx/4VPgs=
+=Q2PJ
+-----END PGP SIGNATURE-----
+
+--------------OXKw02O0ZQVKPdopabmDPVkH--
