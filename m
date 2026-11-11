@@ -1,49 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794404480;
-	b=FyITnKvTGRMn4zr5dglUQSC/SlIlHMdP9335XNOX6Ej7qn9j2cBzScsfmE8+qMrro8E0
-	 n9h0i1a4F4sepsTsaK+HjSKsAGizdhiegT7tF8ITKvO4QQC9w1+BOZa5dZkWTQy2TOLF/
-	 /UqBHGrFxmopdGl+PVkR8PjYHuVj8K37Wj50TfKQ4bu98i3g1qwJYXxKSpLEAUEbCA6pV
-	 a+Rkx7t/MaKsY8dOEjGxjXvu3meq+f+ciKY4kvS8YIg5qF8IPDLBBGl5IoZ8gmq9p3hlA
-	 MRnkmMzc5T/vvF/DIOb7EjKeC+5pDKXUgtJbygEa097FcIzlakakxO99wJGIs93ijVQ==
+	t=1794404481;
+	b=Yd0RncS5I1hysY2r0PzUb9m81dHKVNEi0R2QvshMeW9ZSZyom2qr+v/aaJzv/InfJPf4
+	 0K8/it0lMPChsmoerxSUxKJFiIzxw8mMZFJHYZty7w0z/nDqVQYjROv1zs34Z90gvh2Gu
+	 R62gYjtQkuEEpjcnz7wzUwUR/PxW2HKnWtrZGjY2BeIu9abH+etYXbZo8v+DCvL9o74RW
+	 mTGm+eVCflXtGL2TN9NdIv1Egfl2vmkL6hSpr87tltFOLC1rVnece60UocahnnH36VF1k
+	 BPylrbz5P7Bh75Iw1HemlIDFwFEnnQdEARdYFlplELzYwFrq+c3HvxycisJ0OKjBz7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794404480;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794404481;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=an3TW83ZdtfT2MwoqXi8iWyGphn95qAGXKqfNkWAXfk=;
-	b=N0MD1Ijq0DchNygKWzoFeiyaeujBpepS2W+XEw9U+Izojty2HMZemiTRHDwgKGejWrYv
-	 QL8kTHJIK20Rt4yP2oq5iT0gbqoDBNuVjO/Q6aGE7TbczgW+SW/ueNR+X5ktAERBtxeat
-	 bH0yo5H5hnTS1r0Ww0fnGQYOkQVc7HehcqECycqZuROaGgrTCGumFoOGjiE0dOuavXsjo
-	 jCHzHOmUSH8cUL6HsXtdRsfefN0XWXuBLErHJRLgC4Hu7typGgzZRWHlw4h9Aa/JO+f80
-	 LjDUoS7xww8TOpE3i4UaLYde8bhg51n+LdEjCBcho7F2ISFTUbsournTBYoFmbYrMMQ==
+	bh=CWLTIs+hni+fvoY6mrigTluRycmFyDv/vZwkFpYXWa8=;
+	b=LmsmDat00c6BAMklIvUL5r3CN2GYpuz0/XpWcrQXnUEwTkn6Pl/8Xr3qJpZE/tOB8/Of
+	 LJvXgs1sURHc/L7nrJW3gBQIvAzSWRzvViNcSz9lwp7uRz1MuzKDKs3c6XE2YXYqzfv8B
+	 K3XhMiHLPlEtPbxkBsllm2Ym3/O8goilhRvflmKg48veoqMuBcOoG6TR19o7VUFZ4GY7t
+	 heIHA/sGpJ4r73UcGPy1vCrYm+vfKCGyZy/9S6UV0Ej9mNKjINHiWzYRcgcJ2Yw3Nxvkw
+	 rroNor7HoE1rnftV//8BraLQBT+do35zR46YH/xZ5amD57qWV46P1B/x1o5sjRMQQcg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mDJvm9DZ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HU5ZhD+V;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0B1606A333;
-	Wed, 11 Nov 2026 13:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A4B606A886;
+	Wed, 11 Nov 2026 13:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mDJvm9DZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EBFE1F00A05;
-	Wed, 11 Nov 2026 13:41:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HU5ZhD+V
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0717D1F00A06;
+	Wed, 11 Nov 2026 13:41:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794404479;
-	bh=an3TW83ZdtfT2MwoqXi8iWyGphn95qAGXKqfNkWAXfk=;
+	s=k20260515; t=1794404481;
+	bh=CWLTIs+hni+fvoY6mrigTluRycmFyDv/vZwkFpYXWa8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=mDJvm9DZo1HkrE3pb8UCSA3HTwc2O3eGKShLigUsy39u8UoL6dT8TYhhobrj5mSBo
-	 cYQQDh9xYuJNXpA6roxseht8LDxS7o4UxHz55+q+HLubW46ExnF6z3cRKWd40800z6
-	 XierzCbiApwgYjar1swKIIFnmSb/k8DTdtaCAU5sh1edx20Nno8Dde+kUzxTzVhzmL
-	 isrtH8ONsH915dmf7NKJuu9pD/tKNZZMWpvgqxfDMjEOAe+AISKKq3pVJ0B1mUmSE8
-	 7p94DLjyzPxQVV/zQ2NgzyQoLowGNUpvULcAjQrW6/cqKuCXsuLSaz8Y/8dtTvjLHb
-	 uw/UzzkHNQfIA==
+	b=HU5ZhD+V9B384SxzSafmdgNVqtG7/1MKEtQ8/V8Lw+9qZV3wF2jHkucArjBvMumni
+	 w8dMwXgxmFDt2GBqz+qCrgujnHXARoqylq285P5pXXpN3oZ5XzOmS7dRrDnFlEyLUJ
+	 23FSBTyKPo7ryAor0QbL7zs1OlmVfi6QyeNG70YMzWeTEI7PKUe/Zd0oFM6YOHNm/O
+	 VicYhuQw1gw4oLIu+mBXeREomulT307Eqvxq+fMTuNZzKufRTDAtw4yb5+SLtgX2/h
+	 40PIAZ+MZ3ILCjeK1hkw3ePM3olakQ0OiinhgF3LsV+/MZ4gVt++4NCpL9pQHMNBdR
+	 0Cfp9sw5/oUFw==
 From: Vincent Mailhol <mailhol@kernel.org>
-Date: Wed, 11 Nov 2026 14:41:03 +0100
-Subject: [PATCH 1/3] kbuild: make rq-offsets-file an explicit preparation
- dependency
+Date: Wed, 11 Nov 2026 14:41:04 +0100
+Subject: [PATCH 2/3] kbuild: move preparation checks out of single-build
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -55,50 +54,68 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261111-reduce-single-build-dependencies-v1-1-7196ca986a85@kernel.org>
+Message-Id: <20261111-reduce-single-build-dependencies-v1-2-7196ca986a85@kernel.org>
 References: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
 In-Reply-To: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
  Vincent Mailhol <mailhol@kernel.org>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1024; i=mailhol@kernel.org;
- h=from:subject:message-id; bh=9viEUNJwwz+O3SrkICAMO/5gG9D0++zxZl0+mSGfRXs=;
- b=owGbwMvMwCV2McXO4Xp97WbG02pJDFlfCmrqZldFaTzamsztvWfKlz9uEQb9rVMmb5uzy07bR
- HHnqlntHRNZGMS4GCzFFFmWlXNyK3QUeocd+msJM4eVCWSItEgDAxCwMPDlJuaVGukY6ZlqG+oZ
- Ahk6RgxcnAIw1VptjAz7g4yfaszYIe3TOuuNg9TML29lvmwV2j0v4Y3Ol/+2mvOeMzK0vGRbvV1
- n1e5L8qVdqpPWrVp0M+zwwuen3ty1LLpq+lqVHQA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1517; i=mailhol@kernel.org;
+ h=from:subject:message-id; bh=J60Bfg5rnG38+O4wzyuXYBV9jjEM5OMi/wZayVk+IsQ=;
+ b=owGbwMvMwCV2McXO4Xp97WbG02pJDFlfCmocrk+t+XDspM3ShTOMnnD4lpz3+uMk+vTmTbsNz
+ a41d5Y4dkxkYRDjYrAUU2RZVs7JrdBR6B126K8lzBxWJpAh0iINDEDAwsCXm5hXaqRjpGeqbahn
+ CGToGDFwcQrAVD8+xvDPqHt3zZ6HoaJLXpzr2jT/1M8jF0+IvmB5vOns3/11M07Wz2BkeKHgnrJ
+ lnbrrsmVbHboSF+8szrz/Ny0oNmT9O4XzLr93cQEA
 X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
  fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 
-The generated rq-offsets.h header is included by linux/sched.h and must
-exist before compiling ordinary objects. Currently that header is
-prepared indirectly through the missing-syscalls target.
+The missing-syscalls check and the atomic-checks are currently set as
+preparation dependencies. However, these are not needed to compile, for
+example, a single object.
 
-Make prepare depend directly on rq-offsets-file. Because rq-offsets-file
-depends on offsets-file, that other dependency can be removed.
-
-Keep the rq-offsets-file dependency in missing-syscalls so that the
-check can still run independently.
+Add a new prepare_checks target to group those checks and call it
+conditionally only if we are not doing a single-build so that the
+prepare target does not trigger that dependency anymore.
 
 Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
 ---
- Kbuild | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Kbuild   | 7 +++++--
+ Makefile | 2 +-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/Kbuild b/Kbuild
-index a6a0192dea08..5a65be2d51b0 100644
+index 5a65be2d51b0..5151e32985c6 100644
 --- a/Kbuild
 +++ b/Kbuild
-@@ -87,7 +87,7 @@ $(atomic-checks): $(obj)/.checked-%: include/linux/atomic/%  FORCE
+@@ -86,8 +86,11 @@ $(atomic-checks): $(obj)/.checked-%: include/linux/atomic/%  FORCE
+ 
  # A phony target that depends on all the preparation targets
  
- PHONY += prepare
--prepare: $(offsets-file) missing-syscalls $(atomic-checks)
-+prepare: $(rq-offsets-file) missing-syscalls $(atomic-checks)
+-PHONY += prepare
+-prepare: $(rq-offsets-file) missing-syscalls $(atomic-checks)
++PHONY += prepare prepare_checks
++prepare: $(rq-offsets-file)
++	@:
++
++prepare_checks: missing-syscalls $(atomic-checks)
  	@:
  
  # Ordinary directory descending
+diff --git a/Makefile b/Makefile
+index f895752d4b05..2c1289a44c56 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1413,8 +1413,8 @@ archprepare: outputmakefile archheaders archscripts scripts include/config/kerne
+ 	include/generated/rustc_cfg remove-stale-files
+ 
+ prepare0: archprepare
++	$(Q)$(MAKE) $(build)=. prepare $(if $(single-build),,prepare_checks)
+ 	$(Q)$(MAKE) $(build)=scripts/mod
+-	$(Q)$(MAKE) $(build)=. prepare
+ 
+ # All the preparing..
+ prepare: prepare0
 
 -- 
 2.56.1
