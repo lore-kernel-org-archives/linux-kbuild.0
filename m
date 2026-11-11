@@ -1,96 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794347647;
-	b=Lc871d+dT5bizvF9wVShtAL3cVit5vRZH4XmUM/FBNU/XU5KsiU/qVod5bIgH4w1y5fP
-	 PjHSlhJ/9jSrNFxh9lixgnzsfCfLIAuaME3eFd2BoiASLxAFWIUiPTayptWMBcXjcIjX3
-	 /R5s2F1vKkQ6gMlDlq/leZPoyoTb+wMtWCGCuhI4nsyUgTazlCoBQhxkDvJamEtRQNl2+
-	 fQQDG0GmubPkUHJLsguH/gOE3imtyw/yrF8rhDn0Qq6RvZdbo+81XSpbx71pvKXkcfWrl
-	 I0oTNwRMDJKAKj0LWuCNM31zkc29ftDTW3DdQXz3FmEW3jKa7crzDNyXqmE3/ozpToA==
+	t=1794355275;
+	b=j5IAdM6cBs09Obe0y1ZOOc5Uwkw9sHdxu0oBiLUunHxMmhaxhwMOMYuU/nr3JELJgKr/
+	 HHLBlhoQYbPeWVQa9050c97qAksPObIXouNMmrIDovBc2KU+F7ez7lYoVEpw1E4jS7uvD
+	 +Ox6PY/q9YZfunfthr/s+betWiH/sCt7UPknW/VOv1ig5Jm7M4tj1E++BmEagZyc5tTm0
+	 XSRjiM3HRZYAONqLwDDbtY4KBTKlupTMPY1oJUj+SSxE+dBdqBKnjt4ygBmdKEBWrIj4s
+	 xWtPe0Vli1zDadCYkr4CeZWaI8NdJi8QK9Pb/TfLkp0vNhbx7GdadxE5zq2B0xlXjLw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794347647;
-	h=DMARC-Filter:Received:X-Virus-Scanned:Received:DKIM-Signature:
-	 Received:Date:From:To:CC:Subject:User-Agent:In-Reply-To:References:
-	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=vx1nbI8H5SPVIs7K1QTdSx40kl0+EAzRn/9rTMIQZ3o=;
-	b=VfSxIk383GB4wJKjVvF7AV74cmkJ1HyAMTSYHIrFpBowaFLxGvQhTkG5I3oqbktLKSi+
-	 f7ctYimzyftt03C2nQU6At5ZKChpl7r4ijcCdL+sIbXkAm8cx3UZd12mzIP9Y74Jl3OuA
-	 Zujj/LkBT9BFocX6v1feaefcsSG0JR4LR0uXG/Gqkm9WD74pCnyN/KRLfl7dh1rwktoNT
-	 rnOBJY6363m9QHXQmujGqcfmLZQpvcXlXz2FKFbHMAlxNk0fQKOWXyy2qGAyneLLxDBuV
-	 sleEV1jq3eHLJTSYZpNDETvop7tpE1w8Izv+b3Wwa4Ntw71yzknZS86MXgjw6u8uWsA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794355275;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=4EQhYPyXvgCmzyOp93TmW0Sui1/AxR4wHC7lOiswods=;
+	b=GW9FmbHOGYyiHp+YkCeHV0osLfLy0RdTgatw7gP7ZbdcsvnVtciFtKj+ENeXkU8mjfmp
+	 LtOUxYlyXKs6neZvl14yxYJjeKmIT4WJGU0eZAT2qhAIGz/+vJStKslCbroBre2kRyuL/
+	 /0H+tCQTvCzzywQFbPd1nDIyQB7tZmaozaVGD+f+SKCkftwKyG8g+EXL1f89dhqpYKLgF
+	 X0qGmqgk2cGuxlufygfJKaXCZ37dfyCjrKYlucT1GvLsgAsFBnE2JUEhWH42OIydM8yfm
+	 +drQnBwhMnUD4fvxZv+0BZ0MRe+nofAB4GDz5zQnvjjUZ16Bzt0uVgzTTQTZcwBSYCw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=alien8.de;
-	spf=pass smtp.mailfrom=alien8.de;
-	dkim=pass header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=Ou2MxfjY;
-	arc=none smtp.remote-ip=65.109.113.108
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JUvENXyL;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D693A606A31C;
-	Tue, 10 Nov 2026 21:54:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D693A606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53400606A31C
+	for <linux-kbuild@vger.kernel.org>; Wed, 11 Nov 2026 00:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key, unprotected) header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=Ou2MxfjY
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 68CD740E021B;
-	Tue, 10 Nov 2026 21:54:04 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id czhD7jfCKnPg; Tue, 10 Nov 2026 21:54:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1794347641; bh=vx1nbI8H5SPVIs7K1QTdSx40kl0+EAzRn/9rTMIQZ3o=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=Ou2MxfjYszDDOusFqyzE2NCwV2TIw0REH1b6qaYengEmZgqcgPNWoWfFH7zoanOT/
-	 YUnJjOuYkEX1DWVwsj1sd4dvUntoVdVIiebg+1jiS2GDqMb8n0dw1SyEzoM6gE8Rr6
-	 OuZ/GhgJks9kUF5X0AlIvZw83p29yR0DSyCBW7L9II1kebOFADENldwh0VPCDmd0Q8
-	 OJRM/ftgOdu6BiBSonKF654i3pMfANFIsBhpBYTF5XFZjwnZFyEkQW0Uwwmfi+Hxj8
-	 7ov4RY2OaEQHUKx+VhJFbSu/A7jr8geceLx5/zH8p9stIjc7UXjb468OzU1pth33Aq
-	 WoVoETOr1xCCEt1WmDTIE22EZX/JGmfKyh0oMAX1sn4C0zjE6R8vLszZtAEnl18BhR
-	 JNz0vpaI/w+8ass26npR8dhbSjuws4oHjKVyxtn1GjkqI3vTy47SAukQlHq2es5DtV
-	 RANFO3QtttLajggJo3IzzerHM2LOyV9qUBkqc3qE1CLHNv+ddkQvd8nAm+Lhzn34Du
-	 Ne6Fql5NOu9a0WvmXCjiCMVQk14nJcj0iWrqgM3bNvArnsMp39ohDEoY7hqzHLMzOb
-	 zsWNRF5RUOh5aK+yJZ3sPz9blFOqdpI8GHfVqflfx8g/85aobJPjh7B3iPyc9q3DC7
-	 WqIrVx2tx/t/3VZlOLxV6RcY=
-Received: from ehlo.thunderbird.net (mobile-166-137-178-020.mycingular.net [166.137.178.20])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4E09540E0219;
-	Tue, 10 Nov 2026 21:53:28 +0000 (UTC)
-Date: Tue, 10 Nov 2026 21:53:21 +0000
-From: Borislav Petkov <bp@alien8.de>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
- Miguel Ojeda <ojeda@kernel.org>
-CC: Thomas Gleixner <tglx@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- Sami Tolvanen <samitolvanen@google.com>, Kees Cook <kees@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>,
- =?ISO-8859-1?Q?Bj=F6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>,
- Alexandre Courbot <acourbot@nvidia.com>,
- =?ISO-8859-1?Q?Onur_=D6zkan?= <work@onurozkan.dev>,
- rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org,
- stable@vger.kernel.org, Kent Overstreet <kent.overstreet@linux.dev>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH=5D_x86/rust=3A_use_=60-Zindirect-?=
- =?US-ASCII?Q?branch-cs-prefix=60_for_RETPOLINE_builds?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <CANiq72npfiOC2ZCan-zAe-h79kba_5jtWFAeAoigCs_hnO8gJA@mail.gmail.com>
-References: <20261018175457.87803-1-ojeda@kernel.org> <CANiq72npfiOC2ZCan-zAe-h79kba_5jtWFAeAoigCs_hnO8gJA@mail.gmail.com>
-Message-ID: <E91BAC6B-9F08-4801-8866-2BB0ECAAB349@alien8.de>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JUvENXyL
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E3F1F0089F;
+	Wed, 11 Nov 2026 00:01:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794355275;
+	bh=4EQhYPyXvgCmzyOp93TmW0Sui1/AxR4wHC7lOiswods=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=JUvENXyLfOP6HrdvS24fQILhiulc3PzH5MoPEsq3xJTgBgel+x7L+MI/EVA1Bp0Cc
+	 JRIF6VXrnFBNDRXLoM73O2S9t+oUb32K/y85qFdWVKzalS2FxRC9zEjC7OB66GKApc
+	 Cqn4/N1SQ45cPbZF+V3JIvk44RUzLtjV3w4UA70zYkCDLuqnGSM2ZV9DCsIm1tXHRQ
+	 VzyAlU5FD/jhX0nRU6p9JmrjpjgdrU6x9wPy766ccvc1/oSRGbvf1YtCt9VdimkF4C
+	 T4loq82k3db2WP2H8jFK/pF6y8eHzF9AQgm75rnck6Bag+QvJP/bxoXp7Ke/e79Ehd
+	 wSBXHHzSnH2og==
+Message-ID: <sashiko-outbox-207990@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 1/6] genksyms: fix infinite loop on declarations with
+ parameter lists
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Leizhen Zhang" <lzsx618@gmail.com>, nathan@kernel.org, nsc@kernel.org
+Cc: masahiroy@kernel.org, ardb@kernel.org, rostedt@goodmis.org, hpa@zytor.com, linux-kbuild@vger.kernel.org
+In-Reply-To: <20261110000003.1719966-2-lzsx618@gmail.com>
+References: <20261110000003.1719966-1-lzsx618@gmail.com>
+ <20261110000003.1719966-2-lzsx618@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Nov 2026 00:01:14 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -99,38 +60,65 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On November 10, 2026 8:31:08 PM UTC, Miguel Ojeda <miguel=2Eojeda=2Esandoni=
-s@gmail=2Ecom> wrote:
->On Sun, Oct 18, 2026 at 7:55=E2=80=AFPM Miguel Ojeda <ojeda@kernel=2Eorg>=
- wrote:
->>
->> The C compiler is asked to add a `cs` prefix to the `call` and `jmp`
->> instructions that go through the indirect thunks for the `r8`-`r15`
->> registers, which makes them 6 bytes long instead of 5=2E That gives
->> `patch_retpoline()` enough room to inline them, e=2Eg=2E as `lfence; ca=
-ll
->> *%r11` for `spectre_v2=3Dretpoline,lfence`=2E
->>
->> However, Rust code does not get the prefix, e=2Eg=2E for a
->> `CONFIG_MITIGATION_RETPOLINE=3Dy` build:
->
->Any comments on this?
->
->If it helps, then I am happy to take it via one of the Rust trees with
->an Acked-by from x86=2E
->
->Thanks!
->
->Cheers,
->Miguel
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Low] genksyms: unresolvable ambiguous 12-char SHA in Fixes trailer
+--
 
-LGTM=2E
+commit e896d8ddfccae8b5749722baf42845ecf75f09be
+Author: Leizhen Zhang <lzsx618@gmail.com>
 
-Acked-by: Borislav Petkov <bp@alien8=2Ede>
+> genksyms: fix infinite loop on declarations with parameter lists
+>
+> decl_specifier_seq updates the global decl_spec, which is used by the ','
+> action of init_declarator_list to give each further declarator the
+> specifiers of the declaration. However, decl_specifier_seq is also used
+> for parameter declarations, so for a declaration such as
+>
+>   int a, f(int);
+>
+> decl_spec is clobbered by the specifiers of the parameter "int" by the
+> time the ',' action runs. The action then links the parameter's own token
+> node back into its chain, creating a cycle, and copy_list_range() loops
+> forever while allocating memory:
+>
+>   $ printf 'int a, f(int);\n' | scripts/genksyms/genksyms
+>   (hangs)
+>
+> Before commit 45c9c4101d3d ("genksyms: fix memory leak when the same
+> symbol is added from source") the same corruption did not hang but
+> silently recorded a wrong type for subsequent declarators (e.g. for
+> "int f(long), a;" the type of "a" was recorded as "int f ( long a").
+>
+> Only set decl_spec in decl_specifier_seq_opt, which is used at the
+> declaration level, and let decl_specifier_seq just return the last
+> specifier. Struct and union member declarations use a new
+> member_decl_specifier_seq_opt that does not touch decl_spec, so a
+> struct body nested in a parameter list cannot clobber it either.
+>
+> The generated symtypes and CRCs for 149 preprocessed kernel source files
+> (1128 exported symbols) are unchanged, and no new bison conflicts are
+> introduced.
+>
+> Found by fuzzing genksyms with ASan/UBSan.
+>
+> The problem was found with ASan and UBSan, and the analysis and fix were
+> prepared with the help of an AI coding assistant; I reviewed and
+> tested the result.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Leizhen Zhang <lzsx618@gmail.com>
+
+[Severity: Low]
+In the kernel repository, the 12-character prefix 1da177e4c3f4 is ambiguous
+because it matches both 1da177e4c3f41 ("Linux-2.6.12-rc2") and
+1da177e4c3f47 ("docs: git SHA prefixes are for humans"), so git cannot
+resolve the Fixes tag.  Should this use at least 13 characters, or
+reference 45c9c4101d3d ("genksyms: fix memory leak when the same symbol is
+added from source") which introduced the copy_list_range() call that loops
+forever?
+
 --=20
-Small device=2E Typos and formatting crap
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261110000003.1719=
+966-1-lzsx618@gmail.com?part=3D1
