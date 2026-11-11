@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794404478;
-	b=v768SQb7G06OiHVAu082gbV9SH/xe1HDjR9enfBEvhkIR3yWIX2QnEmZ8bH5li5gZ1Vo
-	 WNEpbQoZwdRtoGSLGUrt57YmtEAtLtPE6fG3zSnuh6gd0oNNRPWdDQ6zxAm2tiJ7mqitE
-	 OtSTIo7GWF2CaaRA+aTV5BT4HZJO+BCHzz+1IX291MxLcudhmn7zSCaINfbaumENDnI3x
-	 Juk3X5djIeXv9MvULB+FuICkfZBsfCZEES2RAoFlh3kun12F/QB7WZQ6OpVdzV8DUGjLl
-	 sb3/3lrXuIdxmww5BYw8+INAWytfJ9yCQPO765oN53QF/0t2Gb2rt+fO8s9wjqxKyVA==
+	t=1794404480;
+	b=FyITnKvTGRMn4zr5dglUQSC/SlIlHMdP9335XNOX6Ej7qn9j2cBzScsfmE8+qMrro8E0
+	 n9h0i1a4F4sepsTsaK+HjSKsAGizdhiegT7tF8ITKvO4QQC9w1+BOZa5dZkWTQy2TOLF/
+	 /UqBHGrFxmopdGl+PVkR8PjYHuVj8K37Wj50TfKQ4bu98i3g1qwJYXxKSpLEAUEbCA6pV
+	 a+Rkx7t/MaKsY8dOEjGxjXvu3meq+f+ciKY4kvS8YIg5qF8IPDLBBGl5IoZ8gmq9p3hlA
+	 MRnkmMzc5T/vvF/DIOb7EjKeC+5pDKXUgtJbygEa097FcIzlakakxO99wJGIs93ijVQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794404478;
-	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=Wf6GC0pos7NagAI8bEw9egY7U0gPHI7FXFb0Thd1+L0=;
-	b=u3VcrEyx4BgUp4sMCaegN/Bp9+KsNVWCb/U4zXHakL6xkX/S5d1vUVKsL99b51+xvu0+
-	 2xqPO1flBlWQDHsGb+dHNus7BL4HzVfEjNpY3BuO+EM05ZUa2aUMOKOr0XpjRb6D5D2gF
-	 S9hmiaOqZYwuWXr6GUX52O8rU/zZ45vROMLs0RbkW7f/UiUBxYeYdyR3dv8yHxFIZ5b/v
-	 YC7B7/Xdntcjqy75V8DXqdlztG5ukMSkXtJrQX40Ez280B3/mUj7qjnf3k9tFy35bp0Wv
-	 11MvFOq8P8oA/llji0ovzirwBIV40CWskGqF38ETbOztv5CYKg3566E/OA7LvubnW2Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794404480;
+	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=an3TW83ZdtfT2MwoqXi8iWyGphn95qAGXKqfNkWAXfk=;
+	b=N0MD1Ijq0DchNygKWzoFeiyaeujBpepS2W+XEw9U+Izojty2HMZemiTRHDwgKGejWrYv
+	 QL8kTHJIK20Rt4yP2oq5iT0gbqoDBNuVjO/Q6aGE7TbczgW+SW/ueNR+X5ktAERBtxeat
+	 bH0yo5H5hnTS1r0Ww0fnGQYOkQVc7HehcqECycqZuROaGgrTCGumFoOGjiE0dOuavXsjo
+	 jCHzHOmUSH8cUL6HsXtdRsfefN0XWXuBLErHJRLgC4Hu7typGgzZRWHlw4h9Aa/JO+f80
+	 LjDUoS7xww8TOpE3i4UaLYde8bhg51n+LdEjCBcho7F2ISFTUbsournTBYoFmbYrMMQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BPoEitQX;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mDJvm9DZ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CBE606A31C;
-	Wed, 11 Nov 2026 13:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0B1606A333;
+	Wed, 11 Nov 2026 13:41:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BPoEitQX
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2121D1F00A05;
-	Wed, 11 Nov 2026 13:41:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mDJvm9DZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EBFE1F00A05;
+	Wed, 11 Nov 2026 13:41:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794404478;
-	bh=Wf6GC0pos7NagAI8bEw9egY7U0gPHI7FXFb0Thd1+L0=;
-	h=From:Subject:Date:To:Cc;
-	b=BPoEitQXjGmdN5KW2c0UNs8lVzZgLqtiUG62LOacpVojt9wHT47QNOAEaFgmxQuOT
-	 LcZQV1Rmpa0SFXblA/pTGc32JglFfvU8aiKyEumqd3dS9/eS3lIfW14vZDYpWHzIjU
-	 YV0wTPf1ps+1mvFgAGcu0Igov5ACwHbDb15HJKk4fHmJcekamygvulndI/Zzl6sIW1
-	 1zT29CX5JpyNoCgNfPIDQyLF+fv0whc3CXkgUiMdPCuQM8N0QKtdgCRelmn3I3VZrY
-	 rPmuUvk/31ofqvBaA2u4g98M9Ej4T/X8jOFCN//B3+T9MpEIf4Jh1nEMUPw2IdvHzx
-	 td5j2mqW8Pl2w==
+	s=k20260515; t=1794404479;
+	bh=an3TW83ZdtfT2MwoqXi8iWyGphn95qAGXKqfNkWAXfk=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=mDJvm9DZo1HkrE3pb8UCSA3HTwc2O3eGKShLigUsy39u8UoL6dT8TYhhobrj5mSBo
+	 cYQQDh9xYuJNXpA6roxseht8LDxS7o4UxHz55+q+HLubW46ExnF6z3cRKWd40800z6
+	 XierzCbiApwgYjar1swKIIFnmSb/k8DTdtaCAU5sh1edx20Nno8Dde+kUzxTzVhzmL
+	 isrtH8ONsH915dmf7NKJuu9pD/tKNZZMWpvgqxfDMjEOAe+AISKKq3pVJ0B1mUmSE8
+	 7p94DLjyzPxQVV/zQ2NgzyQoLowGNUpvULcAjQrW6/cqKuCXsuLSaz8Y/8dtTvjLHb
+	 uw/UzzkHNQfIA==
 From: Vincent Mailhol <mailhol@kernel.org>
-Subject: [PATCH 0/3] kbuild: reduce single-build dependencies
-Date: Wed, 11 Nov 2026 14:41:02 +0100
-Message-Id: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
+Date: Wed, 11 Nov 2026 14:41:03 +0100
+Subject: [PATCH 1/3] kbuild: make rq-offsets-file an explicit preparation
+ dependency
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -55,95 +55,51 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/y2N3QqCQBBGX0XmuiGVWshXCS9099OmdLX9CUF89
- zZtboYDH+es5OEEnqpsJYePeJlsguKUkX40tgeLSUxlXqoiHTuYqMFebD+A2yiDYYMZ1sDqZOK
- bUuqiuvLa5JqSZnboZNkT9/pgH9sndPh5/wuHd0ztcMyobTxYT+Moocpee+R8PLZYAtXb9gW6p
- ZDJugAAAA==
-X-Change-ID: 20261111-reduce-single-build-dependencies-966646f25a0c
+Message-Id: <20261111-reduce-single-build-dependencies-v1-1-7196ca986a85@kernel.org>
+References: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
+In-Reply-To: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
  Vincent Mailhol <mailhol@kernel.org>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2245; i=mailhol@kernel.org;
- h=from:subject:message-id; bh=ayFwgbyzCc4jEX+AV8iN6VwSnjdMzA1UPAmivFUt1tc=;
- b=owGbwMvMwCV2McXO4Xp97WbG02pJDFlfCirKvuuFvvz37cRqRikucUmpqQLHnibsj/fY2f3Yj
- +HZ7c7mjoksDGJcDJZiiizLyjm5FToKvcMO/bWEmcPKBDJEWqSBAQhYGPhyE/NKjXSM9Ey1DfUM
- gQwdIwYuTgGY6ohdjAxTH/g0Km0yO39w09UoZq9t0Sp7MhbuMlfgnqe5woRFVMCFkeGa+fWV+U/
- mC83zaIltYly2d9ZWt+1iP/b6JgXsWsv+uYgbAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1024; i=mailhol@kernel.org;
+ h=from:subject:message-id; bh=9viEUNJwwz+O3SrkICAMO/5gG9D0++zxZl0+mSGfRXs=;
+ b=owGbwMvMwCV2McXO4Xp97WbG02pJDFlfCmrqZldFaTzamsztvWfKlz9uEQb9rVMmb5uzy07bR
+ HHnqlntHRNZGMS4GCzFFFmWlXNyK3QUeocd+msJM4eVCWSItEgDAxCwMPDlJuaVGukY6ZlqG+oZ
+ Ahk6RgxcnAIw1VptjAz7g4yfaszYIe3TOuuNg9TML29lvmwV2j0v4Y3Ol/+2mvOeMzK0vGRbvV1
+ n1e5L8qVdqpPWrVp0M+zwwuen3ty1LLpq+lqVHQA=
 X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
  fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 
-Building a single .o file depends on the prepare target which contains a
-lot of dependencies. Some of those preparation dependencies are not
-needed for a single .o build.
+The generated rq-offsets.h header is included by linux/sched.h and must
+exist before compiling ordinary objects. Currently that header is
+prepared indirectly through the missing-syscalls target.
 
-This is a small annoyance because a modification of the compilation
-flags causes several prepare dependencies to rebuild. Consequently,
-single-build incurs an artificial penalty.
+Make prepare depend directly on rq-offsets-file. Because rq-offsets-file
+depends on offsets-file, that other dependency can be removed.
 
-Move the generic preparation checks and scripts/mod out of the
-single-build preparation path. The first patch is a preparation change
-to make rq-offsets-file an explicit prepare dependency. The second
-addresses missing-syscalls check and atomic-checks. The third and last
-patch addresses scripts/mod.
-
-== Illustration ==
-
-These are the build steps triggered when changing the compilation
-flags (here: adding W=1).
-
-Before this series...
-
-  $ time make W=1 init/main.o
-    CC      scripts/mod/empty.o
-    MKELF   scripts/mod/elfconfig.h
-    HOSTCC  scripts/mod/modpost.o
-    CC      scripts/mod/devicetable-offsets.s
-    HOSTCC  scripts/mod/file2alias.o
-    HOSTCC  scripts/mod/sumversion.o
-    HOSTCC  scripts/mod/symsearch.o
-    HOSTLD  scripts/mod/modpost
-    CC      kernel/bounds.s
-    CC      arch/x86/kernel/asm-offsets.s
-    CC      kernel/sched/rq-offsets.s
-    CALL    scripts/checksyscalls.sh 
-    DESCEND objtool
-    CC      init/main.o
-  
-  real	0m3.603s
-  user	0m2.839s
-  sys	0m0.959s
-
-... and after:
-
-  $ time make W=1 init/main.o
-    CC      kernel/bounds.s
-    CC      arch/x86/kernel/asm-offsets.s
-    CC      kernel/sched/rq-offsets.s
-    DESCEND objtool
-    CC      init/main.o
-  
-  real	0m2.060s
-  user	0m1.505s
-  sys	0m0.732s
-
-(done on an x86_64 cpu).
+Keep the rq-offsets-file dependency in missing-syscalls so that the
+check can still run independently.
 
 Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
 ---
-Vincent Mailhol (3):
-      kbuild: make rq-offsets-file an explicit preparation dependency
-      kbuild: move preparation checks out of single-build
-      kbuild: move scripts/mod target out of single-build
+ Kbuild | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- Kbuild   |  7 +++++--
- Makefile | 11 +++++++----
- 2 files changed, 12 insertions(+), 6 deletions(-)
----
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
-change-id: 20261111-reduce-single-build-dependencies-966646f25a0c
+diff --git a/Kbuild b/Kbuild
+index a6a0192dea08..5a65be2d51b0 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -87,7 +87,7 @@ $(atomic-checks): $(obj)/.checked-%: include/linux/atomic/%  FORCE
+ # A phony target that depends on all the preparation targets
+ 
+ PHONY += prepare
+-prepare: $(offsets-file) missing-syscalls $(atomic-checks)
++prepare: $(rq-offsets-file) missing-syscalls $(atomic-checks)
+ 	@:
+ 
+ # Ordinary directory descending
 
-Best regards,
---  
-Vincent Mailhol <mailhol@kernel.org>
+-- 
+2.56.1
 
