@@ -1,47 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794400564;
-	b=1rRWMsEY7Hs/t1q9YFEes4nicjupm7HtkokZdQQ2+gjSHQ+Z7/642P8NsFHFD1ind9at
-	 E5bSmMeLAeADuZOL5GL4EV/JscWP/4zbocMhhWyB5nKGJLpLknzEbh+2HmjB3CKjanTLj
-	 vCwtgahnjpEonTPwter/kKKFDc7eH4Y7CPiYDS8q8eMTNYycZWGjViDStC+jyu0nwCxwE
-	 ASibkmf0XXQ7sYqhgMIrYQ/7hCOH3NMZOQqO+hl/P3vfxw9omCmeUO6AO4jzyN1AoPJoB
-	 iItJ/wfHNxrykfW2JiYeUS5ZKG7LRb5pGgqjLp0WziVZMVxCKtbxyrR7qEuYX+NTbBQ==
+	t=1794401213;
+	b=2GVdtBuBfb5ZrhHrcIeXf53zKSyJy3t2pFHbz+XJD+KYPbUUcPsWxJH27xw1t1OK9JvX
+	 nQdAIdRej7JQmJm5S3LwsjsIuBTt95SaKQl7g7dRJOspbpu/Ze89Fdozl/bdZesLKoISy
+	 tWJXdQjUwtL54I16PvKGVoVFb3Kn8FN78LfEJNjQwBUJVtmkMmkqz8NYwLxHZrSNIw52q
+	 4uXOGsI7+kNGzFO5+Q7JEQ4nJk0Pvbkbam+IXhjyJ7JwnXhfj5S9Mwt1D2xsa+zBJOuiH
+	 FtubxC6g4yPTiqIZk8m1Ll1GEuYZrkd4HorergnZMU93D2ZfczV6NQ5Y5Qua/80+7fw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794400564;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794401213;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=dupzLpkceFuWrFi/LEBVfl9CMIVn2NyAFtg6ujtOZ7E=;
-	b=lw9p++1GO9r+PIpgUBLpPK5k8fBJPKc5RHfhVlUuz42KjYDcqafpt9Fv/RUEZePZRQcl
-	 2EvgQWTq1T4hNSh6HyATf7/3eItDu3R53SZrhOidfzBJ8X4XPI2IQEes/+Tvkf5tk8rCV
-	 vaFMBzvf0dtKkGdyJvRiBVH0LCps3WX+Yk3K3cAZgnV+az0X4e5BAArcbEpDY+7L/edUc
-	 HZ1b+RamN0AtvsCEYepFIZXxvJuwzeN5lMMk09PCvYAbd5paxi29uUXo2jkVSVlk1GPfZ
-	 drZqc/H8bdy/BsDdYtoUVNwye6lZkvq1jS+ug1OX/iRyEplRxDGZ5lBxVGqTsbKz12g==
+	bh=QhJOCa+1Qe6960YUiR0AbRg7kmwlsf759Ceo5CeH5Lk=;
+	b=jIjO3nRgjiawcS0Pw5xVzYj/SMtaTN8PcMt+ApICC4QArTG6k8KLLDXk7458kmFYRyJr
+	 UHm0HRj77mXUcTreKrThk5TcEzXTIDMjrtkBLhBcStQdXH3mHkORluppe0d1qPQh1UL1c
+	 4UJ99zqvXvssaDlyR4yzogVHBbfxKsaOebgAzgW1E7gVxqgExwFBffDxtCPAX1QrNvBWs
+	 /GwsYD4aYLd8xLuSMIsb6TNqZ6mhYzUrkOCykblVS/yhCW9Kg58D9Fpyds99jhWhtAhFT
+	 U8gLBExFuYln6KlDnuFUyICI8zFADbOjNvYy8uwRq1qxRLf0fK5/mpBihfwdDFb7qgw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lazi7o8p;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YKweV1n+;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96247606A31C;
-	Wed, 11 Nov 2026 12:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717F4606A326;
+	Wed, 11 Nov 2026 12:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lazi7o8p
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE551F00A05;
-	Wed, 11 Nov 2026 12:36:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YKweV1n+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A2261F00A05;
+	Wed, 11 Nov 2026 12:46:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794400564;
-	bh=dupzLpkceFuWrFi/LEBVfl9CMIVn2NyAFtg6ujtOZ7E=;
+	s=k20260515; t=1794401212;
+	bh=QhJOCa+1Qe6960YUiR0AbRg7kmwlsf759Ceo5CeH5Lk=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=lazi7o8pPGGOczPlJvzY6/mkl6nAE+dqvizkgYLQGq9FmY0H51Ycc5tGNfLUFJrxY
-	 4Biu9OUvhiMuPLmLbWvxVeBsg/uW6cKaX6KprFsAFNxLkUce91mvOEDYINaVcc09Xg
-	 z5Qvv9rEcQdsD3He1ZqNsB+XgEvgslzYSCcH065Cn0NTOQTbDdEKMJy4ko/TH17EXl
-	 uFXQ6xQaSHNhrC1iod46Dyl5Mq6loVxnp3sCkhPW+UUDqvFBG3qay3KdVsxPOHS2zf
-	 e8ndeQ7JWuBwVALhuLRSc6E6vlj2y6jiBMILQHsIkre9+P0zdNS9yOGypDE4cbzEAV
-	 KUETqOCJLqF4Q==
-Message-ID: <sashiko-outbox-208986@kernel.org>
+	b=YKweV1n+wEoSOFAcA4aE4ZYKKkCUQnhobZwiXjd9vyVkrfy35gBsHTONezyf5Rcd1
+	 LDuN+oENDnBgRjL2NiiRWsnblVFQFj34Xo0BQ47CHsXupU7gm4i6DdrMUi0w99xTUq
+	 5NQSBg6QWzNybwZomxztXLDeDfNG9fkl6IwLOCDcJ58SXKlfD+yuFRlzslahTPLEnm
+	 CVquY4ui83ndXkLYaGGJNuaHyTgbLB7K1OktWcEoYoANKedX9GF4w1GH5Z2zsiULN8
+	 vsuOlJT1ZJYmKZujmJiz6ZkpwFuXXmaylNvZgx75ano2Od+yWWbwFVCo3GHSd3nSBH
+	 bfUqpQALbSC9Q==
+Message-ID: <sashiko-outbox-209009@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 next 05/13] kallsyms: Fix selftest startup delay
+Subject: Re: [PATCH v3 next 07/13] kallsyms: Match compressed tokens on the
+ fly during binary search
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "David Laight" <david.laight.linux@gmail.com>, "Petr Mladek" <pmladek@suse.com>, "Kees
  Cook" <kees@kernel.org>, linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, "Jim
@@ -49,12 +50,12 @@ To: "David Laight" <david.laight.linux@gmail.com>, "Petr Mladek" <pmladek@suse.c
 Cc: "Luis Chamberlain" <mcgrof@kernel.org>, "Andrey Grodzovsky" <andrey.grodzovsky@crowdstrike.com>, "Steven
  Rostedt" <rostedt@goodmis.org>, "Andrii Nakryiko" <andrii@kernel.org>, "Samuel
  Wu" <wusamuel@google.com>, nathan@kernel.org, nsc@kernel.org
-In-Reply-To: <20261111115911.1142000-6-david.laight.linux@gmail.com>
+In-Reply-To: <20261111115911.1142000-8-david.laight.linux@gmail.com>
 References: <20261111115911.1142000-1-david.laight.linux@gmail.com>
- <20261111115911.1142000-6-david.laight.linux@gmail.com>
+ <20261111115911.1142000-8-david.laight.linux@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Nov 2026 12:36:03 +0000
+Date: Wed, 11 Nov 2026 12:46:51 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -66,33 +67,33 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential
 issue to consider:
-- [Low] kallsyms: missing Fixes trailer on selftest startup delay fix
+- [Low] kallsyms: duplicated paragraph in commit message description
 --
 
-commit 06f0c3fe023ccc28da9c2bd9798921899fb0ec63
-Author: David Laight <david.laight.linux@gmail.com>
+commit 997bbc0ca13e8295f645bd1de808235b97a9b662
+Author: Jim Cromie <jim.cromie@gmail.com>
 
-> kallsyms: Fix selftest startup delay
+kallsyms: Match compressed tokens on the fly during binary search
+
+This commit introduces kallsyms_strcmp_symbol() to compare ASCII symbol
+names against compressed symbol tokens on the fly during binary search in
+kallsyms_lookup_names(), avoiding full symbol decompression on the stack.
+
+> However, full string expansion at every step is equally wasteful: of
+> the ~17 strcmps in the binary search, only the last needs to check
+> all N chars in both strings, earlier steps will know +/- outcome at
+> char 0,1,2..N-1.
 >
-> The kallsym_selftest code clearly intends to sleep until initialisation
-> is complete in order to get more reproducable timings.
->
-> Replace the schedule_timeout() calls with schedule_timeout_idle()
-> so that the thread actually sleeps.
-> Poll every second (not every 5) for SYSTEM_RUNNING and then wait
-> another 10 seconds before starting the tests, otherwise the tests
-> start as soon an init is executed.
->
-> This code is in the initial 2022 import of the tests.
->
-> Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> However, full string expansion at every step is equally wasteful: of
+> the ~17 strcmp()s in the binary search, only the final matching step
+> needs to test all characters.  Earlier non-matching steps diverge at
+> the first differing character (0..N-1), but the baseline expands every
+> candidate symbol to the stack unconditionally, before comparing.
 
 [Severity: Low]
-Since this fixes the broken schedule_timeout() call from the initial
-selftest import, should it include:
-
-  Fixes: 30f3bb09778d ("kallsyms: Add self-test facility")
+This isn't a bug, but the commit message duplicates this paragraph, where
+the first version looks like an earlier draft of the second.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111115911.1142=
-000-1-david.laight.linux@gmail.com?part=3D5
+000-1-david.laight.linux@gmail.com?part=3D7
