@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794444747;
-	b=5DwwR7rZJ3IBFC97lVzuAIeUGvZfyuv8bQkAngI3AIxrW7LvAjYppxq2GsY1oSct/YkA
-	 A+NPSXocl/hnXsC/uSpF0HSqcjGkYk+C4FT4qCCfKauYhOfIKBqjmcD8yjbnONjZ+mxRo
-	 z/iKdNe1AmpSYUB+TOhyY4oIYqSk1S7HEYL/6GN6hq5QRQlu9XKLaRp3kFth0jcCjJcIb
-	 NSvhAnKcXZaxN0Rm22y0jPNRaDg6or878taG1ZL0i9+OfIglCsueP0RJGi+OWEZLp1RWj
-	 FcqR2RoiDJ2yPsM3BQ/C9Pyodu8clszk15l3PwZzFKnZQc9FGNaGvF6sZycrW4OZTWA==
+	t=1794444750;
+	b=gI150/o4UuSv+C8ClyfBN+KG8azzSJi3LG0JcgAZoI7dTt+osR3MU6VDXh4hLTv+rRbj
+	 g9JdVcsCPyV+Ya9GNb4rbSS/p5wiHQO5NQXD08Pfgzwv1/4EWKekZJmB+5EriFBQZHMQk
+	 zRztsMVKHXaVtBR7HuX5zAGRksuqYuLZDtejE6o1Vh4oB13JjpP9c4x6MHdXCvp/AykF6
+	 zQNCqsQl+0LsWtWSNMalQtb/sW6PpA0xxLqvxd/oYHId70QBh3PDWkLBXnaeuH20GRS7M
+	 hCS++ybUN+qZb9jeMPWY2lzV3M2XdjtS6SKgyYZYI0DkPw21S0MBgMRlnD/Swt2Lj9w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794444747;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794444750;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=P9ZuztlUPoctnqcHf/2Ym1t6tNXL8VOARRpsBJYkGr0=;
-	b=nhIl5+pMDXvo486CjUdkTfHh0Z8PM2pyqnUU6PG//ZtcQ3/uq8UWxcUHjmODHW7F3DxO
-	 SWr5cn5MXVRRMhBmgPw7AeEP98EkqLM/pqguU1KRCLgZ6or7yq6P8xjdSzR52TfWmqwMN
-	 3sG/GVodAMpedEuT7jY+Xzl3UQAC45ZmfZq6pvVMTaucyhRPlbi87AmaRLRnU1G5aJr9t
-	 8+rplmn7/NxlymnECSi1EWa3iKcFn8kTkfJPlm6FCU4ZJHDYeNFiLHnyNakAciVdJ+YcI
-	 7ZrCoHWoWiJlseyP/GtArFFnw97Bc1M+zFkZLtXcb6XsNgSuw30OGDR8t9COKsV9bYA==
+	bh=Ly+BsufNIv370j8p07TD2PGfCvrVzQv4fO91mb3IBJs=;
+	b=Vxt80aqlPM/+VYq+5vQ5N+C3SAJcC0MtB5ZPjSIXBeaTea9h29CJn7el0aA7EnaL2qov
+	 d+J/bD9c3DrKhcC+X1p2qIhygTqeruZqtm88XSSmtLJNTyulIOLaN6XB1xr902BD1DtLv
+	 sFPr3jTcIcNTKQ2D5UB7UXoXDv++4jxZehtO3t9cDj85qDly9K+PhmZ0evJ4re3TKWybC
+	 IaZq/GITX3A8F6jB3ebriNesJkWHCTzAGTW0ebqmsb79a/CEiazMw/hKhqNhFsRFz1XWq
+	 eeorlRuSi8q8eG6Cexp4whU7g3PLf65A/DTsSrbqbP+UGnC1qvIVbU+zSKwWeQAhYcA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Kcyg97AW;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mUuEq9ls;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB59606A88A;
-	Thu, 12 Nov 2026 00:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE70606A899;
+	Thu, 12 Nov 2026 00:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Kcyg97AW
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59FEF1F00A0A;
-	Thu, 12 Nov 2026 00:52:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mUuEq9ls
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16521F00A0B;
+	Thu, 12 Nov 2026 00:52:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794444747;
-	bh=P9ZuztlUPoctnqcHf/2Ym1t6tNXL8VOARRpsBJYkGr0=;
+	s=k20260515; t=1794444749;
+	bh=Ly+BsufNIv370j8p07TD2PGfCvrVzQv4fO91mb3IBJs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=Kcyg97AWIgx965vJesXBnh46PhKC7UGXaWiXfy+bOtCNvw7syFC9kuNQ3jgyxXoKa
-	 mtMZ3JcvsENOmsBldNC/lCjX3rjLyqjq9HN8Zrd5UL32Wljds8a+xapsRreYNWkmTM
-	 av4LrSGVfKXnvt3iLqw5rjTxVZ0Uf12OBZ7g26ov1bfzR7ZODTrWSyv3bV9IbjrUTu
-	 bGCzuue/jUOU/vqr2do8EE9HWQR2zCeZ53u6zMGqzEVlWIREDgU3Uqz2o00NNU6MPj
-	 qj4RCYW0wlIn3V62/tRJRxF9UoX2x49o3x2hr04s34djoBKHjFsyceoJflC+fVDTJ1
-	 MMAO+a0GHMx0g==
+	b=mUuEq9lsXu/aIFD4ZyRZXGkXJxe6URJ1JYFq337myEF5yX4rENa/6y918QHRZ/c/k
+	 7rt4vH6WuM1Gh3SUWboyudomE1dQ0V2tjGq5GUgmvf216/eXasqfPDhV4I+k/Khlb5
+	 MrxpwtYAl1ln2urcs6zKa4cA9pxpGvSkNQEpTsgHXSZdXzQy2nxjArDogEbfr2D4td
+	 hDF28n8eH9V2hcoGkTE9Ih+BtDJw2v/55mWpnt57+DOAa1jYSncT42jIqomaRkkmUf
+	 fNTCvfWC0rDXVyVhJYyYLlbYmjyWr/kpgba33Z3i6UmaNUEN1wj/R2lsSPkGpFyNoR
+	 /rQoxpYxv2m4A==
 From: Nathan Chancellor <nathan@kernel.org>
-Date: Wed, 11 Nov 2026 17:52:04 -0700
-Subject: [PATCH v2 2/6] scripts/Kconfig.toolchain: Do not dynamically probe
- '-fno-addrsig'
+Date: Wed, 11 Nov 2026 17:52:05 -0700
+Subject: [PATCH v2 3/6] scripts/Kconfig.toolchain: Clean up
+ '-fno-allow-store-data-races' handling
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -55,7 +55,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261111-kconfig-toolchain-updates-v2-2-b2d9415c1757@kernel.org>
+Message-Id: <20261111-kconfig-toolchain-updates-v2-3-b2d9415c1757@kernel.org>
 References: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
 In-Reply-To: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
@@ -66,40 +66,65 @@ Cc: Julian Braha <julianbraha@gmail.com>,
  linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
  llvm@lists.linux.dev
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1063; i=nathan@kernel.org;
- h=from:subject:message-id; bh=c36ACcGFS9SpK9Is3XYNZQCupebZON88Go6ISpoOm9o=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFlfefetumTmVG29SHNFvvEea8Folv2Z+xZZH9QwYtqxs
- ivE2Sa9o5SFQYyLQVZMkaX6sepxQ8M5ZxlvnJoEM4eVCWQIAxenAExk6zqGv9IbT+t0nHobkBOq
- eFn8xxNHlxb9NX0i9RwWAcHJ2/PmtzP8M6p22PVr1WvxF1UTyrvaXa5IP7jY3cRwr63GaGZCg+w
- RdgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2314; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=FUuYGzRoAi4s97S6XgIIx8GQogeTcteEpGl81/L/NxA=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFlfefedP1pppGN78luRzUPnNpWdaZocXmX+QXpnWhZ/v
+ Kx6a97UjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRUm1Ghi3S9exvL7RdtD/S
+ /uOdbded2rnuj7n0anqPe54xrdbLiGRkuM9yrs7qyO85yYZHmr9EzN0wK2PX+hMmR3zVS/ewe0z
+ KZgMA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-'-fno-addrsig' avoids generating the LLVM specific .llvm_addrsig
-section. This flag is supported by all supported versions of clang, so
-convert CONFIG_CC_OPT_NO_ADDRSIG into a simple string symbol that
-depends on CC_IS_CLANG to clean up a dynamic probe that is unnecessary.
+Commit 454e00cf8ee5 ("kbuild: avoid re-running compiler and linker
+probes") added two separate symbols for the "no allow store data races"
+GCC flags. These flags serve the same purpose, so combine them using the
+second argument of cc-option-str to handle the old value. To avoid
+setting the second value of cc-option-str for clang, add a GCC
+dependency to the symbol. This will eventually allow the cc-option-str
+call to be eliminated when GCC 10 is the minimum version for the kernel.
 
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
- scripts/Kconfig.toolchain | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Makefile                  | 5 -----
+ scripts/Kconfig.toolchain | 7 ++-----
+ 2 files changed, 2 insertions(+), 10 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index d73f2bbd3b93..fb2490faa8d1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -949,12 +949,7 @@ KBUILD_RUSTFLAGS += -Cdebug-assertions=$(if $(CONFIG_RUST_DEBUG_ASSERTIONS),y,n)
+ KBUILD_RUSTFLAGS += -Coverflow-checks=$(if $(CONFIG_RUST_OVERFLOW_CHECKS),y,n)
+ 
+ # Tell gcc to never replace conditional load with a non-conditional one
+-ifdef CONFIG_CC_IS_GCC
+-# gcc-10 renamed --param=allow-store-data-races=0 to
+-# -fno-allow-store-data-races.
+-KBUILD_CFLAGS	+= $(CONFIG_CC_OPT_ALLOW_STORE_DATA_RACES_PARAM)
+ KBUILD_CFLAGS	+= $(CONFIG_CC_OPT_NO_ALLOW_STORE_DATA_RACES)
+-endif
+ 
+ ifdef CONFIG_READABLE_ASM
+ # Disable optimizations that make assembler listings hard to read.
 diff --git a/scripts/Kconfig.toolchain b/scripts/Kconfig.toolchain
-index 666d44cc6ba8..570c5a31016c 100644
+index 570c5a31016c..6520a06a9103 100644
 --- a/scripts/Kconfig.toolchain
 +++ b/scripts/Kconfig.toolchain
-@@ -164,7 +164,8 @@ config CC_OPT_ZERO_INIT_PADDING_BITS
- 	def_string "$(cc-option-str,-fzero-init-padding-bits=all)"
+@@ -176,12 +176,9 @@ config CC_OPT_DIAGNOSTICS_SHOW_INLINING_CHAIN
+ config CC_OPT_STRICT_FLEX_ARRAYS
+ 	def_string "$(cc-option-str,-fstrict-flex-arrays=3)"
  
- config CC_OPT_NO_ADDRSIG
--	def_string "$(cc-option-str,-fno-addrsig)"
-+	# supported in clang, not needed for gcc
-+	def_string "-fno-addrsig" if CC_IS_CLANG
+-# gcc-10 renamed --param=allow-store-data-races=0 to -fno-allow-store-data-races
+-config CC_OPT_ALLOW_STORE_DATA_RACES_PARAM
+-	def_string "$(cc-option-str,--param=allow-store-data-races=0)"
+-
+ config CC_OPT_NO_ALLOW_STORE_DATA_RACES
+-	def_string "$(cc-option-str,-fno-allow-store-data-races)"
++	# gcc-10 renamed --param=allow-store-data-races=0 to -fno-allow-store-data-races
++	def_string "$(cc-option-str,-fno-allow-store-data-races,--param=allow-store-data-races=0)" if CC_IS_GCC
  
- config CC_OPT_DIAGNOSTICS_SHOW_CONTEXT
- 	def_string "$(cc-option-str,-fdiagnostics-show-context=2)"
+ config CC_HAS_MNOP_MCOUNT
+ 	def_bool $(cc-option,-mnop-mcount)
 
 -- 
 2.56.0
