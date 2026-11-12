@@ -1,74 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794497838;
-	b=eTMbrVGLW6IUAeUW4BmU8IN7+Vf+qvZffBlL6FevSssc9dmBvwNqkGBYSpoZQAT4qTb7
-	 /qsQ2g+8+zL/vrOIcF1hkw9CUwqouLlQ5JBI1u2g5Gt/Fmp++DUTIaT5/16OKL4zFjuFS
-	 W/g0MktvmRXM7fFH3AL9LxsJ6zf7A12D3gAdqDzZm1fNndMJ17B6AxfdwlrZ76YbhuoXn
-	 HzCd8XgyVKyTOEcscaHUCJ3uOeDS5Rnet57ixGJsiN5YG8F+AGZfQnrvdbxaslCahyMW7
-	 rP57udkgoMcYd5xIRQls+MGcfMzi9x6gwj3pDNJEiluSJgeMjN53ZYmLQEF+OrbVmPg==
+	t=1794498799;
+	b=H+LG1m+4Vki84EMQ9MNIV9G6ZAgwhxHRnl7rJN6M6lZT2st0WZ8C3t3nNt+JscPsD/zW
+	 TWYgTMixxbN3MHLVZW8E8rY5JGABFUIdiVolS9DhcbFayVmjw44/o1OjU7wUHb9C7/giK
+	 MLe3t3U1Pc/F5qiKYehKJ25fPDn8c/DX6u//mwTIGuiLUYPp2of96glgZ+0MGuHFdVMnx
+	 nRGE4Kn7LI2Zl9NJcx7NP4DaSMbk58/BvEDPDNDn5NafkFSOdPh7XvPRs7ZPVxDRXp44a
+	 VPjsRJNz20jWIb5G0uJ9Ke3tUDdm3q8zRo7Gt7I3NKhd5+cPllUzafeZeZ3LKZ+hTXA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794497838;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Date:From:To:Cc:
-	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition:
-	 Organization;
-	bh=i58snUFxY9yTSGS+iItFZzR/U5IATL55FOLI2eUySOM=;
-	b=3poF5uFkqFWAQeVhia4Ah+dtQZDuL9e3QsYEjSrxGXHnizqzpN8IBGrCs46Hl5UsUJA6
-	 rSLWY6vjsNeLiDBquhe+FIAycB7e1pCkHo9W+47t/QuTMPQFVtU31aChTFXHzwQI91aTz
-	 nWRNRCFIRjVwkspm2e/jnTYH0+OHe6VEg/joA9nBReKCTzX7/2iCFcA51T+X3pHuBE6A2
-	 Y5A9vn6MMngJSmJLJV9GGzrYSDqECPIdSJciCH2h4usHJqLSlu0PdXYYPJN1ZDvHdQFPs
-	 Umy4sXaQh7z5B4vkCzH760d9kuykwu77WPrMaTUKLB5ECHj2vnqJfv40GQSJw6Khm4A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794498799;
+	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=UFtl5GLe9nZn9BitOJaL1QWLScfaFrXmqzl4iAP7tmo=;
+	b=cd51shjRE151ST/90cDzQ5FZ50z8lYH0ArOmLObXQFtKXux8tKUejdE/F9ZYLkXrCHfO
+	 vWZZs7gJnywlcMhqHdM6/b9gw1fjRHAnWyHzMua7CQky2nyMS7SPFBD0Ql2PzxJTfFaoD
+	 kKIiarqDIiFi5jpqto5NXkIkHtzsP5JZf5CZW8KlH7zmuud8JFqpRaTtwBLdgWYQGL/hu
+	 U1s7S63IRr8sOySIMyfc0X/nQDNORZASGDP18a6bS/TSniwg3h3tzE0A5KesScQcDcLfp
+	 e9gJAS2ulcm3ncI8yFIh/Nrkftl9sudxGs9dlP3qEohLE20pSu0u+RZsZnRhRH1lLQg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Yn3CRDrw;
-	arc=none smtp.remote-ip=198.175.65.11
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=linutronix.de;
+	spf=pass smtp.mailfrom=linutronix.de;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=wixbtCzT;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="EPiN0gr/";
+	arc=none smtp.remote-ip=193.142.43.55
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33B1606A32A;
-	Thu, 12 Nov 2026 15:37:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B33B1606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2990A606A339;
+	Thu, 12 Nov 2026 15:53:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2990A606A339
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Yn3CRDrw
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794497836; x=1826033836;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=u2UAqCB8nx4y6B7lDfmLv273jy8Kj4aMY6RjCrvO1NM=;
-  b=Yn3CRDrwPwQWtOj2CZNp0Gc9SXjBlHuwMZrRf470oeDFe03oGmVyjNCt
-   L7yCeuigXd1Xc+vTS7+zqjhFUO01PrIE5sQ70jB01z8wXm8X5d9THic/r
-   abawsBn71QvCkIdEIIDxt084PpPxEtWJt9srmSmzq+iRt49UM/Jz/4kui
-   rqDBvpjbvWi2RnDzFhS6kbpChbectRWje6RpkltBlo1LAHw/iUUv6Hd7x
-   8JfKKWwWBlX4siRas8Y9ABuaPGwB9QZfHNGjecK3cp79baCl2l3UtdmfB
-   ArtTBCGlLn6WJdgZzUay6ThUaeJmvWuVvOSEGAkhqLFiazgnFHLPAtLwt
-   w==;
-X-CSE-ConnectionGUID: TRVRuWkiTVq6/FxUff7t+A==
-X-CSE-MsgGUID: BtqSalOZRMilbNfyM0G88g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11964"; a="3185047"
-X-IronPort-AV: E=Sophos;i="6.27,209,1787036400"; 
-   d="scan'208";a="3185047"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2026 07:37:15 -0800
-X-CSE-ConnectionGUID: rdxpa9b5QY2f3AzeS6lN0Q==
-X-CSE-MsgGUID: aQRVT6NLT9CdDCb68OE+Cw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,209,1787036400"; 
-   d="scan'208";a="8783083"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.6])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2026 07:37:13 -0800
-Date: Thu, 12 Nov 2026 17:37:11 +0200
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Miguel Ojeda <ojeda@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
-	". Boqun Feng" <boqun@kernel.org>,
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=wixbtCzT;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=EPiN0gr/
+Date: Thu, 12 Nov 2026 16:53:15 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1794498797;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UFtl5GLe9nZn9BitOJaL1QWLScfaFrXmqzl4iAP7tmo=;
+	b=wixbtCzT/zD161L+fADU+VHbeRMZthwXbLkiVMNah81RqVCw2wzAKwfpzzus6M/7kO0RAp
+	/tWy9x4NrY0pRp4v+UxF9R4CZcEJ1OXdOgYYMNZc8RdkS5XFzNFYU6XWBtq0VhbMtKwvT6
+	ah0TtMHGjxhjhNzAzrvkAIcG8El7w5eo0q04tdbA15qtVahuX6mKZEm1hVT+aeSmb9oK5q
+	0TNrNfMn3ai8m8LFrGgn8++TQ2Q+RTL79AZXBy95trZjGvpTWrJJ6d79JttJTyJr4MOUBs
+	DfIJK2huLxIdJstif3P3/DMh7W7QhRUuj+WfkyycYWN1+YIQuM0NcZlyrA4gsg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1794498797;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UFtl5GLe9nZn9BitOJaL1QWLScfaFrXmqzl4iAP7tmo=;
+	b=EPiN0gr/Zgzia99J1JDPUJoaPrfPvrXsBek11pT6qFUTeLfD1Cv8Kef56XEAkhQ/Hhmgr1
+	nt+9Cz4rCi37O7Cw==
+From: "Ahmed S. Darwish" <darwi@linutronix.de>
+To: sashiko-reviews@lists.linux.dev
+Cc: Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ingo Molnar <mingo@redhat.com>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: rant on Rust in kernel
-Message-ID: <avXdJyqNNqopuH2_@ashevche-desk.local>
+	Nicolas Schier <nsc@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Ogness <john.ogness@linutronix.de>,
+	Derek Barbosa <debarbos@redhat.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Luca Boccassi <luca.boccassi@gmail.com>,
+	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 04/10] kconfig: Introduce checkconfig target
+Message-ID: <avXg6yuLW0GwFiYr@lx-t490>
+References: <20261106091922.7560-1-darwi@linutronix.de>
+ <20261106091922.7560-5-darwi@linutronix.de>
+ <sashiko-outbox-202759@kernel.org>
+ <avIn71Md3LtNaYje@lx-t490>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -80,46 +90,28 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+In-Reply-To: <avIn71Md3LtNaYje@lx-t490>
 
-Hi!
+On Mon, 09 Nov 2026, Ahmed S. Darwish wrote:
+>
+> On Sat, 07 Nov 2026, sashiko-bot@kernel.org wrote:
+>
+> >
+> > In addition, grep -qw treats $(RULES) as a regular expression with word
+> > boundaries against the comma-separated output of list-rules rather than
+> > matching an exact profile name.
+> >
+>
+> That's good catch; will fix.
+>
 
-(Cc'ed to Rust and Kbuild people)
+I've just verified that 'grep -w' considers ',' as a valid word separator:
 
-I have two quite annoying things that lately Rust brought to kernel
-(in some way).
+    $ echo 'word1,preempt_rt,word2' | grep -qw preempt_rt
+    $ echo $?
+    0
 
-First of all, it broke the old and nice kernel feature to build a subset with
-allmodconfig or allyesconfig. For instance,
+So, Sashiko, this is also a non-issue.
 
-  make LLVM=-22 O=... W=1 C=1 CF=-D__CHECK_ENDIAN__ -j64 allyesconfig -- fs/pstore/
-
-Now this makes a very good fireworks out of some rust.
-
-Ex.:
-
-error[E0609]: no field `disconnect` on type `usb_driver`
-  --> .../rust/kernel/usb.rs:57:27
-   |
-57 |             (*udrv.get()).disconnect = Some(Self::disconnect_callback);
-   |                           ^^^^^^^^^^ unknown field
-   |
-   = note: available field is: `_address`
-
-Second one, is that now with the above feature the build is finished like
-a minute (sic!) later than it was before on a good server with 24 modern
-CPU cores. It started happening somewhat a release ago.
-
-I have no clue what is there, but I will appreciate if it gets fixed ASAP!
-I rely on the above feature to save my time when doing test builds.
-
-My repo is Linux Next based, the compilers are standard to what Debian unstable
-provides. Ask me any details or help with testing any proposed patches. I'm
-really disappointed of having these issues.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Thanks,
+Ahmed
