@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794444750;
-	b=gI150/o4UuSv+C8ClyfBN+KG8azzSJi3LG0JcgAZoI7dTt+osR3MU6VDXh4hLTv+rRbj
-	 g9JdVcsCPyV+Ya9GNb4rbSS/p5wiHQO5NQXD08Pfgzwv1/4EWKekZJmB+5EriFBQZHMQk
-	 zRztsMVKHXaVtBR7HuX5zAGRksuqYuLZDtejE6o1Vh4oB13JjpP9c4x6MHdXCvp/AykF6
-	 zQNCqsQl+0LsWtWSNMalQtb/sW6PpA0xxLqvxd/oYHId70QBh3PDWkLBXnaeuH20GRS7M
-	 hCS++ybUN+qZb9jeMPWY2lzV3M2XdjtS6SKgyYZYI0DkPw21S0MBgMRlnD/Swt2Lj9w==
+	t=1794444753;
+	b=O3xfrTn7KyISwxUr5EdAVs5UvMq8E4MggmXoXScsqBPiCrMs5qIzGLDcdX4IughVDCS5
+	 BLh7mIQbNGO/NeJQt5767W8UtXW2Ad3NOLr3U4/ATqilxG8LOIdiXOyt0MQkWOEoCdfjJ
+	 +aRdMSnPb+2piHk69IZXylXDKvCTcIb9Pk8RkztAVDCLCl0+WDa5P4Eai3ZBNV7Rj3RmT
+	 w8APeGR8Vu6ULlTD+gsHutXxJJj5GPHdVYgBUzplbDsKbjZB3rEOFyvhKdimyvB5VMaES
+	 QLYKosKnCHwQGCukJ6ePSmLrMV7CdtIW7uiDquMXCYb3oyUHI8hyj74CRBsBwhpus4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794444750;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794444753;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=Ly+BsufNIv370j8p07TD2PGfCvrVzQv4fO91mb3IBJs=;
-	b=Vxt80aqlPM/+VYq+5vQ5N+C3SAJcC0MtB5ZPjSIXBeaTea9h29CJn7el0aA7EnaL2qov
-	 d+J/bD9c3DrKhcC+X1p2qIhygTqeruZqtm88XSSmtLJNTyulIOLaN6XB1xr902BD1DtLv
-	 sFPr3jTcIcNTKQ2D5UB7UXoXDv++4jxZehtO3t9cDj85qDly9K+PhmZ0evJ4re3TKWybC
-	 IaZq/GITX3A8F6jB3ebriNesJkWHCTzAGTW0ebqmsb79a/CEiazMw/hKhqNhFsRFz1XWq
-	 eeorlRuSi8q8eG6Cexp4whU7g3PLf65A/DTsSrbqbP+UGnC1qvIVbU+zSKwWeQAhYcA==
+	bh=DAECrafKSpt/7XFimlBzzmF1bv+Nbr5QSGfylmB/A7A=;
+	b=UALVgWqx89ME4qiU4ug8jtmE4u5aamdV9eQrzWhuAsyN1wyuF6Ogce+3BGlMkTS6G+v3
+	 ALNFgEY5ePesgPh4GYSHMcz980Rc2zabtTG0xrkOZ7n1c//yrcRwc97+gVGCxxxUeims9
+	 1gmxrrYKEM6wpT8L7Nm2tRYCMyf2Mh4htjRrNiEVJbOTh3ks0s3ii2XnXt2u80TM+J6GZ
+	 US5MC7i79Q2fVzKKNCIsSAjh/U3JYCFbcy0R7X0leJ/yXg957SK2q/ro/a2V38jMEX5YU
+	 yKe6cYgrIpT4tezBp+Jm9qjQoVuhWDw5l5nTZPLm2wTztZ7E+bir1kCLZZQgmdQAfYQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mUuEq9ls;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Oj62HCJ8;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE70606A899;
-	Thu, 12 Nov 2026 00:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75328606A899;
+	Thu, 12 Nov 2026 00:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mUuEq9ls
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16521F00A0B;
-	Thu, 12 Nov 2026 00:52:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Oj62HCJ8
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57CA71F00A0C;
+	Thu, 12 Nov 2026 00:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794444749;
-	bh=Ly+BsufNIv370j8p07TD2PGfCvrVzQv4fO91mb3IBJs=;
+	s=k20260515; t=1794444753;
+	bh=DAECrafKSpt/7XFimlBzzmF1bv+Nbr5QSGfylmB/A7A=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=mUuEq9lsXu/aIFD4ZyRZXGkXJxe6URJ1JYFq337myEF5yX4rENa/6y918QHRZ/c/k
-	 7rt4vH6WuM1Gh3SUWboyudomE1dQ0V2tjGq5GUgmvf216/eXasqfPDhV4I+k/Khlb5
-	 MrxpwtYAl1ln2urcs6zKa4cA9pxpGvSkNQEpTsgHXSZdXzQy2nxjArDogEbfr2D4td
-	 hDF28n8eH9V2hcoGkTE9Ih+BtDJw2v/55mWpnt57+DOAa1jYSncT42jIqomaRkkmUf
-	 fNTCvfWC0rDXVyVhJYyYLlbYmjyWr/kpgba33Z3i6UmaNUEN1wj/R2lsSPkGpFyNoR
-	 /rQoxpYxv2m4A==
+	b=Oj62HCJ8MNvWMgP41/0dKJ+5vZvPTeLpuOtKP6rinCdhZKwIgbqeI0lqZS+osI0HZ
+	 Y+Pag783baPTNnXA+kXE8OV92FSo2SLDj2LFMtDe0sWtsR8tgAb1x34m5eOsRmqFZf
+	 ikDvzXgQiBAVxayAAL0RSvJ3mdC9SaQn4pDGMV0AK7jueQBciEFia3msZiFDSgJgyz
+	 4A5uhczUQ5xM3fXpUtuPt13xUJ7TDQXSKB/Xn8lIuAEeHgreKrQxx1iMh5FwhPurl5
+	 +ZGCasXMeihfc8F850F9r9KGdegRu3BLVhnkyz+QiEBL7Qm0FFYKDxhTiwumuyE8Vd
+	 mtJywVAbN6GDA==
 From: Nathan Chancellor <nathan@kernel.org>
-Date: Wed, 11 Nov 2026 17:52:05 -0700
-Subject: [PATCH v2 3/6] scripts/Kconfig.toolchain: Clean up
- '-fno-allow-store-data-races' handling
+Date: Wed, 11 Nov 2026 17:52:06 -0700
+Subject: [PATCH v2 4/6] riscv: checksum: Fix CC_HAS_ASM_GOTO_TIED_OUTPUT
+ check
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -55,7 +55,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261111-kconfig-toolchain-updates-v2-3-b2d9415c1757@kernel.org>
+Message-Id: <20261111-kconfig-toolchain-updates-v2-4-b2d9415c1757@kernel.org>
 References: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
 In-Reply-To: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
 To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
@@ -64,67 +64,55 @@ Cc: Julian Braha <julianbraha@gmail.com>,
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>, 
  linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- llvm@lists.linux.dev
+ llvm@lists.linux.dev, Charlie Jenkins <thecharlesjenkins@gmail.com>, 
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+ linux-riscv@lists.infradead.org
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2314; i=nathan@kernel.org;
- h=from:subject:message-id; bh=FUuYGzRoAi4s97S6XgIIx8GQogeTcteEpGl81/L/NxA=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFlfefedP1pppGN78luRzUPnNpWdaZocXmX+QXpnWhZ/v
- Kx6a97UjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRUm1Ghi3S9exvL7RdtD/S
- /uOdbded2rnuj7n0anqPe54xrdbLiGRkuM9yrs7qyO85yYZHmr9EzN0wK2PX+hMmR3zVS/ewe0z
- KZgMA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1327; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=NbI1YZqYLAsD/6ruXbkjBAtuB6jqDayciE1k4lyC0ec=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFlfeff/XDRdcEEYb+n529aHG2fdjV7fzLZV7qavf6W2x
+ B7nvpNFHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAi/qcZ/kpLhSlwKFhJ/iur
+ q3tvLdRit0aS8dEKiflqRt51NrbVugz/4zT5D9j8cq9LrLry7GtTRu2R+pmCHhvuH4ngSwm188j
+ iBAA=
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Commit 454e00cf8ee5 ("kbuild: avoid re-running compiler and linker
-probes") added two separate symbols for the "no allow store data races"
-GCC flags. These flags serve the same purpose, so combine them using the
-second argument of cc-option-str to handle the old value. To avoid
-setting the second value of cc-option-str for clang, add a GCC
-dependency to the symbol. This will eventually allow the cc-option-str
-call to be eliminated when GCC 10 is the minimum version for the kernel.
+The defined symbol is CONFIG_CC_HAS_ASM_GOTO_TIED_OUTPUT, not
+CC_HAS_ASM_GOTO_TIED_OUTPUT.
 
+Fixes: 4525462dd0db ("riscv: lib: Check if output in asm goto supported")
 Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
- Makefile                  | 5 -----
- scripts/Kconfig.toolchain | 7 ++-----
- 2 files changed, 2 insertions(+), 10 deletions(-)
+Cc: Charlie Jenkins <thecharlesjenkins@gmail.com>
+Cc: Paul Walmsley <pjw@kernel.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: linux-riscv@lists.infradead.org
+---
+ arch/riscv/lib/csum.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index d73f2bbd3b93..fb2490faa8d1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -949,12 +949,7 @@ KBUILD_RUSTFLAGS += -Cdebug-assertions=$(if $(CONFIG_RUST_DEBUG_ASSERTIONS),y,n)
- KBUILD_RUSTFLAGS += -Coverflow-checks=$(if $(CONFIG_RUST_OVERFLOW_CHECKS),y,n)
+diff --git a/arch/riscv/lib/csum.c b/arch/riscv/lib/csum.c
+index 5d4379768e5d..c2b8986a0d39 100644
+--- a/arch/riscv/lib/csum.c
++++ b/arch/riscv/lib/csum.c
+@@ -142,7 +142,7 @@ do_csum_with_alignment(const unsigned char *buff, int len)
+ 	end = (const unsigned long *)(buff + len);
+ 	csum = do_csum_common(ptr, end, data);
  
- # Tell gcc to never replace conditional load with a non-conditional one
--ifdef CONFIG_CC_IS_GCC
--# gcc-10 renamed --param=allow-store-data-races=0 to
--# -fno-allow-store-data-races.
--KBUILD_CFLAGS	+= $(CONFIG_CC_OPT_ALLOW_STORE_DATA_RACES_PARAM)
- KBUILD_CFLAGS	+= $(CONFIG_CC_OPT_NO_ALLOW_STORE_DATA_RACES)
--endif
+-#ifdef CC_HAS_ASM_GOTO_TIED_OUTPUT
++#ifdef CONFIG_CC_HAS_ASM_GOTO_TIED_OUTPUT
+ 	if (IS_ENABLED(CONFIG_RISCV_ISA_ZBB) &&
+ 	    IS_ENABLED(CONFIG_TOOLCHAIN_HAS_ZBB) &&
+ 	    riscv_has_extension_likely(RISCV_ISA_EXT_ZBB)) {
+@@ -186,7 +186,7 @@ do_csum_with_alignment(const unsigned char *buff, int len)
+ 		return csum >> 16;
+ 	}
  
- ifdef CONFIG_READABLE_ASM
- # Disable optimizations that make assembler listings hard to read.
-diff --git a/scripts/Kconfig.toolchain b/scripts/Kconfig.toolchain
-index 570c5a31016c..6520a06a9103 100644
---- a/scripts/Kconfig.toolchain
-+++ b/scripts/Kconfig.toolchain
-@@ -176,12 +176,9 @@ config CC_OPT_DIAGNOSTICS_SHOW_INLINING_CHAIN
- config CC_OPT_STRICT_FLEX_ARRAYS
- 	def_string "$(cc-option-str,-fstrict-flex-arrays=3)"
- 
--# gcc-10 renamed --param=allow-store-data-races=0 to -fno-allow-store-data-races
--config CC_OPT_ALLOW_STORE_DATA_RACES_PARAM
--	def_string "$(cc-option-str,--param=allow-store-data-races=0)"
--
- config CC_OPT_NO_ALLOW_STORE_DATA_RACES
--	def_string "$(cc-option-str,-fno-allow-store-data-races)"
-+	# gcc-10 renamed --param=allow-store-data-races=0 to -fno-allow-store-data-races
-+	def_string "$(cc-option-str,-fno-allow-store-data-races,--param=allow-store-data-races=0)" if CC_IS_GCC
- 
- config CC_HAS_MNOP_MCOUNT
- 	def_bool $(cc-option,-mnop-mcount)
+-#endif /* CC_HAS_ASM_GOTO_TIED_OUTPUT */
++#endif /* CONFIG_CC_HAS_ASM_GOTO_TIED_OUTPUT */
+ #ifndef CONFIG_32BIT
+ 	csum += ror64(csum, 32);
+ 	csum >>= 32;
 
 -- 
 2.56.0
