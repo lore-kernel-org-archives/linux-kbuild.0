@@ -1,52 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794503831;
-	b=b9KaJ8Q5uXO8Q8nD2KicHDdOBp9Md+p+wijElMvkUPETChAuXBGyKbsmoDSSS0YE91FW
-	 1KKHE3JjPsEb5LA4IoC/9YfyT4kmUPPOQifeawfhR4sRNQ4fC8E+nJv0w6C1MbxFwDOyL
-	 jf6poF8tdCrJheTeBPgKGj+KF7MZsydJpKqv0aK3LKJkbANyrxKcAO9ZoSoESwbTvLHIj
-	 42juBLa7J+T4OkyiDMMwEdyiheyUyMRNCJlm1O3kQ1ozPMcqc5ihLUT5UDOgOzwoQGUSx
-	 4yJtlGsJvIxhhEejX8vqMbU2RRTl9CggDca/TXRVFWFZkFbdKO1FahWss0Bd1CTmgEQ==
+	t=1794504094;
+	b=dl5jNKcSb2Tqm45HeRb/iE49cRSUuhDcTCOYrJclBYYH7tXO2myzsdUVvgPP7/CiYF2d
+	 yUnXfEvaRgnk1hOUM/eUViwbhKINLYS30unFGFWmLWrbOsO+4aOIV2SUzAn3I4WgWjYj4
+	 9hFYhCkUXg47HQCutYYCCoCm94VXkP5XGabbVSSaT3z71UonXtbYG1iR9+8HlBC3Vz1ht
+	 vf82IyG+jp68A0lRT0Gx2skEPfrL5cxpKLGbYgn76Uf9z7voqtA23D0FvseGMl5E/ofLO
+	 XJNAlYMW2zF3t4MsYgBCBrpKdheUcseEOW3KLaFV3qUf0omzAIz7skB6/LQCo7w+zZw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794503831;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794504094;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=mAJUvoio1U7jK053NhvlJPhpip0OAdIw2S527UpVNZE=;
-	b=rICR/pwhWDfxAOBFw+W+sUnpJvbD3Rj13ZU65A3kye1EVjU1TbWQMUFbz9xSkP5qntOc
-	 evpdMGJD6rYtbjiohEzbDmyVG5akoCj5+oL+BwJIJagQwuVdo0aKerOdA7bXRcmJ27WXm
-	 jN9mVHpQJAJXyfMFMi6uzk6rGOI4ouMljTH2syZPCV9YX8VCwpQ/mK2ZRzn507PRFv7nr
-	 4f6jh9fDuZDKUEfCWSD4nwlb+H5qEVV46IrDeHGRoD8hP8fVS9JBx5fwo4NhOmlK8ch6H
-	 YYpvBkQscxOaUUpwfP9N6xc9Ccs92VLZR4vPMKCz1a9GowGdxgYpObez3ywVV7IEDPA==
+	bh=tnvalXgW49Ysw5FO5d/oAkIaPivhfvhSp3vcrnFI3to=;
+	b=Ue5KaWursFJZILyYvBoeK4pGhmlGNvIC1pGB1hJsS/VwM2ikLsm4JGXhqgrVycon+jds
+	 cBGrwexSVh888D6a1VEetFaEZnsUjtfsjxanFLwZVEd0DjiFEQJyQbpU3tstXg0tZamXL
+	 vZDeHY+4I5k7GUQEVhS7OryzAFl9IWRteMVpev82mxnrG8i9wAgVINns2cLuNl838CbGl
+	 YQtf/cboh5rHnQnrDSWfbfqEiRmxCq06CaekOo0ND0+aPUX2bsR/BTqEtNoPE9VFBNlsb
+	 aQeTlGN5ce03xnr3nwlqwowPeUnD8wzCi5iVCyLShTaoZKryIZMJQWe1YQ6/901+twA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XKBVP7Sl;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hR5qYI+1;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D64606A31C;
-	Thu, 12 Nov 2026 17:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE139606A31C;
+	Thu, 12 Nov 2026 17:21:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XKBVP7Sl
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 320151F000C4;
-	Thu, 12 Nov 2026 17:17:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hR5qYI+1
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCF321F000C4;
+	Thu, 12 Nov 2026 17:21:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794503830;
-	bh=mAJUvoio1U7jK053NhvlJPhpip0OAdIw2S527UpVNZE=;
+	s=k20260515; t=1794504093;
+	bh=tnvalXgW49Ysw5FO5d/oAkIaPivhfvhSp3vcrnFI3to=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=XKBVP7SlQRcCvTXtPF4C1mkZ7YToPoGYAVI0GHtY3ItnGHRb7s5FJ2PjPtYt2OymX
-	 +wm6u4C+2gYigX0aLzWnFH4elWdJrzUYRHsMQQsoKrJng19TUCGpTGeMXtLJF7YVRC
-	 nGhrwff469RFHLKNaMQAVuYqFGo3BAtjdqcXR/kr0eu+hW9pglpwnL2lVvsSG+iE5j
-	 k7PWnkQ100nvqMCODy9HjbhqnD7HFk6u9y7H3W6epi/6lsoTdip/KngotcGkGL+YnT
-	 b+m/NHwDM9swC0mFFbjJMQv3pFd6jX7y+6R8tumXkj01ivw1/hNVmvIxrSz5UgVBck
-	 FRfPmghgQMqvw==
-Date: Thu, 12 Nov 2026 10:17:06 -0700
+	b=hR5qYI+1tNNfCdB4mT3Xavp6UXrwmkDoZbAkG7szDZoB5vbyW9uyPsHjmB6kK0GU3
+	 yNaFi72wPr3rl+an6i9w2VRC0cG0dCD+b1uM5HiXNV2DYao/XI98Zh+YLxS4UNiRrC
+	 nsVL1luqSVC/VitEr/1DmcKfX+eetD8koKYp3LHLqHrBIdyLSJbkDVTZajvDpTPCGl
+	 d8tbhmM0lDTvjO2IqIhiMU4IYbfDh43IHYmN1LYKGrLNM0mYwq58LAtMqnUxbjx0KR
+	 AlNJvPJQ2IjXoUZE13Ujs4H+q/jTAyzN9vqi/Mnz/6wkEr+xvHtMWP+kltt1cOjyOg
+	 tdT1vTt+qfXqw==
+Date: Thu, 12 Nov 2026 10:21:28 -0700
 From: Nathan Chancellor <nathan@kernel.org>
-To: Julian Braha <julianbraha@gmail.com>
-Cc: nsc@kernel.org, andi@firstfloor.org, ljs@kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: cleanup Kconfig entry
-Message-ID: <20261112171706.GA4107043@ax162>
-References: <20261112164826.110736-1-julianbraha@gmail.com>
+To: Nicolas Schier <nsc@kernel.org>
+Cc: Julian Braha <julianbraha@gmail.com>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	llvm@lists.linux.dev, Charlie Jenkins <thecharlesjenkins@gmail.com>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 4/6] riscv: checksum: Fix CC_HAS_ASM_GOTO_TIED_OUTPUT
+ check
+Message-ID: <20261112172128.GB4107043@ax162>
+References: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
+ <20261111-kconfig-toolchain-updates-v2-4-b2d9415c1757@kernel.org>
+ <avWiaIuhkYw_xE5A@levanger>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -58,53 +68,36 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261112164826.110736-1-julianbraha@gmail.com>
+In-Reply-To: <avWiaIuhkYw_xE5A@levanger>
 
-On Thu, Nov 12, 2026 at 04:48:26PM +0000, Julian Braha wrote:
-> 'scripts/config' provides a CLI for kernel configuration, but currently is
-> not included in any MAINTAINERS entry, despite the commit that created it
-> using the 'kconfig:' subject:
-> commit 8e54701ea85b ("kconfig: add script to manipulate .config files on the command line")
-> so let's add it to the Kconfig entry.
+On Thu, Nov 12, 2026 at 12:26:32PM +0100, Nicolas Schier wrote:
+> On Wed, Nov 11, 2026 at 05:52:06PM -0700, Nathan Chancellor wrote:
+> > The defined symbol is CONFIG_CC_HAS_ASM_GOTO_TIED_OUTPUT, not
+> > CC_HAS_ASM_GOTO_TIED_OUTPUT.
+> > 
+> > Fixes: 4525462dd0db ("riscv: lib: Check if output in asm goto supported")
+> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> > ---
+> > Cc: Charlie Jenkins <thecharlesjenkins@gmail.com>
+> > Cc: Paul Walmsley <pjw@kernel.org>
+> > Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> > Cc: linux-riscv@lists.infradead.org
+> > ---
+> >  arch/riscv/lib/csum.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
 > 
-> Additionally, 'scripts/Kconfig.toolchain' is used for checking various
-> aspects of the active build toolchain from the host environment. It's
-> merely written in Kconfig, and is not really part of Kconfig's
-> implementation. Let's move it into the Kbuild entry.
+> Thanks for catching!
 > 
-> Signed-off-by: Julian Braha <julianbraha@gmail.com>
+> Reviewed-by: Nicolas Schier <nsc@kernel.org>
+> 
+> Since 4525462dd0db (v6.7) still supported clang-11: shall we add 'Cc: stable'?
 
-Acked-by: Nathan Chancellor <nathan@kernel.org>
-
-> ---
->  MAINTAINERS | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 93abbb315065..245bbfed8122 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -14374,8 +14374,8 @@ S:	Odd Fixes
->  Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git
->  F:	Documentation/kbuild/kconfig*
-> +F:	scripts/config
->  F:	scripts/Kconfig.include
-> -F:	scripts/Kconfig.toolchain
->  F:	scripts/kconfig/
->  
->  KCORE
-> @@ -14451,6 +14451,7 @@ F:	Documentation/kbuild/
->  F:	Makefile
->  F:	scripts/*vmlinux*
->  F:	scripts/Kbuild*
-> +F:	scripts/Kconfig.toolchain
->  F:	scripts/Makefile*
->  F:	scripts/bash-completion/
->  F:	scripts/basic/
-> -- 
-> 2.56.0
-> 
+I was a little on the fence about the 'Cc: stable'. On the one hand, it
+is definitely a bug and it would totally qualify for stable. On the
+other hand, nobody has noticed for almost three years and it is
+exercising a new code path. I'll leave that up to you when you apply it
+(or the RISC-V people can give their input as well).
 
 -- 
 Cheers,
