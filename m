@@ -1,57 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.158
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794491144;
-	b=ClqfWB4aA1mfCBl0Glj2iXUvswWi4EUZxYIqFnHydUje9pS85EPIHx2pSevlz9BnR2RR
-	 18Gl056G1KRVo7k1cICjLY3sz6souJOWF6YXjot/xuQMbJ7rjzENJa9RvavN7tz1Krcby
-	 s3XEXE8S1fzE4ZWUcPvTmp0Fh+IInxRI7vF4LvRTVtyTQDwwFKwqWognk+CVOx7XyDTLM
-	 965kxQ/i0x5pm4+16Yiofr+3Wxp1qDl0ccSinCHLRAdE8P9BjBRUIvmSGxKq8cboR/Xlb
-	 fTL21xsWtYC51ZJnnZ1IodMMWdegXq+Y6HUqR0V9O+vUbuBmUQfaeNivkmnuFJPlrCA==
+	t=1794492289;
+	b=qVaDCnI/Eab9KXFJy2mXA7q4QLXi9hAAbNVfmSSY6XgeajbA68bGbBloDNWXWzveU93w
+	 L3yOVfGsZ+BGTMeO3yQyYWR0osBQdv+uh4PUbpMi/0eQ7JPX7OsAdyWDzWYY2QRSQJ9dg
+	 8kuPOUoe7b+A9R/cgixwdFyeRkggGw4ZGhZxDfffH1FG22CIiAT8VOJ6CT4xUOuaPIWPl
+	 50DpeugiScH4vPKqGy4f4l5Xnhxl+bd7085nxsmQiIJ5bhUr1GGrku3yLZqrcw9ElW+mg
+	 IxQYd5l61xp/xcH2+cN8lQCTOqYOlUk5oYPVZhNB13+r1LIciEbm4jMa8tV2Wzc4z0Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794491144;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=aT16KA4MQDAF15+nyLCa6tt/dF/cLKIFYBequyDmlYg=;
-	b=teDI5qiuy10296TYXVUrj4sRtgi7WhW9zfZ0GFS8s8PVyon4qd+58oS8xrPDQ5Xy7HEe
-	 WDW+6gOz8H3ejs9J1tVEKtFodiFoEwWXN6C5JYkyejJO6lbHPdTVP5pqLTD8yJBImBdt6
-	 GBflX+8bH9WCAdthDh/QlIOSYmYtX6usUsc0OpdSHVMSavdkMmIQ2c2mrm6yIsR/HW/QJ
-	 frfEbFpDV1IOpQGFArsmwMe+TsiuEV8e9XOBkRyxB4IyLFf4OqJoIa8cBivORUYKEdn7u
-	 WMQ9i+tHrFjpKTNRqwkrr4dN7e59rGBlzG2YAauxzN3y14j8JnnsWne06Jq1rNad8qg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794492289;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
+	 References:Subject:Content-Type:Content-Transfer-Encoding;
+	bh=/tAXn9HhhI5i2xRr+VsFOZh/OUH+m9OqcmYc0kEYn+s=;
+	b=TPCmGPlC82eptSd4UGexfUdONf6+W8bjBiRmV+w+jy4Wo/1ajRt8/0W7YpUXLswIXkSG
+	 jiSAqFmkFzLjNSavIXQ/7hB9mrNl6tUK6oCmpkrnMiH2usfeoKzgBryXP/jwf2Jg7S5DI
+	 N4txQbWH0v1QKPdkPA0yqnZdouuECpDUPMfeczteJyf4UWDYnjMXiHYathPRmxV4C/RHH
+	 o2IpRMloNib99F+fvpqRpzuLvJjxFGG7N149dLrZuo2k/NXgN4coMn6T+zLWclF8nHJK4
+	 OITqJFfOBnwgWLDaUSoW05bPVgs2ZvFGFi505Mbw2XEVD+IL7+FVgUR9Z2Kcv4QTrTQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GkCK6X2f;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=arndb.de;
+	spf=pass smtp.mailfrom=arndb.de;
+	dkim=pass header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=h6epGYND;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=E1F13uXq;
+	arc=none smtp.remote-ip=202.12.124.158
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD44606A330
-	for <linux-kbuild@vger.kernel.org>; Thu, 12 Nov 2026 13:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A73606AE87
+	for <linux-kbuild@vger.kernel.org>; Thu, 12 Nov 2026 14:04:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0A73606AE87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GkCK6X2f
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D256D1F00A05;
-	Thu, 12 Nov 2026 13:45:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794491144;
-	bh=aT16KA4MQDAF15+nyLCa6tt/dF/cLKIFYBequyDmlYg=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=GkCK6X2f29+YUfaiFlUcKgcLKFu8JAdVV7FoSPMdqvdio0zssyXE2SSbIG6bTzfvN
-	 Eq79Yn1LhgMJrrggwwDGYMFtMqcjEnbQJXvGFZVYcReO2oOG7wugueHauaMGwi8BT1
-	 WZHSaAxGYMvdFRrae4rOZZT3cmo5x3FnQkXhGXjc9FkytHxKkwVvaWH+J3iQv9zfKu
-	 MXH+uPMsCWpfyUhheUnoQ/EdEOUiW2kMxTuH60ZzX6T9R1eqTrrRyiHRajyyQALoy/
-	 w3LcUHQR3BPOhGiifJx8BBjoFhCpnPbvB2/75yaVORqeY2stw3VxkuOIYB7sZ4a18U
-	 ZKJeBhqBMpDOg==
-Message-ID: <sashiko-outbox-211218@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/3] kbuild: move scripts/mod target out of single-build
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Mailhol" <mailhol@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
- Schier" <nsc@kernel.org>
-Cc: linux-kbuild@vger.kernel.org
-In-Reply-To: <20261111-reduce-single-build-dependencies-v1-3-7196ca986a85@kernel.org>
-References: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
- <20261111-reduce-single-build-dependencies-v1-3-7196ca986a85@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Nov 2026 13:45:43 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=h6epGYND;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=E1F13uXq
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 242497A0168
+	for <linux-kbuild@vger.kernel.org>; Thu, 12 Nov 2026 09:04:48 -0500 (EST)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Thu, 12 Nov 2026 09:04:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1794492281;
+	 x=1794578681; bh=/tAXn9HhhI5i2xRr+VsFOZh/OUH+m9OqcmYc0kEYn+s=; b=
+	h6epGYNDiXOZ0U54jmhcFmhr9liTv0S3e/4nsnTQfdZmBFJGFRaPsxgpJKPUpAk1
+	man4juZ+v7SfR72SVe3i5cfcS0G7NL3QkvZTt+0piUTA2wTEghZ7hXd9p0RBPABG
+	5vhk1MBr3ULBoO0fTV4xpy4d/uBlLl/WFzoCs379XjgTDVtHfTWujuvdYu9H5pow
+	2mXvdrxvo6BhDIXhZTTx/bO3Exp+PlvP7cK/DsGo9hy9sNUO0aoE67RezRNBDEZt
+	Kasby90AUwr7/BWv+b6YVD+uqy69CBR415lbcTs4A9hLDdoP+N+5GcejR9XDXDhW
+	w0ADKq6QwhGjXMVmZTHlJQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1794492281; x=
+	1794578681; bh=/tAXn9HhhI5i2xRr+VsFOZh/OUH+m9OqcmYc0kEYn+s=; b=E
+	1F13uXqZUsWP9ERbcmBRauF4vI+GEx2BkuRQNzoes0ataedMZtzqTjRBbAf7LabK
+	6WDlDw915yi5GTALoa6bso7Dz4Pc0J9qUX9MgVn/kt3l+Lah3AavR6rBwmaTmSf1
+	/Dkgzk8DNWALFs+mQR3HrIKBuWVqz/5oa9tJ3ZgIgjiHGDvTqNr6BNpbQqqJor89
+	huWf3aFIMMPKU8muFWmaNaWYC1XeD81vPT0o1Ohqq1cIEcM1xxKA2Xzx7q+SLPfa
+	QKwNqZZeCSI8o3vbKYTqsjy8jI/z1G4n6JK8HUwDxqK0p+GX20y40nbDpuam5VaR
+	ofEDJNS4lNkRVhiMiG7mA==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=arndb.de a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1794492281; d=arndb.de;
+	mf=PGFybmRAYXJuZGIuZGU+;
+	rt=PGxpbnV4LWtidWlsZEB2Z2VyLmtlcm5lbC5vcmc+;
+	s=fm2:rsa-sha256:j9llXZX3qWZZOeZErIajvCowC8IS2D63MKzZi2owSmoW1To
+	9/jgK2eRLTqhvzI/5h6OFPoEy2pJFF42DgWt23YapeqJ0XnQI/1J1oMlBiYUvFg6
+	9L102GNvsz0A9QqF6sRNCxo+iDSSuw0Ch1QfTnZmwjh2NMAYD0D+QQNzUSOIGr9o
+	avwI1RU8Baig24ioDpljy5paJMBe2g9zTCzRVXzjPaAB2e+UbvHuh4tiF8rwBjhs
+	JCBh1iPBD7NfZWLvhI7DC+lz/brrW2YWnxb9Ra2w3z29RKsBPvbXO6RC83NxFz2/
+	uJgBRNgHQIBJfmF/AmG5d3VaRC7kFcNz294pGIw==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=12;
+	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
+	from,in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:yhBWo2F8Mg0lXsgAAiDFBLboJONwipmeaHVibNlXcm4=:/tAXn9HhhI5i2xRr+VsFOZh/OUH+m9OqcmYc0kEYn+s=;
+X-ME-Sender: <xms:dcf1ap4UN1N1sYgm98NrBR9yMo43zP8zWJHt_KoCCUEsCOixwmXvbA>
+    <xme:dcf1ahuPMMxteh0vrY0B4rNvmUkFDIN65y7XQAlfVmsmWslILsr3sEP7InMBsBFGj
+    jbDb_lVhqrDpul3WXu1CnFH6muk8Of_T9-Lj4BHAQuKYb3qH8sFKJ4o>
+X-ME-Proxy-Cause: dmFkZTEraX544mQ4uwFvdzCIHZ/nHTECZ1d9wNRCoCeA56HdTpiTyq3xSVAqiNV3X35/Z+
+    dDXXwTcNSzIAJs5fwRvM3QaBeQigOW0u7sEAgv9lxlziJXvg6CryNer7nVzhQF8juyj+aa
+    hRvH/YxuTpd4mrkR5o5OwzbwL4nDwtcuGyVhfjrnAyzbXG69muhVoQHXlcEoD8wQmkGr28
+    VnetKWGF/1sn1HHrJB+F7J5TcmgHftJ59BVNmRvt+ttOpu2zJ8WeAveF1srqK9/1pU1bv9
+    kQRD8+Jeqc9KbjeuF/GwuTL1cm0gvom1BFAQUMXqfIfM0hlgHFgzSKueKw1YJR40jKF1Kv
+    1gxoiF0Xcg0X8YKBTOnVVdwZbEx7LTkcAo9TDrv5CmdIwZlhYabltHnf1TXjhEhFJ7mRh9
+    CsavwvhJzZQje+YI9kWh/F4c3Byqi+Lh9cZ94FgydIu4K98FIU4bAF8yVVBQpwEVNFNrcV
+    /Y8BolSDQx3UwXNXakz2fAlRJjSjz7Bcqoa/DazJqLfFkM9i0bZDaW55ekxupA1FzMDwsX
+    2fYIe3mnx8s7qWJWF4kH37tOLKz6HQ9xmLTk66yk1/H2bO8Wqfi47UDgWnfhstGrZNWee4
+    lE+sM2ptnn48DlRfenKAM500y06BMwBdjQDEM2nKvqkQ7fX1p3NjqkZSZqcQ
+X-ME-Proxy: <xmx:d8f1anI4GyahBTQZsMiQINwhNdinl3W9pXUuBsnor0nDZiOGnXqGHA>
+    <xmx:d8f1arzkSPTEAgh1hwjM-z_KEXo1JI1bT0cQNqGONl2t3IaIjdm0hA>
+    <xmx:d8f1aq0bbLxprs1Ax6j_YjKbqVlZDjcm0WcWdgsV6Z2ubsV4AScf_Q>
+    <xmx:d8f1ak9BDP92Kq051cUj7-aWz23-e42FFO7yN9MbetviFDBx2VwM2g>
+    <xmx:ecf1aqEH4wnb05YC4zON_rcfe3sxx7jDz8fsDVXV3sknS5Vvne6Dwq7a>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 2DC8932A009E; Thu, 12 Nov 2026 09:04:37 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -60,73 +114,35 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+X-ThreadId: AtwnaRLwEjKw
+Date: Thu, 12 Nov 2026 15:04:16 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>
+Cc: "Christian Brauner" <brauner@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev,
+ linux-mips@vger.kernel.org, sparclinux@vger.kernel.org
+Message-Id: <b580eaab-100f-4375-a8df-7d1f4c751cbc@app.fastmail.com>
+In-Reply-To: <20261105-tonyk-syscall_table-v9-13-8d1275885d9c@igalia.com>
+References: <20261105-tonyk-syscall_table-v9-0-8d1275885d9c@igalia.com>
+ <20261105-tonyk-syscall_table-v9-13-8d1275885d9c@igalia.com>
+Subject: Re: [PATCH v9 13/15] syscalls: Avoid matching substrings in the ABI parsing
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] kbuild: unordered modpost_prepare and stack_protector_prepare
-  mutates CFLAGS
---
+On Thu, Nov 5, 2026, at 21:05, Andr=C3=A9 Almeida wrote:
+> Currently, the abi parsing for grep will match substrings. For instanc=
+e, an
+> ABI called `abc` will match also the ABI called `abcde`. Use the space
+> limiter to match a complete word and avoid matching substrings.
+>
+> While here, add a true command in the end of grep command to avoid the
+> script exiting earlier and being able to do the cleanup.
+>
+> Signed-off-by: Andr=C3=A9 Almeida <andrealmeid@igalia.com>
 
-commit 08ffc13380249741520c2ea434688d701b5d0e9b
-Author: Vincent Mailhol <mailhol@kernel.org>
-
-kbuild: move scripts/mod target out of single-build
-
-This commit moves the scripts/mod build out of prepare0 into a new
-modpost_prepare target depended on by modules_prepare and modpost.
-
-> diff --git a/Makefile b/Makefile
-> index 2c1289a44c560..93236f310f080 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1405,7 +1405,7 @@ scripts: scripts_basic scripts_dtc
->  # archprepare is used in arch Makefiles and when processed asm symlink,
->  # version.h and scripts_basic is processed / created.
-> =20
-> -PHONY +=3D prepare archprepare
-> +PHONY +=3D prepare archprepare modpost_prepare
-> =20
->  archprepare: outputmakefile archheaders archscripts scripts include/conf=
-ig/kernel.release \
->  	asm-generic $(version_h) include/generated/utsrelease.h \
-> @@ -1414,6 +1414,8 @@ archprepare: outputmakefile archheaders archscripts=
- scripts include/config/kerne
-> =20
->  prepare0: archprepare
->  	$(Q)$(MAKE) $(build)=3D. prepare $(if $(single-build),,prepare_checks)
-> +
-> +modpost_prepare: archprepare
->  	$(Q)$(MAKE) $(build)=3Dscripts/mod
-
-[Severity: Low]
-Should modpost_prepare be ordered relative to stack_protector_prepare (or
-depend on prepare)?
-
-On arm, arm64, powerpc, and riscv, prepare depends on
-stack_protector_prepare, which depends on prepare0 and mutates the
-exported KBUILD_CFLAGS variable at recipe execution time:
-
-arch/arm64/Makefile:
-prepare: stack_protector_prepare
-stack_protector_prepare: prepare0
-	$(eval KBUILD_CFLAGS +=3D -mstack-protector-guard=3Dsysreg		  \
-				-mstack-protector-guard-reg=3Dsp_el0	  \
-				-mstack-protector-guard-offset=3D$(shell	  \
-			awk '{if ($$2 =3D=3D "TSK_STACK_CANARY") print $$3;}' \
-				$(objtree)/include/generated/asm-offsets.h))
-
-Previously, scripts/mod was built inside prepare0, so it always ran before
-stack_protector_prepare modified KBUILD_CFLAGS.  With modpost_prepare
-only depending on archprepare, a parallel build runs modpost_prepare
-concurrently with prepare0 before stack_protector_prepare updates
-KBUILD_CFLAGS, whereas a serial build or make modules_prepare runs
-prepare first and passes the updated KBUILD_CFLAGS to scripts/mod.
-
-Because scripts/mod/empty.o is compiled with KBUILD_CFLAGS, switching
-between parallel and serial or single-module builds changes its recorded
-command line, rebuilding empty.o, regenerating elfconfig.h (which uses
-if_changed), and forcing a full rebuild of modpost.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111-reduce-sin=
-gle-build-dependencies-v1-0-7196ca986a85@kernel.org?part=3D3
+Acked-by: Arnd Bergmann <arnd@arndb.de>
