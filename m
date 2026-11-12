@@ -1,69 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794483775;
-	b=n4gEzTS9tQbn7eCL1D+K99Yw2R0/H0+MXRK0p4LQzlH5CaMqMds0Xqhh5cPqAu5KA2oh
-	 OX9Fyw0HTVMJFEmH/fw2DMc9/ejwAPssI2OD55RpkPgOksfAaqxolru/cxM7XJE9Xxr9S
-	 ApK1C8CvCg/zw1PlDjgWRvY3TKnxbIyFTJiiZnxLsEDb9AT8fZYTYthqIVuO8rgkjOxdI
-	 q/UW8PBukclS4NphBd2qyGLiRWlmS5krCuesWvkGHfpuqJFNBBU42I5vl47P5PIE5etYV
-	 PwuGndpzsixNlMHy3X+xfCSqiwqlHkTbhyBRELdSGVvuzdaquNfHL785NyauGtlNSwQ==
+	t=1794483925;
+	b=CIMKGYlGuWy9EY0Xg0OEAUlrt29rDPeoMO+pK42NHwOszFJaYzIHcVTYv8du47kkqMW3
+	 D2YlcgGminkLxFEUIFN4hBlmZEcuS2gAl9enoxb7ziDHRBDuyyVTpnY9aEX7M+pWSqRU8
+	 /DGTXVZegO9W9U+58rhZ4C4PdsUyAXbVjUuRTN5s9VknME4xNdFyoFQS+G9oYTIApgKYG
+	 vnXytancpRU5PqVVIfmTrwBiv7QVJ085/CACBFeFxjwRYWS4jMqxkmb7RsNkxcypk3tfe
+	 c3UvB9rpzo5EFEEFNXBT1O1Ybmq5waBtxA1m2obumBKRbMDO9pLn0ULsbs2LKwxipuA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794483775;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=cDOkqX+SLw3QMyylghtf6DmRMvisUn9CYoKbxeXNWQQ=;
-	b=s4Z5zrFQ6DAyPL/sfMyLV1kiUIHcowEI7XVmW2goQPNFyUBsAtBsSSZt5bHtpjCD7aFs
-	 q8KUFh5CMSF/52Z1xiD+2Q0RqUr1pnHLgAzWN458IGxzrDcImxvVhGEg7/4bw3yZPJ1Sh
-	 vwtLRMnWoJhFdFcEVi9xoFlP0AHib8IhKe99C2oNa1stqcMgRS34COOOr5qhbi0pDHtPb
-	 B5YOPh9IiPXPrChXsgbnz/nsIkLJ09Nkuajg10F7NuOPVpzzxOdZFj24YIYqRpwP9st9q
-	 8tugrDmt7k9+pqLy2N7JVhV6EDYv3ecxAaYEjeK2p7G/x/2+ySJ0S8jg+C0NjZF9Xvg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794483925;
+	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=+HOiY7t+6Ht5kHOkHA2FZLOJZLjbuqmVxYfSgV4Fl4o=;
+	b=K9Gfw92qSQpSl8fpa5d2F0080axzxIPPfmXhAFhvWz6uBfVTRR+YpL2nUGTf5EIRLVNf
+	 esezY0Dj6ljXx9f8+SJVTQ/2X0qDXExzKdq3WGU+qIC8Xlt9LpjiNLUJlHrYiYdwlQSaf
+	 EtSNYK+lnQYMLsDzYFGgDlg8HRWG2sZuUrFelSh/O1uVASg8+eicfbKyUr82a7BMORM/r
+	 FzIVwjDayNPbrJcNvXh2EDrNaZ2N21SsMyYRP8SGbAae4AludpUXq5WA9EQZGT7U56KH3
+	 TLD+7gjtN48WoPyazDFu+O9/em4obusK95R8eZD21gt30qMWco6/zfnv6ygI1sIeAgQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=J0M81yIe;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=linutronix.de;
+	spf=pass smtp.mailfrom=linutronix.de;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=K3xooDCT;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=8eJ0S19h;
+	arc=none smtp.remote-ip=193.142.43.55
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 7BB1B606A884;
-	Thu, 12 Nov 2026 11:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD061606A31C;
+	Thu, 12 Nov 2026 11:45:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD061606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=J0M81yIe
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id A41CD1F00A08;
-	Thu, 12 Nov 2026 11:42:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794483775;
-	bh=cDOkqX+SLw3QMyylghtf6DmRMvisUn9CYoKbxeXNWQQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=J0M81yIeLlJqm7O3nQ/hhbbL1SgPOVSsn0SBZh0xw3iIkvgsKwDXT2qvHyIarc+La
-	 NIYgXuYeNFkciNjNO2TuAtHUnOa90zyKyFpv2L7nNUPWu2q+vWKVAqxdpwhMh2a3eo
-	 Y8b8yANSgMUsZWkRIT4rWebq5iuCHYcUy2A/KzxAqiwxy/N1WC+0pVdlVEjIF0kTVX
-	 c/GmuFMLuol1eip/FLgZVlh/DDPjisUdbXZw+iFU0W1C719V6nliCXH/xs/lbDsONb
-	 aiZnzmqpxc4l6XAXFEy+tjMB76O7W7zT0qGEHYUKK8Xnw3zxGR9VZJOZKbjIWQ1AXu
-	 Ei4Es5kTEampA==
-Date: Thu, 12 Nov 2026 12:42:21 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Julian Braha <julianbraha@gmail.com>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH v2 6/6] scripts/Kconfig.toolchain: Document minimum
- supported versions for dynamic checks
-Message-ID: <avWmHRIMSvfApGu3@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=K3xooDCT;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=8eJ0S19h
+Date: Thu, 12 Nov 2026 12:45:17 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1794483919;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+HOiY7t+6Ht5kHOkHA2FZLOJZLjbuqmVxYfSgV4Fl4o=;
+	b=K3xooDCTtoxJZQDgV9I7H2+ev6J11md9UHLOAON+cxSf8+iv2pjdX+patbdGxUMfaMP8Vl
+	ESbeTvnze4rfuVRlovHf4EuP2m+bFabuofouKCRb4p8dYBPK4LiIW79x2F2/t71avlBXcm
+	BfiMlMNLaDAbrBc7AsczAvZIS95nUysvZ0nQqHUfXWQp50BrlpXruB3ndkmREoJH66y0P9
+	k49NVkx7YR/WHMzRyxCMjPlL40gx4O8RkhzQPh3KlVBtpKsylgLjsX3NGZBARq/wstKR2s
+	L3j3AEaoGvr/ivVD8dYgUjuMrS8z0rALgG1Bb3symr+L9uRIGGj451I01vX8FQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1794483919;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+HOiY7t+6Ht5kHOkHA2FZLOJZLjbuqmVxYfSgV4Fl4o=;
+	b=8eJ0S19h+N5fpVcW8D5IHRytFJFj2Qq24YIjN58GKiNsp5QIeRAD6G73nB9xk8pwhwDb0h
+	9NQCWZl7C0eaPpCA==
+From: "Ahmed S. Darwish" <darwi@linutronix.de>
+To: Nicolas Schier <nsc@kernel.org>
+Cc: Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ingo Molnar <mingo@redhat.com>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Kees Cook <kees@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	llvm@lists.linux.dev
-References: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
- <20261111-kconfig-toolchain-updates-v2-6-b2d9415c1757@kernel.org>
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Ogness <john.ogness@linutronix.de>,
+	Derek Barbosa <debarbos@redhat.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Luca Boccassi <luca.boccassi@gmail.com>,
+	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
+	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 10/10] kconfig: Introduce OVERLAY= for make checkconfig
+Message-ID: <avWmzbh3rp7TawCn@lx-t490>
+References: <20261106091922.7560-1-darwi@linutronix.de>
+ <20261106091922.7560-11-darwi@linutronix.de>
+ <avQNgXSWhODyc5Fc@derry.ads.avm.de>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -75,23 +89,36 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261111-kconfig-toolchain-updates-v2-6-b2d9415c1757@kernel.org>
+In-Reply-To: <avQNgXSWhODyc5Fc@derry.ads.avm.de>
 
-On Wed, Nov 11, 2026 at 05:52:08PM -0700, Nathan Chancellor wrote:
-> To make it easier to clean up unnecessary dynamic checks when the
-> minimum supported version of a toolchain component is updated, add
-> comments documenting when features were first supported. Request that
-> future additions document this as well.
-> 
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
->  scripts/Kconfig.toolchain | 64 ++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 63 insertions(+), 1 deletion(-)
-> 
+Hi Nicolas,
 
-Great, I really appreciate that.  Thanks a million!
+On Wed, 11 Nov 2026, Nicolas Schier wrote:
+>
+> Please add the optional overlay arguments right here:
+>
+> 	$(Q)$(checkconfig) check -r "$(RULES)" -c "$(KCONFIG_CONFIG)" $(addprefix -o , "$(OVERLAY)")
+>
 
-Acked-by: Nicolas Schier <nsc@kernel.org>
+Sure, will do.
 
--- 
-Nicolas
+> <bike-shedding>
+> ... or let kconfig-policy-checker read the 'OVERLAY' environment
+> variable itself.
+> </bike-shedding>
+
+I'm not a big fan of environment variables, especially in the sensitive
+domains of auditing and validation.
+
+I've built a lot of Linux systems with Yocto, Debian tooling, etc., and
+environment variables led to some of the hardest debug sessions.
+
+One checks CI logs, Yocto build logs, etc., and nothing directly leads to
+the problem at hand.  Only to realize some hours later that it was an
+environment variable some layer on top of you has erroneously set :(
+
+Thanks!
+
+--
+Ahmed S. Darwish
+Linutronix GmbH
