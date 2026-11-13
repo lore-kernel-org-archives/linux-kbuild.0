@@ -1,71 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794534772;
-	b=rgMN/X1DKAcwkNzMBQqQXzQVLWBzgz+NQtZq4SH797pnB0UrD85IxBAy4feG6mZYWrbQ
-	 CSqnWqsJiS6f1jMaXW+okY/6Grs/qV7C84bZhGkuI7S7XL0j+X2VO8y9p2qrDLaEFKHog
-	 YAPy+KVWldJxToGXdG85pU4gyfJV78X04rw5hAT3/uxlLum1n8dus1QLuQbS9dUaXE86x
-	 qzrvXvl5h3gDaI/EtOGwkYTBGg0n3FDRqf2K9AbONA29dJn73yCcYC8fqTaq6E6I8enVu
-	 vyJYU9nWB2Rgg5IN+S7SsXJvILmMhlK3fYvUXC0dlTMj0xlERLCkWD/qw7CDXEk3/UQ==
+	t=1794545954;
+	b=BAP82V5sYN39u7h0JZtg4pZ7oOOSksS/tF3AUipOewWSTrQOJ5vyVycx8AJBuPlBl7UM
+	 A/0MjT2jf6GIuRnjUrl2J22X20dxmi9b4DLsgHw1pmzjNFl9Mrjr82zEAZpB+kmDLRKuT
+	 rgFnmaSqho1A+z1ljqK9zbVKLLTnPAWftCFXP5ZfMLe+LhkIeSVAToXLvCOgsdKFQBVZu
+	 SBKhBGyzIHqleqlgR6K1XNUDGkPHj8afuli1A78tsZhyCo4HIcHkntzKwvncIxuaH8dfT
+	 eDSy6CPah1O4YD5Dh6T0eXZ/05MTctbdi/r4BYM5ISXy0sYXffP8XEtnb7xhKpKQG5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794534772;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=dUzo3UGgXY0oHBScVAe5t2TvKWuG/rK4hhPW0dEbd48=;
-	b=zg+hBd12u64A8n8jseO15PlH5tQNMNoCvWA+ptoB/jE4HoyLOzSe+8HeWTxvoNwhXKMO
-	 tacdcJUYMahu++PKsTshnR3h1eLhauC68VkBxboGUL66LhAQLHoXz27Ey6QjDGN8L5mwl
-	 GJJQ4gIIY5xJSGLUcHcdMgyYaqqxV7sjIOnB+50RLEBua5MbeZijVpJeyeYEEGDG6ZB+N
-	 ktY9i/cdrpETyCPriVAzPFmBR9jBGHQ6ZhhpM9vXTOgKVS6rqfu+IhzAQRayfFIpE998c
-	 Ui975xVjqcS4nhbP/zhmRwaVb8zkl/maktUyTBU59juDe3UDKSOgpXdQwaPY1b42z9g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794545954;
+	h=Received:DKIM-Signature:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
+	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=eLV5i1h2Maz4efFluSDDdrb0YwAHGxnFPrtIuNcYclo=;
+	b=d2/LhYTx6kygyjXosc++ViGDh+VmMtZdCxZxsv81PjP21pUVZnm5UawcISJPQ7pjh4DY
+	 D1k3Q1KkTBwk9LcmHn9tWiCdTyfxtnAleGQ6tV/9OhjQmMYzob8OkgfPGa9h+XNKGO82Y
+	 Xw5ztE05FlVjGXx/1W/vXWBp35925Wzy5G0YtdV5x5/gIourFtzN63EyhtnZkt31cX8Ai
+	 UgApO9YVmWQIKCppvGSCQFkCE3eYXm1ggiefPnW4vo+z+gHNtOsM3VX0lXThB/GLL/XgX
+	 j2ZZHb9oMCXxA21p1QseFE0ANF2AWsJSmbOGfF6ASY9lgLDch5863FJFDyPz2x4hiPQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MUjgymgh;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c13D6oR5;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1131B606A31C;
-	Fri, 13 Nov 2026 01:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC33606A321;
+	Fri, 13 Nov 2026 04:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MUjgymgh
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 153521F000C4;
-	Fri, 13 Nov 2026 01:52:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c13D6oR5
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06EC01F000C4;
+	Fri, 13 Nov 2026 04:59:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794534771;
-	bh=dUzo3UGgXY0oHBScVAe5t2TvKWuG/rK4hhPW0dEbd48=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MUjgymgh5PvB1DM1usyj8GMmNXD10UuhNp+4Xs50YA+7I9tsciAQB0BGg15x8CMRy
-	 ChNyD6HtWLGBUAnBZq1azhDr/UFLyjLkUrN+rGiojt3wrAEpu/s337md/xtgj47Wy0
-	 i8fq2kWd28/4TQxIPrNBu+Sc236HRhY5zXXMRNU3BY8f27hY4r9kG9QnsnEKdV63mh
-	 iJ6hEl7nKGtbAGZ1xwFVv9Ofhp2HJYrmCtwZl2Klth+edTIgI4ezmQt32pBHLRtoLp
-	 DYP9RzNADqpk9Zk3PwJEZoAPQRXzHkNP94wlDk+UFe4uDzch44rBSOD/aTCdhpBCDi
-	 HXMQLVyn2nyLQ==
-From: Sasha Levin <sashal@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>,
-	linux-kbuild@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	James Clark <james.clark@linaro.org>,
-	linux-perf-users@vger.kernel.org,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Thorsten Leemhuis <linux@leemhuis.info>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 0/7] kbuild: build the userspace tools in tools/ with the kernel
-Date: Thu, 12 Nov 2026 20:52:48 -0500
-Message-ID: <20261113015248.777097-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261112122347.dbb972627dc856c50eb01cd0@linux-foundation.org>
-References: <20261112195427.3411746-1-sashal@kernel.org> <20261112122347.dbb972627dc856c50eb01cd0@linux-foundation.org>
+	s=k20260515; t=1794545954;
+	bh=eLV5i1h2Maz4efFluSDDdrb0YwAHGxnFPrtIuNcYclo=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=c13D6oR53e40MJmUKOI2pIBn1/Xd90top50niHSoil0c28bt+0omJxkF2y8kZ7ft3
+	 9afOnV7t6vzTVVAfeDx5i0wnLbpRAGe1MBTJ1kMxcTMU3sVdD6yiY3OQHk/hSX5XQ3
+	 k9LF9aTg+aMlikGYXtEZOvghZVT2Pv5NLtxgGl7BXwjBdEIPja4tZMbj4nSFRYuK47
+	 siL7QQ2f/5OV7oPEN2unIUHL3oOvdOP68KVoB4QSlEhBPtk7tpatAhdXccvzZn1kr9
+	 Jw3KS5J19zWoEKtZXIIwnK1LlrGgJClt33BgLJSBmS9bTfV2xwwL0txImo3mZNymcG
+	 bgrW9swywRxiQ==
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -75,29 +49,102 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v7] scripts/config: honor $KBUILD_OUTPUT by default
+From: Nathan Chancellor <nathan@kernel.org>
+To: Dmitry Voytik <voytikd@gmail.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Nicolas Schier <n.schier@fritz.com>, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org
+In-Reply-To: <20261006161155.862736-1-voytikd@gmail.com>
+References: <20261006161155.862736-1-voytikd@gmail.com>
+Date: Thu, 12 Nov 2026 21:59:06 -0700
+Message-Id: <179454594618.814257.8646757102444143940.b4-reply@b4>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2506; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=LmLc1ua9MO22CuSKBsx1zzq0p2XhETJ7Ot64x8TjVRw=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFnfZkpVTGliLp+0wKrq5IndUo9Y5MXzXOp5g3f7vMw3X
+ XNZKn9uRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZjI9w5GhhduCW/nth21vVjo
+ rRBTFtLi/CNTnDux5P9LQfmSL7W15owMeyXX3picsI3z0MxjRyw4nxkcs5YSOOkxkT3j6GI+80c
+ 7uAA=
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Thu, Nov 12, 2026 at 12:23:47PM -0800, Andrew Morton wrote:
->So the 20-odd selftests which build modules and then modprobe them can
->find that some of the exports which they need were zapped by
->CONFIG_TRIM_UNUSED_KSYMS, so their modprobe fails.
+Hi Dmitry,
 
-[...]
+On 2026-10-06 18:11 +0200, Dmitry Voytik wrote:
+> If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
+> 
+> Fix the issue when the script silently updates a stale .config in
+> the root directory, while the user expects ${KBUILD_OUTPUT}/.config
+> to be updated.
+> Handle properly if the config file is a relative path.
+> 
+> The problem can be worked around with --file, but this is easy to miss,
+> and is inconsistent with how the Makefile and other tools work
+> (e.g., scripts/diffconfig).
 
->Does this patchset fix this CONFIG_TRIM_UNUSED_KSYMS-vs-sefltests thing?
+I was finally able to sit down and look at this a little bit more. I
+think we can avoid the use of realpath altogether, which would avoid
+most of what Sashiko is complaining about. I tested the following diff
+with your examples and they appear to pass without any issues. Please
+give it a shot. I think we can drop most of the reproduction and
+examples in the commit message. If you want to include them for others,
+please put it below the '---' where you have the changelog, as I don't
+think it needs to end up in git history.
 
-No, not yet, but almost :)
-
-This only builds userspace, and the selftests that build their own modules
-(bpf, livepatch, mm, net/bench, sched_ext) aren't there quite yet.
-
-It does get us closer though. With this in, a selftest is a Kconfig entry, so
-the kernel build knows which ones it's going to build. For the ones with
-modules we could then either build the modules together with the kernel's, so
-modpost sees what they import, or generate the whitelist from them.
-
-I haven't tried either yet. I can look at it once this foundation is in.
+diff --git a/scripts/config b/scripts/config
+index 32428ea909c2..497551538433 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -144,6 +144,22 @@ while [[ $# -gt 0 ]]; do
+ 	fi
+ done
+ 
++# If no '--file' was specified, use KBUILD_OUTPUT as the base if it exists
++if [[ "$FN" = ".config" && -n "$KBUILD_OUTPUT" ]]; then
++	if [[ ! -d "$KBUILD_OUTPUT" ]]; then
++		echo "KBUILD_OUTPUT is set ('$KBUILD_OUTPUT') but does not exist or is not a directory." >&2
++		echo "Create it before running $myname or use '--file' to specify configuration file." >&2
++		exit 1
++	fi
++	FN="$KBUILD_OUTPUT/$FN"
++fi
++# Turn FN into an absolute path if it is relative so that '--refresh' works on
++# the correct file. This does not use realpath, as $FN may not exist yet.
++case "$FN" in
++	/*) ;;
++	*) FN="$PWD/$FN" ;;
++esac
++
+ set -- "${CMDS[@]}"
+ if [ "$1" = "" ] ; then
+ 	usage
+@@ -200,10 +216,10 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 
+ 	--state|-s)
+-		if grep -q "# ${CONFIG_}$ARG is not set" $FN ; then
++		if grep -q "# ${CONFIG_}$ARG is not set" "$FN" ; then
+ 			echo n
+ 		else
+-			V="$(grep "^${CONFIG_}$ARG=" $FN)"
++			V="$(grep "^${CONFIG_}$ARG=" "$FN")"
+ 			if [ $? != 0 ] ; then
+ 				echo undef
+ 			else
+@@ -229,7 +245,7 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 
+ 	--refresh)
+-		yes "" | make oldconfig KCONFIG_CONFIG=$FN
++		yes "" | make oldconfig KCONFIG_CONFIG="$FN"
+ 		;;
+ 
+ 	*)
 
 -- 
-Thanks,
-Sasha
+Cheers,
+Nathan
+
