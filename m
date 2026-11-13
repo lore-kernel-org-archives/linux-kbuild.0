@@ -1,73 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.28
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794606451;
-	b=Sp2allt1c3uOxwNxb0RAexy6OJt0kwJX92vCNB+ofmBiuUH0Mv4fK1Wt8Fp3Uh7fmTJG
-	 Yk2i3UZXe4GuC0wYxiNCntS5uWYylxgwiEAB8byXJKjYDzXK+v9zReM1MywVHPTIy9oIk
-	 gJgAAulsIaanIO7xs2F77JLclxnX9fnoe4x8eMLSTcx14WWC3gKxQwEuxpUo3cLNWc0xn
-	 gLQmSX3DgPfuNJOWYDwdEre4IpWqgdrJOioCRSbHkFD7H4sqUp4xHKHSd8r4JV9pgErKv
-	 qHLqLyLStWgJPlItQSSc1kk4fkplLVai8/1JFbMSSDw6Re6l44rcCGpIY1ijTIOc3OQ==
+	t=1794608088;
+	b=Q3dos1zT38+mR4CKxGN47oEBQ6v1i4fXWgMtdZ0Fripv3e95K/1+FK6nMp12f8IomIR/
+	 6cXMY7VeB8hkHo8Kyd+Y01s4oy0X7PzBbC4CvO7bmN/biJZlbo9Gl5XBkgWPwe1YeI2S5
+	 ZODskhZMtoqDeq/Yav/z8qEvom9JC2EWOV20+Bo95a28j0JK7S+JVClVSYkYxi163vx6E
+	 1Rpo9m5u2OmgcqP+KYIexrN5piFTf5qR9HGOZMJO9D1yvWYeLk+lGRRevIcpF7cwmDYCL
+	 pQY1b9XH9fDWpb61lxqGvUR4DbLhDDuac3TgOO24a5pexkJQoXiM1Ku+e/zIQoqkMhw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794606451;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
-	 References:Subject:Content-Type:Content-Transfer-Encoding;
-	bh=dyCoPsA0aOvLJXWHgDENXQwMLfq1W+de7nvoNnEl1II=;
-	b=G/4Uttj0oE5jMI2hm/beeDgWjNS0/4DLth8gdC8j+ZA32q+ZNd3XjLsKIU2+iveHl26w
-	 X//vLBBtuRw2ammJbntX5P8gtmd7vpImtUOBsiOoMS5BPcdjywGaieLCXOfhFE4im5SqY
-	 /7d1zqsFQ2awqhiC5kr875WE1zHmZJYWa6uXdZFwuJ9HxheIYfDRhjAHDorqtkMrf6Mdl
-	 RNYEXt0HvcVaHY2WrFKC4kDnqGpKqrQ7YJXge7FPK35A19mwMRx9vilprCe8qntwVCvoy
-	 UjN6JD0S78wmEyiKNjczoebA7nLWmWMkOBD4hoAzIMbwB+/CcGxVsiTBh6G8aUgPG2g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794608088;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Date:From:To:CC:Subject:In-Reply-To:
+	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=R9rduGAl1SHAakLebetDlXuPxuUEhf5VdhoiXEwGJSs=;
+	b=u6mWyzBkLlh1utLZbM6ealRciR8qcxXyWRb3IceC+tNkTEtVEOjpBUwTVDC6alVVZ62U
+	 4N3d3012b5RH64PD8MbJ1q0qXzSazKIGDo5Z0UZEdQjbHjpQ+/X5xg9ygB+1P4SVam8CP
+	 bIf16gK70vX48x/dIds6VWwEsHEM1gsonE8GrVm8iCqJhauIfJ/TjZWoeJ1zAB6B5dgAQ
+	 5RspBNBXc56kx/Td0H4433D9mTldu2reUMPAhjCTqjX7aRr7j7PHdx+zO2XvNSy9Srh0t
+	 T4DL6l6y+9LDSsRwoEDrldcdFtTqFaAogndPEE5jrZHuseda4Bp1QNbMiaY2GvruOKw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=M4xpMlSz;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=X7DQWJ7C;
+	arc=none smtp.remote-ip=91.218.175.28
+Received: from mta0.migadu.com (out-28.mta0.migadu.com [91.218.175.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122CA606A336
-	for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 21:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD44860A2620
+	for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 22:14:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD44860A2620
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=M4xpMlSz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 726F11F000CC;
-	Fri, 13 Nov 2026 21:47:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794606450;
-	bh=dyCoPsA0aOvLJXWHgDENXQwMLfq1W+de7nvoNnEl1II=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=M4xpMlSzgtN1gl+LY+LdBB4tYi9a6KJfWiukiNA0a4aGgtPtBYa5ZuZu7pBjwC/G3
-	 hT7HN3c364kasIqlRRTzSzn4XKJwP9YlK5+TicjdzVQHMAXNJUR5uOYGvf1fw3+mjY
-	 E8U7XroSDb0EXtcKNB8lrckuN8Oed/gzokM2zPDXEpQHAmf/AxVdwrW35lZwMqQ7Aq
-	 IyLfPnTNURAot35eWJowEbodgOukMKrjPRWbqQU8M15E6guhiitXOloZJA3y/eqTbC
-	 N/4JvfE5hZQ4V7ko1QMonvwxZXaKfHB6LXiDw6Q2XHNxaYBlmL61JmGG3lzHsvEpAI
-	 2elrPQAo3DFWA==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 7B766198003A;
-	Fri, 13 Nov 2026 16:47:28 -0500 (EST)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Fri, 13 Nov 2026 16:47:28 -0500
-X-ME-Sender: <xms:boX3as7Xa1vd_C9l0vVk2S1n6okh9_45h98mF9Wbn-tUZyYQlMZhOQ>
-    <xme:boX3aovKRELz2ZRAALb3yQBmO1EWCacRIdFc07DlIGWUhGIcZAUrbqQggvnotgCKs
-    naTlEBsv4XZnZu61C3ZdpZPVAE6dWXm7vtQBATrYw5jRfZAFzN_eHm2Aw>
-X-ME-Proxy-Cause: dmFkZTGn9lrskfsW1+KbF6ZUS6NkVQFTi6onuN4cCIouK54mbrZXCz6ufIVLN1gsoPBIEw
-    0RFP+B6M2pDlmqKmu6sBndWXJi2T3Hgu27A/8xAjhQkjUXOHB647a/OUIL3C3Sf0AhAp9j
-    au4hmQbGK7SR9ukusDshTV9UBw7bg/H+VzFyMHGJjvKwq8pW10PQTH7Qbkrg7uorMRBavh
-    M+aeCb7QBysFip3jMt7w+4pNdXhynAQ+ayS8LOi57/U4WxbQFESC3vM/rVA/5UgvT08jWb
-    jsGxSCsJGmjeAPXk/C34f5qMtmCOWtO1+HWQtUwcWcTyzXRDZefimuQfEMllQ8BfWt38je
-    CLKQDEldFgV+B7AK9UBrQ9V8gZfnz7gW4+svkE9YuPVnTsxLa+PZBqImnqgJH+6YQtM1ir
-    OtulGULT0p4AaviB3K4pFy/+lopvEK1YIpMqHeX2vhXVFvNnEDApXmv2AgHiPzivyEBrGB
-    s4hBAIVC5AnV9li/f3fbZYJ/uYvwhelHveNVk/AU4OOdt3HnWnL4FT3/YHXhyK/gZBXJWz
-    RIi6l0+qbtbTxZMy7g0JyoN4fHYQpxWvE3TzGndxS1nasW9f8bDmCqB5gkvHD8MgFvd//s
-    5vbWtaSTNKKIH5LG8wxj8Y5M3JB6hu1vjXUtm69jzmFBXcn/lnZLlKU80aKA
-X-ME-Proxy: <xmx:cIX3ah-3xPlXF68y2C1WHKlnjV3DAljzi3bu2s3AS09jXSzN98JtsA>
-    <xmx:cIX3akzNRFbDpo62wYqIOq_Ym6qorqrm1ZYoU2uHq4gefIK2w_T4zQ>
-    <xmx:cIX3alNvWkkCtq9XFFAMQJBZA80NujBNEZBAtcT3niCsxAWADW8-sQ>
-    <xmx:cIX3ah8W84qwh5HHIaVUZ4jjewlY78sgnJB5GDYS9VHvP42XDJGavg>
-    <xmx:cIX3aq7TMv6ITrAfE_XnT744kil1uWbsr0uZem-l8mZeHJvc9irFnYJF>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 864FBF8008E; Fri, 13 Nov 2026 16:47:26 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=X7DQWJ7C
+X-Envelope-To: linux-kbuild@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=B16odCs177cdXLEvKntuWHjttnpyOtVHrFIqeH/UPaQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794608083; v=1; x=1795212883;
+ b=X7DQWJ7Colzn1U8y/9DcSRlM5eTDSn/YSFLFgihWL4YcdLpu2oDm0gRwzC862anvzLOmtRiW
+ K2SJYkKLAZyauLnrtgmVnUylu2XDwp+xpqHrcrj01h57SWhtrG4FqqdiYMI8HWfv20UzHNc0jWm
+ cufP0uEKFF68DDOGSA9e9wbE=
+X-Envelope-To: linux-kbuild@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 0adfe5a205e05619;
+	Fri, 13 Nov 2026 22:14:42 +0000
+X-Mizu-Trace-ID: 0adfe5a205e05619
+X-Migadu-Flow: FLOW_OUT
+Date: Fri, 13 Nov 2026 22:14:43 +0000
+From: Bradley Morgan <bradley.morgan@linux.dev>
+To: pmenzel@molgen.mpg.de
+CC: atomlin@atomlin.com, da.gomez@kernel.org, dsterba@suse.com,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-modules@vger.kernel.org, mcgrof@kernel.org, nathan@kernel.org,
+ nsc@kernel.org, petr.pavlu@suse.com, samitolvanen@google.com,
+ terrelln@fb.com
+Subject: Re: [PATCH] module: Add LZ4 module compression
+In-Reply-To: <20261113144233.193782-1-pmenzel@molgen.mpg.de>
+Message-ID: <C55315CE-D1F3-487A-B9D6-A0BA457374E5@linux.dev>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -77,81 +66,383 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-ThreadId: A5RLEaK5Drvc
-Date: Fri, 13 Nov 2026 22:47:06 +0100
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>,
- "Catalin Marinas" <catalin.marinas@arm.com>
-Cc: "Nathan Chancellor" <nathan@kernel.org>, linux-kbuild@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- "Christoph Hellwig" <hch@lst.de>
-Message-Id: <289380e8-9bdd-4769-b62e-dbedb553a16e@app.fastmail.com>
-In-Reply-To: <20261113203007.GB29151@quark>
-References: <20261029135020.272082-6-ardb+git@google.com>
- <20261112222720.GA188816@ax162>
- <bc58b973-3d54-4480-aaaa-f5d5269418ea@app.fastmail.com>
- <20261113190150.GA2857474@ax162>
- <b7f72b97-6e8e-4b07-a2a1-6ac8c6e596e4@app.fastmail.com>
- <20261113203007.GB29151@quark>
-Subject: Re: [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-cc Catalin for real this time.
-
-TL;DR Clang builds are broken due to type override hacks that we
-don't actually need.
-
-Please consider these for the arm64 tree, preferably as fixes.
-
-On Fri, 13 Nov 2026, at 21:30, Eric Biggers wrote:
-> On Fri, Nov 13, 2026 at 09:05:32PM +0100, Ard Biesheuvel wrote:
->> (cc Catalin)
->> 
->> Full thread:
->> https://lore.kernel.org/all/20261029135020.272082-6-ardb+git@google.com/
->> 
->> On Fri, 13 Nov 2026, at 20:01, Nathan Chancellor wrote:
->> > On Fri, Nov 13, 2026 at 09:23:03AM +0100, Ard Biesheuvel wrote:
->> >> On Thu, 12 Nov 2026, at 23:27, Nathan Chancellor wrote:
->> >> > Who do you think should take this series? It would be nice if it could
->> >> > start making its way to mainline sooner rather than later since tip of
->> >> > tree clang builds have been broken for over a month at this point.
->> >> >
->> >> 
->> >> Are the first two patches sufficient for that? Perhaps Eric can take them
->> >> through the CRC or libcrypto trees, and I can send the remaining ones
->> >> through the respective arch trees the following cycle.
->> >
->> > Unfortunately not :/ we need the third patch to resolve the error since
->> > that is where the conflict is originating.
->> >
->> 
->> OK in that case, maybe Catalin can take the whole thing via the arm64 tree? 
->> 
->> 
->> 
->> Diffstat:
->> 
->> Ard Biesheuvel (4):
->>   lib/crc: Don't include <linux/types.h> in NEON intrinsics code
->>   xor: arm/arm64: Move NEON xor_gen() dispatch into the glue code
->>   arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
->>   ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
->> 
->>  Documentation/arch/arm/kernel_mode_neon.rst | 10 +++--
->>  arch/arm/include/asm/neon-intrinsics.h      | 43 +++-----------------
->>  arch/arm64/include/asm/neon-intrinsics.h    | 24 +++--------
->>  lib/crc/crc64-neon.c                        | 10 ++---
->>  lib/raid/xor/arm/xor-neon-glue.c            |  3 ++
->>  lib/raid/xor/arm/xor-neon.h                 | 16 +++++++-
->>  lib/raid/xor/arm64/xor-eor3.c               | 15 ++-----
->>  lib/raid/xor/arm64/xor-neon-glue.c          |  5 +++
->>  lib/raid/xor/arm64/xor-neon.h               | 31 ++++++++++++--
->>  lib/raid/xor/xor-neon.c                     | 16 ++------
->>  10 files changed, 78 insertions(+), 95 deletions(-)
+On 13 November 2026 14:42:29 GMT, Paul Menzel <pmenzel@molgen.mpg.de>
+wrote:
+>XZ modules are small but slow to decompress in the kernel. Therefore,
+>support modules compressed in the LZ4 frame format (.ko.lz4), as written
+>by lz4(1). Decode block by block into a scratch buffer and copy into the
+>module pages. Linked blocks keep the last 64 KiB of output in front of
+>the scratch buffer as the dictionary. Verify the header checksum, block
+>checksums, content checksum and content size when the frame has them.
+>Frames with a dictionary ID are rejected.
 >
-> I agree the arm64 tree makes the most sense for cross-subsystem arm and
-> arm64 infrastructure changes like this.
+>modules_install uses `lz4 -12 -B4 -BD`: 64 KiB linked blocks are as
+>small as 4 MiB blocks (i915.ko: 3587140 vs 3585364 bytes) and keep the
+>scratch buffer at 128 KiB.
 >
-> - Eric
+>Userspace needs kmod with LZ4 support for depmod and modprobe [1].
+>
+>On a Dell XPS 13 9310 with an Intel Core i7-1165G7 (Tiger Lake) and an
+>NVMe SSD, decompressing and checking the signatures of the 237 modules
+>loaded during boot takes 624 ms of CPU time with XZ (i915: 91 ms) and
+>131 ms with LZ4 (i915: 12 ms), measured by calling finit_module() again
+>for each loaded module. The LZ4 modules take 20.3 MB instead of 11.0 MB.
+>Both kernels are v7.4-rc1 with the same patches, including pending
+>lib/xz decoder speed-ups. Ten alternating boots of each kernel:
+>
+>  | ms (median)                               |  XZ  | LZ4  | change |
+>  +-------------------------------------------+------+------+--------+
+>  | early-i915 (modprobe i915 + dependencies) |  295 |   90 |   -205 |
+>  | first i915 message                        |  738 |  547 |   -192 |
+>  | GDM autologin                             |  973 |  876 |    -96 |
+>  | GRUB start to autologin                   | 1292 | 1197 |    -94 |
+>
+>QEMU 11.1.2 (KVM, AMD EPYC 7763, 8 vCPUs, module.sig_enforce=1, 10
+>rounds), loading the same 237 modules in dependency order:
+>
+>  | median                   |   XZ    |   LZ4   | uncompressed |
+>  +--------------------------+---------+---------+--------------+
+>  | one at a time            | 2082 ms | 1499 ms |      1461 ms |
+>  | 8 in parallel, like udev |  619 ms |  573 ms |       593 ms |
+>
+>Link: https://github.com/kmod-project/kmod/pull/505 [1]
+>Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
+>---
+>
+>Notes:
+>    Assisted-by: Claude Opus 5.5 (Claude Code) wrote the decoder and this message. Tests: W=1 compile (GCC 16.2, Debian config); QEMU with module.sig_enforce=1: 11 LZ4 frame variants (64 KiB-4 MiB, linked/independent, block/content checksums, content size, stored blocks) load, 7 corrupt or truncated files are rejected; 237-module boot set loads in QEMU and on a Dell XPS 13 9310 (20 boots).
+>
+> kernel/module/Kconfig      |  13 ++-
+> kernel/module/decompress.c | 227 +++++++++++++++++++++++++++++++++++++
+> scripts/Makefile.modinst   |   6 +
+> 3 files changed, 245 insertions(+), 1 deletion(-)
+>
+>diff --git a/kernel/module/Kconfig b/kernel/module/Kconfig
+>index 43b1bb01fd273..36f12612c74dd 100644
+>--- a/kernel/module/Kconfig
+>+++ b/kernel/module/Kconfig
+>@@ -344,7 +344,7 @@ config MODULE_COMPRESS
+> 	  This is fully compatible with signed modules.
+> 
+> 	  The tool used to work with modules needs to support the selected
+>-	  compression type. kmod MAY support gzip, xz and zstd. Other tools
+>+	  compression type. kmod MAY support gzip, lz4, xz and zstd. Other tools
+> 	  might have a limited selection of the supported types.
+> 
+> 	  Note that for modules inside an initrd or initramfs, it's more
+>@@ -377,6 +377,15 @@ config MODULE_COMPRESS_ZSTD
+> 	  Support modules compressed with ZSTD. The installed modules are
+> 	  suffixed with .ko.zst.
+> 
+>+config MODULE_COMPRESS_LZ4
+>+	bool "LZ4"
+>+	help
+>+	  Support modules compressed with LZ4. The installed modules are
+>+	  suffixed with .ko.lz4.
+>+
+>+	  LZ4 modules are larger than XZ or ZSTD ones but decompress
+>+	  several times faster.
+>+
+> endchoice
+> 
+> config MODULE_COMPRESS_ALL
+>@@ -394,6 +403,8 @@ config MODULE_DECOMPRESS
+> 	select ZLIB_INFLATE if MODULE_COMPRESS_GZIP
+> 	select XZ_DEC if MODULE_COMPRESS_XZ
+> 	select ZSTD_DECOMPRESS if MODULE_COMPRESS_ZSTD
+>+	select LZ4_DECOMPRESS if MODULE_COMPRESS_LZ4
+>+	select XXHASH if MODULE_COMPRESS_LZ4
+> 	help
+> 	  Support for decompressing kernel modules by the kernel itself
+> 	  instead of relying on userspace to perform this task. Useful when
+>diff --git a/kernel/module/decompress.c b/kernel/module/decompress.c
+>index cce098671be97..5828b7ec9d7b6 100644
+>--- a/kernel/module/decompress.c
+>+++ b/kernel/module/decompress.c
+>@@ -287,6 +287,233 @@ static ssize_t module_zstd_decompress(struct load_info *info,
+> 	kvfree(wksp);
+> 	return retval;
+> }
+
+↓ wont you comment and say what this is?
+
+>+#elif defined(CONFIG_MODULE_COMPRESS_LZ4)
+>+#include <linux/bitfield.h>
+>+#include <linux/lz4.h>
+>+#include <linux/sizes.h>
+>+#include <linux/unaligned.h>
+>+#include <linux/xxhash.h>
+>+#define MODULE_COMPRESSION	lz4
+>+#define MODULE_DECOMPRESS_FN	module_lz4_decompress
+>+
+>+/* LZ4 frame format, as written by lz4(1) */
+>+#define LZ4F_MAGIC		0x184d2204
+>+#define LZ4F_FLG_VERSION_MASK	GENMASK(7, 6)
+>+#define LZ4F_FLG_VERSION	0x40
+>+#define LZ4F_FLG_BLOCK_INDEP	BIT(5)
+>+#define LZ4F_FLG_BLOCK_CSUM	BIT(4)
+>+#define LZ4F_FLG_CONTENT_SIZE	BIT(3)
+>+#define LZ4F_FLG_CONTENT_CSUM	BIT(2)
+>+#define LZ4F_FLG_RESERVED	BIT(1)
+>+#define LZ4F_FLG_DICT_ID	BIT(0)
+>+#define LZ4F_BD_MAX_SIZE	GENMASK(6, 4)
+>+#define LZ4F_BD_RESERVED	(BIT(7) | GENMASK(3, 0))
+>+#define LZ4F_BLOCK_UNCOMPRESSED	BIT(31)
+
+These define blocks look odd.
+
+>+/* Linked blocks may reference up to 64 KiB of earlier output. */
+>+#define LZ4F_DICT_SIZE		SZ_64K
+
+I feel this could be better, not got my thinking glasses on, any ideas?
+
+>+
+>+static int module_lz4_copy_out(struct load_info *info, const u8 *src,
+>+			       size_t len, size_t *total)
+>+{
+>+	while (len) {
+>+		size_t offset = *total % PAGE_SIZE;
+>+		size_t chunk = min_t(size_t, len, PAGE_SIZE - offset);
+>+		struct page *page;
+>+
+>+		if (offset)
+>+			page = info->pages[info->used_pages - 1];
+>+		else
+>+			page = module_get_next_page(info);
+>+		if (IS_ERR(page))
+>+			return PTR_ERR(page);
+>+
+>+		memcpy_to_page(page, offset, src, chunk);
+>+		src += chunk;
+>+		len -= chunk;
+>+		*total += chunk;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+static int module_lz4_verify_content(struct load_info *info, size_t total,
+>+				     u32 expected)
+>+{
+>+	void *data;
+>+	u32 csum;
+>+
+>+	data = vmap(info->pages, info->used_pages, VM_MAP, PAGE_KERNEL_RO);
+>+	if (!data)
+>+		return -ENOMEM;
+>+	csum = xxh32(data, total, 0);
+>+	vunmap(data);
+>+
+>+	if (csum != expected) {
+>+		pr_err("LZ4-compressed data is corrupt (content checksum)\n");
+>+		return -EINVAL;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+static ssize_t module_lz4_decompress(struct load_info *info,
+>+				     const void *buf, size_t size)
+>+{
+>+	const u8 *in = buf, *end = in + size, *desc;
+>+	size_t block_max, total = 0, dict_len = 0;
+>+	u64 content_size = 0;
+>+	u8 *scratch, *out;
+>+	bool linked;
+>+	u8 flg, bd;
+>+	int retval;
+>+
+>+	if (size < 7 || get_unaligned_le32(in) != LZ4F_MAGIC) {
+>+		pr_err("not an lz4 compressed module\n");
+>+		return -EINVAL;
+>+	}
+>+
+>+	desc = in + 4;
+>+	flg = desc[0];
+>+	bd = desc[1];
+>+	in = desc + 2;
+>+	if ((flg & LZ4F_FLG_VERSION_MASK) != LZ4F_FLG_VERSION ||
+>+	    (flg & LZ4F_FLG_RESERVED) || (bd & LZ4F_BD_RESERVED) ||
+>+	    FIELD_GET(LZ4F_BD_MAX_SIZE, bd) < 4) {
+>+		pr_err("LZ4-compressed data has an unsupported frame descriptor\n");
+>+		return -EINVAL;
+>+	}
+>+	if (flg & LZ4F_FLG_DICT_ID) {
+>+		pr_err("LZ4-compressed data needs a dictionary\n");
+>+		return -EINVAL;
+>+	}
+>+	if (flg & LZ4F_FLG_CONTENT_SIZE) {
+>+		if (end - in < 8)
+>+			goto truncated_header;
+>+		content_size = get_unaligned_le64(in);
+>+		in += 8;
+>+	}
+>+	if (end - in < 1)
+>+		goto truncated_header;
+>+	if (*in != ((xxh32(desc, in - desc, 0) >> 8) & 0xff)) {
+>+		pr_err("LZ4-compressed data has a corrupt frame descriptor\n");
+>+		return -EINVAL;
+>+	}
+>+	in++;
+>+
+>+	/* 4: 64 KiB, 5: 256 KiB, 6: 1 MiB, 7: 4 MiB */
+
+Id reckon this would need to make sense for a new code reader.
+
+>+	block_max = SZ_64K << (2 * (FIELD_GET(LZ4F_BD_MAX_SIZE, bd) - 4));
+>+	linked = !(flg & LZ4F_FLG_BLOCK_INDEP);
+>+
+>+	scratch = kvmalloc((linked ? LZ4F_DICT_SIZE : 0) + block_max,
+>+			   GFP_KERNEL);
+>+	if (!scratch)
+>+		return -ENOMEM;
+>+	out = scratch + (linked ? LZ4F_DICT_SIZE : 0);
+>+
+>+	for (;;) {
+>+		u32 block_size;
+>+		size_t len;
+>+		int ret;
+>+
+>+		if (end - in < 4)
+>+			goto truncated;
+>+		block_size = get_unaligned_le32(in);
+>+		in += 4;
+>+		if (!block_size)
+>+			break;
+>+
+>+		len = block_size & ~LZ4F_BLOCK_UNCOMPRESSED;
+>+		if (len > block_max) {
+>+			pr_err("LZ4-compressed data has an oversized block\n");
+>+			retval = -EINVAL;
+>+			goto out;
+>+		}
+>+		if ((size_t)(end - in) < len +
+>+		    (flg & LZ4F_FLG_BLOCK_CSUM ? 4 : 0))
+>+			goto truncated;
+>+
+>+		if ((flg & LZ4F_FLG_BLOCK_CSUM) &&
+>+		    xxh32(in, len, 0) != get_unaligned_le32(in + len)) {
+>+			pr_err("LZ4-compressed data is corrupt (block checksum)\n");
+>+			retval = -EINVAL;
+>+			goto out;
+>+		}
+>+
+>+		if (block_size & LZ4F_BLOCK_UNCOMPRESSED) {
+>+			memcpy(out, in, len);
+>+			ret = len;
+>+		} else if (linked) {
+>+			ret = LZ4_decompress_safe_usingDict(in, out, len,
+>+							    block_max,
+>+							    out - dict_len,
+>+							    dict_len);
+>+		} else {
+>+			ret = LZ4_decompress_safe(in, out, len, block_max);
+>+		}
+>+		if (ret < 0) {
+>+			pr_err("LZ4-decompression failed\n");
+>+			retval = -EINVAL;
+>+			goto out;
+>+		}
+>+
+>+		retval = module_lz4_copy_out(info, out, ret, &total);
+>+		if (retval)
+>+			goto out;
+>+
+>+		if (linked) {
+>+			/*
+>+			 * The dictionary ends where the new output starts:
+>+			 * move the last 64 KiB of both in front of the
+>+			 * output area for the next block.
+>+			 */
+
+bit long.
+
+>+			size_t keep = min_t(size_t, dict_len + ret,
+>+					    LZ4F_DICT_SIZE);
+>+
+>+			memmove(out - keep, out + ret - keep, keep);
+>+			dict_len = keep;
+>+		}
+>+
+>+		in += len;
+>+		if (flg & LZ4F_FLG_BLOCK_CSUM)
+>+			in += 4;
+>+	}
+>+
+>+	if (flg & LZ4F_FLG_CONTENT_CSUM) {
+>+		if (end - in < 4)
+>+			goto truncated;
+>+		retval = module_lz4_verify_content(info, total,
+>+						   get_unaligned_le32(in));
+>+		if (retval)
+>+			goto out;
+>+		in += 4;
+>+	}
+>+
+>+	if (in != end) {
+>+		pr_err("LZ4-compressed module has trailing data\n");
+>+		retval = -EINVAL;
+>+		goto out;
+>+	}
+>+
+>+	if ((flg & LZ4F_FLG_CONTENT_SIZE) && content_size != total) {
+>+		pr_err("LZ4-compressed data has a wrong content size\n");
+>+		retval = -EINVAL;
+>+		goto out;
+>+	}
+>+
+>+	retval = total;
+>+	goto out;
+>+
+>+truncated:
+>+	pr_err("LZ4-compressed data is truncated\n");
+>+	retval = -EINVAL;
+>+out:
+>+	kvfree(scratch);
+>+	return retval;
+>+
+>+truncated_header:
+>+	pr_err("LZ4-compressed data is truncated\n");
+>+	return -EINVAL;
+>+}
+> #else
+> #error "Unexpected configuration for CONFIG_MODULE_DECOMPRESS"
+> #endif
+>diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+>index 9ba45e5b32b18..aebc5e89d0e75 100644
+>--- a/scripts/Makefile.modinst
+>+++ b/scripts/Makefile.modinst
+>@@ -57,6 +57,7 @@ ifdef CONFIG_MODULE_COMPRESS_ALL
+> suffix-$(CONFIG_MODULE_COMPRESS_GZIP)	:= .gz
+> suffix-$(CONFIG_MODULE_COMPRESS_XZ)	:= .xz
+> suffix-$(CONFIG_MODULE_COMPRESS_ZSTD)	:= .zst
+>+suffix-$(CONFIG_MODULE_COMPRESS_LZ4)	:= .lz4
+> endif
+> 
+> modules := $(patsubst %.o, $(dst)/%.ko$(suffix-y), $(modules))
+>@@ -151,6 +152,8 @@ quiet_cmd_xz = XZ      $@
+>       cmd_xz = $(XZ) --check=crc32 --lzma2=dict=1MiB -f $<
+> quiet_cmd_zstd = ZSTD    $@
+>       cmd_zstd = $(ZSTD) --rm -f -q $<
+>+quiet_cmd_lz4 = LZ4     $@
+>+      cmd_lz4 = $(LZ4) -12 -B4 -BD --rm -f -q $< $@
+> 
+> $(dst)/%.ko.gz: $(dst)/%.ko FORCE
+> 	$(call cmd,gzip)
+>@@ -161,6 +164,9 @@ $(dst)/%.ko.xz: $(dst)/%.ko FORCE
+> $(dst)/%.ko.zst: $(dst)/%.ko FORCE
+> 	$(call cmd,zstd)
+> 
+>+$(dst)/%.ko.lz4: $(dst)/%.ko FORCE
+>+	$(call cmd,lz4)
+>+
+> PHONY += FORCE
+> FORCE:
+> 
+>
+
+--- Thanks!
