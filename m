@@ -1,45 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794545954;
-	b=BAP82V5sYN39u7h0JZtg4pZ7oOOSksS/tF3AUipOewWSTrQOJ5vyVycx8AJBuPlBl7UM
-	 A/0MjT2jf6GIuRnjUrl2J22X20dxmi9b4DLsgHw1pmzjNFl9Mrjr82zEAZpB+kmDLRKuT
-	 rgFnmaSqho1A+z1ljqK9zbVKLLTnPAWftCFXP5ZfMLe+LhkIeSVAToXLvCOgsdKFQBVZu
-	 SBKhBGyzIHqleqlgR6K1XNUDGkPHj8afuli1A78tsZhyCo4HIcHkntzKwvncIxuaH8dfT
-	 eDSy6CPah1O4YD5Dh6T0eXZ/05MTctbdi/r4BYM5ISXy0sYXffP8XEtnb7xhKpKQG5Q==
+	t=1794558207;
+	b=FZy4x1OdX3TdpqvG7ClHDJS58P/F3s6CCoDAzFSFa7N8Se9OBovs2k6Moe+X7vN9Jrna
+	 cVMlsPxqpBXOYZ6Tunlo4Hda2sMZ3bcucYbkslG5cmCFgcl68LdjrcRglB8ps9BbhbPjf
+	 +jbw0kVQyRl9xCq7t7xLVeL8hjjydX2tYXFyczpvE5RKDw9yQoPQ7QDHQMS41AgRFbnDc
+	 xKJ2vuUK0UxmZRnFSlvVWEWklFA+hnfgr/kHGcMZf8ieU76P59jtdi0P6JPR8WNY2ZPEr
+	 GNI1L/8mMso6yxm66GR9vnyCStYymeAjPU1mtXI9JcgpuULeORTJgjDbwWxLLwCQfuA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794545954;
-	h=Received:DKIM-Signature:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
-	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=eLV5i1h2Maz4efFluSDDdrb0YwAHGxnFPrtIuNcYclo=;
-	b=d2/LhYTx6kygyjXosc++ViGDh+VmMtZdCxZxsv81PjP21pUVZnm5UawcISJPQ7pjh4DY
-	 D1k3Q1KkTBwk9LcmHn9tWiCdTyfxtnAleGQ6tV/9OhjQmMYzob8OkgfPGa9h+XNKGO82Y
-	 Xw5ztE05FlVjGXx/1W/vXWBp35925Wzy5G0YtdV5x5/gIourFtzN63EyhtnZkt31cX8Ai
-	 UgApO9YVmWQIKCppvGSCQFkCE3eYXm1ggiefPnW4vo+z+gHNtOsM3VX0lXThB/GLL/XgX
-	 j2ZZHb9oMCXxA21p1QseFE0ANF2AWsJSmbOGfF6ASY9lgLDch5863FJFDyPz2x4hiPQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794558207;
+	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
+	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
+	 References:Subject:Content-Type:Content-Transfer-Encoding;
+	bh=uws9udfa5adxCOqS10/CzLqccmroeJZWnY6ioU46GUA=;
+	b=afeVQQ9JqJ5rFmiTgh97OF2W06CibaRZagHaxJz09H2aizEqlfMuBOHn/8QeXpgIFpd9
+	 edpZHNB5ZhR8NkpFdcYagpvYsEv5HpahoHBVFnfwbxoxIqlCPOmKrwBpinW49p5GRWFCz
+	 EiB/x9tQgwPG4GciIm5zf48tAAduJMewSC8z5OjcHpqZJkgK+wxfGXLdbNn5p6Z7yUQH3
+	 AelQpVgeDcfTVKfM+JuF2GNa3GNxSGoW1yMJw0j1vbIS/8XlTQB4M0wbrBIro33rDcS7P
+	 pogyrpBSuSiPhHnW6DNB0oeYj9Mmxj02auhEU5IbXotDvaAht7+vA+NbvlkPzHAbqBA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c13D6oR5;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kZCFIgb+;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC33606A321;
-	Fri, 13 Nov 2026 04:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6241606A88F
+	for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 08:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c13D6oR5
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06EC01F000C4;
-	Fri, 13 Nov 2026 04:59:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kZCFIgb+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E92ED1F000C9;
+	Fri, 13 Nov 2026 08:23:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794545954;
-	bh=eLV5i1h2Maz4efFluSDDdrb0YwAHGxnFPrtIuNcYclo=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=c13D6oR53e40MJmUKOI2pIBn1/Xd90top50niHSoil0c28bt+0omJxkF2y8kZ7ft3
-	 9afOnV7t6vzTVVAfeDx5i0wnLbpRAGe1MBTJ1kMxcTMU3sVdD6yiY3OQHk/hSX5XQ3
-	 k9LF9aTg+aMlikGYXtEZOvghZVT2Pv5NLtxgGl7BXwjBdEIPja4tZMbj4nSFRYuK47
-	 siL7QQ2f/5OV7oPEN2unIUHL3oOvdOP68KVoB4QSlEhBPtk7tpatAhdXccvzZn1kr9
-	 Jw3KS5J19zWoEKtZXIIwnK1LlrGgJClt33BgLJSBmS9bTfV2xwwL0txImo3mZNymcG
-	 bgrW9swywRxiQ==
+	s=k20260515; t=1794558207;
+	bh=uws9udfa5adxCOqS10/CzLqccmroeJZWnY6ioU46GUA=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=kZCFIgb+C+M14fT8GT+7w3lwKw0U62zWbhKxjM6HW4sHlZnK5OK5zCkoKqSXI4V0/
+	 ps7XCr94u85konlRQiMJhYKUk0axeMWUh0rA994mEycZy81dLHItRqPv7VF9qGliau
+	 Hiq2LyWF5qzyafVScoigIfa9miJUocEvZVVGp/rwfRvYiCldlqEAAWQCe4cEYtl7/W
+	 JPaWtgGshzCmfk4F9aBGE/dxN0PNXqRZvCIkfLN5PEJq+2FXQrDZawV2SZEpCJWZmc
+	 T15/4kdB/r70CqQJ45u8tU1RtNq+W9m1tVQrqIcu5UitCUxAt+tsPrqaWW9I9/kxEj
+	 D7IT9mxF8Iz+g==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 2D6F2198003A;
+	Fri, 13 Nov 2026 03:23:25 -0500 (EST)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Fri, 13 Nov 2026 03:23:25 -0500
+X-ME-Sender: <xms:-8j2aqx0alojUggD-TyY75cRCW6wyvsIQvCpWBQSaCyeiKJwU-HZ5w>
+    <xme:-8j2ahEJRba2QXRnkRRo0oqwDkBzv7fsjq9BseCS1_ijQENTnJq0f5lvGknzsG324
+    jTBKfxuUDWte8cNhcKxxK5BbYsZ7T3vc1LdR2rtd3Nj7tLuRz4PjDo4>
+X-ME-Proxy-Cause: dmFkZTFasi1mk7Wg6vwiVKBf/OywSreu1wv+JOwFPo8fJdW3GoQxx5JHsrogrVfeHcW4fQ
+    lbCN8q3fdN41dpXnltUWEHmAIxBL/mWTVMNLDmGIKgODLU0PJo4SJXr9AGRY1EcOSsiaCF
+    WqB/B1tAYOmeuwlIgFvtcJups27WiWKapW37JCs29lSLVBohtT2zLz+lgFOzcxEMU+FZtQ
+    MWZSK4exr8gaYB68OnDPYfOHqOPhsCw/Q56xm2R/9ddSWMseN+st7tEafzy7qU2Rz8SsCU
+    X/nJi+NABMr/qQ3I3zkRoNbr9qFHTF2Xy/CjmekLgicnmKWy/BqQMEIfPvaNCGt5HjE5lU
+    LwJGyENElv+V32Ts05WL2akjmcx4R/W8d+Jvo4ti5Qw+txJAjHq6wm20brYjPp7oFJS1va
+    jInambHAZ2Es0tvRn+NAxGzZ56vPkTnjG6ValS7tWmmVuQYfZy4XuBlcxHA5DYi6fjVu5P
+    5PT0YQR34s29UfyPIh7Xo+Ywi6N5l489uDwea5qOc/ejptHZ1vMl+0LCUvqXl5jYzf8teh
+    AynXG3v+PPeZD5OdGCmXXr37QFkEbYvbMRzQkSaOe6J3Y39nbVFz+Solb3c5TSkVDSexwe
+    qEuwVB7B7h8P40otg+41ox1u+uytosN+Gg8MN1QZSymrIWJ9yLh5FiXH6D2g
+X-ME-Proxy: <xmx:_cj2anXLN24syy5Z6karfe5hKha3M4js-XdnyZWEyFmcamsH4T8Otw>
+    <xmx:_cj2ah3DNhO7OEGSp47D3kp9-E2_nMcMuHNnopX6ylXrquPWcqfYfQ>
+    <xmx:_cj2alr9nFGKCbn3Yr9qU1mEJFX6xe9POEdDloRKezHv-5CxWkkrtw>
+    <xmx:_cj2aoUpHvU5r-yC6r5VcdROsO0kYy65ZhGXEabAQ3ZQcLN1q_sm2A>
+    <xmx:_cj2agYAdlspQa2uUlC0LcCHFnpKcoGJ_3nYgUsW5aNynf8GjIxpei87>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id C3DD0F8008E; Fri, 13 Nov 2026 03:23:23 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -49,102 +77,58 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-ThreadId: A5RLEaK5Drvc
+Date: Fri, 13 Nov 2026 09:23:03 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Nathan Chancellor" <nathan@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org, "Christoph Hellwig" <hch@lst.de>,
+ "Eric Biggers" <ebiggers@kernel.org>
+Message-Id: <bc58b973-3d54-4480-aaaa-f5d5269418ea@app.fastmail.com>
+In-Reply-To: <20261112222720.GA188816@ax162>
+References: <20261029135020.272082-6-ardb+git@google.com>
+ <20261112222720.GA188816@ax162>
+Subject: Re: [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v7] scripts/config: honor $KBUILD_OUTPUT by default
-From: Nathan Chancellor <nathan@kernel.org>
-To: Dmitry Voytik <voytikd@gmail.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Nicolas Schier <n.schier@fritz.com>, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org
-In-Reply-To: <20261006161155.862736-1-voytikd@gmail.com>
-References: <20261006161155.862736-1-voytikd@gmail.com>
-Date: Thu, 12 Nov 2026 21:59:06 -0700
-Message-Id: <179454594618.814257.8646757102444143940.b4-reply@b4>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2506; i=nathan@kernel.org;
- h=from:subject:message-id; bh=LmLc1ua9MO22CuSKBsx1zzq0p2XhETJ7Ot64x8TjVRw=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFnfZkpVTGliLp+0wKrq5IndUo9Y5MXzXOp5g3f7vMw3X
- XNZKn9uRykLgxgXg6yYIkv1Y9XjhoZzzjLeODUJZg4rE8gQBi5OAZjI9w5GhhduCW/nth21vVjo
- rRBTFtLi/CNTnDux5P9LQfmSL7W15owMeyXX3picsI3z0MxjRyw4nxkcs5YSOOkxkT3j6GI+80c
- 7uAA=
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hi Dmitry,
 
-On 2026-10-06 18:11 +0200, Dmitry Voytik wrote:
-> If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
-> 
-> Fix the issue when the script silently updates a stale .config in
-> the root directory, while the user expects ${KBUILD_OUTPUT}/.config
-> to be updated.
-> Handle properly if the config file is a relative path.
-> 
-> The problem can be worked around with --file, but this is easy to miss,
-> and is inconsistent with how the Makefile and other tools work
-> (e.g., scripts/diffconfig).
+On Thu, 12 Nov 2026, at 23:27, Nathan Chancellor wrote:
+> Hi Ard,
+>
+> On Thu, Oct 29, 2026 at 02:50:20PM +0100, Ard Biesheuvel wrote:
+>> From: Ard Biesheuvel <ardb@kernel.org>
+>> 
+>> Recent Clang has become more finicky when it comes to overriding the
+>> type macros that the freestanding stdint.h consumes when defining the
+>> uintXX_t types, and so it is time to finally get rid of this entirely.
+>> 
+>> So instead of making stdint.h (which comes from the compiler when
+>> -ffreestanding is set on the command line) agree with the kernel's
+>> linux/types.h header, avoid the latter entirely in the compilation units
+>> that actually use the NEON intrinsics (which are always leaf functions
+>> that are not tightly coupled to kernel APIs).
+>> 
+>> Note that the disagreements are about long vs. long long on arm64, and
+>> long vs. int on 32-bit ARM, so never about types that actually have
+>> conflicting representations.
+>> 
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Cc: Eric Biggers <ebiggers@kernel.org>
+>> Cc: Nathan Chancellor <nathan@kernel.org>
+>> 
+>> Ard Biesheuvel (4):
+>>   lib/crc: Don't include <linux/types.h> in NEON intrinsics code
+>>   xor: arm/arm64: Move NEON xor_gen() dispatch into the glue code
+>>   arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
+>>   ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
+>
+> Who do you think should take this series? It would be nice if it could
+> start making its way to mainline sooner rather than later since tip of
+> tree clang builds have been broken for over a month at this point.
+>
 
-I was finally able to sit down and look at this a little bit more. I
-think we can avoid the use of realpath altogether, which would avoid
-most of what Sashiko is complaining about. I tested the following diff
-with your examples and they appear to pass without any issues. Please
-give it a shot. I think we can drop most of the reproduction and
-examples in the commit message. If you want to include them for others,
-please put it below the '---' where you have the changelog, as I don't
-think it needs to end up in git history.
-
-diff --git a/scripts/config b/scripts/config
-index 32428ea909c2..497551538433 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -144,6 +144,22 @@ while [[ $# -gt 0 ]]; do
- 	fi
- done
- 
-+# If no '--file' was specified, use KBUILD_OUTPUT as the base if it exists
-+if [[ "$FN" = ".config" && -n "$KBUILD_OUTPUT" ]]; then
-+	if [[ ! -d "$KBUILD_OUTPUT" ]]; then
-+		echo "KBUILD_OUTPUT is set ('$KBUILD_OUTPUT') but does not exist or is not a directory." >&2
-+		echo "Create it before running $myname or use '--file' to specify configuration file." >&2
-+		exit 1
-+	fi
-+	FN="$KBUILD_OUTPUT/$FN"
-+fi
-+# Turn FN into an absolute path if it is relative so that '--refresh' works on
-+# the correct file. This does not use realpath, as $FN may not exist yet.
-+case "$FN" in
-+	/*) ;;
-+	*) FN="$PWD/$FN" ;;
-+esac
-+
- set -- "${CMDS[@]}"
- if [ "$1" = "" ] ; then
- 	usage
-@@ -200,10 +216,10 @@ while [ "$1" != "" ] ; do
- 		;;
- 
- 	--state|-s)
--		if grep -q "# ${CONFIG_}$ARG is not set" $FN ; then
-+		if grep -q "# ${CONFIG_}$ARG is not set" "$FN" ; then
- 			echo n
- 		else
--			V="$(grep "^${CONFIG_}$ARG=" $FN)"
-+			V="$(grep "^${CONFIG_}$ARG=" "$FN")"
- 			if [ $? != 0 ] ; then
- 				echo undef
- 			else
-@@ -229,7 +245,7 @@ while [ "$1" != "" ] ; do
- 		;;
- 
- 	--refresh)
--		yes "" | make oldconfig KCONFIG_CONFIG=$FN
-+		yes "" | make oldconfig KCONFIG_CONFIG="$FN"
- 		;;
- 
- 	*)
-
--- 
-Cheers,
-Nathan
+Are the first two patches sufficient for that? Perhaps Eric can take them
+through the CRC or libcrypto trees, and I can send the remaining ones
+through the respective arch trees the following cycle.
 
