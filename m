@@ -1,65 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794599708;
-	b=uqIlPfai4t4f9pbUby+2GC4PxeQiO6LPf7WMY704S/JnMC6Ajs5qYF1q5Xm9qjW+1nkk
-	 Vs+TJP/JETiWk8L6RTzlS0wXJXAxKiTSgsKXL0jC6rgGu1Ve8byT4PC6yas6CW7fI693J
-	 E7O27L2GTPPKA8gMBtae/Ki8M8hdSDl+V9/3WF/ra72uh8EzFiTLu0m3/UVC5x628HOWX
-	 OQAytm3s7Vx+t1bbvgeqSdPvVZhvOaH0HnKqHpZA4wFl4wq/04PahP93ExdynKYSPXRA6
-	 LEbfUHO69wvHMLRbzCNwUUndAdsXHhsJu39Wp0vfIBUPIU5UneouBTPdw+50MdshpYw==
+	t=1794600357;
+	b=pjndqd+wiIBt9LL9h+ZSn8pD1aeIwj8QXeen0YOvFCkNHKnokPTRbkkPs5lQCdDZNpKh
+	 8v3MXb2n/XER6lJLMHNDTem9HhB4bWYdkCKC+cu4enCO/HRV6g678Tgj5TBOFQ7szdCne
+	 JJtv1jn11bBHqsCQeWzWJc034FXSHhis6h0t/pWDn3PkKpZwOkZfuST2Fef8V/zMqVgvK
+	 Wou+4wv25qA0OOcB5evk0vgoKbtgFA3jSjuPQ9vPdBfCeIL0hWvol6KP5sbX6ZwdB7JVZ
+	 Xz1lobHAa5DlU2KvSpx3qXwvtnzOmhl3y9tI4hOY5J+wulbS16arrWN9CSdPOSkQUbw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794599708;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=2Q+U0OS3YmZLdLoRNWVXiEYLBkuiGg1W/u8Nx2XwsgY=;
-	b=e7dMOKN+0NKQrfV7Z1DLC0+Wv00w2NUBM2Rhsin8DbNGxlFsA/zWSQsLaktu1Nt5Oa+5
-	 kgJOp99aknrW8qgpMizvxCtul7vaHzfMNoPZi1JOMyYcPHPxaxe9xUflcmqXB8Y7nXSGv
-	 prL/izOX+9Cw9jUtbS0G44HXCMeSZpKnpDBtESY3WxvO+dZGmampw+AG7ZlXuXgYplx2W
-	 q7cApTGPEjG8e3GVRps5HKjKmvWU1XdNb2JssHdbTmfZV7nBPFY5+M3dS8vA3WOaQnpcF
-	 leTIPfTS3Wu/I1rtL/iUuxMBsVTPFsvTZ0lmEObYc9XN35gYFPlnI7C6jhZx/x7wDbg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794600357;
+	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
+	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type:Content-Transfer-Encoding;
+	bh=VvQJyhwgQ+YhbM+FtddDOciD0h7PQaqhxjTy41nTAJE=;
+	b=WjtS7SNiXYM3UjBAcOgT6QkbnTnc9Z0hxbydZHgpsUA3xSzlYPfj1bvqtOBrPRubIw7S
+	 0cR9/EKxJhZuqT0gsik3bLkC7LLmLKiu+bhkbZgbu5UeMnUSDpYhkusBd6wdxvYAmE7Ti
+	 Oo9+twuqK1FTw6EBiCchudKuwcC365/lx2G/cZwfDjzD6aw4NBu6KfwrCRO8ecjjUVSEn
+	 6oJdVestExcp+M/TmH1PwevDcA0XAuAu89WaxK9HQ1r+nkzbqvVzztatxeObey98Z2O6O
+	 O5ViiKD/mUAgM0N3JpiT2N37Z+dQLjcQ4GiMbHPcDs2cI1rQKfgYukxPJZWjSpIMFKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mbDXCJJ7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VDe4n0SQ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A8D606BCF6;
-	Fri, 13 Nov 2026 19:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F76606A323
+	for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 20:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mbDXCJJ7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27E591F000CE;
-	Fri, 13 Nov 2026 19:55:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VDe4n0SQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42C941F000C5
+	for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 20:05:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794599708;
-	bh=2Q+U0OS3YmZLdLoRNWVXiEYLBkuiGg1W/u8Nx2XwsgY=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mbDXCJJ7vtsGUGeUXnwLwotkqd+/VQCnQY11hTC06Er0l2SUn+L99gaO1zNbVjBUa
-	 16BQr5hwQhXTnxa6HQvx5uo1JHsIZzZyl2AAcLc9s4uun1ZA0kx+hedkG26nOiKKhV
-	 e4b4AGdSzNVrtJ3ih0fBBHJJYT4H5EiSrozm+8r3BdIESbySce2fltWnuGz8/uVzxv
-	 a/ytAlD3mxl7sAxhS7QnqKgalvJaChMvia4kvXKfi8MaABuEE88WSGUAYpDEcGqrpR
-	 iK5rhCs6Sgeahnke5GKyOGeUR+vsPIEG9nDGddHnED80x5PuvyNl5fTijMVbdelLeQ
-	 GFskOyKDUK77g==
-Message-ID: <sashiko-outbox-213588@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 6/7] kbuild: build the tools selected in
- tools/Kconfig as part of "make all"
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sasha Levin" <sashal@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
- Schier" <nsc@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: "Shuah Khan" <shuah@kernel.org>, "Peter Zijlstra" <peterz@infradead.org>, "Ingo
- Molnar" <mingo@redhat.com>, "Arnaldo Carvalho de Melo" <acme@kernel.org>, "Namhyung
- Kim" <namhyung@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>, "Alexander
- Shishkin" <alexander.shishkin@linux.intel.com>, "Jiri Olsa" <jolsa@kernel.org>, "Ian
- Rogers" <irogers@google.com>, "Adrian Hunter" <adrian.hunter@intel.com>, "James
- Clark" <james.clark@linaro.org>, linux-perf-users@vger.kernel.org,
- =?utf-8?b?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, "Andrew Morton" <akpm@linux-foundation.org>, "Thorsten
- Leemhuis" <linux@leemhuis.info>
-In-Reply-To: <20261112195427.3411746-7-sashal@kernel.org>
-References: <20261112195427.3411746-1-sashal@kernel.org>
- <20261112195427.3411746-7-sashal@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Nov 2026 19:55:06 +0000
+	s=k20260515; t=1794600356;
+	bh=VvQJyhwgQ+YhbM+FtddDOciD0h7PQaqhxjTy41nTAJE=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=VDe4n0SQNQq+U2H+GeQp9Ln5ycFphUpo9o1RvMgkjl1LYpndhQPgvRmpOXnZR9VJ9
+	 dsXHmTfBUA96g7/1WulQAvY+IFILPIQLwH0F0/GFl+N7AVk//g3xwegphDcEELX8cH
+	 TUrn1/jQYxpor/RDbyoIsetL60j72gAjmSqeQsIvt8B4vc5M0bqs+Dt1TrC9di33Om
+	 wcLkqYMVLq8zwAetL5gqTi7Pr574A2sxAXyK+gBoZrTqCKl604yQ2NitLGd5PMAw8n
+	 P6qX//qsQfkGqi/X2BLGtl2ZzPl1MCsZQstZOgsfL8JZkUiU0oSqW1I5ZX9Vo5QicC
+	 7ITWzo1rL94cQ==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 8B4E8198003A;
+	Fri, 13 Nov 2026 15:05:54 -0500 (EST)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Fri, 13 Nov 2026 15:05:54 -0500
+X-ME-Sender: <xms:oG33ala2Qs4dNCz_pgKY9qRFkQNTC8Md8bjb0LxB46k3LYEbFL24aw>
+    <xme:oG33anO6D0ny--CeA8YHwhOR2Bnxkws17cmN25HV8MXK2cJ7kSMiFxQLvCKELokaa
+    _P9FBJN182cikAmS_EWuQU6f2s5w5re3_lzq_YaU2r3zedxLFq2yi9M>
+X-ME-Proxy-Cause: dmFkZTFrh2j1YerPcsdYSEJl2fuNPZBBkrWfKhKGJpB+r05OZ52nQHlNbhYFKI0raic5S0
+    5bMlCyChL49t3w8ZhhOR0NlNe3z9Lg7QBBiJ59KgCh1sycLWSK809y0RE5D/RanX5bwkrc
+    EudQ9Fb7dAjmpZGKgucomUumnKpy8W0Ifj2G/RKLfrE67vIpEVZmZLp2GFgvO65vFSLxcv
+    +k7OYpW55f5SLyKg+v3yrBkk34QdbPV0RCfi+OvplFq/xqwI0LylgEtFVmCLGUyZvzK/lB
+    joRJw+3eq+P+s9M3NmX+1p1vZU043sdwYPKegHO9x2WqAdMAwNOhQR3RorxmNswidt5zkv
+    hJVDuN6TQrb50u5stQadctkO+AFYznGeqlthIJiuhnH9e6cQFD+7x4XCSZ60HbgKOaTYxF
+    tIl4yKFaQ4aLE3fwHNRQ99xcInMXWkrZDGLOJMIa1+jBcePoyMS5liR4ibrgMaOEWY2mih
+    4IVSRU7Xb3Mqn1LqYgWN8SGE2Bz7yTt6B3sKJ3//eXRiqQdfXcWUZ0n0CcQMy3kI/eHVs6
+    mfBsgf3cLFx9Pe5vb+hYqKSSuLVMgavmAWee3WBa4WNK7/kegauBOUj4lOghBSwIaWgxWy
+    yQ5mOeLhSTkY5m4sG8j6E8abAfc9Rqgy7aT9SUPpBGfe041MC/DINB2qovsw
+X-ME-Proxy: <xmx:om33av8JIDuF_Ma5r_he8EYFJwpuPdP3VGQh-jAlBjKuqbSUBCatiw>
+    <xmx:om33at9fgU3GD5mjgAg1Ga21D6YsgKrJ_wdZicKzXvTcqeRoj0KDng>
+    <xmx:om33avQHEOsTYqaVrKaWbbE4tRwGGfUvyQ1AeBEA3AgIlwpf6sUL0A>
+    <xmx:om33ahcJmPgNrYZJ-_PouhKo7piju3djExvLGCz_NLgX4u1PmOp2JQ>
+    <xmx:om33ajBdzwsFsd6xdno2q81dxNKuZUS8sa3B9bO6gXyXwln_S5LnVrFj>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id D33FBF8008E; Fri, 13 Nov 2026 15:05:52 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -68,58 +76,65 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Date: Fri, 13 Nov 2026 21:05:32 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Nathan Chancellor" <nathan@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org, "Christoph Hellwig" <hch@lst.de>,
+ "Eric Biggers" <ebiggers@kernel.org>
+Message-Id: <b7f72b97-6e8e-4b07-a2a1-6ac8c6e596e4@app.fastmail.com>
+In-Reply-To: <20261113190150.GA2857474@ax162>
+References: <20261029135020.272082-6-ardb+git@google.com>
+ <20261112222720.GA188816@ax162>
+ <bc58b973-3d54-4480-aaaa-f5d5269418ea@app.fastmail.com>
+ <20261113190150.GA2857474@ax162>
+Subject: Re: [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] kbuild: make -n all fails in tools_build when
-  CONFIG_TOOLS_BUILD_PERF=3Dy
---
+(cc Catalin)
 
-commit 0273f2e0753bd56565e4e6fbd57c3d5604e7d261
-Author: Sasha Levin <sashal@kernel.org>
+Full thread:
+https://lore.kernel.org/all/20261029135020.272082-6-ardb+git@google.com/
 
-kbuild: build the tools selected in tools/Kconfig as part of "make all"
+On Fri, 13 Nov 2026, at 20:01, Nathan Chancellor wrote:
+> On Fri, Nov 13, 2026 at 09:23:03AM +0100, Ard Biesheuvel wrote:
+>> On Thu, 12 Nov 2026, at 23:27, Nathan Chancellor wrote:
+>> > Who do you think should take this series? It would be nice if it could
+>> > start making its way to mainline sooner rather than later since tip of
+>> > tree clang builds have been broken for over a month at this point.
+>> >
+>> 
+>> Are the first two patches sufficient for that? Perhaps Eric can take them
+>> through the CRC or libcrypto trees, and I can send the remaining ones
+>> through the respective arch trees the following cycle.
+>
+> Unfortunately not :/ we need the third patch to resolve the error since
+> that is where the conflict is originating.
+>
 
-This commit makes the "all" target depend on "tools_build" when
-CONFIG_TOOLS_BUILD is enabled so that selected tools are built during
-standard kernel builds.
+OK in that case, maybe Catalin can take the whole thing via the arm64 tree? 
 
-> diff --git a/Makefile b/Makefile
-> index 7919263484f0a..2a69f4c73a641 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1650,6 +1650,10 @@ PHONY +=3D tools_build
->  tools_build: headers
->  	$(Q)$(MAKE) -f $(srctree)/tools/Makefile.kbuild
-> =20
-> +ifdef CONFIG_TOOLS_BUILD
-> +all: tools_build
-> +endif
-> +
->  # ----------------------------------------------------------------------=
------
->  # Kernel selftest
-> =20
 
-[Severity: Medium]
-Does this break "make -n all" on a clean tree when CONFIG_TOOLS_BUILD_PERF
-is enabled?
 
-Because tools_build and the "build" macro in tools/Makefile.kbuild invoke
-$(MAKE), GNU Make executes them during a dry run, creating directories
-under tools-build/ and descending into tools/perf/Makefile.perf:
+Diffstat:
 
-tools/perf/Makefile.perf:
-$(LIBAPI): FORCE | $(LIBAPI_OUTPUT)
-	$(Q)$(MAKE) -C $(LIBAPI_DIR) O=3D$(LIBAPI_OUTPUT) \
-		DESTDIR=3D$(LIBAPI_DESTDIR) prefix=3D subdir=3D \
-		$@ install_headers
+Ard Biesheuvel (4):
+  lib/crc: Don't include <linux/types.h> in NEON intrinsics code
+  xor: arm/arm64: Move NEON xor_gen() dispatch into the glue code
+  arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
+  ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
 
-Under "make -n", the $(Q)$(MKDIR) -p $@ recipe for the $(LIBAPI_OUTPUT)
-order-only prerequisite is skipped, while the $(LIBAPI) sub-make still
-runs and aborts in tools/scripts/Makefile.include with "O=3D.../libapi does
-not exist".
+ Documentation/arch/arm/kernel_mode_neon.rst | 10 +++--
+ arch/arm/include/asm/neon-intrinsics.h      | 43 +++-----------------
+ arch/arm64/include/asm/neon-intrinsics.h    | 24 +++--------
+ lib/crc/crc64-neon.c                        | 10 ++---
+ lib/raid/xor/arm/xor-neon-glue.c            |  3 ++
+ lib/raid/xor/arm/xor-neon.h                 | 16 +++++++-
+ lib/raid/xor/arm64/xor-eor3.c               | 15 ++-----
+ lib/raid/xor/arm64/xor-neon-glue.c          |  5 +++
+ lib/raid/xor/arm64/xor-neon.h               | 31 ++++++++++++--
+ lib/raid/xor/xor-neon.c                     | 16 ++------
+ 10 files changed, 78 insertions(+), 95 deletions(-)
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261112195427.3411=
-746-1-sashal@kernel.org?part=3D6
