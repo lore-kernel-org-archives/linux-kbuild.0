@@ -1,73 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.71
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794558207;
-	b=FZy4x1OdX3TdpqvG7ClHDJS58P/F3s6CCoDAzFSFa7N8Se9OBovs2k6Moe+X7vN9Jrna
-	 cVMlsPxqpBXOYZ6Tunlo4Hda2sMZ3bcucYbkslG5cmCFgcl68LdjrcRglB8ps9BbhbPjf
-	 +jbw0kVQyRl9xCq7t7xLVeL8hjjydX2tYXFyczpvE5RKDw9yQoPQ7QDHQMS41AgRFbnDc
-	 xKJ2vuUK0UxmZRnFSlvVWEWklFA+hnfgr/kHGcMZf8ieU76P59jtdi0P6JPR8WNY2ZPEr
-	 GNI1L/8mMso6yxm66GR9vnyCStYymeAjPU1mtXI9JcgpuULeORTJgjDbwWxLLwCQfuA==
+	t=1794558521;
+	b=b7HNpWa1KYrCyxRwQ6JHNwa9k6TCJYtWKEtSl7Y4dKjjxTKXq/jdzSn8r3hs2B2JC5Jc
+	 cfqV0CPY0wQ58ODEVG7vQKFGCSHN0xQnjTwbbLDkROPzFcssFaaOWw0pYiAEbV08CBO8Z
+	 sBeDqpl8PSF6v2SNWtoVg44bYpBm+JWkDIMIlJugJ7eBJoKsb/uYl15tliUTfHjwt64Uj
+	 v2lzaOzSpQou+tF8ZH2tf2jD704LYTV4Imgo8BMz0Btlf1xt+1onxc1shkIsFVfEPzZ6Y
+	 g7rBFCUa0hUcaMxACZfDUTAeRVvTiD4xArUe6Uh7qPBvXyJhp6c2i/hQhx0mRHa6lwg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794558207;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
-	 References:Subject:Content-Type:Content-Transfer-Encoding;
-	bh=uws9udfa5adxCOqS10/CzLqccmroeJZWnY6ioU46GUA=;
-	b=afeVQQ9JqJ5rFmiTgh97OF2W06CibaRZagHaxJz09H2aizEqlfMuBOHn/8QeXpgIFpd9
-	 edpZHNB5ZhR8NkpFdcYagpvYsEv5HpahoHBVFnfwbxoxIqlCPOmKrwBpinW49p5GRWFCz
-	 EiB/x9tQgwPG4GciIm5zf48tAAduJMewSC8z5OjcHpqZJkgK+wxfGXLdbNn5p6Z7yUQH3
-	 AelQpVgeDcfTVKfM+JuF2GNa3GNxSGoW1yMJw0j1vbIS/8XlTQB4M0wbrBIro33rDcS7P
-	 pogyrpBSuSiPhHnW6DNB0oeYj9Mmxj02auhEU5IbXotDvaAht7+vA+NbvlkPzHAbqBA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794558521;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=nrmFebnjevEyXDZoOWfiZZaPcF3U9vlhmYY98rYqI7g=;
+	b=TYgC5s3WTzC9r6gsuE8CXwD/jHF5wy6HuWCV6VvW+qh0WofYPGI1r5JIWs7gXJ2NRxBt
+	 TUo3RYbWAZ5zulxIUrtWyXebzXWkXb3CO7J4JrTX5Lqpn/pJXBjMvmN/yz62G3HtCjDBK
+	 e22w43NFbgfKcOGxGyDRe/6WCitigDmzpA6ptGtLWwn7bHWjOYKp1gcPVnT0jpxOe4/tN
+	 ihEH17oZxLl3+7QOAKQN0zgJ3H+IKvRegkBAmTjO9v9cGWuklNOb1FO4Z9zDQCUDvAxg3
+	 f2uH8lY7A1rwY0BC0L55TVXAPQ5AK2tVU68O93TKKTx3D5rwjKSRNSymuk/UC0WF+Cg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kZCFIgb+;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--jenhaochen.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hOulv2aG;
+	arc=none smtp.remote-ip=209.85.216.71
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6241606A88F
-	for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 08:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124C4606C997
+	for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 08:28:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 124C4606C997
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jenhaochen.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kZCFIgb+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E92ED1F000C9;
-	Fri, 13 Nov 2026 08:23:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794558207;
-	bh=uws9udfa5adxCOqS10/CzLqccmroeJZWnY6ioU46GUA=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=kZCFIgb+C+M14fT8GT+7w3lwKw0U62zWbhKxjM6HW4sHlZnK5OK5zCkoKqSXI4V0/
-	 ps7XCr94u85konlRQiMJhYKUk0axeMWUh0rA994mEycZy81dLHItRqPv7VF9qGliau
-	 Hiq2LyWF5qzyafVScoigIfa9miJUocEvZVVGp/rwfRvYiCldlqEAAWQCe4cEYtl7/W
-	 JPaWtgGshzCmfk4F9aBGE/dxN0PNXqRZvCIkfLN5PEJq+2FXQrDZawV2SZEpCJWZmc
-	 T15/4kdB/r70CqQJ45u8tU1RtNq+W9m1tVQrqIcu5UitCUxAt+tsPrqaWW9I9/kxEj
-	 D7IT9mxF8Iz+g==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 2D6F2198003A;
-	Fri, 13 Nov 2026 03:23:25 -0500 (EST)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Fri, 13 Nov 2026 03:23:25 -0500
-X-ME-Sender: <xms:-8j2aqx0alojUggD-TyY75cRCW6wyvsIQvCpWBQSaCyeiKJwU-HZ5w>
-    <xme:-8j2ahEJRba2QXRnkRRo0oqwDkBzv7fsjq9BseCS1_ijQENTnJq0f5lvGknzsG324
-    jTBKfxuUDWte8cNhcKxxK5BbYsZ7T3vc1LdR2rtd3Nj7tLuRz4PjDo4>
-X-ME-Proxy-Cause: dmFkZTFasi1mk7Wg6vwiVKBf/OywSreu1wv+JOwFPo8fJdW3GoQxx5JHsrogrVfeHcW4fQ
-    lbCN8q3fdN41dpXnltUWEHmAIxBL/mWTVMNLDmGIKgODLU0PJo4SJXr9AGRY1EcOSsiaCF
-    WqB/B1tAYOmeuwlIgFvtcJups27WiWKapW37JCs29lSLVBohtT2zLz+lgFOzcxEMU+FZtQ
-    MWZSK4exr8gaYB68OnDPYfOHqOPhsCw/Q56xm2R/9ddSWMseN+st7tEafzy7qU2Rz8SsCU
-    X/nJi+NABMr/qQ3I3zkRoNbr9qFHTF2Xy/CjmekLgicnmKWy/BqQMEIfPvaNCGt5HjE5lU
-    LwJGyENElv+V32Ts05WL2akjmcx4R/W8d+Jvo4ti5Qw+txJAjHq6wm20brYjPp7oFJS1va
-    jInambHAZ2Es0tvRn+NAxGzZ56vPkTnjG6ValS7tWmmVuQYfZy4XuBlcxHA5DYi6fjVu5P
-    5PT0YQR34s29UfyPIh7Xo+Ywi6N5l489uDwea5qOc/ejptHZ1vMl+0LCUvqXl5jYzf8teh
-    AynXG3v+PPeZD5OdGCmXXr37QFkEbYvbMRzQkSaOe6J3Y39nbVFz+Solb3c5TSkVDSexwe
-    qEuwVB7B7h8P40otg+41ox1u+uytosN+Gg8MN1QZSymrIWJ9yLh5FiXH6D2g
-X-ME-Proxy: <xmx:_cj2anXLN24syy5Z6karfe5hKha3M4js-XdnyZWEyFmcamsH4T8Otw>
-    <xmx:_cj2ah3DNhO7OEGSp47D3kp9-E2_nMcMuHNnopX6ylXrquPWcqfYfQ>
-    <xmx:_cj2alr9nFGKCbn3Yr9qU1mEJFX6xe9POEdDloRKezHv-5CxWkkrtw>
-    <xmx:_cj2aoUpHvU5r-yC6r5VcdROsO0kYy65ZhGXEabAQ3ZQcLN1q_sm2A>
-    <xmx:_cj2agYAdlspQa2uUlC0LcCHFnpKcoGJ_3nYgUsW5aNynf8GjIxpei87>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id C3DD0F8008E; Fri, 13 Nov 2026 03:23:23 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hOulv2aG
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3b0f667a666so999660a91.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 00:28:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794558520; x=1795163320; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=nrmFebnjevEyXDZoOWfiZZaPcF3U9vlhmYY98rYqI7g=;
+        b=hOulv2aGaS9ZeYnKvdMh6U1l4N+M1moW7Kq+ZGF+AV8yNfLpmz1l/YjkfZD+2q1O3W
+         vOzcRXS090dMSTIT6ABgDWNRiQNm2rE2Nt15iV1NZr7LyEZ3Si02OiNVzVyNdbANYNWS
+         jwweszeCZfe+J6GH7eD/5rQBCOzgueHigErCyhFdE48sdajr2sDn0KhDPYP9ls9Isvk0
+         n1lnuFKtsZumrpxUeYPLR/TScqxjbzGJ8oMycyJReOI8ALgf1cGSLMcspEcWGk7i3SRW
+         3MvDpqdZwGMumpG0XjIyKcDBS5eIjfL2CLMvQkSay6LsuQcH9Qk/R1HFRs6gf2bBNR0X
+         GMIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794558520; x=1795163320;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=nrmFebnjevEyXDZoOWfiZZaPcF3U9vlhmYY98rYqI7g=;
+        b=F40ZOrYv2rdQ218ZiiKnD+kBPXq4xHFqKXzmSF31oIrANmAq5jHtqextHNxlf113y8
+         MMel7t/jU3e4e67eUkCD+ShvUDhUWz3Jjeje/+BnhBHrh0kgzFg9uj7aeIu9c3dpKkxl
+         HevJKVeYC9tTvp+FxRYbPR4YJ+5dXqc7cBuu6SjukUfT0PdT6n++l0lCOkA4Tkw2MZof
+         c1OSRUqEiPY1tjw5n/tPCNjOGg6iUKMv/Zncr7qwRMsGZZBdQjHuyWTH+HJWdvv//oTd
+         P2jSQDgrGEPYy/sdbUBtBFtI5PjZMIQgbGL78G6ch0wSCHSiN5h+gE1dfVZ7tMBewJ62
+         H/vg==
+X-Forwarded-Encrypted: i=1; AL+hErGFsEt0rml00gxJe7jvZUxty5Il83df+JTafrD4QaSa+/O3kqb/ZiX1zLO/ufal6olSc4agD2G7rUd2/Zw=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/OXxoCHE/gDq32o4f2DhNz8xO3wwalF7k0yJnQk4TUqI3ucPCJ
+	Cm5jwY3WQTCzPlIw10+vTeqiqVSdul9fT4VlHFgnuWjGZ8fcIfEL1GKGiQ+zoRf/F2yrC2f0+1d
+	eGNe/udleODL+DOpWm0WEfQ==
+X-Received: from pjvd14.prod.google.com ([2002:a17:90a:d98e:b0:3b0:9569:4e9a])
+ (user=jenhaochen job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:3d87:b0:3ab:2737:3395 with SMTP id 98e67ed59e1d1-3b1b0a3a2f9mr1460229a91.42.1794558520120;
+ Fri, 13 Nov 2026 00:28:40 -0800 (PST)
+Date: Fri, 13 Nov 2026 08:28:37 +0000
+In-Reply-To: <CANiq72=zg8WeupV5TPTr2tUxAt7imSZXacw=CBf75MdfcAv-rA@mail.gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -76,59 +78,95 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-ThreadId: A5RLEaK5Drvc
-Date: Fri, 13 Nov 2026 09:23:03 +0100
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Nathan Chancellor" <nathan@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org, "Christoph Hellwig" <hch@lst.de>,
- "Eric Biggers" <ebiggers@kernel.org>
-Message-Id: <bc58b973-3d54-4480-aaaa-f5d5269418ea@app.fastmail.com>
-In-Reply-To: <20261112222720.GA188816@ax162>
-References: <20261029135020.272082-6-ardb+git@google.com>
- <20261112222720.GA188816@ax162>
-Subject: Re: [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20261031030807.4101384-1-jenhaochen@google.com> <CANiq72=zg8WeupV5TPTr2tUxAt7imSZXacw=CBf75MdfcAv-rA@mail.gmail.com>
+X-Mailer: git-send-email 2.56.0.611.g1030f0b940-goog
+Message-ID: <20261113082837.4011638-1-jenhaochen@google.com>
+Subject: Re: [PATCH] kbuild: rust: pass AutoFDO flags to Clang with inline helpers
+From: Jenhao Chen <jenhaochen@google.com>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Rong Xu <xur@google.com>, 
+	Han Shen <shenhan@google.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	"=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Matthew Maurer <mmaurer@google.com>, 
+	Sami Tolvanen <samitolvanen@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Qais Yousef <qyousef@google.com>, Ben Wei <benwei@google.com>, 
+	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Jenhao Chen <jenhaochen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-
-On Thu, 12 Nov 2026, at 23:27, Nathan Chancellor wrote:
-> Hi Ard,
+On Wed, Nov 11, 2026 at 7:48 PM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
 >
-> On Thu, Oct 29, 2026 at 02:50:20PM +0100, Ard Biesheuvel wrote:
->> From: Ard Biesheuvel <ardb@kernel.org>
->> 
->> Recent Clang has become more finicky when it comes to overriding the
->> type macros that the freestanding stdint.h consumes when defining the
->> uintXX_t types, and so it is time to finally get rid of this entirely.
->> 
->> So instead of making stdint.h (which comes from the compiler when
->> -ffreestanding is set on the command line) agree with the kernel's
->> linux/types.h header, avoid the latter entirely in the compilation units
->> that actually use the NEON intrinsics (which are always leaf functions
->> that are not tightly coupled to kernel APIs).
->> 
->> Note that the disagreements are about long vs. long long on arm64, and
->> long vs. int on 32-bit ARM, so never about types that actually have
->> conflicting representations.
->> 
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: Eric Biggers <ebiggers@kernel.org>
->> Cc: Nathan Chancellor <nathan@kernel.org>
->> 
->> Ard Biesheuvel (4):
->>   lib/crc: Don't include <linux/types.h> in NEON intrinsics code
->>   xor: arm/arm64: Move NEON xor_gen() dispatch into the glue code
->>   arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
->>   ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
+> This sounds reasonable, but my LLM spotted that Clang will run
+> `AddDiscriminatorsPass`  again, i.e. on the optimized bitcode that
+> `rustc` produced. So the profile ends up indexed by Clang's renumbered
+> discriminators, and then the build that uses the profile will not find
+> a match for some code (depending on inlining decisions), i.e. that
+> part of the profile is silently dropped.
 >
-> Who do you think should take this series? It would be nice if it could
-> start making its way to mainline sooner rather than later since tip of
-> tree clang builds have been broken for over a month at this point.
+> It proposes `-mllvm -no-discriminators` in
+> `CC_FLAGS_RUST_INLINE_HELPERS` so that Clang doesn't add them, i.e.
+> using the `rustc` ones.
 >
+> Rong, Han: is that expected?
 
-Are the first two patches sufficient for that? Perhaps Eric can take them
-through the CRC or libcrypto trees, and I can send the remaining ones
-through the respective arch trees the following cycle.
+Hi Miguel,
 
+Nice catch -- I tested this on drivers/android/binder/rust_binder_main.o
+(arm64, Clang 22 + rustc 1.91) and confirmed that the duplicate
+AddDiscriminatorsPass run is real and that passing
+`-mllvm -no-discriminators` to the post-llvm-link $(CC) step improves
+profile matching in both stages:
+
+1. Why the second AddDiscriminatorsPass renumbers discriminators:
+   In Stage 1, rustc runs AddDiscriminatorsPass on pre-inlining IR and
+   then runs its optimization/inlining pipeline before emitting .bc.
+   When post-llvm-link $(CC) runs AddDiscriminatorsPass again on the
+   already-inlined .m.bc, llvm/lib/Transforms/Utils/AddDiscriminators.cpp
+   keys blocks by (filename, line) without checking inlinedAt and
+   overwrites existing base discriminators via
+   cloneWithBaseDiscriminator(). On rust_binder_main.o, that second pass
+   increases non-zero DWARF .debug_line discriminator rows from 6,245 to
+   9,313 (+3,068 rows, +49%).
+
+   In the profile-use build, rustc's SampleProfileLoaderPass runs before
+   rustc's inliner (against pre-inlining discriminators), while Stage 3
+   sees a different post-inlining CFG once Stage 1 has applied the
+   profile.
+
+2. Measured round-trip impact (42 sampled functions in
+   rust_binder_main.o):
+   - Stage 1 (rustc -Zprofile-sample-use): annotated branch_weights
+     increase from 454 to 490 (+7.9%) when the profile is generated and
+     used with `-mllvm -no-discriminators` in Stage 3.
+   - Stage 3 ($(CC) -fprofile-sample-use): SampleProfileLoader record
+     coverage increases from 39.3% (2,832 / 7,205) to 54.0%
+     (3,707 / 6,860, +14.7 percentage points), and sample coverage
+     increases from 42.9% (757.8K / 1,767.6K) to 56.4%
+     (989.6K / 1,753.4K, +13.6 percentage points; 969 -> 1,035
+     branch_weights). Against a hardware ETM profile, Stage 3 matched
+     function entry counts also increase by +33.9%.
+
+3. Side-effect checks:
+   - C helpers: rust/helpers/helpers*.bc is compiled separately via
+     cmd_rust_helper (without CC_FLAGS_RUST_INLINE_HELPERS), so C
+     helpers still get their pre-inlining base discriminators before
+     llvm-link.
+   - Flow-sensitive discriminators: MIRAddFSDiscriminators in
+     llvm/lib/CodeGen/MIRFSDiscriminator.cpp checks
+     EnableFSDiscriminator and shouldEmitDebugInfoForProfiling() rather
+     than NoDiscriminators, so post-link FS discriminators remain
+     enabled.
+
+Rong, Han, Miguel, Nathan: would you prefer adding
+`-mllvm -no-discriminators` directly to `CC_FLAGS_RUST_INLINE_HELPERS`
+in the top-level Makefile, or appending it in scripts/Makefile.autofdo
+under `ifdef CONFIG_RUST_INLINE_HELPERS`? Happy to send v2 once we align
+on the preferred spot.
+
+Thanks,
+Jenhao
