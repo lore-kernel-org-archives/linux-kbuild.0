@@ -1,76 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794587824;
-	b=4LdRP5jy7VA+5/VKa3C0v1fnCM7t5DxJTZ6lLHOKRWAOcmvFSIcgAEsE3TMfnaBuLxae
-	 CJJgq6HVL1YNiKXg0wXE0b6BReyRYHuyFaLaQTJiqVIyxRSv0rYuAocecGamq1fL8d/D3
-	 kFeABI6AOah0fIY7qFJ9mz4Y6D+Nx8WfmsyIA0ArfF8CKVs6Wp7N+tLzjvIo8PvOrPwi4
-	 WYOMQOVno++DXIpL8AKqQWZAWy2ESCBbWji/iCcbhUop/f5/xv82P5BiHUGp3MNM1tX9c
-	 kwR9kWIrrwxLPNAu2nUS6fWJYeLASr9kgZp9rhciG6I8RxQE1HYeUeuuL81QrU/ngjw==
+	t=1794588291;
+	b=3bTESP+GT+b6SuLleebCej44o6QNs/w+vum8mc92f+hvCfLCETjazJMQv53ujNS786dk
+	 XjvWY13dzSQFqINtGJ5GQlpE5XiAO7Vh5fGgs4TBh/aip15aclrmqHNffIMBVicmCWR8G
+	 rSMP/PFHhYFWwol1D+kieoXORkV9AsaCX6zU2gat0+9lakdXdArTemOISoRU5BbHEEyKj
+	 OdNqjJn2EylwRD0I4bO95nr3pr3GTgWj9EOLusK91m1vx8mrVSxyfeL2nxo0Msyy9xgkJ
+	 61KfgJ5b/6TKwT+g9Lh+LBczo9kVd4tkUnuWKztIySZFmsAq20frWCma5pJyei/6Y6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794587824;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794588291;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
 	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:Organization;
-	bh=gBy9A8CXbQpral/EbSsaLlYPBMxysRiyGlfRbALVuP8=;
-	b=ggOvCJKtFrjN2IF9yVRHx8o44FZbfHWhHe4ZIQvMdKj/2nPmLRSkJBvd+FT45IzRffVK
-	 ykx5YaOH3zVHmhhr+YY912zyPD+H18fdtynxVUE8yvt4azbX09Gi6tSpjZGiSedWr0NqC
-	 1PMRmnjdOkFwvYnFpaWIviCE2HBRyjuI9qISSHaTsTyq+Bz7RQIe6vOnrOhhAT+nr82yS
-	 vtioBk0SaTDqxRYK7DT05z7A8yHkN2pheZiEEUGikseDDhvJkyCae7fDAXRw6U3bpLLuB
-	 4KX8QTEPKPyKb8i/PYBdDG7XxrXZl5SyOC+vysXaWw9BeP9c2p1TvnnA68ECEG1vl+Q==
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
+	 Organization;
+	bh=rxzLIMM/c8Ep1ewy7LMRLafB+oVmkjl4kE4MbP8LtPk=;
+	b=UJxKAbCNo4huudh1/4v6wAYDIsW8MXIM31pOkzJvblYZg3dPJ2/7tW57LuPa0DLjAz6h
+	 1nSrl7SyrXQmcHhWc33XO5VZsRPJlrQO6rsbjIgtja5xfWDlXH2K2NVKehm2ZRW5umJiY
+	 GS3baarAkePOr1tlVC3qzcUzYvWnYxVaMIx6di+wsdGFYd6gXRAcTnUpLXpjfCY7F9y61
+	 HG5fYDUfHV8WRG8OevuSJ20O5NWoq6f9z89oi05YW8mzxN0P24jPVPjevN+cZOMyK3GoZ
+	 P6FtamIc5nRZAKm4mAHgiEec+oGwbcbXL3qEEAhn0DJ8PI/D06rkdSBmIeroBtsUA1w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fqgq2jxx;
-	arc=none smtp.remote-ip=192.198.163.12
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OQ5htJx6;
+	arc=none smtp.remote-ip=198.175.65.12
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7FA606A323;
-	Fri, 13 Nov 2026 16:37:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F7FA606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28ECE606E20D;
+	Fri, 13 Nov 2026 16:44:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 28ECE606E20D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fqgq2jxx
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OQ5htJx6
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794587824; x=1826123824;
+  t=1794588290; x=1826124290;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8gDAZ18rPNXLCmzOarBPnGCqfpqUBUhx4FE/88BdXiY=;
-  b=fqgq2jxxExYiJAXzn0x6LWTBbi9gmxyIYZ/ojIRQi8/1LZBL9OLaIcwP
-   GhScbmQvIWNbWcdJ0+2s4eSs1gXRRxbzipPoMXSz8h67WmVUo3zovBcR0
-   Yc/6kJZxrvkqkF2ORL6y2NCXi17T19mYBjacCgJzCND9rUg585TRx9jj0
-   eLepopokri6ZPEeZ3Sghh5nmS4WZZUyxc8TLAPWb8nCQ8/aof1LYCx04/
-   aFVdtkPZAzNdz8jay+ernYI5Q6X8KsKMDB92fgs60kvkn1RAANsGviRBX
-   ygmwemrjJHE33rK4W3Ny7kp+kjCznFKl+xj3ohcu2gK6aVgp6GFp+1cL5
-   Q==;
-X-CSE-ConnectionGUID: ii9rT6p4T6i8uoHuVIPsgQ==
-X-CSE-MsgGUID: xAlHpV/eSw+AGHF1O15N4Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11965"; a="3300384"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=m6haUncwr93hsVexdH0BpDD+rx6GbKCTtL0uV1UmNIA=;
+  b=OQ5htJx66Dq+OlK7LYn+yNGSpKDo7aN2fTQYbgWlaBNdcsA6u7a7W4rS
+   uWIg6X1b68Lk2wsBBTAOwEoS3a71eh2u04rANSzkv72v18tueeDG2i59k
+   V6VPbbYyN2w45TVfPyiDvkuPK1vWsTn365CDu3MGVyF0Xhvw04SabZsPO
+   RBj15HIup+X3ZTTHIpE+8XLRJuGpmWRDvGQTML5SuTUsvIo0QnVI1dy78
+   909sOYFZt4yqPlniMmBlB1TH+Rhd7GYSdDQqS1SF+l1dMkjp3npwE7bpu
+   WozbNFku8RIG0N8jz9WZoOQ3+QaV8APyEPIUFs1cUIPuVxbVBw3MvW3tf
+   A==;
+X-CSE-ConnectionGUID: j4d/QIXUS9qI05o+8i/NIw==
+X-CSE-MsgGUID: rgKZmAM/SLSxQ4C6jwVJbA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11965"; a="3266810"
 X-IronPort-AV: E=Sophos;i="6.27,212,1787036400"; 
-   d="scan'208";a="3300384"
-Received: from fmviesa013.fm.intel.com ([10.60.135.153])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 08:37:04 -0800
-X-CSE-ConnectionGUID: Uoqo+KSRROq1g8vy+27/ow==
-X-CSE-MsgGUID: ZOkGohn7RcaLvgUvXp2DVg==
+   d="scan'208";a="3266810"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 08:44:50 -0800
+X-CSE-ConnectionGUID: GPZxIY9HQbyOMaASZXt3+A==
+X-CSE-MsgGUID: 0X6smTg6QG6GPlHewqYeZQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,212,1787036400"; 
-   d="scan'208";a="10866458"
+   d="scan'208";a="9131369"
 Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.148])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 08:37:02 -0800
-Date: Fri, 13 Nov 2026 18:36:59 +0200
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 08:44:48 -0800
+Date: Fri, 13 Nov 2026 18:44:45 +0200
 From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Nathan Chancellor <nathan@kernel.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
 Cc: Miguel Ojeda <ojeda@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
-	". Boqun Feng" <boqun@kernel.org>, Nicolas Schier <nsc@kernel.org>,
-	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org
+	". Boqun Feng" <boqun@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>, rust-for-linux@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
 Subject: Re: rant on Rust in kernel
-Message-ID: <avc8q6zydMFgDiy0@ashevche-desk.local>
+Message-ID: <avc-fQWSvmtHhtCO@ashevche-desk.local>
 References: <avXdJyqNNqopuH2_@ashevche-desk.local>
- <20261112214240.GF4107043@ax162>
+ <CANiq72nw+g=RTvR-zZh29D0=MOwNYboNSeKkNr_Z4v74Q4hn1w@mail.gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -80,77 +83,70 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261112214240.GF4107043@ax162>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72nw+g=RTvR-zZh29D0=MOwNYboNSeKkNr_Z4v74Q4hn1w@mail.gmail.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
  krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Thu, Nov 12, 2026 at 02:42:40PM -0700, Nathan Chancellor wrote:
-> On Thu, Nov 12, 2026 at 05:37:11PM +0200, Andy Shevchenko wrote:
-> > (Cc'ed to Rust and Kbuild people)
-> > 
-> > I have two quite annoying things that lately Rust brought to kernel
-> > (in some way).
-> > 
+On Thu, Nov 12, 2026 at 10:59:21PM +0100, Miguel Ojeda wrote:
+> On Thu, Nov 12, 2026 at 4:37 PM Andy Shevchenko
+> <andriy.shevchenko@intel.com> wrote:
+> >
 > > First of all, it broke the old and nice kernel feature to build a subset with
 > > allmodconfig or allyesconfig. For instance,
-> > 
-> >   make LLVM=-22 O=... W=1 C=1 CF=-D__CHECK_ENDIAN__ -j64 allyesconfig -- fs/pstore/
-> > 
-> > Now this makes a very good fireworks out of some rust.
-> > 
-> > Ex.:
-> > 
+> 
 > > error[E0609]: no field `disconnect` on type `usb_driver`
 > >   --> .../rust/kernel/usb.rs:57:27
-> >    |
-> > 57 |             (*udrv.get()).disconnect = Some(Self::disconnect_callback);
-> >    |                           ^^^^^^^^^^ unknown field
-> >    |
-> >    = note: available field is: `_address`
-> > 
+> 
+> This doesn't sound related to building a subset, but rather a known
+> toolchain bug -- our `rustavailable` script checks for that. Are you
+> seeing this warning in the log when you build?
+> 
+>   ***
+>   *** Rust bindings generator 'bindgen' < 0.72.1 together with libclang >= 22
+>   *** may not work due to a bug
+> (https://github.com/rust-lang/rust-bindgen/pull/3278).
+>   ***   Your bindgen version:  0.71.1
+>   ***   Your libclang version: 22.1.8
+>   ***
+>   ***
+>   *** Please see Documentation/rust/quick-start.rst for details
+>   *** on how to set up the Rust support.
+>   ***
+
+Yes, indeed. Any idea what to do (see below)?
+
+> In particular, you mention Debian unstable packages: I cannot
+> reproduce the issue in pure Debian unstable, nor with `LLVM=-22`,
+> unless I also pick `bindgen` from Debian stable (rather than Debian
+> unstable) which is older (and then I get the warning above).
+> 
+> Can you confirm which toolchains are you using exactly? Ideally
+> checking the `CONFIG_*` values in your `.config`, e.g.
+> `CONFIG_BINDGEN_VERSION_TEXT`.
+
+Ah, it seems I was mistaken, the distro is Debian trixie which sounds like stable.
+Unstable is on my desktop.
+
 > > Second one, is that now with the above feature the build is finished like
 > > a minute (sic!) later than it was before on a good server with 24 modern
 > > CPU cores. It started happening somewhat a release ago.
 > 
-> You are probably seeing this behavior within the last release or so
-> because of
+> This is a bit vague, and there were some changes to the build system
+> recently, but I agree with Nathan: it may simply be that you got
+> `CONFIG_RUST` enabled.
 > 
->   2625480a1bf7 ("hardening: Default randstruct off with rust for better allmodconfig support")
-> 
-> which allows Rust to be enabled with all{mod,yes}config to make -next
-> testing easier.
-> 
-> As for that particular error, is it a -next regression?
+> It could still be something else, of course -- if what Nathan suggests
+> doesn't work, then could you please compare the kernel config file
+> between the "good" and the "bad" points in time you have, and/or the
+> build log?
 
-No, I can easily reproduce that on v7.4-rcX.
+It works what he suggested as a workaround.
 
-> > I have no clue what is there, but I will appreciate if it gets fixed ASAP!
-> > I rely on the above feature to save my time when doing test builds.
-> 
-> Note: The following is my understanding, Miguel or other Rust folks
-> might correct me.
-> 
-> You are noticing the face that certain Rust crates like kernel are built
-> in the prepare target, which will run for pretty much every build; it
-> has been this way since Rust has been merged, you are just noticing it
-> now because Rust is enabled in your configuration. I believe this was
-> done to ensure the kernel crate is built and available before drivers
-> were built via recursive make since they consume it. However, as you
-> have noticed, this implementation bogs down the build and the same
-> problem exists for Rust drivers that depend on other Rust abstractions
-> and such.
-> 
-> Miguel and I chatted about this at Plumbers and we absolutely want to
-> get it resolved but I am just not sure how quickly that will happen. In
-> the meantime, you could just use KCONFIG_ALLCONFIG to disable
-> CONFIG_RUST during configuration time so you can still use a single
-> command:
-> 
->   make ... KCONFIG_ALLCONFIG=<(echo CONFIG_RUST=n) allyesconfig -- ...
-
-Thanks, this indeed helps. But I prefer not to remember this type of hacks.
+> If that still doesn't explain it, then could you please do a quick
+> bisect if it is reproducible on your side?
 
 -- 
 With Best Regards,
