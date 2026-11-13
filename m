@@ -1,79 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794588291;
-	b=3bTESP+GT+b6SuLleebCej44o6QNs/w+vum8mc92f+hvCfLCETjazJMQv53ujNS786dk
-	 XjvWY13dzSQFqINtGJ5GQlpE5XiAO7Vh5fGgs4TBh/aip15aclrmqHNffIMBVicmCWR8G
-	 rSMP/PFHhYFWwol1D+kieoXORkV9AsaCX6zU2gat0+9lakdXdArTemOISoRU5BbHEEyKj
-	 OdNqjJn2EylwRD0I4bO95nr3pr3GTgWj9EOLusK91m1vx8mrVSxyfeL2nxo0Msyy9xgkJ
-	 61KfgJ5b/6TKwT+g9Lh+LBczo9kVd4tkUnuWKztIySZFmsAq20frWCma5pJyei/6Y6g==
+	t=1794592637;
+	b=Bibyr+1ohLioNndtDI7+F1Fet4wC9KSz3yjxUIIhv2EjsJ2tO3Uq11cGjMOyJvCpx9Kk
+	 t+yOWkX1TG1QDQRJ+YBYQh+5IyJpD5Ey2jI8WwvIy8h+MzQujhz2xBIkUsYh5F9sN1LxB
+	 jXEDGBqXOoLGuArqBGFlc2BIVlTm2gBMS9ucW894z3DZkFFCh2RXDxR251WqdAaxsUYxl
+	 j+15/aVKmc6g9MQWWlPFtUAMGprN7XOggoVENKCWpFuGjgeLYfxClC0EUKF8laOQqi5Lj
+	 oPsY7E2gUVQ9GmNovloMTqGoxycoYiP/m905cK/A2SG/bd5t6ZT7HudGAf4W8a9Yq2Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794588291;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
-	 Organization;
-	bh=rxzLIMM/c8Ep1ewy7LMRLafB+oVmkjl4kE4MbP8LtPk=;
-	b=UJxKAbCNo4huudh1/4v6wAYDIsW8MXIM31pOkzJvblYZg3dPJ2/7tW57LuPa0DLjAz6h
-	 1nSrl7SyrXQmcHhWc33XO5VZsRPJlrQO6rsbjIgtja5xfWDlXH2K2NVKehm2ZRW5umJiY
-	 GS3baarAkePOr1tlVC3qzcUzYvWnYxVaMIx6di+wsdGFYd6gXRAcTnUpLXpjfCY7F9y61
-	 HG5fYDUfHV8WRG8OevuSJ20O5NWoq6f9z89oi05YW8mzxN0P24jPVPjevN+cZOMyK3GoZ
-	 P6FtamIc5nRZAKm4mAHgiEec+oGwbcbXL3qEEAhn0DJ8PI/D06rkdSBmIeroBtsUA1w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794592637;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=EPUXYWrxU/x3OmPy7SPZ8/ZMiP8CaKcFQCpXyhSAZ0E=;
+	b=Yn0UUKCfAky3H+cdudOLXhjm2NcDw6SslWbJqCGGqLklw/6QQ0S5CIpmKZX+nVKmquTR
+	 2hguM2qgcwnqbtkveeNIGGLdKVbXnqwLCsoOTNEW9U39OjeNxATNE7iyoPuL8EjFNbTBx
+	 pF2W75FAXhhgbtaw+2xvGpfX+kqxlDJy20OMGJPpcEkxyw/Gudn3eSgUUGNCr8Hmx5nYn
+	 M8FIa918Gw1XBWrx9ABou9puvR8CJzEUqUmApWd03tLAgpori0gLTSiWB++aNG8x7om/A
+	 Au6TQGhyLKfCDMUiJxBhUi8U7fuCpI1FcEYu1FDW4S0WoAFyWQaRIQrj6y2pRbqo4Iw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OQ5htJx6;
-	arc=none smtp.remote-ip=198.175.65.12
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m7w8Ua3X;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28ECE606E20D;
-	Fri, 13 Nov 2026 16:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 28ECE606E20D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D58606B22B;
+	Fri, 13 Nov 2026 17:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OQ5htJx6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794588290; x=1826124290;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=m6haUncwr93hsVexdH0BpDD+rx6GbKCTtL0uV1UmNIA=;
-  b=OQ5htJx66Dq+OlK7LYn+yNGSpKDo7aN2fTQYbgWlaBNdcsA6u7a7W4rS
-   uWIg6X1b68Lk2wsBBTAOwEoS3a71eh2u04rANSzkv72v18tueeDG2i59k
-   V6VPbbYyN2w45TVfPyiDvkuPK1vWsTn365CDu3MGVyF0Xhvw04SabZsPO
-   RBj15HIup+X3ZTTHIpE+8XLRJuGpmWRDvGQTML5SuTUsvIo0QnVI1dy78
-   909sOYFZt4yqPlniMmBlB1TH+Rhd7GYSdDQqS1SF+l1dMkjp3npwE7bpu
-   WozbNFku8RIG0N8jz9WZoOQ3+QaV8APyEPIUFs1cUIPuVxbVBw3MvW3tf
-   A==;
-X-CSE-ConnectionGUID: j4d/QIXUS9qI05o+8i/NIw==
-X-CSE-MsgGUID: rgKZmAM/SLSxQ4C6jwVJbA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11965"; a="3266810"
-X-IronPort-AV: E=Sophos;i="6.27,212,1787036400"; 
-   d="scan'208";a="3266810"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 08:44:50 -0800
-X-CSE-ConnectionGUID: GPZxIY9HQbyOMaASZXt3+A==
-X-CSE-MsgGUID: 0X6smTg6QG6GPlHewqYeZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,212,1787036400"; 
-   d="scan'208";a="9131369"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.148])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 08:44:48 -0800
-Date: Fri, 13 Nov 2026 18:44:45 +0200
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
-	". Boqun Feng" <boqun@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kbuild@vger.kernel.org
-Subject: Re: rant on Rust in kernel
-Message-ID: <avc-fQWSvmtHhtCO@ashevche-desk.local>
-References: <avXdJyqNNqopuH2_@ashevche-desk.local>
- <CANiq72nw+g=RTvR-zZh29D0=MOwNYboNSeKkNr_Z4v74Q4hn1w@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m7w8Ua3X
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62D591F000C4;
+	Fri, 13 Nov 2026 17:57:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794592636;
+	bh=EPUXYWrxU/x3OmPy7SPZ8/ZMiP8CaKcFQCpXyhSAZ0E=;
+	h=From:Subject:Date:To:Cc;
+	b=m7w8Ua3X6gDhkydD/6GZE1rjlGxkHq4lC33+o9onh+PQTLul2fWbfKAq7lFE42sMG
+	 W2NpaaxEReXdP5NadOYvC7VLcsabHcLAQ1x7G8Cbm7PtKN13QHR3+5q4g1Wyl5uupU
+	 gskurmnI5qPvfoHJ1qNoEICYlmWTS7/VDAMRRK5OihedpYcijMarosBAVxr3oaiFVV
+	 ejBNtbjAtUPw2naZr/7drzzfdqh5fWgK3XCK15nvXTdWVfDD/+9boWOCpj4KKrlC6q
+	 tXQu81HQRvU8gOLscEtFr8YuLV+Yos1PdCnBuBlg/oGFVR65D+/CpTLyc60AdqhggU
+	 rhVE12de/y+Pg==
+From: Vincent Mailhol <mailhol@kernel.org>
+Subject: [PATCH v2 0/3] kbuild: reduce single-build dependencies
+Date: Fri, 13 Nov 2026 18:57:04 +0100
+Message-Id: <20261113-reduce-single-build-dependencies-v2-0-93ba1f6c4e46@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -83,73 +53,113 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72nw+g=RTvR-zZh29D0=MOwNYboNSeKkNr_Z4v74Q4hn1w@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42OwW6DMBBEfwXtudsASpyQU/6jysHYA9kGTGobl
+ Cji32ugH9C9rEaaeTNvCvCCQOfsTR6TBBlcEuVHRuamXQsWmzSVeamKdOxhRwMO4toOXI/SWbZ
+ 4wFk4k0hcKaX2qikPOjeUMA+PRp5rxdd102Gsv2Hiwv1zePyMqTtuNqp1AJuh7yWes/tastseO
+ zwjLZybhDj417p8KtbY/0dOBed8LCpldHVS+nS43OEdus/Bt3Sd5/kX3KxBixkBAAA=
+X-Change-ID: 20261111-reduce-single-build-dependencies-966646f25a0c
+To: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+ Vincent Mailhol <mailhol@kernel.org>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2910; i=mailhol@kernel.org;
+ h=from:subject:message-id; bh=IoT9iL3Q0RAFUvMn0K2EKBkPNujVcMRP1+fv3QjqjtM=;
+ b=owGbwMvMwCV2McXO4Xp97WbG02pJDFnf/Sv2GQuK979LV3c8I72bdXmEOcv85YvuPZfOZF34w
+ enP5722HRNZGMS4GCzFFFmWlXNyK3QUeocd+msJM4eVCWSItEgDAxCwMPDlJuaVGukY6ZlqG+oZ
+ Ahk6RgxcnAIw1Sf2MzK8q1r427rlFa/xhv277lbGuoi++Z+QwpfzL0bP/M3kqRGXGP4p+r1I0J9
+ rOMeIJX1KFNON459ljbUn7fqzVmhq33+l8i/MAA==
+X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
+ fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 
-On Thu, Nov 12, 2026 at 10:59:21PM +0100, Miguel Ojeda wrote:
-> On Thu, Nov 12, 2026 at 4:37 PM Andy Shevchenko
-> <andriy.shevchenko@intel.com> wrote:
-> >
-> > First of all, it broke the old and nice kernel feature to build a subset with
-> > allmodconfig or allyesconfig. For instance,
-> 
-> > error[E0609]: no field `disconnect` on type `usb_driver`
-> >   --> .../rust/kernel/usb.rs:57:27
-> 
-> This doesn't sound related to building a subset, but rather a known
-> toolchain bug -- our `rustavailable` script checks for that. Are you
-> seeing this warning in the log when you build?
-> 
->   ***
->   *** Rust bindings generator 'bindgen' < 0.72.1 together with libclang >= 22
->   *** may not work due to a bug
-> (https://github.com/rust-lang/rust-bindgen/pull/3278).
->   ***   Your bindgen version:  0.71.1
->   ***   Your libclang version: 22.1.8
->   ***
->   ***
->   *** Please see Documentation/rust/quick-start.rst for details
->   *** on how to set up the Rust support.
->   ***
+Building a single .o file depends on the prepare target which contains a
+lot of dependencies. Some of those preparation dependencies are not
+needed for a single .o build.
 
-Yes, indeed. Any idea what to do (see below)?
+This is a small annoyance because a modification of the compilation
+flags causes several prepare dependencies to rebuild. Consequently,
+single-build incurs an artificial penalty.
 
-> In particular, you mention Debian unstable packages: I cannot
-> reproduce the issue in pure Debian unstable, nor with `LLVM=-22`,
-> unless I also pick `bindgen` from Debian stable (rather than Debian
-> unstable) which is older (and then I get the warning above).
-> 
-> Can you confirm which toolchains are you using exactly? Ideally
-> checking the `CONFIG_*` values in your `.config`, e.g.
-> `CONFIG_BINDGEN_VERSION_TEXT`.
+Move the generic preparation checks and scripts/mod out of the
+single-build preparation path. The first patch is a preparation change
+to make rq-offsets-file an explicit prepare dependency. The second
+addresses missing-syscalls check and atomic-checks. The third and last
+patch addresses scripts/mod.
 
-Ah, it seems I was mistaken, the distro is Debian trixie which sounds like stable.
-Unstable is on my desktop.
+Move the generic preparation checks and scripts/mod out of the
+preparation path for single .o builds. The first patch is a preparation
+change to make rq-offsets-file an explicit prepare dependency. The
+second addresses missing-syscalls check and atomic-checks. The third and
+last patch addresses scripts/mod.
 
-> > Second one, is that now with the above feature the build is finished like
-> > a minute (sic!) later than it was before on a good server with 24 modern
-> > CPU cores. It started happening somewhat a release ago.
-> 
-> This is a bit vague, and there were some changes to the build system
-> recently, but I agree with Nathan: it may simply be that you got
-> `CONFIG_RUST` enabled.
-> 
-> It could still be something else, of course -- if what Nathan suggests
-> doesn't work, then could you please compare the kernel config file
-> between the "good" and the "bad" points in time you have, and/or the
-> build log?
+== Illustration ==
 
-It works what he suggested as a workaround.
+These are the build steps triggered when just changing the compilation
+flags (here: adding W=1).
 
-> If that still doesn't explain it, then could you please do a quick
-> bisect if it is reproducible on your side?
+Before this series...
 
--- 
-With Best Regards,
-Andy Shevchenko
+  $ time make W=1 init/main.o
+    CC      scripts/mod/empty.o
+    MKELF   scripts/mod/elfconfig.h
+    HOSTCC  scripts/mod/modpost.o
+    CC      scripts/mod/devicetable-offsets.s
+    HOSTCC  scripts/mod/file2alias.o
+    HOSTCC  scripts/mod/sumversion.o
+    HOSTCC  scripts/mod/symsearch.o
+    HOSTLD  scripts/mod/modpost
+    CC      kernel/bounds.s
+    CC      arch/x86/kernel/asm-offsets.s
+    CC      kernel/sched/rq-offsets.s
+    CALL    scripts/checksyscalls.sh 
+    DESCEND objtool
+    CC      init/main.o
+  
+  real	0m5,808s
+  user	0m3,216s
+  sys	0m3,196s
 
+... and after:
+
+  $ time make W=1 init/main.o
+    CC      kernel/bounds.s
+    CC      arch/x86/kernel/asm-offsets.s
+    CC      kernel/sched/rq-offsets.s
+    DESCEND objtool
+    CC      init/main.o
+  
+  real	0m4,064s
+  user	0m1,901s
+  sys	0m2,728s
+
+(done on an x86_64 cpu).
+
+Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+---
+Changes in v2:
+
+  - Make modpost_prepare depend on prepare so scripts/mod is built after
+    preparation completes. This addresses the sashiko report:
+
+      https://lore.kernel.org/all/sashiko-outbox-211218@kernel.org/
+
+Link to v1: https://patch.msgid.link/20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org
+
+---
+Vincent Mailhol (3):
+      kbuild: make rq-offsets-file an explicit preparation dependency
+      kbuild: move preparation checks out of single-build
+      kbuild: move scripts/mod target out of single-build
+
+ Kbuild   |  7 +++++--
+ Makefile | 11 +++++++----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261111-reduce-single-build-dependencies-966646f25a0c
+
+Best regards,
+--  
+Vincent Mailhol <mailhol@kernel.org>
 
