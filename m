@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794530747;
-	b=mnarBtgY/A9PQXQ764S8STW4uTupcjQbLX0XDhFKim685y1m2LKtUAnJQNZNwr4y35th
-	 dEpBRQMCJ3jHC7viEnRpMWiyqbsJRxi91cSR9RTGZcwYn8vaG4V6QRGrjAfpNwEJRv+FZ
-	 j9/Otnb4Toma2Joz76YbmjrRTwp9oRVPCHtfaEGOZ4ue7ZUSjAOCf58NoLb1/FI0Jw0Md
-	 3Hs0jiYvEdCFQh8tmaM6c1HsqaNhj9qlYs/8QP+NTm70oN2q2P6157JV3jtERXtdWVxOO
-	 rmIS/vhuQ+2duAlgK00Bo24an60me7GWSgrMteLYAWaTd1lUYSqvQFPN9Pl90bvjuHA==
+	t=1794530740;
+	b=M3IXdfIjFUfz2DWJbLSGlGJQa/Ad91ZAA47ZU2jvr2hnWlw9j53l0K3nnjskTM2vZCk4
+	 zTAglS/+8DnNf4eF9fN7G5DmLY0cWD4w7EwPsusg5N+q+QlfzefPO3JMsih64dE4EsVOK
+	 UeAvegwMhmXGSoHBzLe2Xp8ZC8PDTctEaTUGMzHFZgZS58oLTCEYn4ri2sf1h5ZbFNUf1
+	 jBcDj2ZcMKNeKRCYM8VNR/U9kcGrQ8WmTy+jmVBIu9Boa7s2wL1pIRCajfBLyf/4lgRts
+	 rF9wY0pnCXO+DE61G/0cDBmniM84EON/we+bBRbRh4r7UOPr+dzsQ6bZsxU4Eyp7dSA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794530747;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794530740;
 	h=Received:DKIM-Signature:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
 	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=sOPD7XTjcQco9W/qUFQ4vgb6nmjatct8ubb0RneDSQ8=;
-	b=Qg+NYPLqgm5JF+N4pHh8qcjn4Nm2gPGwNQtu9cD+2wyApWkf+OksmQWjGFb/nRf7wJL6
-	 i8pWtb+PgY15wQaWsIO2nll0z0mzRa7xdLNrutDIDtpgpaKznug4rJ+35pcWC7vj32jeM
-	 ubb9J9iThOngCtFDe/D0hXEvs5Ax1/RQgtc7rseBw6fDUVJlKc3thH5DTnbMbuyISgZ6U
-	 eCo9/y7u2UYbac/tnMOaILTUKCnqHApQq0ruFHbFXQ8WRP8xvMLQjTxGk43D1j70zVAi7
-	 tpKbywequYkcHb2pUvaWPytplNq0KYkc4F8HM4vxUDm03IS42hQi4fnSgTIXbFTEphQ==
+	bh=Ew+mFBtkvyHaX4L3mOy9ZGheiU3yA4UH3r5Gz26alrc=;
+	b=i5roRZj1ywaJp6S4NhGGgN6Gvj00bYNcWkfxwv1F/tLNKeVGqS3M4ZScFygxPaOuc50h
+	 CwkV02wRhDlyAnlDI4qj4S5Fa8YwgUPm9l+9tiR2BqdUexcLTQVGNT6tn9gCFuxlJV0za
+	 5/xfcbD2AqqIB+ayxXUfv7b1htth8eIVkzLB8/cqmdeVWcwbCnV5WlZktfCr3Wh8x04G4
+	 BIUg7aB+IaUDLBYQlI12sBZsyh6KcFNM3SEA6aMzBr3GKrnoYlQ3cbWXZ0TSW8Hiz4i/E
+	 fQ33nlPFc4gXwhmhRk+BxfkZ5mUhwWxeFF4kxvFCcAc+v0MOKIKeewYnKUM7n91VZlw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Walq2Bbj;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OCYOcQ+V;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45119606A89C;
-	Fri, 13 Nov 2026 00:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B61606A31C;
+	Fri, 13 Nov 2026 00:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Walq2Bbj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14F3E1F000C6;
-	Fri, 13 Nov 2026 00:45:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OCYOcQ+V
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98F651F000C5;
+	Fri, 13 Nov 2026 00:45:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794530747;
-	bh=sOPD7XTjcQco9W/qUFQ4vgb6nmjatct8ubb0RneDSQ8=;
+	s=k20260515; t=1794530740;
+	bh=Ew+mFBtkvyHaX4L3mOy9ZGheiU3yA4UH3r5Gz26alrc=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=Walq2BbjXpDxWLlA3YF3wLZMpoLxFWW4U9/pk1DHBYaWlNB+bT9PlnbdDKYv+YUMW
-	 NUpVL6iWQE/p7uOLE3mZuzV9BrkLC4Jp0ApY+1MdhzD4xne9HgMgqV+Cy28m5oNUlZ
-	 UcnfVBv1+opXkRLD4/wSClDocLJwkuxBWB9hqO32WDmDyxtyypKK2ac7eiEsSl8BJW
-	 eIph+VdqEvRp/FielEG2sVB3w+cDHKp173y+yMO67hLVI4IZzIteuw/2+4V7Jhyiak
-	 00RMqLQCYLS2afQcoDCa/GqNNPETEwT8AqalpcorYveZ+/Q1y8QCZhwKMz04GxbSyd
-	 G/76cIkZMHLEg==
+	b=OCYOcQ+VJQ0nWkSSupczoGkT7Yef/ZfSiq9KKKyQnIDexKNJgpi8PmAoDrQpXwvgF
+	 6qalZHJqwbKu+eGep31ztL/IzaojTLv/BIGJh4UwGZqZAXHAqjUdujcwQiXFreIXfg
+	 mfpu2DJ+QT4B3Yz/4frgZfIkF81uSMb2m837Omy5cSRdcsI5YGLNwMNiOvVI1IPCQA
+	 ZudpZRRzGsWqSWFirrUD5fY21eMIxh00ELa+CqWgg0Mfiy5vtEF9gUmv/G9NO30mTT
+	 SsdTGagxzuZAqp/fu+KDtPTOGoYg6X1NSyOsboDl63tflr/TjxDzShQTooGNUXWfhw
+	 f5Sug0462K5Xw==
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -51,57 +51,94 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v2 18/20] kconfig: add CC_HAS_CONDITION_COVERAGE for
- MC/DC support detection
+Subject: Re: [PATCH v2 02/20] kbuild: unify static coverage instrumentation
+ as COVERAGE_PROFILE
 From: Nathan Chancellor <nathan@kernel.org>
 To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Chuck Wolber <chuck@wolber.net>, 
- Julian Braha <julianbraha@gmail.com>, linux-kbuild@vger.kernel.org, 
- Marco Elver <elver@google.com>, Masami Hiramatsu <mhiramat@kernel.org>, 
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Andrey Konovalov <andreyknvl@gmail.com>, Chuck Wolber <chuck@wolber.net>, 
+ Dmitry Vyukov <dvyukov@google.com>, Jonathan Corbet <corbet@lwn.net>, 
+ kasan-dev@googlegroups.com, linux-doc@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, Marco Elver <elver@google.com>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
  Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>
-In-Reply-To: <20261103015238.3780910-19-sashal@kernel.org>
+ Peter Oberparleiter <oberpar@linux.ibm.com>, 
+ Peter Zijlstra <peterz@infradead.org>, Randy Dunlap <rdunlap@infradead.org>, 
+ Shuah Khan <skhan@linuxfoundation.org>, Thomas Gleixner <tglx@kernel.org>, 
+ workflows@vger.kernel.org, Konstantin Khorenko <khorenko@virtuozzo.com>
+In-Reply-To: <20261103015238.3780910-3-sashal@kernel.org>
 References: <20261103015238.3780910-1-sashal@kernel.org>
- <20261103015238.3780910-19-sashal@kernel.org>
+ <20261103015238.3780910-3-sashal@kernel.org>
 Date: Thu, 12 Nov 2026 17:45:18 -0700
-Message-Id: <179453071829.814257.15879259562619274005.b4-review@b4>
+Message-Id: <179453071828.814257.7183190179491150551.b4-review@b4>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1006; i=nathan@kernel.org;
- h=from:subject:message-id; bh=R3/a0ar+NyTCe6tX1zIbO4VBx1tJcSEYyNlmM39lqoE=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDFnfYpeyS0QKWL1fw613b929u483Pn/rMS2Hr+CtkJdB9
- AuG+rSWjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjAR808M/yNNHq6/nc/bdUze
- 5r9XmVCvuc9qyd9/avr31H53WFRs95nhn82XaY7OLS+03Bj1txV9/BzmXPqEYYus2oSD5+3vxHe
- f4gYA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2607; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=sUhiWgHmxEGxdGgWqPkGj9bsJrQRKZaRFqCuUxknUv4=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDFnfYpcmTbrfpm2V/6p3o29g7nazz+1FYskLUvXEjzwJf
+ D+d9fivjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRF2EM/6tDA6fL97xlNg33
+ 8/Xj/X3j8GPn/JIl/3Zf1p/nmLjLYz0jw45ZG02E12t/XXF515q0tLg189g/uXvPs3ys4ZY/s6L
+ EkxEA
 X-Developer-Key: i=nathan@kernel.org; a=openpgp;
  fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-> Add a Kconfig symbol to detect compiler support for -fcondition-coverage,
-> which enables MC/DC (Modified Condition/Decision Coverage) instrumentation.
-> This flag is available since GCC 14.
+> The gcov plumbing is written for a single coverage implementation: the
+> per-object and per-directory knobs are called GCOV_PROFILE, the flags
+> are CFLAGS_GCOV, and every dependency on "coverage instrumentation is
+> present" spells it as GCOV_KERNEL. Make this generic so that further
+> coverage implementations can share it instead of growing parallel
+> copies:
+> 
+>  - The coverage implementation becomes a choice ("Code coverage
+>    measurement"), with gcov as its only member besides "None" for now.
+>    COVERAGE_KERNEL is set whenever one is selected. allyesconfig and
+>    allmodconfig keep selecting gcov through a COMPILE_TEST default.
+> 
+>  - GCOV_PROFILE_ALL becomes COVERAGE_PROFILE_ALL. The old symbol is
+>    kept as a transitional one so that existing configurations keep
+>    profiling the entire kernel.
+> 
+>  - GCOV_PROFILE[_obj.o] becomes COVERAGE_PROFILE[_obj.o] tree-wide,
+>    with unchanged precedence (object, then directory, then
+>    COVERAGE_PROFILE_ALL). Out-of-tree modules that use GCOV_PROFILE
+>    need the same rename.
+> 
+>  - scripts/Makefile.gcov sets CFLAGS_COVERAGE instead of CFLAGS_GCOV.
+> 
+>  - The per-subsystem opt-ins GCOV_PROFILE_{NETFILTER,IPSET,IPVS,RDS,
+>    AMDGPU,URING,FTRACE} become COVERAGE_PROFILE_*, again with the old
+>    names kept as transitional symbols. The rds selftest is updated.
+> 
+>  - Dependencies that are about instrumented code rather than about
+>    gcov (LTO, the KCFI integer normalization workaround, the longest
+>    symbol KUnit test, the per-subsystem opt-ins and objtool's
+>    --no-unreachable) now use COVERAGE_KERNEL.
 > 
 > Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  scripts/Kconfig.toolchain | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/Kconfig.toolchain b/scripts/Kconfig.toolchain
-> index 2acbd40a38f1..76c1e794d115 100644
-> --- a/scripts/Kconfig.toolchain
-> +++ b/scripts/Kconfig.toolchain
-> @@ -188,6 +188,9 @@ config CC_OPT_NO_ALLOW_STORE_DATA_RACES
->  config CC_HAS_MNOP_MCOUNT
->  	def_bool $(cc-option,-mnop-mcount)
->  
-> +config CC_HAS_CONDITION_COVERAGE
 
-Please add
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
 
-  # gcc-14: https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=08a52331803f66a4aaeaedd278436ca8eac57b50
-  # clang: not supported
+Sashiko's comment around tools/testing/selftests/net/rds/config.sh seems
+relevant though.
 
-to match what I am doing for the rest of the file:
+> [ ... 622 lines skipped ... ]
+> +config COVERAGE_PROFILE_ALL
+> +	bool "Profile entire kernel"
+> +	depends on !COMPILE_TEST
+> +	depends on GCOV_KERNEL && ARCH_HAS_GCOV_PROFILE_ALL
+> +	default GCOV_PROFILE_ALL
+> +	help
+> +	  This option activates coverage instrumentation for the entire kernel.
+> +
+> +	  If unsure, say N.
+> +
+> +	  Note that a kernel compiled with profiling flags will be significantly
+> +	  larger and run slower. Also be sure to exclude files from profiling
+> +	  which are not linked to the kernel image to prevent linker errors.
 
-  https://lore.kernel.org/20261111-kconfig-toolchain-updates-v2-6-b2d9415c1757@kernel.org/
+Can you remove this sentence either in this change or a prerequisite
+one? It is not needed after commit 9c2d1328f88a ("kbuild: provide
+reasonable defaults for tool coverage").
 
 -- 
 Cheers,
