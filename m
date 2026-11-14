@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794666735;
-	b=I1kbPwLr1vrnobu5P+CXXBal8ZG5uY1+zJ7HyYKpiRGjLDWegyhmjj6bknrtJcZjDEZS
-	 +G/LjZc6tn4/y97SM7WPrMUsZoTQPAK8ujIXc6Hg6+ybpCWYWYPra6rR04Vd6hTErP9D7
-	 HlmQ3vsDNsWfQWEeYwOb9Ds0tS5ymk54ZLm3DzxTFwz7t8b+y/CB1AV2OnBEegUSmsu1k
-	 CWZ7inE7XfngopByhTYWyxujDzWEe8aovksNX3hxa53O/tkYIjt5ynJ76nnTsTlR6peaj
-	 Ia8K5o7RborCrH60OdWZgADv0Ii/DvfZ17/4ZBsjV4NgSOVmuqBgthuiEUfFkTdfMjw==
+	t=1794666786;
+	b=dxTs6OSCkQk47AlMNdHRad9AjEOQEsYbx9MZqkYpkX9Y8S3ZpVRail70Rk+lGPNXJCHp
+	 MuzYwWZg6C/8XiTam7C11Lhyzx37CHAE738/UFS9CTfl5+elX23MCG+R8PFG7U5H7HllM
+	 lmnVmu/gjkFRsJbqtNaPlAIyAnt+64359Rg3imgfaLYSpPdkZZLgE7LgUApptRoUtuPHr
+	 zU1an/90Q50mmLufk4I5UE2Y2EE2/H+TB7Ez9BzINY9iypfnyBdeV83ZIoy0/XsxrO5CC
+	 pIJmEdgj54TxWlnOOga6diVOfMU+7fialrAKfVefmZSAU+X83TzpCmkRZPCqI8Q90Og==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794666735;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794666786;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:X-Mailer:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=qWeCdWju2mIKB8UGaY5EcBwHtnHoPxgSD81CkBCW95g=;
-	b=P1jIpnajO4eCVy6OjQbWqdCBTc6LwwmOkTBekBbmoPMV85i1f/6gadXz4UDqtmAFJ48J
-	 yP54Bqq6drCZB6phqLNajFssliC2306Z2/G9sN+iq4a0VjhtIm4WtagcqR44ftvgaOBYo
-	 Cmg059l9Rf+N8fUKaJosmfuaLSu8V7F3eOy0zaXSex9Xor7F3nVGAOi5aoECzbG8wk44M
-	 c3Ixkm1ENllPwaoKDcSPRRvBZbcKPXUdh6tCbelGWMLEjITAzNgP4HpAt3SQXZSLZM1Xj
-	 EFoY8WfAzAskOkAWStuiQS6DNsMEMV5zOxvEUxRF9XXNMA1zFZi3YLGGjZCUKyIJuXA==
+	bh=zZTHArb7/cDEOGGmixdYHyste9bMwihASbVf49eSoI4=;
+	b=m85g5fR34Fm/UG64UB6A05CMp6xVlWfb9bJ6ZTng1uffJsTmeMXKbA5aOMhmjJkmSMVC
+	 M+lHHVC87Gpczdbs3rzjVpWqNxM74oyAvaLvt1MogI8i0yUKRnheELeA0d7rZYDJvSOkY
+	 FqML0fpYzhf6ADvIy3e3AWQDkRxFDyv18Ih84h0kL89e9Og9AcTaNi9D7hL+XzsUiWvJZ
+	 YrS98Ixo54Wi+XUnacIKgw7PLJ/5X+LQthHqfC/zPtSmPehJHgCbp/0nPSK3UqOP7GsON
+	 ZGQRFAthvjaoyqJa4qUCA4uGcwL+U2kwoBVBfQRwEx56J1RDegL0CxKb4oOOPBGq0+w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=l4uwH9W+;
-	arc=none smtp.remote-ip=209.85.128.53
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=o3UL23wO;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC9C606A32E
-	for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 14:32:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CBC9C606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A032606A329
+	for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 14:33:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A032606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=l4uwH9W+
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a214af2076so12200915e9.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 06:32:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=o3UL23wO
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a9a8d6cea8so20082635e9.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 06:33:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794666733; x=1795271533; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794666784; x=1795271584; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=qWeCdWju2mIKB8UGaY5EcBwHtnHoPxgSD81CkBCW95g=;
-        b=l4uwH9W+LongKMjKUPj5DXIOjleJ2mm4NAm1kSaMM6/9KiDRosdmoAXy0LMFRC/TAF
-         MpOGY+/UwXVfZeKN4RxiXflwYRTCKdbtMjBqJ2SZ/sENJMariHaUEJUoOeIyFcdtxAGu
-         u7Dr3YngPo3e7vKyZClqvWfsBsy6XYXoPwkryijjagUA+U3hgWhI6dc+xZSxPXW8r4qG
-         70bYXCpcsbdvqJqkogb9egAWtDNaTH6d1bKxLnKzO7duUPl30s+fUwomjOqZ01rNSo4M
-         xwvmOb5y5jl9RPL1c5AjYJbOYeXVM09JMwQRxkTRgeJOCly30U6uHLai6B94BiNTfAFF
-         Hd5g==
+        bh=zZTHArb7/cDEOGGmixdYHyste9bMwihASbVf49eSoI4=;
+        b=o3UL23wOoojCCtw099LOef2o6FXVCYwfWYdM+YI1ELuwWae0ZY5CRolxwTnSJwqRo6
+         tbmG7+Rxxvu7K+Xqs5BLB3WcVEs3MzYOF9EXviq05ByDs/kG4OheQ3+y71A0hUo+HVd6
+         Eyr4xE6/uhsBTxt3gWXOtnN1bRczoxfiaKwMj2ow7adwVjJoWGJ1Z7bJgjFYxAYXQq+Z
+         NNJahNh/iFfyTdhBEZsOABZe6f3g05zsZj5vT/hTlCYUgzzzKDM8gQbCEBp0wgkUBpG2
+         fgn6OgovIRBTzLaHd10nD8jN2N8xl0Mrmw4MHrnqFr/sXmdQvxxe5FwyH0GoDA9It/rc
+         PquA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794666733; x=1795271533;
+        d=1e100.net; s=20260707; t=1794666784; x=1795271584;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=qWeCdWju2mIKB8UGaY5EcBwHtnHoPxgSD81CkBCW95g=;
-        b=YnGlosUgDvVsd8Ek57CZcWuAlmzqiJeQiSdHAu9aSJlZhzfSsqkQ1tBzjpdoj+PbLk
-         3XQV0eq/Ap/0DX6N/4JrVFz9BuDSbbT50Ta4qHHrDeHY2sr8K/ADgAj7/WqKMF4iqNfg
-         qyY+EQEDOJxTAV89dQKTs6xB+yapR2M9Gm8RloWpPgpmsV43XYx8NQwaNkqFg+VeaJ+F
-         YTtjt9pen09erfH1iDfEQGoMC2nk+M8xQ8c4iavr+UpDQ3zDr9K9fIPKyy1AZKcYlmOm
-         +qPRhM5WaIxUXjH2lIEJspbiAUst8qRu2BLaPW20Cjr4Nhkay8cFyDx9qrUXb59veZNC
-         qfIw==
-X-Forwarded-Encrypted: i=1; AL+hErHEK+3Ae74582OJ04Q/2TmesQPGbqxJAY+0fXXoHRsV8qYMQn3/yBSG+Hdy6Hsjyx4WAuO9nb5pOCak760=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8TrVSIbgPtIAF2AhoGZQtiey42ZzvzUF/UCvndTjPOl96mF8fE
-	fZ667/g4P6/P5Sur5omjjBQo0hrXhfGqGOGv/HwdWZ7RO7EbBpbSKxGj
-X-Gm-Gg: AYBFou0eDhIENyK9aQQxlUasAMXb/ehVJK9lzS6RiAM5cafH6bCS/7ob1P4a1tzsjW7
-	E7ruOfcO2agQ31qzo4siUc/nD/+A08O2rccMGn29qnHgWEU9KNJZjRHobgtycqa0O+TCE7nxI9o
-	UwIo2a+Q50E7k2BaJn/7uCN1kT1YYPHlhf4DnmAL+5K//OJc4l9a9KslXWMwDotsfJypJvhu9Fo
-	FcVeOYmBtbj8ywHHG2nzBrZ0yH2AgPpfNlrsNZpYIxQeDbzAs/UsrM3lXoL1GLsVcxp/kTVE5r3
-	VwFCQMDjT1G+/0I3udSIjtoy9uCSFgCKXCjt1Hdx4Kf+xXHEkkfUImOqYqVD4bDeAxjs34DRMVc
-	aGjDuwQpbAX0snks89Qm4UZ7dFFE5vyfGEhEkrQbA7JNPZ2DC/8UziuSkBjptVVRXi8BC54pkFS
-	quPvIzf1Vqms7BdDzDke9svAaWwuCZDSaNp/n2pr9/9n1JNfXIz0ciqyk+nzX1kAvvW+S+/sKw2
-	1LVCwxmOsV8fy1p5AU8K0gCDAAfs/Zn98ae4n4MEr5ov/qFjDVPkFoBOPB2EyYwuEpPDgKEOkXM
-	eXzJuLHBHf3pcjPeFMxf+PE4m7Mck2RXsIm67s971UzL/1rP+F5hES17aGPyYbuOPA==
-X-Received: by 2002:a05:600c:2d2:b0:4af:c210:5b3f with SMTP id 5b1f17b1804b1-4bb55a63720mr87539035e9.24.1794666733074;
-        Sat, 14 Nov 2026 06:32:13 -0800 (PST)
+        bh=zZTHArb7/cDEOGGmixdYHyste9bMwihASbVf49eSoI4=;
+        b=ovN3/RKSSyba1ymnX+e7+I8XHaG0r+gEsDEFry6LUr6lyjCp7w28j2RYqRodE1k/ey
+         N4T+guNygYWxW9nyJOQ51MGKmBTDd6bPNhTBnaJqxyFqOxhAz82mjyo0bVHK/uPway4d
+         T0BRgBCgayJhS137fKRZFxvoKFEGC5cSuSxlerLSjtykIgtDxCnbdZ4Tr9CwZ29EFLTx
+         k0ZWprOlnq0dwMr5fjOzlK+z9cnISyj+MzAKtSPfxXuITuURxVgqUkpproXggcAp7gIL
+         kkNd01A5bZQSPs7ZE4HolVdZmZ9I/YnCGqArRWdM8vA4ns2qqszkGzgNwZAKVuwuOPpF
+         ghbQ==
+X-Forwarded-Encrypted: i=1; AL+hErGDGIVfNf0exvrst2c4zJ2MZuT5NsWENuu32CUafsmQqnJlXtqftmvK6oQ/K+f0aEL6VR02KxISxwYjuHk=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9fI6LXUSg+VX8a0bZ2/e+PbJNhlp7j/LFt7XaUKkGuEwF513Sf
+	Kpzjz5Xvb+JrzE5fo74es3QXIm0b+J2zXZnCr4Cwutd/Px5hyBA2V95g
+X-Gm-Gg: AYBFou3edKr707iSnlfiOd4/uCnRLQ8QIGCe47CZL4L7FpPo25w39x33Mu0n/Wp5h+G
+	v9eJC5M+kaHFoq4WpjYb6SEZ3A83WfI54q3tM+R4idq+9684XuxzlwP0BjilTKHcPicM198J5cH
+	M8OBl+lM9e8PkR87zLNip4/7HfTF1UBvikKcsQNntyfjOzTBDEgmamG8dRSNFlZjnLXB/Ai454T
+	U5iJEBKMXarPd9PyB68f749cSIiKAl9K5QKNCJ38TOjhruAWyfu39d+xX0/vNdsYRPmF9wJLIu3
+	eOV3+0XsfjsAhWUb4j83oKvRaM3wGdHXvsRWSCUoWzxpG3rbqI4sMBc17BHJsncZzlFgvgUgbSV
+	YZX1L8IIsGH4UAQLHWO0heyqWmPS8bo/EAACxc/t0JcXmgwaZR3IdjbdTQTIBLGOYH0By5pq7qo
+	ihYlf5feJcQiIg2TeVn0dHKq0Iucs7ft9V5FeYTABoEy0d3PseLhTvj66VrN6M+xT7cY6Ty9GY0
+	FaBEZHPYSXGMtpaCAXBWY+j1g/yi3lGVA7FI1bqT7qcsLet3tgHrEbzVDzLN6SmbC+fFEkkh5X6
+	H11wyJM8MkN6HRmxYxjQHf/HAnxpxWSNfqDQxuK0vUVPnpx9iDE0+nvEYy2xP/puYw==
+X-Received: by 2002:a05:600c:4691:b0:4bb:5e8c:13bc with SMTP id 5b1f17b1804b1-4bb5e8c13e4mr80850505e9.7.1794666784523;
+        Sat, 14 Nov 2026 06:33:04 -0800 (PST)
 Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb679b7e1asm56702255e9.6.2026.11.14.06.32.12
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb56fa1062sm95802815e9.5.2026.11.14.06.33.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Nov 2026 06:32:12 -0800 (PST)
-Date: Sat, 14 Nov 2026 14:32:11 +0000
+        Sat, 14 Nov 2026 06:33:04 -0800 (PST)
+Date: Sat, 14 Nov 2026 14:33:02 +0000
 From: David Laight <david.laight.linux@gmail.com>
 To: sashiko-bot@kernel.org
 Cc: sashiko-reviews@lists.linux.dev, "Petr Mladek" <pmladek@suse.com>, "Kees
@@ -89,13 +89,12 @@ Cc: sashiko-reviews@lists.linux.dev, "Petr Mladek" <pmladek@suse.com>, "Kees
  <andrey.grodzovsky@crowdstrike.com>, "Steven Rostedt"
  <rostedt@goodmis.org>, "Andrii Nakryiko" <andrii@kernel.org>, "Samuel Wu"
  <wusamuel@google.com>, nathan@kernel.org, nsc@kernel.org
-Subject: Re: [PATCH v3 next 04/13] scripts/kallsyms: make use of binary data
- output optional
-Message-ID: <20261114143211.753aaba7@pumpkin>
-In-Reply-To: <sashiko-outbox-208980@kernel.org>
+Subject: Re: [PATCH v3 next 05/13] kallsyms: Fix selftest startup delay
+Message-ID: <20261114143302.3eb7125d@pumpkin>
+In-Reply-To: <sashiko-outbox-208986@kernel.org>
 References: <20261111115911.1142000-1-david.laight.linux@gmail.com>
-	<20261111115911.1142000-5-david.laight.linux@gmail.com>
-	<sashiko-outbox-208980@kernel.org>
+	<20261111115911.1142000-6-david.laight.linux@gmail.com>
+	<sashiko-outbox-208986@kernel.org>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -109,106 +108,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 11 Nov 2026 12:32:07 +0000
+On Wed, 11 Nov 2026 12:36:03 +0000
 sashiko-bot@kernel.org wrote:
 
-> Thank you for your contribution! Sashiko AI review found 3 potential
-> issues to consider:
-> - [Medium] scripts/kallsyms: wrong variable negated for negative offsets
->   in write_src()
+> Thank you for your contribution! Sashiko AI review found 1 potential
+> issue to consider:
+> - [Low] kallsyms: missing Fixes trailer on selftest startup delay fix
+> --
 
-Will fix in v4 - all the symbols offsets in my build are positive.
-
-> - [Medium] scripts/kallsyms: 9-digit buffer in write_src() clobbers sign
->   on large offsets
-
-I can't count! Only affects kernels that are larger that 1G.
-
-> - [Low] scripts/kallsyms: missing endian.h include for htobe32() and
->   htole32()
-
-Will change since v4 is needed,
+Missed because it isn't worth backporting.
 
 David
 
-> --
 > 
-> commit b5cbf4ceba792715bcee0dd6d58ce67f9542a5ad
+> commit 06f0c3fe023ccc28da9c2bd9798921899fb0ec63
 > Author: David Laight <david.laight.linux@gmail.com>
 > 
-> scripts/kallsyms: make use of binary data output optional
-> 
-> This commit makes the binary output file and input ELF file optional in
-> scripts/kallsyms, writes the markers table in target endianness when using
-> binary output, and formats pc-relative offsets into a buffer for fwrite().
-> 
-> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> > index aa3a8ec83fbb8..74db751600b4f 100644
-> > --- a/scripts/kallsyms.c
-> > +++ b/scripts/kallsyms.c  
-> [ ... ]
-> > @@ -406,51 +417,105 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)  
-> [ ... ]
-> > +		if (out_bin_file) {
-> > +			if ((i & 0xFF) == 0)
-> > +				markers[i >> 8] = big_endian ? htobe32(off) : htole32(off);  
+> > kallsyms: Fix selftest startup delay
+> >
+> > The kallsym_selftest code clearly intends to sleep until initialisation
+> > is complete in order to get more reproducable timings.
+> >
+> > Replace the schedule_timeout() calls with schedule_timeout_idle()
+> > so that the thread actually sleeps.
+> > Poll every second (not every 5) for SYSTEM_RUNNING and then wait
+> > another 10 seconds before starting the tests, otherwise the tests
+> > start as soon an init is executed.
+> >
+> > This code is in the initial 2022 import of the tests.
+> >
+> > Signed-off-by: David Laight <david.laight.linux@gmail.com>  
 > 
 > [Severity: Low]
-> Does scripts/kallsyms.c need to include <endian.h> for htobe32() and
-> htole32()?  Glibc pulls it in transitively through <stdlib.h>, but on
-> musl libc hosts neither scripts/kallsyms.c nor its included headers
-> declare these functions, breaking the host tool build.
+> Since this fixes the broken schedule_timeout() call from the initial
+> selftest import, should it include:
 > 
-> [ ... ]
-> 
-> > @@ -458,31 +523,15 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)  
-> [ ... ]
-> >  	output_label("kallsyms_offsets");
-> >  
-> >  	for (i = 0; i < table_cnt; i++) {
-> >  		if (pc_relative) {
-> > +			/* All 64 bit builds and (at least) relocatable 32 bit ones */
-> > +			static char line[] = "\t.long\t_text - . +123456789";
-> > +			char *end = line + sizeof(line) - 1;
-> >  			long long offset = table[i]->addr - _text;
-> > +			int off32;
-> >  
-> >  			if (offset < INT_MIN || offset > INT_MAX) {
-> >  				errx(EXIT_FAILURE, "kallsyms failure: "
-> > @@ -490,12 +539,28 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
-> >  					table[i]->addr);
-> >  				exit(EXIT_FAILURE);
-> >  			}
-> > -			printf("\t.long\t_text - . + (%d)\t/* %s */\n",
-> > -			       (int)offset, table[i]->sym);
-> > +
-> > +			/* Build the line so the the faster fwrite() can be used */
-> > +			*end-- = out_bin_file ? '\n' : '\t';
-> > +			memset(end - 8, ' ', 8);
-> > +			off32 = offset;
-> > +			if (off32 < 0) {
-> > +				end[-9] = '-';
-> > +				offset = -off32;
-> > +			} else {
-> > +				end[-9] = '+';
-> > +			}  
-> 
-> [Severity: Medium]
-> Should this negate off32 (or an unsigned magnitude) instead of assigning
-> -off32 back to offset?  Because offset is not used after this point,
-> off32 stays negative when a symbol lies below _text, so off32 % 10 in the
-> digit loop below yields negative remainders and writes non-digit ASCII
-> characters into the assembly output (and -off32 overflows if off32 is
-> INT_MIN).
-> 
-> > +			do
-> > +				*end-- = '0' + off32 % 10;
-> > +			while (off32 /= 10);  
-> 
-> [Severity: Medium]
-> Can a 10-digit offset in [INT_MIN, INT_MAX] overwrite the '+' or '-' sign
-> in line[]?  The template only reserves 9 digit slots after end[-9], so any
-> symbol at least 1,000,000,000 bytes from _text runs 10 iterations of the
-> loop and clobbers end[-9], emitting invalid assembly syntax.
+>   Fixes: 30f3bb09778d ("kallsyms: Add self-test facility")
 > 
 
