@@ -1,100 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794666498;
-	b=roSg/BmsSDPphVg9AveDnFp2Z+A4IsYOzSAAuGwCOxIN+OKUjXTqdVj+9ceq0iUnRcAh
-	 2KaMEal4743tG2Ivw5+IO8EU74s12jhKSqY/p6Cky4bzFzfFDshZKsuNrV+oHaYSeLCVM
-	 o4XPcPyc0AoPSP2LtTuSgdtccUkNa353p4p1L4fS8c/QP+bOqcOlNp/jN/WL+44kjw4g9
-	 ezI6qKd5/D/PI1akS8vbmf++e85YlejjwIYY70/rJ0MAQhnNKQYtAcLN1VvnsAOUgNm7j
-	 2q+6AMZsFI8yaaLbcxzG5pSpJxDR3yapoRGLYTcQhzhSb/e8ekoFYAFTTRGUIddFniA==
+	t=1794666589;
+	b=EWuVQvFEJ9pJsT56jbvY8uR/D0GIJQQCQ9DVZZUeg6c4Ul6QorR+ZNwR1Ez4Yk+1rHxS
+	 ysJHpHnYr9LN2ziZ0/r4JVi5gI1DLCTTPf1Q3R/hsRu3Y/liz+A7Zanr+ywyFQge/Q+6N
+	 5gjSJeUsil0n6QTO/o9soEM9Y1JDGTYwXkUWzfyolU1/+3Nf03oaXYislIsQSfaq2CNj4
+	 qh8Lh9VYLhLeYfKoff4OJ5iandQzpmJWBY3H54yLcjsgBxGQkIiLoCo5ex7hGIMcyj07A
+	 mS0ShfX0n8fVwwVb4xMFojz9bboBuY4wBW0RrGtv/5dOt1bNgP7WyoFYtmqPpLQO5XQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794666498;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794666589;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:X-Mailer:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=MKd4jZbLeaqRjSZ/bcG2vE1bYEI/pNWLpN8kMR29sBs=;
-	b=sUiAbIgVoynd4o9TUNAeS0Qw0T9mzcEZm658xZbMxP8QiMMTLy1AOZbbPB8CGXRfIqvN
-	 Hz/0qJ+sVdZ8smKRSJreDz605dbvvXvZAIqicUADrCHe8LJB9DEyf5yQWkgIRFNS9+ikK
-	 zvIN+Aj4syxxvxWEUKtFvMeTRLokfT0SOo9W03xumvQ8AosGLDMX4Xb7MO6YxOW7s0oeR
-	 8hIL96XYo6dzZvWA6NVD9Lwjd+Xqv4r9hJElGXIYi/qs+1QVBpAHYhNCiyj/vDZwpq1Ta
-	 4I1vHlPT9+pevrheTEqtcuPvrxQln//s6Q7akAWajkBmmR+3uAfhAYcz3mlCgeSXTzA==
+	bh=f7HvEUVX2tM63yR8jJepOym4Rh82WzMm5BKq2XP3tdo=;
+	b=p95Bk4kmSikAb10GjJr7GgOpddoCn6ImZfsF/qOpWIUT4ytDGWaer292QOqnEXiN4Qcg
+	 HnNf66Kkdrnh3SgixHqjNiGVOGU/cTNyv7MhYKAnVbm+EqxHrsgNTpdTkXHByx9GY2Zkb
+	 ijZ+mINteLKgBrn3lxT46PKYM+JgmRa2W4WGrC6U3V8qpKmyh9np8baOwK+0nhsFgBsb8
+	 Q5Y/BoszxBXxsfz6CbaGohlrGTKe8kQI9twTt2EM9I0lbJq4GPl65g030+ekF2oqdnMme
+	 fOsV+cETsLyeyK1ZEAz3KZW7HgEF0j39YUKRuXzJm9mcXHpwqYOJjU24LYybN0IcwLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q+4R3ovY;
-	arc=none smtp.remote-ip=209.85.221.41
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HpXUScZA;
+	arc=none smtp.remote-ip=209.85.128.43
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6110A606A332
-	for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 14:28:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6110A606A332
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F73606A33B
+	for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 14:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54F73606A33B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q+4R3ovY
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-498f5fa4f70so2369459f8f.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 06:28:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HpXUScZA
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so24300395e9.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 06:29:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794666497; x=1795271297; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794666588; x=1795271388; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=MKd4jZbLeaqRjSZ/bcG2vE1bYEI/pNWLpN8kMR29sBs=;
-        b=q+4R3ovYZbd3E1S20U1Aa4ML4vU6N0d9VX4pI7dJC1FzV1C0gYGljRlnC27lur9gQZ
-         YugQHs5bQxVznydDn3qYG2pwcBsqY/YiYexRPjAPgU8L1MmWkLFLKM4dNsWF6X9DLjTv
-         65bsh7L0NNvNMpKQQfDOODwA+FtWtNz/sH9kH+GVKC/sy+14ztxMurYyTlLolP7GVb7r
-         rQN/GfkPzqJnser1+TZnLpkoIyYQpSidIKcBPq2zoZVkJ7gQbs5UXo/q/hYcW4OIpgEK
-         hY0jrQYC8qQ33c/FtAr7PGt7x6IvOSF1XPh3lSYdkkofselScUqnYK4OqdxON+6oB8aC
-         C7Fg==
+        bh=f7HvEUVX2tM63yR8jJepOym4Rh82WzMm5BKq2XP3tdo=;
+        b=HpXUScZACECxG4WhYK9jGinw4ofm8bkHLlHgC0rBsHtIayapJcUt8XtJ9A4FyTa+0R
+         b11ZZl2iA9Rt1NDyvpXbeIbx/vRd5ZvFj5w1jFmYZeMLRs9m5fVvDbY3vrjzhSfID396
+         mOAkiNkyBVDYGyFsa/NpUbcwMPhaFxsa1fLW7EweVi5rQKuP7G4cM2ZTXVJdeTpTeBAD
+         SRDgnS8P+coEsSP/TyqY71F+vuh57tkCCTVD0a4jCahViewn6GustfvWM28hVIWR8R2j
+         nj0/m6qQQ/P474IGCzI1zcrvTFZEhdaRMpal5S55MO7kkJ3J/gu/oezSqKL6jJNz3bHr
+         Chnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794666497; x=1795271297;
+        d=1e100.net; s=20260707; t=1794666588; x=1795271388;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=MKd4jZbLeaqRjSZ/bcG2vE1bYEI/pNWLpN8kMR29sBs=;
-        b=Jsrr/0391nrknRPOsd0mkrWQuOOv+ivxvntotL9bDQ8u0OLjUNqOL4jI8k/YsBWM32
-         7LKkoqXdAcmSw3fwXgMUVCENNJyaK7zJFjtKBnr1TtvGTdgeGBbQCx1NQtZCkr8dwBsq
-         8S5f8vMk1TgotlKe5Ll350zSHSbdJTjQrABBnv5Xiv5icHTx+LMx9NYHeg8+qhSVPAzH
-         D2aQZc+HG4KG2ovxCmNU4BW6esvOnm9aYEJlcJtMsi7VilIBWfokKp5ych8cv+/x+7jT
-         MNPhIG+wxTQcNtpmriqs7KSNxJafJ0+9sXZKZlQ8zi5E+6wT6jyvesgRoWkL3lcJBMDZ
-         0Wxw==
-X-Forwarded-Encrypted: i=1; AL+hErEfYhfRpyNEZrElHVEBTogG4Mf4s2IQ6ozR+6P652ACSLnuY6fsgX/m7N0oKTUnM3mfyw2wxGiwxkPLEIk=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8ZZ3KfpWA0SlWOJbU6S6BfAh0FhbPvHZoQSlyirA4AdO6xq1fQ
-	jILSG/7FjWmEqswR4RZJlA5nk5SPxRBfc4qQDOYreAyic7j4bhF/UE14
-X-Gm-Gg: AYBFou2DwbkPErdps+96qLPIHULMGnroqh26z8FrOZYIiTQOnYV5utERHasqgP/YE/s
-	zJ0uL94UWqMl9bvVNpUsj88yXtiv2DG+nRVEhwNo9cKSkbnAoz/a79dtG5ZtzYI9NE/Rq6l/zo9
-	qW3gXDh9jq+zB9jA0ytE2oKmeZYDISrqANBLY0JepXh+Kqd9+BqtkZOK6VeLQcklJDAsuCkyl67
-	C7R2jCVgWK2sEt1xwPNHxrXso1LvuZy/in+BrW+sMRJv9FExB3Rm1CwPcDeIr9DZvp6MmSzjbAj
-	KjTp3227b3yaQyV1eYVh7+vMcUOjeIhZjMbM8uVetBuEkVEgqscWHTWSqLFJtKtOuumaMasj7NN
-	gp4K/g72hc+wI4PD8OnA6jGDLFjeJhA8hi4kI1IeaPKwKjSgWqsYbwAI3j6MKx7NqaIC4nh+VFm
-	xzkrH+1wxrIayGoauRtyT8v8eQoRkdr3s0H1AYF0I9OJ+89jBLyoy8AUOj8is0D4q1NI1CrcP+d
-	18YYBXGKVFxmMU9OU+fGhscMtuuaf1PWeAQbpkllg8CIT98RmmN/MWoBe00Kn90lZt/cKFxslPI
-	PGfwJ8AyGguvTvFSIoGSB4j6U1D8YeKPa7biulg+Mgd6vTAlN+ClFIi2SlrRmibaFw==
-X-Received: by 2002:a05:600c:83ca:b0:4a2:1612:637a with SMTP id 5b1f17b1804b1-4bb55a4e680mr118360915e9.16.1794666496622;
-        Sat, 14 Nov 2026 06:28:16 -0800 (PST)
+        bh=f7HvEUVX2tM63yR8jJepOym4Rh82WzMm5BKq2XP3tdo=;
+        b=syc42Apv0IJ7LLG/l+hOVK74MRw4xj70G4hsfoUxPixFNfy3obmFCFPy9K4cxcOySA
+         88ZoQQ50bfVBcXGhTwOiURhu93rYo26CaMH7USA3cS4F3EcosyRWPxTi36o72kN1zSYX
+         y6hNCg8Z3HYbPWHQ3wzMTcpUqJRNScq4xtZ2/WdyxSVf1WHVVdgwsrDn05biCkXl1x5K
+         JYGlEokdNZcl80z+GtOddAM+FbDQQRATp8vl4R8IguR/lXeopR4ndu/en9TIzFqnbQOF
+         4lgV1z3i+uppKxCAAzlPEjA8166Xffqb7vvb3UcMckgMQY3TLtJxz4ZjTnFCYN5F3lyQ
+         8pDw==
+X-Forwarded-Encrypted: i=1; AL+hErG17gt7uieAcSzms/h7HHWMY+XYwZBtkyMMYuXDUjDg2GFj8sHbBjnc1G+iSG/V4d+8m7stMve74g45TYM=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8nbB04qt2zfir5E8d1q94f0LY7fNlWB9ROZ6olhDB5wq48gM+3
+	/chLx8WStbNFVNEdxxhcibA2pvqx6GWqK8QQxobCNPdX4pPpcB0CgmV8
+X-Gm-Gg: AYBFou2nKfc/EOQCkLT8hMJCX5jBznMzYySEU9zHCe9zwXKWw8c6uLNLye7/bF+vPSl
+	q0RCM4tqblXL25IuUwdA7+wHovE87ZS4/fmQwC3dx5tHRsWEI+lQ5KzSUG+D42MYs53TAH2PrvE
+	Ek2OoK7iZBqX90m4P8GEMOheSGHoWclr/ZOS9Wh5gktKv7vsZbWI9M86rFRNjzBJGTT2oUoUgM9
+	4M4ii86HRRDKbqM0PzHNhP0GZqgEZFfM84eR4mBk2lsNoN3RxLAQkYZOLZZhqn+RLZPCKIZLPBm
+	9BBLwaXWMEdVAErUfueNWx0PB6yeWUshZzLk0QA0o6Hs0QN28G21rP2IQmrZzYiRIBJs8KfQVUe
+	dWaQi4weMwrd6qIw5+x+6evqpv/4bmXuD4ZhCud6TUPSTWHvxfMtKX+dkW0wh62GqvXQu32WFKe
+	4/wJk/oQTMhBpUFlg1H3ZEr00dsG5umBmx2htYtvWve5MNJTQ9oJ7nnHxSdYAt06jedmnGpPcQU
+	1GLnWvMUKF14n/RWK8l2HqrVLfdNtnhwOwKNfQxcDczi7IukqD4PBtrWFXR/0scsmRO+GaqhXrh
+	jiVDUF3J/VOdmvWh9PO6/xJEVLHoCxGTO7fGQydyJUi4i3tH46JlRlzXbvvtv5swLw==
+X-Received: by 2002:a05:600c:a0b:b0:4bb:685e:cc41 with SMTP id 5b1f17b1804b1-4bb685eccc8mr17988175e9.8.1794666587612;
+        Sat, 14 Nov 2026 06:29:47 -0800 (PST)
 Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb55ae5299sm156028195e9.11.2026.11.14.06.28.15
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb56f8d054sm92922965e9.3.2026.11.14.06.29.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Nov 2026 06:28:16 -0800 (PST)
-Date: Sat, 14 Nov 2026 14:28:14 +0000
+        Sat, 14 Nov 2026 06:29:47 -0800 (PST)
+Date: Sat, 14 Nov 2026 14:29:46 +0000
 From: David Laight <david.laight.linux@gmail.com>
-To: sashiko-bot@kernel.org
-Cc: sashiko-reviews@lists.linux.dev, "Petr Mladek" <pmladek@suse.com>, "Kees
- Cook" <kees@kernel.org>, linux-kbuild@vger.kernel.org, bpf@vger.kernel.org,
- "Jim Cromie" <jim.cromie@gmail.com>, "Lorenzo Stoakes" <ljs@kernel.org>,
- "Luis Chamberlain" <mcgrof@kernel.org>, "Andrey Grodzovsky"
- <andrey.grodzovsky@crowdstrike.com>, "Steven Rostedt"
- <rostedt@goodmis.org>, "Andrii Nakryiko" <andrii@kernel.org>, "Samuel Wu"
- <wusamuel@google.com>, nathan@kernel.org, nsc@kernel.org
+To: bot+bpf-ci@kernel.org
+Cc: pmladek@suse.com, kees@kernel.org, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, jim.cromie@gmail.com,
+ ljs@kernel.org, mcgrof@kernel.org, andrey.grodzovsky@crowdstrike.com,
+ rostedt@goodmis.org, andrii@kernel.org, wusamuel@google.com,
+ linux-kselftest@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
+ mason@kernel.org, ihor.solodrai@linux.dev
 Subject: Re: [PATCH v3 next 02/13] scripts/kallsyms: Improve error reporting
-Message-ID: <20261114142814.30c8786d@pumpkin>
-In-Reply-To: <sashiko-outbox-208961@kernel.org>
-References: <20261111115911.1142000-1-david.laight.linux@gmail.com>
-	<20261111115911.1142000-3-david.laight.linux@gmail.com>
-	<sashiko-outbox-208961@kernel.org>
+Message-ID: <20261114142946.4d696bc5@pumpkin>
+In-Reply-To: <8c6f9e7d8a4cb037b480c22ba2b6866133292bbd68ebdc777e385373950b793f@mail.kernel.org>
+References: <20261111115911.1142000-3-david.laight.linux@gmail.com>
+	<8c6f9e7d8a4cb037b480c22ba2b6866133292bbd68ebdc777e385373950b793f@mail.kernel.org>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -108,48 +107,87 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 11 Nov 2026 12:14:50 +0000
-sashiko-bot@kernel.org wrote:
+On Wed, 11 Nov 2026 23:33:55 +0000 (UTC)
+bot+bpf-ci@kernel.org wrote:
 
-> Thank you for your contribution! Sashiko AI review found 1 potential
-> issue to consider:
-> - [Low] scripts/kallsyms: incomplete errx() conversion in write_src()
-> --
+> > scripts/kallsyms: Improve error reporting  
+> 
+> TL;DR:
+> - Error message for failing to open the output file says "nin.out", likely a
+>   typo for "out.bin"
 
-I need to do a v4, I'll change the message (and remove the '\n').
+Indeed - will fix (and in #4)
+
+> - usage() text for --all-symbols may be inaccurate: it covers all sections,
+>   not just local symbols
+
+It'll do - needs to be terse and it's a build tool.
 
 David
 
 > 
-> commit 74224a3e189e43104e9d68aefe42fe16a066052c
-> Author: David Laight <david.laight.linux@gmail.com>
-> 
-> scripts/kallsyms: Improve error reporting
-> 
-> This commit converts fatal error reporting in scripts/kallsyms.c to use
-> err() and errx(), updates the usage message, and adds a --verbose option
-> for timing output.
-> 
 > > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> > index 140e888bf7133..aa3a8ec83fbb8 100644
 > > --- a/scripts/kallsyms.c
 > > +++ b/scripts/kallsyms.c  
 > 
 > [ ... ]
 > 
-> > @@ -490,7 +485,7 @@ static void write_src(FILE *out_bin_file, const char *out_bin_name)
-> >  			long long offset = table[i]->addr - _text;
+> > @@ -822,6 +824,25 @@ static void sort_symbols(void)
+> >  	qsort(table, table_cnt, sizeof(table[0]), compare_symbols);
+> >  }
 > >  
-> >  			if (offset < INT_MIN || offset > INT_MAX) {
-> > -				fprintf(stderr, "kallsyms failure: "
-> > +				errx(EXIT_FAILURE, "kallsyms failure: "
-> >  					"relative symbol value %#llx out of range\n",
-> >  					table[i]->addr);
-> >  				exit(EXIT_FAILURE);  
+> > +static void usage(void)
+> > +{
+> > +	fprintf(stderr,
+> > +		"Usage: kallsyms [options] vmlinux out.bin > out.S\n"
+> > +		"       kallsyms --sysmap=out.map vmlinux\n"
+> > +		"           --all-symbols     Include all local symbols\n"  
 > 
-> [Severity: Low]
-> Since errx() already prepends the program name, appends a newline, and
-> does not return, should the "kallsyms failure: " prefix, the trailing
-> newline, and the unreachable exit(EXIT_FAILURE) call be dropped here?
+> This isn't a bug, but is this description of --all-symbols accurate?
 > 
+> In symbol_valid() the option only disables the text range filter:
+> 
+>     if (!all_symbols) {
+>         ...
+>         if (symbol_in_range(s, text_ranges,
+>                             ARRAY_SIZE(text_ranges)) == 0)
+>             return 0;
+> 
+> so symbols from the data, rodata and bss sections are included, global and
+> local alike.  Local text symbols are already kept without the option.  This
+> also matches the CONFIG_KALLSYMS_ALL help text, "symbols from all sections".
+> 
+> Would something like "Include symbols from all sections, not only text" be
+> closer to what the code does?
+> 
+> [ ... ]
+> 
+> > @@ -845,49 +867,57 @@ int main(int argc, char **argv)  
+> [ ... ]
+> >  	out_bin_name = argv[optind + 1];
+> >  	out_bin_file = fopen(out_bin_name, "w");
+> > -	if (!out_bin_file) {
+> > -		perror(out_bin_name);
+> > -		exit(EXIT_FAILURE);
+> > -	}
+> > +	if (!out_bin_file)
+> > +		err(EXIT_FAILURE, "failed to open nin.out file %s", out_bin_name);  
+> 
+> Is "nin.out" a typo here?  usage() and the close-time message in main(),
+> 
+>     errx(EXIT_FAILURE, "error writing out.bin file %s", out_bin_name);
+> 
+> both call this file "out.bin".
+> 
+> The string is changed later in the series by 317dc01f3774 ("scripts/kallsyms:
+> make use of binary data output optional") to "failed to open bin.out file
+> %s", which still differs from the "out.bin" used by usage() and the
+> close-time message.
+> 
+> 
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> 
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/43116767394
 
