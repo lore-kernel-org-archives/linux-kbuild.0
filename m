@@ -1,100 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.51
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794617147;
-	b=2G1zYapWrkzEQLilbsyb0Yf1n+Nj8Vkvp/uqJlFduMKCHoJWdA9iIlvtmLXryWw97nvY
-	 NpZ2tob6ysQVbszQF+YXt7ipnXjrGr9CEH5HB/lz6EHWyouPv0vNfE6W7vu2j+g4vvAm5
-	 KD4Lpyis1gBc5KmodqDocqSJKj+N3ewDZMmJBfixZiopiJD5vGjOkQU/vnftDvq9sFk4G
-	 xlHHHeb00eyUIaVZkc95phmMRIcdrDgwWFgcv+IRQh60d/fVSzzW1/UicxcW+SiDZCOwP
-	 6egRDxRnppIaUpewNMWf5h39LZgJUi1vQixEyUiCpHrInyAfl8cFTHS2fmDr0x1lfHA==
+	t=1794618131;
+	b=mxnFZA4AKFSUeAhU+Ypvh1sjHMTuC+qDvcayinAF6y6kuBVwcJrni0K4jl7Bpi5bQTht
+	 Z3LF++RLiJeqvCru7cdgT6pe01X9kFaPAOoOmSoWlK8TwwnlKaOfl1csmXPM1F+ZvQ5sP
+	 1qzABdJ0LagV+T2NKUwYpMC9GovRagc6381u5A0kj2JItkXouWdourY/OiMtAQ7zp7VIf
+	 mbuK8mAVesfv8BnXzx21t5B2LHHCsBIOBGc90FNcgvk1rEu0jTYibe4ruVq+/fE7fsdx0
+	 RIrFftnGFfQJ6zEuJizeYC3L3Rq2K6hN5UIF/1R9ZAYM6c4uahOxbncDDEHaGlQw/1Q==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794617147;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794618131;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=RncxFXadV++AJd3yarKiBmLGzKxXKrhpwpqz68JunX0=;
-	b=oJZbDFXAkstKBNEaZXjZar1e59o2EHaWoYJMPewFQmT3DKs6Xl7+QIEoA7XnLLlaV8oo
-	 ggL5Y6rakU8Vp/uIYH6MBFKDQnPmVz+kUmRS4qcqkqvDF1KizBM6ofaGK2vvC0S0leSX3
-	 eRJrtXdOezC2dBug0cZxOGBstuK/Acb+dJhnO8rAWGjs8JgKPPg8Ilp9dsPcRxx5Ftgc2
-	 B601e8EiRt4FzKSjY5iwAyzuS49ycsFqJDcGROo6fN8/Dx+XqUZh7bFa8cHuqTXxOEA9M
-	 j9Xb17MuL7wDxNAc2faFn6FNEKULOiOGYyPh0GY8+UCuSk9kUS5MuLCodq95MJl/ffw==
+	bh=/m5d7czP0+mAkTXvCBEQeqM+jQc19scZ/VuN8vwz6lk=;
+	b=Vdm0H7sjjP4phEuZJKmGI+0LkX1VuhIeSx37uGljmesu5TZp40RrsUHbR7/RbckCi8wa
+	 nDa57WJ7iJKpOAOnLd4aHamzZOaTE9b+IsrEXsafQFfhGrqvM/bfc9+Z06u1bbadwVK1c
+	 cf05doWaSr9iOip63CdMFqMNwvUAUoc8+hy9LxP3ACUwJuvkvNStNnidmmbfLLj9Yl9cb
+	 oykVLXw+irrUIpXlLUoXfUbQfMTQqu+ZGPKTlzURlMt55JjuWs/rjAoelfwrzhq4EuHxR
+	 vQcZejfXi9n7rS/aIk403GEM45HSOe97AYqWv7RCiFf/6ai2yI0aNCkhlNhj94VxUkA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lQAYO9Hg;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.49
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BU9q51b+;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.51
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE32606A881
-	for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 00:45:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1CE32606A881
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AE0606A334
+	for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 01:02:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 89AE0606A334
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lQAYO9Hg
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c50a2efbe1dso279487466b.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 16:45:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794617145; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BU9q51b+
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c40f29667e6so344034966b.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 Nov 2026 17:02:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794618129; cv=none;
         d=google.com; s=arc-20260327;
-        b=cZ/3A1qiwUIjQscwbRYqf6CyN+fJY5409ksa0R3dmYBuu+XLWiMKTmKt3JZyNF3Nzr
-         czG4+wsUFZm1viR1x77e9EaH59bjliigic2WEc5jpgtmqOPynftPI5AzgSprB83qpRm1
-         3BowUC/s6xV0/N7QaAHcVGvyS7EVlIhBcle8Tv+yx2aQ/OurdRqmfPvFOfRweGS39mJj
-         imKPkSfSmg8mnfRPlYA+oHQViEdxYC5IDJRTTWjoJNXSQgSq2DJAN77I6a+w2gLhlG9k
-         sIsPoEmav67FO8zwKrHG/ixLydrPky9zjEwR5H+W10W3ASrW9fWPQiCPYl29+4ALC7fi
-         TauA==
+        b=dsXmXaqYiVMArFXzqGvdEzOGPGcEZVUpwHvJ3d5wbUOhkSMDQJYqPaH7je4yYSfB+2
+         wltM6xrX9Hq8sDZ9YfV6phNQ/ThVHhP0qeURDofyDUijxfva6A6a1TBNarzE09l+j4Hp
+         VbFWgye2ZsVmouHhzPb5mEFgKCqrhUQUZeSBbZxqUnq5VWkSlDIwgKihyt+5U85Ww5E7
+         bCGOy8vNTcu+C6oQkcoru5wAzaBQJoX8vgKbWLeBXgHrciMNTZFGqscHkh6w/hseQIBD
+         ZQZ8uIHZ9urOMYpQiHQzxN9nBFftuJFJaZRBbkfNIoQZuP3UFy2ag98soznLM++/3+1B
+         YLFg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=RncxFXadV++AJd3yarKiBmLGzKxXKrhpwpqz68JunX0=;
-        fh=LvulTsnpKQf0MnV2/ihseUUlkMpAvhctseraqABnV2c=;
-        b=TSqzh8Ht2F9ydTlBSQFNJf4MnhZwBnDwbWKgnORW+oWnEjfkdLqVk5jPLnYxBnw/US
-         zGpeOkD0JhN2IweUItOLJVc8FHMwmliYtKveTZofKno8vm+k4KCbp0zR02e+5CuY9Czc
-         aaOqg+rTHALm2ElmOCRit3uSV4HIcqMEfu8C3UboVBllT/vNQvFhFSp2ZV2dqO7e3sWM
-         FZjzOUnO7MA1TMO4ZIza0oWZnwTOZBXlcrARsUabPDERpPrMDR6a48oWlYOCMOxRPHRk
-         qBlrcUJSX5DB3MzzzbhujCRojRzYzUs9RYksE9zMqFbV5tukI7MfTv0JuFOpf9Z/sZMe
-         LFgg==;
+        bh=/m5d7czP0+mAkTXvCBEQeqM+jQc19scZ/VuN8vwz6lk=;
+        fh=UZepKYisHVPLcECztFSOkgUMI8JvRXqWvVLZ/iTCRao=;
+        b=s+B8ie28aEA+C87hA8nLHtjd2Cx2ipMeKVdnt2nXZAVQCk0hF0MO4tgsWxfR6SasZj
+         l/FcxuD488pFjmz4pQjfDgdH1+wMVPNuJiSrmgQ/wKDqsgYJq/9u9Bf6AUhDXHV1LAqv
+         eznzDTkjB2VOxzZX5szw6NdqPxj2VtkQcayeL/OH0+PddPSSLkpUGDhzujg4OSF+3q8e
+         pgKME8VIVwH0HqhmO8eLdR3+BV+KF+V6/A/i8cP2M8yeLPZb9ttzROiT6UNcqWVt51+U
+         Ta5PNo/SXAeCFKapTWomdfQhs4DyeEftYkIQvZQk6h/+J/o1eAO2+xAGyxZjy/ksvjQe
+         x/Cg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794617145; x=1795221945; darn=vger.kernel.org;
+        d=google.com; s=20260707; t=1794618129; x=1795222929; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=RncxFXadV++AJd3yarKiBmLGzKxXKrhpwpqz68JunX0=;
-        b=lQAYO9HgW+rTGDKMEQ6/0bEURVnvteVYM9OOX2PoBG7krvG2mHIGTr31EpVhv/4AUO
-         AHltLzetwCXhzVdbHk7aHBV41fdIGkt6pDoNsjh85g9n9WVGdsnshrAtC0kMikyDtxmW
-         UXC+HqhbPirWciUskJ6VwFxO6wd/G1xYkkAAMpn7eBIgnWvz1dmj0p4teEmYRJVf8BZv
-         ArGHggwmv+j5y4H/cSwrx77xJUj4AY7v6KgiR+TKaDrVV2Ix2S8zRRm9XuhsVj4ksnw+
-         0t7PPQy8ZqWkYOJgW1og8UhfxCAKGMtvo3VrwM+UxcwFWgRt+tlVbAcpuUhz2cc2/nwq
-         YN5g==
+        bh=/m5d7czP0+mAkTXvCBEQeqM+jQc19scZ/VuN8vwz6lk=;
+        b=BU9q51b+qIJpzYDPk22/yVpWZX81by8BeuEdqZRj3hJsh1Uf/rZxAT1JLa3NOnUvZJ
+         B0B8kgEH5e/8oYq9DXLRNPRbdUqR5nb5RBJa9XPJvkMYd/iUttJpM+hChgj7Rb3nJJm0
+         LroCX4V5KWRDi0i9ulgdRMnGoaIMIyWTCb/21zBqu7amw6T3lcIPV6a8ATgEI6ekuSW7
+         AeB0haBR2KP1f55/asA5+4kVtwjNfrez12ghsELF+Maq4RytNFl14DC3rdyj8ZmbmFZC
+         y5VlNo58HqUjZjqTnPApbbowg90CpsZEG8fQ+MC7XEAlujK94GCAt5WbKlYlsQ3IadmU
+         GgPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794617145; x=1795221945;
+        d=1e100.net; s=20260707; t=1794618129; x=1795222929;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=RncxFXadV++AJd3yarKiBmLGzKxXKrhpwpqz68JunX0=;
-        b=jSxkLQA4vGPij0aJbkQN8enuyGJwbn7bNm/xtpphI4qjLFEZoc+e39TW3lo/KFJfJ2
-         pTFntrk3UEa9EfBTLQYHsIBZLPAs0KiaOGWvhyKJthg3m/86D9mENIK/IIBMutQU/nt/
-         oSiRVRpPHmXw8+u9Hd4kipIaCCo9qpwmF++6L3flCDiC9YFRPcaovWKv6e6miwHbARGX
-         amtQwXRYzUBLVIVe9pve5UIv2Ze53p7JjLN9d+FpSkgJh971Au4LTdOlCSl5DdKuxV32
-         sr/gMD1Zw4o0SReukPf8SRiM+k16OyzZm8Br0XWgr2Y8Os5gwDw67yPnVnRjfSxEajo7
-         LkJA==
-X-Forwarded-Encrypted: i=1; AL+hErFP6/q5qDLTVkmT7idHBEGXBKaPzU+wfW916aIqhUAmKrJPdFsorU2DGdPnHgCESLuEFJlfibu8spXumdo=@vger.kernel.org
-X-Gm-Message-State: APuU4Z869Qc771LhOFqRMPVKTYfFgWUee0BBHHt1P9TTQVzxi6ckhWKz
-	HQhPAZeHcr8NJRkK5SdlGnWLKEHykCT1hLHd5dJ3MrjwAfXhBn0RSyvw3gsbSfR27DCXZLUUhp1
-	p5K1yUaRgL+eAyT3CeNZMY0kuhXeB+ZsHLVjUjJPj
-X-Gm-Gg: AYBFou2HWck9XKgYVtJWkuowAMZiZmfd7ShyhSSFfMfpAvfp3RhZ1g4tXwGG+WFbO7I
-	+yUAauIU89YnIcy3Be67QTpp3sqIcKHKUyW4qrx8RPF6y2I/Z12cAAUIZoEi0O6+ZwK6vPWjriy
-	oPn+8KMZ3UHhruBSQH9C2dp/LBaknT0kuyiu/klqOAu+lJzZsj3zaIC1l4uJX7XZqOTEoNnJXQL
-	zUAKviAm3at/umChOFtGDu20C5/8ToTf8un2TpEtggA0aLagyUWV9esOQtGl6qAmKysy9jP3tD5
-	qMq2yjPETCSVgr6wJ/ofACfiR/4Y3q/Qa6ota6AdCzag7uGu3904788DcLVKwFGqfOV4JRDxp9f
-	mtLFhspbHcVo3olLkAjiC2LF/D1hdKYiLtET2BltDvF6qqY2ZIW4Jv6+dexxjIkP3cO1QjQ==
-X-Received: by 2002:a17:907:eccc:b0:c31:5bb8:4b3b with SMTP id
- a640c23a62f3a-c509611127dmr374609166b.2.1794617144927; Fri, 13 Nov 2026
- 16:45:44 -0800 (PST)
+        bh=/m5d7czP0+mAkTXvCBEQeqM+jQc19scZ/VuN8vwz6lk=;
+        b=E0h7k7cwI8atHxVJKom9g1tpDqD+p/sz1/oX8il6mlHstHUyPOtSoD6n9+RDJkVmum
+         +SD6BreM24aLDX9Jot/9SvnTBUkIgIsKqqGJBm+EFDAnODzac4tiEWluw1zkDH3uWdKC
+         yiozQOEkLXUk+aSMvgm3Pf7uMDpDIdHKat/ovOEVHfjJcVnIUu70vBl2rgvmCMGznAUo
+         PLUpNVN+21cZaLbLqGIPW0YV1kMhLFESXLJo+NqcBUamNgs2y4MyHK5Qpc4dxLQWCFO1
+         AgrUhZKoplDCu1hpuvN3QDxneDMthr5kKXARR7Dr4DWw65StXfGCMGXyj8aqFCwPCuDX
+         Kjkg==
+X-Forwarded-Encrypted: i=1; AL+hErHBtanzOLXNSYRiCaaKIKXHfJIW5l+eJOxHk8FGpzneiO/qPXZggNGLdmXaIKYLBKv4hKoGhuJNcjkORrM=@vger.kernel.org
+X-Gm-Message-State: APuU4Z83XLfVd6PngTcaT2LPDKDckcJaZNKhGgourIWwDkxb02Lru6y7
+	NKpOiRdor67mOonZI/XDNkm1vLZRK2OSlVqJtcqE4WRrG5WL98XM82KDH16GeaYTvJcj+irzKKt
+	KM9roNTi49rWHs56u8X3nqS30mcF2DttUNNwVp8Br
+X-Gm-Gg: AYBFou0vTHHZ6SKBk3XXGhk/zjEQlNyxqQXfzT4KJx612Kq5h227Rk8qQZUXl1/ZZkf
+	OGw/lFZdSbkXFlCsjj41GQZI5XRagt8bzXRW3NUOFb0Im3e7EqT0sdjyYoMYnvhpB52f4xKhi6t
+	kdxgQr4//iWEpYaNsFEKs/4xdhIPvJM8RWzVVHOPZAOauE95LSOFATcWoqa/CrkE4izHGmIKYwP
+	8EXPh5LQIlJ8bYEuWFMsnIJ4ogjBgBPbrNhUo2X7NxRz8i5RcRgnbth7vSb0bWb+cFn15W1q3Tj
+	4IqYl513LE/x1ULeyOlUBJh4nWihww4HYE3BapyS0ByuSaK3t1giJYcgvLuRgeZSzjLKWzhEzzN
+	OfegSw9Gx0Y2WtRN/S61/dr28PzFHmdMEH5abloMAN1RzpqNVbzQwihtS39VD8aOwDviGJg==
+X-Received: by 2002:a17:907:72c8:b0:c2d:c98f:4824 with SMTP id
+ a640c23a62f3a-c509640e213mr344745266b.30.1794618128439; Fri, 13 Nov 2026
+ 17:02:08 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -104,13 +104,14 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261111115911.1142000-1-david.laight.linux@gmail.com> <20261111115911.1142000-9-david.laight.linux@gmail.com>
-In-Reply-To: <20261111115911.1142000-9-david.laight.linux@gmail.com>
+References: <20261111115911.1142000-1-david.laight.linux@gmail.com> <20261111115911.1142000-10-david.laight.linux@gmail.com>
+In-Reply-To: <20261111115911.1142000-10-david.laight.linux@gmail.com>
 From: Samuel Wu <wusamuel@google.com>
-Date: Fri, 13 Nov 2026 16:45:33 -0800
-X-Gm-Features: AclHuK9LmaXz8sX43Vv-rLxGQgDvv5qT26IFoen_6Yi7-ag8usId7Ni6mm3ot-8
-Message-ID: <CAG2KctqLmjL1EZgc8GoLZ_FU9xvqYam_xabvT2q=Ofm91CW38g@mail.gmail.com>
-Subject: Re: [PATCH v3 next 08/13] kallsyms: Optimise symbol name search
+Date: Fri, 13 Nov 2026 17:01:56 -0800
+X-Gm-Features: AclHuK92ZDtDkLGXySEyJcsPwdTi7Im-tlh3FuOteUS-nzQ2KxAv8LMSfv9gpak
+Message-ID: <CAG2KctruqvRDU46Q58Sk3Bkr=i1yuhs8znqgWWP65ZydBnT+Hw@mail.gmail.com>
+Subject: Re: [PATCH v3 next 09/13] kallsyms: Add a kernel parameter to change
+ the kallsyms_markers[] density
 To: David Laight <david.laight.linux@gmail.com>
 Cc: Petr Mladek <pmladek@suse.com>, Kees Cook <kees@kernel.org>, linux-kernel@vger.kernel.org, 
 	linux-kbuild@vger.kernel.org, bpf@vger.kernel.org, 
@@ -123,431 +124,287 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Nov 11, 2026 at 3:59=E2=80=AFAM David Laight
 <david.laight.linux@gmail.com> wrote:
 >
-> Change the alphabetically ordered lookup table (kallsyms_seqs_of_names)
-> to one that indexes the table of compressed names rather than the
-> array of symbol values.
-> This removes all the linear scans during the binary search for the symbol
-> name.
-> Once the name has been found a second binary search of the 'markers' arra=
-y
-> followed by a linear scan for the symbols address gives the symbol value.
+> The density is a tradeoff between data size and execution speed.
+> Reducing it from 256 to 64 gives a 35% improvement for name lookups.
 >
-> This linear scan is done once for each address returned, whereas the old
-> code did the scan for each of the ~17 comparisons in the binary search
-> (and the binary search was done twice for a symbol that appears once).
+> Change scripts/kallsyms to take the density from a --marker-shift command
+> line parameter so that it can be build specific.
+> Write the value used to the output file to ensure the kernel uses the
+> correct value.
 >
-> For normal kernels the index table stays at 24 bits per symbol (now host
-> ordered), but a 32 bit table is used if necessary (probably only for
-> allyesconfig builds - which needs 26 bits on x86-64).
->
-> Use the low bit of the index table value to indicate that the symbol has
-> the same name as the previous one.
-> Use this to avoid the second lookup to find if the name is unique, speed
-> up the search for the first symbol with a given name, and simplify
-> kallsyms_on_each_match_symbol().
->
-> Speeds up lookup by name by a factor of about 12, and makes a massive
-> difference to the time taken to lookup symbols that occur 100s or
-> 1000s (or maybe 10000s) of times.
->
-> The slowest 'lookup by name' changes being a symbol that is duplicated a =
-lot
-> to one that is very long.
->
-> Build for BE kernels correctly flips the byte order in the index table.
+> The program's default is unchanged at 1 marker per 256 symbols,
+> The kernel config defaults to 1 marker per 64 symbols.
+> This increases the static data by a little less than 1 bit for every
+> two symbols.
 >
 > Signed-off-by: David Laight <david.laight.linux@gmail.com>
 > ---
 >
-> v3:
-> - Use a discrimant union for the name table instead of weak symbols.
->   Undefined weak symbols can't be guaranteed to be zero and a build
->   mismatch left both undefined.
-> - Patch the kallsyms_off_size_24 static key from an initcall,
->   the first name lookup might not be allowed to sleep.
->   Leave a conditional in the 32bit offset case, it is unlikely
->   to be needed for a real kernel.
-> - Merge in the following patch that optimised the scan for duplicates.
+> v3: Previously patches 8 and 9
 >
->  kernel/kallsyms.c          | 162 ++++++++++++++++++++++++-------------
->  kernel/kallsyms_internal.h |   7 +-
->  scripts/kallsyms.c         |  49 +++++++----
->  3 files changed, 148 insertions(+), 70 deletions(-)
+>  init/Kconfig               | 19 +++++++++++++++
+>  kernel/kallsyms.c          | 16 ++++++-------
+>  kernel/kallsyms_internal.h |  1 +
+>  scripts/kallsyms.c         | 49 ++++++++++++++++++++++++++------------
+>  scripts/link-vmlinux.sh    |  6 +++++
+>  5 files changed, 67 insertions(+), 24 deletions(-)
 >
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 4013781e0a02..b2db123a51d7 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -1908,6 +1908,25 @@ config KALLSYMS
+>           symbolic stack backtraces. This increases the size of the kerne=
+l
+>           somewhat, as all symbols have to be loaded into the kernel imag=
+e.
+>
+> +config KALLSYMS_MARKER_SHIFT
+> +       int "Interval between kallsyms markers (6 =3D> 64, 8 =3D> 256)"
+> +       depends on KALLSYMS
+> +       default 6
+> +       range 0 24
+> +       help
+> +         Set the interval between the kallsyms marker entries as a power=
+ of 2.
+> +
+> +         This bounds the linear search when locating the name of a symbo=
+l
+> +         from its index in the array of values (and v.v.).
+> +
+> +         Smaller values speed up the search but increase the memory foot=
+print.
+> +         Values below 5 (one 32 bit marker every 32 symbols) are unlikel=
+y to
+> +         make a significant difference because other parts of the code
+> +         dominate.
+> +
+> +         The default of 6 is a reasonable compromise. It makes looking u=
+p a
+> +         symbol by name around 35% faster than setting it to 8.
+> +
+>  config KALLSYMS_SELFTEST
+>         bool "Test the basic functions and performance of kallsyms"
+>         depends on KALLSYMS
 > diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-> index d18d78e626db..fd42a1a8ed3e 100644
+> index fd42a1a8ed3e..2c4264a3e0c5 100644
 > --- a/kernel/kallsyms.c
 > +++ b/kernel/kallsyms.c
-> @@ -177,6 +177,36 @@ static unsigned int get_symbol_offset(unsigned long =
-pos)
->         return name - kallsyms_names;
->  }
->
-> +/*
-> + * Find the value of a symbol given the offset in the compressed stream.
-> + */
-> +static unsigned long get_name_address(unsigned int name_offset)
-> +{
-> +       unsigned int low, pos, high;
-> +
-> +       low =3D 0;
-> +       high =3D ((kallsyms_num_syms - 1) >> 8) + 1;
-> +
-> +       while (high - low > 1) {
-> +               pos =3D low + (high - low) / 2;
-> +               if (name_offset >=3D kallsyms_markers[pos])
-> +                       low =3D pos;
-> +               else
-> +                       high =3D pos;
-> +       }
-> +
-> +       pos =3D kallsyms_markers[low];
-> +       for (low <<=3D 8; pos < name_offset; low++) {
-> +               unsigned int len =3D kallsyms_names[pos];
-> +               if (len & 0x80)
-> +                       len +=3D (kallsyms_names[pos + 1] << 7) - 0x7f;
-> +               pos +=3D 1 + len;
-> +       }
-
-Is this just get_symbol_data() from previous patch? If so, that would
-make it more readable.
-
-> +
-> +       return kallsyms_sym_address(low);
-> +}
-> +
-> +
->  unsigned long kallsyms_sym_address(int idx)
+> @@ -147,13 +147,11 @@ static int kallsyms_strcmp_symbol(unsigned int off,=
+ const char *name)
+>  static unsigned int get_symbol_offset(unsigned long pos)
 >  {
->         /* non-relocatable 32-bit kernels just embed the value directly *=
-/
-> @@ -185,66 +215,87 @@ unsigned long kallsyms_sym_address(int idx)
->         return (unsigned long)offset_to_ptr(kallsyms_offsets + idx);
->  }
+>         const u8 *name;
+> -       int i, len;
+> +       int len;
 >
-> -static unsigned int get_symbol_seq(int index)
-> -{
-> -       unsigned int i, seq =3D 0;
-> +static DEFINE_STATIC_KEY_FALSE(kallsyms_off_size_24);
+> -       /*
+> -        * Use the closest marker we have. We have markers every 256 posi=
+tions,
+> -        * so that should be close enough.
+> -        */
+> -       name =3D &kallsyms_names[kallsyms_markers[pos >> 8]];
+> +       /* Scan from the marker before the requested symbol number */
+> +       name =3D &kallsyms_names[kallsyms_markers[pos >> kallsyms_marker_=
+shift]];
+> +       pos &=3D (1 << kallsyms_marker_shift) - 1;
 >
-> -       for (i =3D 0; i < 3; i++)
-> -               seq =3D (seq << 8) | kallsyms_seqs_of_names[3 * index + i=
-];
-> +/*
-> + * Get the offset into the compressed list of names for the n'th
-> + * symbol in the 'sorted by name' list.
-> + * Returns 'offset << 1 | is_duplicate_name'.
-> + * To save memory (the array can have 200k+ entries) the values are usua=
-lly
-> + * 24 bit (host ordered) but will be 32 bit if necessary.
-> + */
-> +static inline unsigned int get_symbol_name_offset(unsigned long index)
-> +{
-> +       if (static_branch_likely(&kallsyms_off_size_24) ||
-> +           unlikely(kallsyms_offs_of_names.size =3D=3D 24)) {
-> +               u8 *off =3D kallsyms_offs_of_names.offs + index * 3;
-> +#if !defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
-> +               return ((struct {unsigned int v:24 __packed; } __packed *=
-)off)->v;
-> +#else
-> +#if defined(__BIG_ENDIAN)
-> +               return (*(u32 *)(off - 1)) & 0xffffff;
-> +#else
-> +               return (*(u32 *)(off - 1)) >> 8;
-> +#endif
-> +#endif
-> +       }
+>         /*
+>          * Sequentially scan all the symbols up to the point we're search=
+ing
+> @@ -161,7 +159,7 @@ static unsigned int get_symbol_offset(unsigned long p=
+os)
+>          * so we just need to add the len to the current pointer for ever=
+y
+>          * symbol we wish to skip.
+>          */
+> -       for (i =3D 0; i < (pos & 0xFF); i++) {
+> +       while (pos--) {
+>                 len =3D *name;
 >
-> -       return seq;
-> +       return ((u32 *)&kallsyms_offs_of_names.offs)[index];
->  }
+>                 /*
+> @@ -185,7 +183,7 @@ static unsigned long get_name_address(unsigned int na=
+me_offset)
+>         unsigned int low, pos, high;
 >
-> -static int kallsyms_lookup_names(const char *name,
-> -                                unsigned int *start,
-> -                                unsigned int *end)
-> +static int kallsyms_set_kallsyms_off_size(void)
->  {
-> +       if (kallsyms_offs_of_names.size =3D=3D 24)
-> +               static_branch_enable(&kallsyms_off_size_24);
-> +
-> +       return 0;
-> +}
-> +early_initcall(kallsyms_set_kallsyms_off_size);
-> +
-> +static int kallsyms_lookup_names(const char *name, unsigned int *start)
-> +{
-> +       unsigned int mid, off;
-> +       int low, high;
->         int ret;
-> -       int low, mid, high;
-
-nit: any issue with mixing signed and unsigned here? Simpler to keep
-them the same type if possible.
-
-> -       unsigned int seq, off;
 >         low =3D 0;
->         high =3D kallsyms_num_syms - 1;
+> -       high =3D ((kallsyms_num_syms - 1) >> 8) + 1;
+> +       high =3D ((kallsyms_num_syms - 1) >> kallsyms_marker_shift) + 1;
 >
-> -       while (low <=3D high) {
-> +       for (;;) {
-> +               if (low > high)
-> +                       return -1;
->                 mid =3D low + (high - low) / 2;
-> -               seq =3D get_symbol_seq(mid);
-> -               off =3D get_symbol_offset(seq);
-> -               ret =3D kallsyms_strcmp_symbol(off, name);
-> -               if (ret > 0)
-> +               off =3D get_symbol_name_offset(mid);
-> +               ret =3D kallsyms_strcmp_symbol(off >> 1, name);
-> +               if (ret > 0) {
->                         low =3D mid + 1;
-> -               else if (ret < 0)
-> -                       high =3D mid - 1;
-> -               else
-> -                       break;
-> -       }
-> -
-> -       if (low > high)
-> -               return -ESRCH;
-> -
-> -       low =3D mid;
-> -       while (low) {
-> -               seq =3D get_symbol_seq(low - 1);
-> -               off =3D get_symbol_offset(seq);
-> -               if (kallsyms_strcmp_symbol(off, name) !=3D 0)
-> -                       break;
-> -               low--;
-> -       }
-> -       *start =3D low;
-> -
-> -       if (end) {
-> -               high =3D mid;
-> -               while (high < kallsyms_num_syms - 1) {
-> -                       seq =3D get_symbol_seq(high + 1);
-> -                       off =3D get_symbol_offset(seq);
-> -                       if (kallsyms_strcmp_symbol(off, name) !=3D 0)
-> +                       continue;
-> +               }
-> +               if (!ret) {
-> +                       /*
-> +                        * Found a match, but need the first one.
-> +                        * Most symbols (and all exported/global ones) on=
-ly occur
-> +                        * once, most of the others only occur a small nu=
-mber of
-> +                        * times so it is worth doing a linear scan that =
-avoids the
-> +                        * kallsyms_strcmp_symbol() call.
-> +                        * However some symbols occur a large number of t=
-imes
-> +                        * (_sub_D_65535_0 is repeated 24610 times in an =
-x86-64
-> +                        * allyesconfig, __func__.0 442 in a more normal =
-kernel).
-> +                        * Avoid a long linear scan by returning to the b=
-inary
-> +                        * search if a short linear search is fruitless.
-> +                        */
-> +                       unsigned int scan =3D 16;
-> +                       while ((off & 1) && scan--)
-> +                               off =3D get_symbol_name_offset(--mid);
-> +                       if (!(off & 1))
-
-Curious if you have numbers comparing with and without this linear
-scan. Did a quick check on my desktop and phone, and ~99% of symbols
-are unique already; of the ~1% that are repeated, they're generally
-compiler generated local variables which I think are rare targets for
-symbolization (AFAIK).
-
-Just a vanilla lower_bound() would halve the line count of this function. :=
-)
-
->                                 break;
-> -                       high++;
->                 }
-> -               *end =3D high;
-> +               high =3D mid - 1;
+>         while (high - low > 1) {
+>                 pos =3D low + (high - low) / 2;
+> @@ -196,7 +194,7 @@ static unsigned long get_name_address(unsigned int na=
+me_offset)
 >         }
 >
-> -       return 0;
-> +       *start =3D mid;
-> +
-> +       return off;
->  }
->
->  /* Lookup the address for this symbol. Returns 0 if not found. */
-> @@ -257,9 +308,9 @@ unsigned long kallsyms_lookup_name(const char *name)
->         if (!*name)
->                 return 0;
->
-> -       ret =3D kallsyms_lookup_names(name, &i, NULL);
-> -       if (!ret)
-> -               return kallsyms_sym_address(get_symbol_seq(i));
-> +       ret =3D kallsyms_lookup_names(name, &i);
-> +       if (ret >=3D 0)
-> +               return get_name_address(ret >> 1);
->
->         return module_kallsyms_lookup_name(name);
->  }
-> @@ -289,17 +340,20 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const=
- char *, unsigned long),
->  int kallsyms_on_each_match_symbol(int (*fn)(void *, unsigned long),
->                                   const char *name, void *data)
->  {
-> -       int ret;
-> -       unsigned int i, start, end;
-> +       int name_offset, ret;
-> +       unsigned int sym_number;
->
-> -       ret =3D kallsyms_lookup_names(name, &start, &end);
-> -       if (ret)
-> +       name_offset =3D kallsyms_lookup_names(name, &sym_number);
-> +       if (name_offset < 0)
->                 return 0;
->
-> -       for (i =3D start; !ret && i <=3D end; i++) {
-> -               ret =3D fn(data, kallsyms_sym_address(get_symbol_seq(i)))=
-;
-> +       do {
-> +               ret =3D fn(data, get_name_address(name_offset >> 1));
-> +               if (ret)
-> +                       break;
->                 cond_resched();
-> -       }
-> +               name_offset =3D get_symbol_name_offset(++sym_number);
-> +       } while (name_offset & 1);
->
->         return ret;
->  }
+>         pos =3D kallsyms_markers[low];
+> -       for (low <<=3D 8; pos < name_offset; low++) {
+> +       for (low <<=3D kallsyms_marker_shift; pos < name_offset; low++) {
+>                 unsigned int len =3D kallsyms_names[pos];
+>                 if (len & 0x80)
+>                         len +=3D (kallsyms_names[pos + 1] << 7) - 0x7f;
 > diff --git a/kernel/kallsyms_internal.h b/kernel/kallsyms_internal.h
-> index 81a867dbe57d..11fb0de92ede 100644
+> index 11fb0de92ede..9137870ad00f 100644
 > --- a/kernel/kallsyms_internal.h
 > +++ b/kernel/kallsyms_internal.h
-> @@ -13,6 +13,11 @@ extern const char kallsyms_token_table[];
+> @@ -12,6 +12,7 @@ extern const unsigned int kallsyms_num_syms;
+>  extern const char kallsyms_token_table[];
 >  extern const u16 kallsyms_token_index[];
 >
+> +extern const unsigned int kallsyms_marker_shift;
 >  extern const unsigned int kallsyms_markers[];
-> -extern const u8 kallsyms_seqs_of_names[];
-> +
-> +/* Although constant, size is volatile for better code generation. */
-> +extern struct {
-> +       volatile unsigned int size;     /* 24 or 32 */
-> +       unsigned char offs[];           /* int:24[] or int:32[] */
-> +} kallsyms_offs_of_names;
 >
->  #endif // LINUX_KALLSYMS_INTERNAL_H_
+>  /* Although constant, size is volatile for better code generation. */
 > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> index 74db751600b4..930ec27a53c0 100644
+> index 930ec27a53c0..c27aaabccd1b 100644
 > --- a/scripts/kallsyms.c
 > +++ b/scripts/kallsyms.c
-> @@ -403,7 +403,7 @@ static void sort_symbols_by_name(void)
+> @@ -59,6 +59,8 @@ static unsigned int table_size, table_cnt;
+>  static int all_symbols;
+>  static int pc_relative;
+>  static int verbose;
+> +/* Default to one kallsyms_markers[] entry for each 256 symbols */
+> +static unsigned long marker_shift =3D 8;
 >
->  static void write_src(void)
->  {
-> -       unsigned int i, k, len, off, seq;
-> +       unsigned int i, k, len, off, off_size, table_size;
->         unsigned int best_idx[256];
->         unsigned int *markers, markers_cnt;
->         unsigned long bin_offset =3D 0;
-> @@ -453,7 +453,7 @@ static void write_src(void)
->                 unsigned char len[2];
+>  static int big_endian; /* Extracted from the elf file */
 >
->                 se =3D table[i];
-> -               se->seq =3D i;
-> +               se->seq =3D off;
+> @@ -441,8 +443,8 @@ static void write_src(void)
+>         stamp("write token table");
 >
->                 /* The length must be less than that of the original symb=
-ol. */
->                 if (!se->len || se->len > KSYM_NAME_LEN)
-> @@ -485,7 +485,7 @@ static void write_src(void)
->                         if ((i & 0xFF) =3D=3D 0)
->                                 markers[i >> 8] =3D off;
+>         /* table of offset markers, that give the offset in the compresse=
+d stream
+> -        * every 256 symbols */
+> -       markers_cnt =3D (table_cnt + 255) / 256;
+> +        * every (1 << marker_shift) (typically 64 or 256) symbols */
+> +       markers_cnt =3D (table_cnt + 255) >> marker_shift;
+
+Should be (table_cnt + (1 << marker_shift) - 1) >> marker_shift.
+
+Otherwise, looks good to me!
+
+>         markers =3D xmalloc(sizeof(*markers) * markers_cnt);
 >
-> -                       printf("\t.byte\t%u", len[0]);
-> +                       printf("\t/* n:%u */\t.byte\t%u", off, len[0]);
+>         output_label("kallsyms_names");
+> @@ -476,14 +478,14 @@ static void write_src(void)
+>                 }
+>
+>                 if (out_bin_file) {
+> -                       if ((i & 0xFF) =3D=3D 0)
+> -                               markers[i >> 8] =3D big_endian ? htobe32(=
+off) : htole32(off);
+> +                       if ((i & ((1u << marker_shift) - 1)) =3D=3D 0)
+> +                               markers[i >> marker_shift] =3D big_endian=
+ ? htobe32(off) : htole32(off);
+>
+>                         fwrite(len, 1, len_len, out_bin_file);
+>                         fwrite(se->sym, 1, se->len, out_bin_file);
+>                 } else {
+> -                       if ((i & 0xFF) =3D=3D 0)
+> -                               markers[i >> 8] =3D off;
+> +                       if ((i & ((1u << marker_shift) - 1)) =3D=3D 0)
+> +                               markers[i >> marker_shift] =3D off;
+>
+>                         printf("\t/* n:%u */\t.byte\t%u", off, len[0]);
 >                         if (len_len =3D=3D 2)
->                                 printf(",%u", len[1]);
->
-> @@ -500,6 +500,7 @@ static void write_src(void)
->                 memcpy(se->sym, buf, se_len + 1);
->         }
->         write_incbin(&bin_offset, off);
-> +       table_size =3D off;
+> @@ -504,6 +506,10 @@ static void write_src(void)
 >         printf(".size kallsyms_names, . - kallsyms_names\n");
 >         printf("\n");
 >
-> @@ -560,7 +561,7 @@ static void write_src(void)
->                                out_bin_file ? '\n' : '\t');
->                 }
->                 if (!out_bin_file)
-> -                       printf("/* %c %s */\n", table[i]->sym[0], table[i=
-]->sym + 1);
-> +                       printf("/* n:%u %c %s */\n", table[i]->seq, table=
-[i]->sym[0], table[i]->sym + 1);
->         }
->         printf(".size kallsyms_offsets, . - kallsyms_offsets\n");
->         printf("\n");
-> @@ -570,23 +571,41 @@ static void write_src(void)
->         sort_symbols_by_name();
->         stamp("sort by name");
+> +       output_label("kallsyms_marker_shift");
+> +       printf("\t.long\t%lu\n" , marker_shift);
+> +       printf("\n");
+> +
+>         output_label("kallsyms_markers");
+>         if (out_bin_file) {
+>                 write_incbin_header("markers", &bin_offset);
+> @@ -926,6 +932,7 @@ static void usage(void)
+>                 "Usage: kallsyms [options] [vmlinux [out.bin]] > out.S\n"
+>                 "       kallsyms --sysmap vmlinux > out.map\n"
+>                 "           --all-symbols     Include all local symbols\n=
+"
+> +               "           --marker-shift=3Dn  Interval between makers (=
+6 =3D> 64, 8 =3D> 256)\n"
+>                 "           --pc-relative     Output symbol offsets\n"
+>                 "           --sysmap=3Dout.map  Text map file\n"
+>                 "           --verbose         Extra diagnostic output\n"
+> @@ -946,21 +953,33 @@ int main(int argc, char **argv)
 >
-> -       output_label("kallsyms_seqs_of_names");
-> -       write_incbin_header("seq_of_names", &bin_offset);
-> +       off_size =3D table_size < (1u << 23) ? 24 : 32;
-> +       output_label("kallsyms_offs_of_names");
-> +       printf("\t.long\t%u\n", off_size);
-> +       write_incbin_header("offs_of_names", &bin_offset);
->         for (i =3D 0; i < table_cnt; i++) {
->                 se =3D table[i];
-> -               seq =3D se->seq;
-> +               off =3D se->seq << 1;
-> +               if (i && se->len =3D=3D table[i - 1]->len &&
-> +                   !memcmp(se->sym + 1, table[i - 1]->sym + 1, se->len -=
- 1))
-> +                       /* Mark that this is a duplicate of the previous =
-symbol */
-> +                       off |=3D 1;
->                 if (out_bin_file) {
-> -                       unsigned int seq_be =3D htobe32(seq);
-> -                       fwrite((char *)&seq_be + 1, 1, 3, out_bin_file);
-> +                       unsigned int off_te =3D big_endian ? htobe32(off)=
- >> (32 - off_size): htole32(off);
-> +                       fwrite(&off_te, 1, off_size / 8 , out_bin_file);
->                 } else {
-> -                       /* The three spaces before the tab line up the co=
-mments */
-> -                       printf("\t.byte\t%u,%u,%u   \t/* %8d %c %s */\n",
-> -                               seq >> 16, (seq >> 8) & 0xff, seq & 0xff,
-> -                               seq, se->sym[0], se->sym + 1);
-> +                       if (off_size =3D=3D 32) {
-> +                               printf("\t.long\t%#4x", off);
-> +                       } else {
-> +                               if (big_endian)
-> +                                       off =3D __builtin_bswap32(off) >>=
- 8;
-> +                               /* The trailing three spaces line up the =
-comments */
-> +                               printf("\t.byte\t%u,%u,%u   ",
-> +                                       off & 0xff, (off >> 8) & 0xff, of=
-f >> 16);
-> +                       }
-> +                       printf("\t/* n:%-8d %c %s */\n",
-> +                               se->seq, se->sym[0], se->sym + 1);
->                 }
->         }
-> -       write_incbin(&bin_offset, table_cnt * 3);
-> -       printf(".size kallsyms_seqs_of_names, . - kallsyms_seqs_of_names\=
-n");
-> +       write_incbin(&bin_offset, table_cnt * (off_size / 8));
-> +       /* Add a terminator without the 'duplicate' flag. */
-> +       if (off_size =3D=3D 24)
-> +               printf("\t.byte\t0,0,0\n");
-> +       else
-> +               printf("\t.long\t0\n");
-> +       printf(".size kallsyms_offs_of_names, . - kallsyms_offs_of_names\=
-n");
+>         while (1) {
+>                 static const struct option long_options[] =3D {
+> -                       {"all-symbols",     no_argument, &all_symbols,   =
+  1},
+> -                       {"pc-relative",     no_argument, &pc_relative,   =
+  1},
+> -                       {"sysmap",    optional_argument, NULL,           =
+'s'},
+> -                       {"verbose",         no_argument, &verbose,       =
+  1},
+> +                       {"all-symbols",        no_argument, &all_symbols,=
+     1},
+> +                       {"marker-shift", required_argument, NULL,        =
+   'm'},
+> +                       {"pc-relative",        no_argument, &pc_relative,=
+     1},
+> +                       {"sysmap",       optional_argument, NULL,        =
+   's'},
+> +                       {"verbose",            no_argument, &verbose,    =
+     1},
+>                         {},
+>                 };
 >
->         stamp("write name index");
+> -               int c =3D getopt_long(argc, argv, "", long_options, NULL)=
+;
+> -
+> -               if (c =3D=3D -1)
+> +               switch (getopt_long(argc, argv, "", long_options, NULL)) =
+{
+> +               case -1:
+>                         break;
+> -               if (c =3D=3D 's')
+> +               case 0:
+> +                       continue;
+> +               case 'm':
+> +                       if (!optarg[0])
+> +                               continue;
+> +                       marker_shift =3D strtoul(optarg, NULL, 10);
+> +                       if (marker_shift > 24)
+> +                               usage();
+> +                       continue;
+> +               case 's':
+>                         sysmap =3D optarg ?: "";
+> -               else if (c !=3D 0)
+> +                       continue;
+> +               default:
+>                         usage();
+> +               }
+> +               break;
+>         }
+>
+>         stamp(NULL);
+> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> index 44b5a6d78ce5..61cf8f287ebe 100755
+> --- a/scripts/link-vmlinux.sh
+> +++ b/scripts/link-vmlinux.sh
+> @@ -37,6 +37,10 @@ is_enabled() {
+>         grep -q "^$1=3Dy" include/config/auto.conf
+>  }
+>
+> +value() {
+> +       sed -n "/^$1=3D/{s///;p;q}" include/config/auto.conf
+> +}
+> +
+>  # Nice output in kbuild format
+>  # Will be suppressed by "make -s"
+>  info()
+> @@ -140,6 +144,8 @@ kallsyms()
+>                 kallsymopt=3D"${kallsymopt} --pc-relative"
+>         fi
+>
+> +       kallsymopt=3D"${kallsymopt} --marker-shift=3D$(value CONFIG_KALLS=
+YMS_MARKER_SHIFT)"
+> +
+>         info KSYMS "${2}.S"
+>         scripts/kallsyms ${kallsymopt} ${1:+"${1}" "${2}.bin"} > "${2}.S"
 >
 > --
 > 2.39.5
