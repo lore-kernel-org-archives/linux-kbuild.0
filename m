@@ -1,101 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794666786;
-	b=dxTs6OSCkQk47AlMNdHRad9AjEOQEsYbx9MZqkYpkX9Y8S3ZpVRail70Rk+lGPNXJCHp
-	 MuzYwWZg6C/8XiTam7C11Lhyzx37CHAE738/UFS9CTfl5+elX23MCG+R8PFG7U5H7HllM
-	 lmnVmu/gjkFRsJbqtNaPlAIyAnt+64359Rg3imgfaLYSpPdkZZLgE7LgUApptRoUtuPHr
-	 zU1an/90Q50mmLufk4I5UE2Y2EE2/H+TB7Ez9BzINY9iypfnyBdeV83ZIoy0/XsxrO5CC
-	 pIJmEdgj54TxWlnOOga6diVOfMU+7fialrAKfVefmZSAU+X83TzpCmkRZPCqI8Q90Og==
+	t=1794667402;
+	b=hwu+b6qtmgMmLMsC6Jp00Xs8QwTLeWysypshbD7FnHGJfcoMg58fY5Xch/oJZvMZUUwa
+	 ubU0wP8+ZbomgwYGfgd8BOIyfjU3KWQ4yCrVncjeGp0ZT3Lsfr5sUvIaxPA/v5GF3QdMt
+	 ytNZQwIVKG4jx4ewC4HJnWc5I9Pbp2AjzonmOKGesk62tbyqucb4RGD5hbxuT5Ob7SZHS
+	 EOC+22Jka9YvF7eHlZmI04mba/U/S6jw5xMEpUNQSVBoJk6kz9om21jNmFfa0ANlqxtne
+	 s8TzS7Am6jnOmu10PeDqNnboaPb1tl88b87xm34Kdr8hSfeX/ASWNfqd/cZtmuvXqdA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794666786;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:X-Mailer:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=zZTHArb7/cDEOGGmixdYHyste9bMwihASbVf49eSoI4=;
-	b=m85g5fR34Fm/UG64UB6A05CMp6xVlWfb9bJ6ZTng1uffJsTmeMXKbA5aOMhmjJkmSMVC
-	 M+lHHVC87Gpczdbs3rzjVpWqNxM74oyAvaLvt1MogI8i0yUKRnheELeA0d7rZYDJvSOkY
-	 FqML0fpYzhf6ADvIy3e3AWQDkRxFDyv18Ih84h0kL89e9Og9AcTaNi9D7hL+XzsUiWvJZ
-	 YrS98Ixo54Wi+XUnacIKgw7PLJ/5X+LQthHqfC/zPtSmPehJHgCbp/0nPSK3UqOP7GsON
-	 ZGQRFAthvjaoyqJa4qUCA4uGcwL+U2kwoBVBfQRwEx56J1RDegL0CxKb4oOOPBGq0+w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794667402;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=DHvb0rX14VD3+BLmmVcyRb1OFLTsx+6h+sMOxp0D5OM=;
+	b=2l+S/6iqD6BqMAfAw6sYO+FFCVlZ5SME8HUFNxtudZXPuMv9KpUARFYkBoUCvFhwuDh9
+	 H3i0Riyvr/eG4UGFrBlcdiG1hYAPrmzH+Be+gdLjg7MfKEEauk9mS9jRANo92h9cDZzXG
+	 7eCAeG/1bkvPYVNu+ld4LHErGpQXksVuNdNEdMIP2esiwMqShCg20ppKLI4dYi1JTra8p
+	 YqMtSCJ2WjMTcEGqokeuCCUsow3s0v7RuXhlP4cgAc1c6XYhxem4qi5pXBGB38lEa9gfy
+	 wkQ3w0cfs4yPX0K5MzwwPJtyfSAf4kSZd51pqS8PiIIZFlhvBFGkkBKuRVjJTrCfYBQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=o3UL23wO;
-	arc=none smtp.remote-ip=209.85.128.48
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HOiv39gM;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A032606A329
-	for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 14:33:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A032606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1480606A329;
+	Sat, 14 Nov 2026 14:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=o3UL23wO
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a9a8d6cea8so20082635e9.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 14 Nov 2026 06:33:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794666784; x=1795271584; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=zZTHArb7/cDEOGGmixdYHyste9bMwihASbVf49eSoI4=;
-        b=o3UL23wOoojCCtw099LOef2o6FXVCYwfWYdM+YI1ELuwWae0ZY5CRolxwTnSJwqRo6
-         tbmG7+Rxxvu7K+Xqs5BLB3WcVEs3MzYOF9EXviq05ByDs/kG4OheQ3+y71A0hUo+HVd6
-         Eyr4xE6/uhsBTxt3gWXOtnN1bRczoxfiaKwMj2ow7adwVjJoWGJ1Z7bJgjFYxAYXQq+Z
-         NNJahNh/iFfyTdhBEZsOABZe6f3g05zsZj5vT/hTlCYUgzzzKDM8gQbCEBp0wgkUBpG2
-         fgn6OgovIRBTzLaHd10nD8jN2N8xl0Mrmw4MHrnqFr/sXmdQvxxe5FwyH0GoDA9It/rc
-         PquA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794666784; x=1795271584;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=zZTHArb7/cDEOGGmixdYHyste9bMwihASbVf49eSoI4=;
-        b=ovN3/RKSSyba1ymnX+e7+I8XHaG0r+gEsDEFry6LUr6lyjCp7w28j2RYqRodE1k/ey
-         N4T+guNygYWxW9nyJOQ51MGKmBTDd6bPNhTBnaJqxyFqOxhAz82mjyo0bVHK/uPway4d
-         T0BRgBCgayJhS137fKRZFxvoKFEGC5cSuSxlerLSjtykIgtDxCnbdZ4Tr9CwZ29EFLTx
-         k0ZWprOlnq0dwMr5fjOzlK+z9cnISyj+MzAKtSPfxXuITuURxVgqUkpproXggcAp7gIL
-         kkNd01A5bZQSPs7ZE4HolVdZmZ9I/YnCGqArRWdM8vA4ns2qqszkGzgNwZAKVuwuOPpF
-         ghbQ==
-X-Forwarded-Encrypted: i=1; AL+hErGDGIVfNf0exvrst2c4zJ2MZuT5NsWENuu32CUafsmQqnJlXtqftmvK6oQ/K+f0aEL6VR02KxISxwYjuHk=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9fI6LXUSg+VX8a0bZ2/e+PbJNhlp7j/LFt7XaUKkGuEwF513Sf
-	Kpzjz5Xvb+JrzE5fo74es3QXIm0b+J2zXZnCr4Cwutd/Px5hyBA2V95g
-X-Gm-Gg: AYBFou3edKr707iSnlfiOd4/uCnRLQ8QIGCe47CZL4L7FpPo25w39x33Mu0n/Wp5h+G
-	v9eJC5M+kaHFoq4WpjYb6SEZ3A83WfI54q3tM+R4idq+9684XuxzlwP0BjilTKHcPicM198J5cH
-	M8OBl+lM9e8PkR87zLNip4/7HfTF1UBvikKcsQNntyfjOzTBDEgmamG8dRSNFlZjnLXB/Ai454T
-	U5iJEBKMXarPd9PyB68f749cSIiKAl9K5QKNCJ38TOjhruAWyfu39d+xX0/vNdsYRPmF9wJLIu3
-	eOV3+0XsfjsAhWUb4j83oKvRaM3wGdHXvsRWSCUoWzxpG3rbqI4sMBc17BHJsncZzlFgvgUgbSV
-	YZX1L8IIsGH4UAQLHWO0heyqWmPS8bo/EAACxc/t0JcXmgwaZR3IdjbdTQTIBLGOYH0By5pq7qo
-	ihYlf5feJcQiIg2TeVn0dHKq0Iucs7ft9V5FeYTABoEy0d3PseLhTvj66VrN6M+xT7cY6Ty9GY0
-	FaBEZHPYSXGMtpaCAXBWY+j1g/yi3lGVA7FI1bqT7qcsLet3tgHrEbzVDzLN6SmbC+fFEkkh5X6
-	H11wyJM8MkN6HRmxYxjQHf/HAnxpxWSNfqDQxuK0vUVPnpx9iDE0+nvEYy2xP/puYw==
-X-Received: by 2002:a05:600c:4691:b0:4bb:5e8c:13bc with SMTP id 5b1f17b1804b1-4bb5e8c13e4mr80850505e9.7.1794666784523;
-        Sat, 14 Nov 2026 06:33:04 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb56fa1062sm95802815e9.5.2026.11.14.06.33.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Nov 2026 06:33:04 -0800 (PST)
-Date: Sat, 14 Nov 2026 14:33:02 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: sashiko-bot@kernel.org
-Cc: sashiko-reviews@lists.linux.dev, "Petr Mladek" <pmladek@suse.com>, "Kees
- Cook" <kees@kernel.org>, linux-kbuild@vger.kernel.org, bpf@vger.kernel.org,
- "Jim Cromie" <jim.cromie@gmail.com>, "Lorenzo Stoakes" <ljs@kernel.org>,
- "Luis Chamberlain" <mcgrof@kernel.org>, "Andrey Grodzovsky"
- <andrey.grodzovsky@crowdstrike.com>, "Steven Rostedt"
- <rostedt@goodmis.org>, "Andrii Nakryiko" <andrii@kernel.org>, "Samuel Wu"
- <wusamuel@google.com>, nathan@kernel.org, nsc@kernel.org
-Subject: Re: [PATCH v3 next 05/13] kallsyms: Fix selftest startup delay
-Message-ID: <20261114143302.3eb7125d@pumpkin>
-In-Reply-To: <sashiko-outbox-208986@kernel.org>
-References: <20261111115911.1142000-1-david.laight.linux@gmail.com>
-	<20261111115911.1142000-6-david.laight.linux@gmail.com>
-	<sashiko-outbox-208986@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HOiv39gM
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C85531F000C4;
+	Sat, 14 Nov 2026 14:43:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794667402;
+	bh=DHvb0rX14VD3+BLmmVcyRb1OFLTsx+6h+sMOxp0D5OM=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=HOiv39gMvRlm/XnJpSgXFc2eC9q5WzQ/JLo8ga+t1+Znyq9yWWiqgtGviU0wt0P1K
+	 NYzT4zu8P4o1tjdMptcjJRUMGiuN92PQIdvi9hOGtYCfSh+3cBVpEReRVQNct1Gf6v
+	 28KLUnaQshKhWghfVCou87ysVfB0Xicz2JUBf5s2KcV9OEXvrwa/IO9xcqtyWL0882
+	 w0VvPPEdgWRa23jN1dBOG6H0Gnh8HeD802jVbtOXYLqaTSo3DgoFdBLB8zFFzD0o7E
+	 +lHWdM5rwVoHrL9sen4rnynN/pBjmCVrxTKqEQlWeiK4XIwwoRqAedx7r4syqs2gQV
+	 AxXGXeHbdjg0w==
+Message-ID: <sashiko-outbox-214645@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] module: Add LZ4 module compression
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Paul Menzel" <pmenzel@molgen.mpg.de>, "Luis Chamberlain" <mcgrof@kernel.org>, "Petr
+ Pavlu" <petr.pavlu@suse.com>, "Daniel Gomez" <da.gomez@kernel.org>, "Sami
+ Tolvanen" <samitolvanen@google.com>, "Aaron Tomlin" <atomlin@atomlin.com>, "Nathan
+ Chancellor" <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Nick
+ Terrell" <terrelln@fb.com>, "David Sterba" <dsterba@suse.com>
+Cc: linux-modules@vger.kernel.org, linux-kbuild@vger.kernel.org
+In-Reply-To: <20261113144233.193782-1-pmenzel@molgen.mpg.de>
+References: <20261113144233.193782-1-pmenzel@molgen.mpg.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 14 Nov 2026 14:43:21 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -104,45 +62,102 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Wed, 11 Nov 2026 12:36:03 +0000
-sashiko-bot@kernel.org wrote:
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [Medium] module: int retval overflow and truncation in
+  module_lz4_decompress()
+- [Low] module: 0-byte LZ4 frame causes vmap() -ENOMEM in
+  module_lz4_decompress()
+--
 
-> Thank you for your contribution! Sashiko AI review found 1 potential
-> issue to consider:
-> - [Low] kallsyms: missing Fixes trailer on selftest startup delay fix
-> --
+commit 5ec28e23c9b1ef7c279c61b63187aad310dbdc6c
+Author: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Missed because it isn't worth backporting.
+module: Add LZ4 module compression
 
-David
+This commit adds build and in-kernel decompression support for LZ4-compress=
+ed
+kernel modules (.ko.lz4).
 
-> 
-> commit 06f0c3fe023ccc28da9c2bd9798921899fb0ec63
-> Author: David Laight <david.laight.linux@gmail.com>
-> 
-> > kallsyms: Fix selftest startup delay
-> >
-> > The kallsym_selftest code clearly intends to sleep until initialisation
-> > is complete in order to get more reproducable timings.
-> >
-> > Replace the schedule_timeout() calls with schedule_timeout_idle()
-> > so that the thread actually sleeps.
-> > Poll every second (not every 5) for SYSTEM_RUNNING and then wait
-> > another 10 seconds before starting the tests, otherwise the tests
-> > start as soon an init is executed.
-> >
-> > This code is in the initial 2022 import of the tests.
-> >
-> > Signed-off-by: David Laight <david.laight.linux@gmail.com>  
-> 
-> [Severity: Low]
-> Since this fixes the broken schedule_timeout() call from the initial
-> selftest import, should it include:
-> 
->   Fixes: 30f3bb09778d ("kallsyms: Add self-test facility")
-> 
+Link: https://github.com/kmod-project/kmod/pull/505 [1]
 
+> diff --git a/kernel/module/decompress.c b/kernel/module/decompress.c
+> index cce098671be97..5828b7ec9d7b6 100644
+> --- a/kernel/module/decompress.c
+> +++ b/kernel/module/decompress.c
+
+[ ... ]
+
+> +static int module_lz4_verify_content(struct load_info *info, size_t tota=
+l,
+> +				     u32 expected)
+> +{
+> +	void *data;
+> +	u32 csum;
+> +
+> +	data =3D vmap(info->pages, info->used_pages, VM_MAP, PAGE_KERNEL_RO);
+> +	if (!data)
+> +		return -ENOMEM;
+> +	csum =3D xxh32(data, total, 0);
+> +	vunmap(data);
+> +
+> +	if (csum !=3D expected) {
+> +		pr_err("LZ4-compressed data is corrupt (content checksum)\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+
+[Severity: Low]
+What happens here when an LZ4 frame decompresses to 0 bytes?
+
+Unlike the gzip, xz and zstd decompressors, which allocate a page before
+starting the loop, module_lz4_decompress() only calls module_get_next_page()
+inside module_lz4_copy_out() while len is non-zero.  An empty LZ4 frame hits
+the zero block_size end mark with info->used_pages =3D=3D 0, so vmap() in
+module_lz4_verify_content() (and in module_decompress() when content
+checksums are disabled) returns NULL and fails with -ENOMEM instead of
+rejecting the empty module.
+
+> +
+> +static ssize_t module_lz4_decompress(struct load_info *info,
+> +				     const void *buf, size_t size)
+> +{
+> +	const u8 *in =3D buf, *end =3D in + size, *desc;
+> +	size_t block_max, total =3D 0, dict_len =3D 0;
+> +	u64 content_size =3D 0;
+> +	u8 *scratch, *out;
+> +	bool linked;
+> +	u8 flg, bd;
+> +	int retval;
+
+[ ... ]
+
+> +	if ((flg & LZ4F_FLG_CONTENT_SIZE) && content_size !=3D total) {
+> +		pr_err("LZ4-compressed data has a wrong content size\n");
+> +		retval =3D -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	retval =3D total;
+> +	goto out;
+
+[Severity: Medium]
+Can assigning total to int retval overflow or truncate the decompressed siz=
+e?
+
+module_lz4_decompress() returns ssize_t, but retval is declared as int.  If=
+ a
+highly compressible LZ4 frame expands to 2 GiB or more, assigning size_t
+total to retval either overflows into a negative non-errno value returned
+from finit_module() or truncates the upper 32 bits on 64-bit systems, leavi=
+ng
+info->len smaller than the vmap()'d pages in info->hdr.  Declaring retval as
+ssize_t (like module_gzip_decompress() and module_xz_decompress()) and
+bounding total would avoid this.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261113144233.1937=
+82-1-pmenzel@molgen.mpg.de?part=3D1
