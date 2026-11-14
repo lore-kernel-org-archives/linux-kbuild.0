@@ -1,61 +1,71 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794682958;
-	b=t/BCl8AqRD3ob1xgSxeOi7rbiEsmeWJSkYrDasvkMWe88NDbrkt4+rfYiKc4zYLHaPAC
-	 uNpnxUFXDIYxswVhCawB1EXfkrbosnkGZJCzzp1UZ3hIBgLC4t24unMX3JfsIp7VOSWTG
-	 e6vHUGGHhxq7+vorUMcjzP2yafKL6/QYuwAvYyQj1rYKyBFtfDo0MZ/YKC/G7N19wbgk2
-	 sS+nt02IAhbJINXJHaotIh7d6bAX+hZehiuEetGIwYrLlfkkWYOVR27zbhH+xGZJffOfs
-	 F8tIbzkvRN1qT9PH0CYLR2I4KPure9Z/vLeMwnDLf6ckrbqJvM1cCRuYAMn7DpdZbnw==
+	t=1794690592;
+	b=ic/duQZ2DZWBiXyOS/ZFKGE29Seo4IwnwLhN1ji1MluQesZoWnmozCnz+EBz4e67Dipv
+	 p9tkk4MRC3WrpwiBVnncWwz3g0pthSU4ykFKZssMsJ9/YRM5OXsD3dr6pWP7drlQONzQ1
+	 BPraZu1ny8r277lD597DKRSXUv+P+JxVWqX+LoMaHMihbGenKKKZQpb3dADMHtHCegei9
+	 5okDYXcJ+fttfGhSJ4RYoOtfXny/hgiskifn5R95thVJlFNxd8DWkmGwvUWufEVPWNu2Y
+	 YEUIKxbCWLQ9xdjh0lf2afbeLeh0FcYZKUnvsDySItuL/0OOXOnjsd5iotY5vgCvCuQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794682958;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=IrA16pSRjyjc9pdru+9oO56IkBoLOh4h6uxCuoJG8KY=;
-	b=Uu4cF9KrgxSXrABIv0yqIO9gwtYnV+kaRATptKbMJO+W5q6LUfANoDvqRAwzrE5JQwtp
-	 lJ7/iwOmrYjCsATdZYXH8RU2zqsTUzRQMKJBym0PAls3B3a8a1PrsPWvsv4+N75vj6IMg
-	 OOPlTvAOaqCtl5y4ejS4VEqRJ9IlXScH18zXSW6WHAz5m0E5gfAKeAqZXM3bjI5qbKT+n
-	 u5VRlWWOVHfi/59XrzDO/XL+CBgCS4mIP3YbcwFVQOYobt5DfSJDcZ1dpBj1a3NascWdF
-	 o1a2cFZvVduRXGySnmh1XtIZNvrg4INI77Lj5L8npT0AXLV7BenHnbBajPAg/JuTDoA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794690592;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=/31kFSZ+eRDqgUopjz+B5MGJf8WSI3fqeWtC2wOjRVg=;
+	b=WBa+oOWdEQ6N3T2uN6T/t93e7PW8uISVEbGl7JyxNjFoAwCSKv32UWw3IrClf9Ik7rH9
+	 ZIrvnOYj1pBnfM3R9elUi/lZS+hwIuPTzVRoBJTTf+dpv6aZNASMp3vgnDKCLzRqchC92
+	 EPnnR1i1Y5APIlnzpMtXLd1D6Ufku8tH81xlfEV6Lgr/7dwb9wuMRSLEBdMAwGDQEWnf2
+	 s6w1iu7DNqcC6R1wVLVL1MWOIGkWnaVL1MECKgzKy4M8JAsKqmmbft55Og6dewYLfxesQ
+	 toHws9Y5R7hGZe5d8iEF7rpJ4EIu7y2FEUMfJadVcdpxja1eGBYkEYifD/DbqUCDzwQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OuwIE8Lw;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gLrvfee6;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 4F052606A887;
-	Sat, 14 Nov 2026 19:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AC9606A327;
+	Sat, 14 Nov 2026 21:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OuwIE8Lw
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 7B5251F000C4;
-	Sat, 14 Nov 2026 19:02:37 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gLrvfee6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B32E1F000C4;
+	Sat, 14 Nov 2026 21:09:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794682958;
-	bh=IrA16pSRjyjc9pdru+9oO56IkBoLOh4h6uxCuoJG8KY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OuwIE8Lw4NMGx/GpWugWuMuALFAo9gDIDLSECCmRs7weKUB7W/8lF1sm7Vtc5Zz7h
-	 xO5dl2TGKNxCAE4mQ7MgBTweoGzQCVP2X7Dwa+XTi4OZy8PS5cWElmv0S7G4xJU7uY
-	 4vnGlL8j1V6wEQ53omqIeld4byrUbChxsPJSY7FRoX0ckWVtEdOmOdplwvqmoDMf6P
-	 EnWuf6iTQaOgQgp3qIP8vMHB2RuS9gJFsSv/7WRQQGA2et43tY5/oiPa9t9vC7USYi
-	 ojHJRNwwIEpJ/v2nedw82QsVHWoSTB6kYMOSgk7vd8xNUCQEDZPg0aQx6NYppSfbca
-	 x586xng328Xqg==
-Date: Sat, 14 Nov 2026 20:02:09 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: =?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	n.schier@fritz.com
-Subject: Re: [PATCH] kbuild: depmod: fallback to
- /boot/System.map-KERNELRELEASE
-Message-ID: <aviwMdFX5CpBfB0Y@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20261016111106.221542-1-adriangarciacasado42@gmail.com>
- <20261016-lyrical-original-woodlouse-3cfb2c@l-nschier-aarch64>
- <179392018201.309869.11526061626002654500.b4-reply@b4>
+	s=k20260515; t=1794690591;
+	bh=/31kFSZ+eRDqgUopjz+B5MGJf8WSI3fqeWtC2wOjRVg=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=gLrvfee6AkBl57/USM6tcT5dTfBUc47KM6dfZZv4eC6svKeay4goXE1Pa5xpQ3xuw
+	 UgwpsVbFzJgz8VhYbGbPtbAo3AZnl32nJyaGzHwi+NZRbrsfRX1vtZcGvT6bqeSuww
+	 OT23yAtvmtXJUNut2RNwTjH1fJNlYW+gxIsKD2JNsvOjqPx3+FnOM1UIVOeJC6kGM+
+	 gB50e6tuBVkNj8+UxyAMtpY90RsvgcuGsEo+XthzZTna2KYiFqCR7ZG5cbGCtF+KMp
+	 vuPi8fG9c+aEHiXMs4YfBG+Cl02K0nv76QGva+ldiPUz3NfpFGxBxsGGdlkgBV17DD
+	 iPIMy0cZa1WYw==
+Message-ID: <sashiko-outbox-215033@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC PATCH v2 2/5] kbuild: fit: Support selecting DTBs and
+ config properties from a file
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Douglas Anderson" <dianders@chromium.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Konrad
+ Dybcio" <konradybcio@kernel.org>
+Cc: "Julius Werner" <jwerner@chromium.org>, "Michal Simek" <michal.simek@amd.com>,
+ =?utf-8?b?QW5kcsOpIERyYXN6aWs=?= <andre.draszik@linaro.org>, "Simon Glass" <sjg@chromium.org>, "Peter
+ Griffin" <peter.griffin@linaro.org>, linux-kbuild@vger.kernel.org, "Tudor
+ Ambarus" <tudor.ambarus@linaro.org>, "Chen-Yu Tsai" <wenst@chromium.org>, "Will
+ Deacon" <will@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, Devicetree@vger.kernel.org, "Catalin
+ Marinas" <catalin.marinas@arm.com>, "Nicolas Schier" <nsc@kernel.org>, "Saravana
+ Kannan" <saravanak@kernel.org>, "Brian Norris" <briannorris@chromium.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Jonathan Corbet" <corbet@lwn.net>, "Josh
+ Poimboeuf" <jpoimboe@kernel.org>, =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>, "Manuel
+ Ebner" <manuelebnerli@mailbox.org>, "Marco Elver" <elver@google.com>, "Mark
+ Rutland" <mark.rutland@arm.com>, "Mauro Carvalho Chehab" <mchehab+huawei@kernel.org>,
+ =?utf-8?b?UGV0ZXIgWmlqbHN0cmEgKEludGVsKQ==?= <peterz@infradead.org>, "Randy
+ Dunlap" <rdunlap@infradead.org>, "Rong Xu" <xur@google.com>, "Shuah Khan" <skhan@linuxfoundation.org>
+In-Reply-To: <20261113130858.RFC.v2.2.I5cd8aab4380bc4cfd302c4e4708af58c43370715@changeid>
+References: <20261113210918.356261-1-dianders@chromium.org>
+ <20261113130858.RFC.v2.2.I5cd8aab4380bc4cfd302c4e4708af58c43370715@changeid>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 14 Nov 2026 21:09:49 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -64,115 +74,132 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <179392018201.309869.11526061626002654500.b4-reply@b4>
 
-On Thu, Nov 05, 2026 at 04:09:42PM -0700, Nathan Chancellor wrote:
-> On 2026-10-16 16:22 +0200, Nicolas Schier wrote:
-> > On Fri, Oct 16, 2026 at 01:11:06PM +0200, Adrián García Casado wrote:
-> > > When installing external modules (M=...) against packaged kernel headers
-> > > such as linux-headers built via 'make bindeb-pkg', ${objtree}/System.map
-> > > is absent because System.map is located in:
-> > > /boot/System.map-${KERNELRELEASE}
-> > > 
-> > > Currently, scripts/depmod.sh only checks ${objtree}/System.map and skips
-> > > running depmod with a warning, leaving newly installed out-of-tree
-> > > modules unindexed in modules.dep.
-> > > 
-> > > Fall back to ${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE} when
-> > > ${objtree}/System.map is not readable so that depmod runs properly
-> > > during external module installation.
-> > > 
-> > > Signed-off-by: Adrián García Casado <adriangarciacasado42@gmail.com>
-> > > ---
-> > >  scripts/depmod.sh | 13 +++++++++----
-> > >  1 file changed, 9 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/scripts/depmod.sh b/scripts/depmod.sh
-> > > index 3c34fecac..d6d1b9547 100755
-> > > --- a/scripts/depmod.sh
-> > > +++ b/scripts/depmod.sh
-> > > @@ -12,9 +12,14 @@ KERNELRELEASE=$1
-> > >  
-> > >  : ${DEPMOD:=depmod}
-> > >  
-> > > -if ! test -r "${objtree}/System.map" ; then
-> > > -	echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
-> > > -	exit 0
-> > > +system_map="${objtree}/System.map"
-> > > +if ! test -r "${system_map}" ; then
-> > > +	if test -r "${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}" ; then
-> > > +		system_map="${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}"
-> > > +	else
-> > > +		echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
-> > > +		exit 0
-> > > +	fi
-> > >  fi
-> > >  
-> > >  # legacy behavior: "depmod" in /sbin, no /sbin in PATH
-> > > @@ -25,7 +30,7 @@ if [ -z $(command -v $DEPMOD) ]; then
-> > >  	exit 0
-> > >  fi
-> > >  
-> > > -set -- -ae -F "${objtree}/System.map"
-> > > +set -- -ae -F "${system_map}"
-> > >  if test -n "$INSTALL_MOD_PATH"; then
-> > >  	set -- "$@" -b "$INSTALL_MOD_PATH"
-> > >  fi
-> > > -- 
-> > > 2.39.5
-> > > 
-> > 
-> > Thanks for report and patch.
-> > 
-> > For the record, this is what I can find in Debian's Linux packages:
-> > 
-> > Debian puts a dummy System.map to /lib/modules/$(KERNELVER)/System.map 
-> > (linux-image-$(KVER)-$(DEBVER)-$(ARCH).deb) and the real System.map is 
-> > only available in linux-image-$(KVER)-$(DEBVER)-$(ARCH)-dbg package 
-> > at /usr/lib/debug/lib/modules/$(KVER)-$(ARCH)/System.map.
-> > 
-> > So, do we need a valid System.map for out-of-tree modules?
-> 
-> Yeah, how does this work for the main Debian packages? Do they just not
-> expecte modules.dep to be generated for external modules if System.map
-> is not in a standard location? Or maybe nobody cares?
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [Medium] kbuild: fit: leading ./ in FIT_CONFIG_DTBS breaks
+  Makefile.dtbs matching
+- [Medium] kbuild: fit: basename lookup in _process_dtbs() breaks O=3D
+  subdir DTBs
+--
 
-Supplying '-F ../path/to/System.map -e' to depmod enables checking all
-installed modules for unresolved symbols.  The in-tree scripts/depmod.sh
-wrapper script always adds '-e -F ${objtree}/System.map', or fails if
-System.map is not there (cp. report above).  Debian installs a dummy
-/boot/System.map-${KVER}, but that will not be used automatically by
-anything (as far as I can see).
+commit 7793aa0a3f31c2e79bf996dd2bb1dcd0d8affc8c
+Author: Douglas Anderson <dianders@chromium.org>
 
-Thus, AFAIK System.map is required only for checking against unresolved
-symbols in the just installed kernel modules, whether they are built
-in-tree or out-of-tree.
+kbuild: fit: Support selecting DTBs and config properties from a file
 
-> > At a first glance, you patch looks good to me.  But lets way some days 
-> > for other feedback.
-> 
-> I don't have a particular opinion on this patch other than maybe this is
-> being patched in the wrong place? Perhaps we should be fixing this in
-> scripts/package/install-extmod-build? scripts/package/PKGBUILD copies
-> System.map to its external module build folder already.
-> scripts/package/kernel.spec copies it to /lib/modules/<rel>, not
-> /lib/modules/<rel>/build. Unifying those in in install-extmod-build
-> would avoid having to change it here (since /boot/System.map-<rel> seems
-> like a Debian-ism that we are hard coding here). I trust your judgement
-> though.
+This commit adds support for a FIT_CONFIG make variable pointing to a
+.fitconfig file that selects which DTBs to build and include in image.fit
+and sets properties or subnodes on /configurations/conf-N nodes.
 
-Yeah, I think you're right: we should fix in install-extmod-build and
-unify the install for all packaging targets by putting System.map to the
-build directory, as that's where scripts/depmod.sh expects to find it.
+> diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
+> index c4e4663902844..cc14fc905ea3b 100644
+> --- a/scripts/Makefile.dtbs
+> +++ b/scripts/Makefile.dtbs
+> @@ -5,6 +5,15 @@ all-dtb :=3D $(dtb-y) $(dtb-)
+>  # If CONFIG_OF_ALL_DTBS is enabled, all DT blobs are built
+>  dtb-$(CONFIG_OF_ALL_DTBS) +=3D $(dtb-)
+> =20
+> +# If FIT_CONFIG is specified, restrict $(dtb-y) to only the DTBs listed =
+in
+> +# $(FIT_CONFIG_FILE).
+> +ifdef FIT_CONFIG_FILE
+> +ifneq ($(filter arch/$(SRCARCH)/boot/dts%, $(obj)),)
+> +dtb-y :=3D $(filter $(all-dtb), \
+> +	$(patsubst $(obj)/%, %, $(filter $(obj)/%, $(FIT_CONFIG_DTBS))))
+> +endif
+> +endif
+> +
+>  # Composite DTB (i.e. DTB constructed by overlay)
+>  multi-dtb-y :=3D $(call multi-search, $(dtb-y), .dtb, -dtbs)
+>  # Primitive DTB compiled from *.dts
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 19e96b30a122f..e08e35d4ed747 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -427,8 +427,33 @@ quiet_cmd_fit =3D FIT     $@
+>  		--name '$(UIMAGE_NAME)' $(FIT_EXTRA_ARGS) \
+>  		$(if $(findstring 1,$(KBUILD_VERBOSE)),-v) \
+>  		$(if $(FIT_DECOMPOSE_DTBS),--decompose-dtbs) \
+> +		$(if $(FIT_CONFIG_FILE),--config $(FIT_CONFIG_FILE)) \
+>  		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^)
+> =20
+> +# If FIT_CONFIG is specified on the command line (either relative to $(s=
+rctree)
+> +# or relative to arch/$(SRCARCH)/boot/dts/), locate that file and extrac=
+t the
+> +# list of .dtb files to build.
+> +ifdef FIT_CONFIG
+> +FIT_CONFIG_REL :=3D $(firstword $(patsubst $(abs_srctree)/%,%,\
+> +	$(patsubst $(srctree)/%,%,$(patsubst ./%,%,$(wildcard \
+> +	$(FIT_CONFIG) \
+> +	$(srctree)/$(FIT_CONFIG) \
+> +	$(srctree)/arch/$(SRCARCH)/boot/dts/$(FIT_CONFIG))))))
+> +ifeq ($(FIT_CONFIG_REL),)
+> +$(error FIT_CONFIG '$(FIT_CONFIG)' not found)
+> +endif
+> +FIT_CONFIG_FILE :=3D $(srctree)/$(FIT_CONFIG_REL)
+> +ifndef FIT_CONFIG_DTBS
+> +export FIT_CONFIG_DTBS :=3D $(addprefix $(dir $(FIT_CONFIG_REL)), \
+> +	$(shell $(MAKE_FIT) -C $(FIT_CONFIG_FILE) --list-dtbs))
+> +$(if $(FIT_CONFIG_DTBS),,$(error Failed to parse DTB list from $(FIT_CON=
+FIG_FILE)))
+> +endif
 
-I am preparing a patch for that.
+[Severity: Medium]
+Does $(dir $(FIT_CONFIG_REL)) prepend a leading ./ to every entry in
+FIT_CONFIG_DTBS when FIT_CONFIG points to a file in the root of $(srctree)?
 
-Thanks!
+When FIT_CONFIG_REL has no slash (or when FIT_CONFIG is passed with a
+leading ./ in an out-of-tree build so $(patsubst ./%,%,...) runs before
+$(srctree)/ is stripped), $(dir $(FIT_CONFIG_REL)) evaluates to ./.  In
+scripts/Makefile.dtbs, $(filter $(obj)/%, $(FIT_CONFIG_DTBS)) compares
+against $(obj) without a leading ./, so nothing matches, dtb-y is cleared
+across all DTS directories, and no DTBs are built.  Stripping ./ from
+$(dir $(FIT_CONFIG_REL)) and running $(patsubst ./%,%,...) after stripping
+$(srctree)/ and $(abs_srctree)/ would avoid this.
 
+[ ... ]
 
--- 
-Nicolas
+> diff --git a/scripts/make_fit.py b/scripts/make_fit.py
+> index 9bd35aa721191..0c0af80426411 100755
+> --- a/scripts/make_fit.py
+> +++ b/scripts/make_fit.py
+
+[ ... ]
+
+> @@ -322,9 +397,20 @@ def _process_dtbs(args, fsw, entries, fdts):
+> =20
+>      # First figure out the unique DTB files that need compression
+>      todo =3D []
+> -    file_info =3D []  # List of (fname, model, compat, files) tuples
+> +    file_info =3D []  # List of (fname, model, compat, files, props) tup=
+les
+> +
+> +    if args.config:
+> +        config =3D parse_config(args.config)
+> +        by_name =3D {os.path.basename(fn): fn for fn in args.dtbs}
+> +        config_dir =3D os.path.dirname(args.config)
+> +        dtb_configs =3D [
+> +            (by_name.get(dtb, os.path.join(config_dir, dtb)), props)
+> +            for dtb, props in config.items()
+> +        ]
+> +    else:
+> +        dtb_configs =3D [(fname, {}) for fname in args.dtbs]
+
+[Severity: Medium]
+Will by_name.get(dtb, ...) always miss in out-of-tree (O=3D) builds when a
+.fitconfig section header includes a subdirectory path such as
+[google/lga-blazer.dtb]?
+
+by_name is keyed by os.path.basename(fn), so any dtb key containing a
+slash never matches and falls back to os.path.join(config_dir, dtb).
+Because scripts/Makefile.lib sets FIT_CONFIG_FILE in $(srctree),
+config_dir points into the source tree rather than $(objtree) where the
+compiled .dtb and .dtb.cmd files live, causing process_dtb() to fail with
+FileNotFoundError.  Looking up os.path.basename(dtb) (or matching the
+suffix against args.dtbs) would find the built DTB in $(objtree).
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261113210918.3562=
+61-1-dianders@chromium.org?part=3D2
