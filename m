@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794690592;
-	b=ic/duQZ2DZWBiXyOS/ZFKGE29Seo4IwnwLhN1ji1MluQesZoWnmozCnz+EBz4e67Dipv
-	 p9tkk4MRC3WrpwiBVnncWwz3g0pthSU4ykFKZssMsJ9/YRM5OXsD3dr6pWP7drlQONzQ1
-	 BPraZu1ny8r277lD597DKRSXUv+P+JxVWqX+LoMaHMihbGenKKKZQpb3dADMHtHCegei9
-	 5okDYXcJ+fttfGhSJ4RYoOtfXny/hgiskifn5R95thVJlFNxd8DWkmGwvUWufEVPWNu2Y
-	 YEUIKxbCWLQ9xdjh0lf2afbeLeh0FcYZKUnvsDySItuL/0OOXOnjsd5iotY5vgCvCuQ==
+	t=1794690594;
+	b=12mtXCG7LrJXwLqjtqZ4KRaSwM7eqXyHga5V9WEP7dRAWdnWOrheGmlZTw/jyi4rsBLF
+	 kyybNpyQjNcK7xGODOB8nSCfksYjlqUdqkmB07W4d09KnLybXeLgNU8ax0aM0DcEUr5ry
+	 KgtvE3KvH0pmC7MAegl0VKWvot33bLNCPNnEMnqMpR0dqEAXO5ZAiSuAewxR8rhojiXUX
+	 v1h7+NF1adhNVIYwfme6c7JqtJru0wyevqb4VRwVAeZgcRODRYi6p9k+MOsDB4zE2qNH7
+	 xhwo390vZDZzxktvtSAsEip/3fgT3d1mOY168DU+0/OesDXjOxp/edZbt5Oiz8QkWZw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794690592;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794690594;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=/31kFSZ+eRDqgUopjz+B5MGJf8WSI3fqeWtC2wOjRVg=;
-	b=WBa+oOWdEQ6N3T2uN6T/t93e7PW8uISVEbGl7JyxNjFoAwCSKv32UWw3IrClf9Ik7rH9
-	 ZIrvnOYj1pBnfM3R9elUi/lZS+hwIuPTzVRoBJTTf+dpv6aZNASMp3vgnDKCLzRqchC92
-	 EPnnR1i1Y5APIlnzpMtXLd1D6Ufku8tH81xlfEV6Lgr/7dwb9wuMRSLEBdMAwGDQEWnf2
-	 s6w1iu7DNqcC6R1wVLVL1MWOIGkWnaVL1MECKgzKy4M8JAsKqmmbft55Og6dewYLfxesQ
-	 toHws9Y5R7hGZe5d8iEF7rpJ4EIu7y2FEUMfJadVcdpxja1eGBYkEYifD/DbqUCDzwQ==
+	bh=LPh65sIV6PUIbo3zIpRD+buIIKCEHZbaq/2yXyMObYI=;
+	b=iiSezzyctsjozBjACKo6gNule8OpnYWBjjrfHxPu3YmE2UiG/MO6f8T0xtaSGnaTghpH
+	 V+KyKWY4a8ZG7N9vSJTSwYlQxU5JyqbzKXBkluJUEZSTF6CVMhIYJUY3hop9OaAuB2sh7
+	 7yqvnTSdi9iXwlt3QYeMmfVxlYFwDQ/oLnPuduaJh0eQyqHI80MkTSMV+Z4228zCFSNuB
+	 TtWtaE9xRO5rRr0CTddelG9fJSCYvay6FkqUtAblGWnGsgc76M+aZ2VN+8kueN1Rszks5
+	 B64MddRetBPT1vzKM+ZcBFLUpXEy4EcqxkyvfyJkkze8x1OBjKYJdWVgje6AuRZ8KFA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gLrvfee6;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nEytx9ko;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AC9606A327;
-	Sat, 14 Nov 2026 21:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BB7606A323;
+	Sat, 14 Nov 2026 21:09:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gLrvfee6
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B32E1F000C4;
-	Sat, 14 Nov 2026 21:09:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nEytx9ko
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A96E1F000C5;
+	Sat, 14 Nov 2026 21:09:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794690591;
-	bh=/31kFSZ+eRDqgUopjz+B5MGJf8WSI3fqeWtC2wOjRVg=;
+	s=k20260515; t=1794690593;
+	bh=LPh65sIV6PUIbo3zIpRD+buIIKCEHZbaq/2yXyMObYI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=gLrvfee6AkBl57/USM6tcT5dTfBUc47KM6dfZZv4eC6svKeay4goXE1Pa5xpQ3xuw
-	 UgwpsVbFzJgz8VhYbGbPtbAo3AZnl32nJyaGzHwi+NZRbrsfRX1vtZcGvT6bqeSuww
-	 OT23yAtvmtXJUNut2RNwTjH1fJNlYW+gxIsKD2JNsvOjqPx3+FnOM1UIVOeJC6kGM+
-	 gB50e6tuBVkNj8+UxyAMtpY90RsvgcuGsEo+XthzZTna2KYiFqCR7ZG5cbGCtF+KMp
-	 vuPi8fG9c+aEHiXMs4YfBG+Cl02K0nv76QGva+ldiPUz3NfpFGxBxsGGdlkgBV17DD
-	 iPIMy0cZa1WYw==
-Message-ID: <sashiko-outbox-215033@kernel.org>
+	b=nEytx9kouZeM48F1z1Y0aL8GdxUiYJgYk6D+C8m0RzqPw824OX1ke50vky+/Xv4S8
+	 XhsjcvOYvUzW7zG0Br/pYzZEhqRatnQnRjIjLJxYGy6omsAfnw78AHDekEotTnJxPH
+	 wTYXFXdga41g+Q7f9/sB94Hv/gt2CgeUhU8e+Z/IlZPMNKvhDVmahTd9XiiqA2zO7b
+	 7Zf5FgW3FmHol1gejs4F5CQpPHwLDD4zwUBs4p8GLy5hXcoi9nNYM4FqKDalRdE3xH
+	 /bzr/fRUpslDVRoPdppI5i+HFBSaLOEk6/8cURL2hS2e+AwP+bEDuOkpGt1TkH3kAv
+	 tUVPavBFsY8WQ==
+Message-ID: <sashiko-outbox-215034@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 2/5] kbuild: fit: Support selecting DTBs and
- config properties from a file
+Subject: Re: [RFC PATCH v2 3/5] kbuild: fit: Add opt-in FIT_FACTOR_DTBS
+ support using fdtfactor
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Douglas Anderson" <dianders@chromium.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
  Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Konrad
@@ -60,12 +60,12 @@ Cc: "Julius Werner" <jwerner@chromium.org>, "Michal Simek" <michal.simek@amd.com
  Rutland" <mark.rutland@arm.com>, "Mauro Carvalho Chehab" <mchehab+huawei@kernel.org>,
  =?utf-8?b?UGV0ZXIgWmlqbHN0cmEgKEludGVsKQ==?= <peterz@infradead.org>, "Randy
  Dunlap" <rdunlap@infradead.org>, "Rong Xu" <xur@google.com>, "Shuah Khan" <skhan@linuxfoundation.org>
-In-Reply-To: <20261113130858.RFC.v2.2.I5cd8aab4380bc4cfd302c4e4708af58c43370715@changeid>
+In-Reply-To: <20261113130858.RFC.v2.3.I4a691041bb6d31e5ab2fde8cd4139ca72ee72c5b@changeid>
 References: <20261113210918.356261-1-dianders@chromium.org>
- <20261113130858.RFC.v2.2.I5cd8aab4380bc4cfd302c4e4708af58c43370715@changeid>
+ <20261113130858.RFC.v2.3.I4a691041bb6d31e5ab2fde8cd4139ca72ee72c5b@changeid>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 14 Nov 2026 21:09:49 +0000
+Date: Sat, 14 Nov 2026 21:09:52 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -75,131 +75,85 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 2 potential
-issues to consider:
-- [Medium] kbuild: fit: leading ./ in FIT_CONFIG_DTBS breaks
-  Makefile.dtbs matching
-- [Medium] kbuild: fit: basename lookup in _process_dtbs() breaks O=3D
-  subdir DTBs
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] kbuild: fit: incomplete __local_fixups__ on composite DTBs
+  with FIT_FACTOR_DTBS
 --
 
-commit 7793aa0a3f31c2e79bf996dd2bb1dcd0d8affc8c
+commit b1fb21de907c618079fb42ef4673839c84598f6a
 Author: Douglas Anderson <dianders@chromium.org>
 
-kbuild: fit: Support selecting DTBs and config properties from a file
+kbuild: fit: Add opt-in FIT_FACTOR_DTBS support using fdtfactor
 
-This commit adds support for a FIT_CONFIG make variable pointing to a
-.fitconfig file that selects which DTBs to build and include in image.fit
-and sets properties or subnodes on /configurations/conf-N nodes.
+This commit adds opt-in support for factoring DTBs inside a compiled FIT
+image into shared base DTBs and per-board overlays using fdtfactor when
+FIT_FACTOR_DTBS is set.
 
 > diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
-> index c4e4663902844..cc14fc905ea3b 100644
+> index cc14fc905ea3b..bc0c62617a7c2 100644
 > --- a/scripts/Makefile.dtbs
 > +++ b/scripts/Makefile.dtbs
-> @@ -5,6 +5,15 @@ all-dtb :=3D $(dtb-y) $(dtb-)
->  # If CONFIG_OF_ALL_DTBS is enabled, all DT blobs are built
->  dtb-$(CONFIG_OF_ALL_DTBS) +=3D $(dtb-)
+> @@ -126,6 +126,14 @@ DTC_FLAGS +=3D -Wnode_name_chars_strict \
+>               -Wunique_unit_address
+>  endif
 > =20
-> +# If FIT_CONFIG is specified, restrict $(dtb-y) to only the DTBs listed =
-in
-> +# $(FIT_CONFIG_FILE).
-> +ifdef FIT_CONFIG_FILE
+> +# When FIT_FACTOR_DTBS is set, pass -@ -L to dtc so the built DTBs retai=
+n the
+> +# /__symbols__ and /__local_fixups__ nodes required by fdtfactor.
+> +ifneq ($(FIT_FACTOR_DTBS),)
 > +ifneq ($(filter arch/$(SRCARCH)/boot/dts%, $(obj)),)
-> +dtb-y :=3D $(filter $(all-dtb), \
-> +	$(patsubst $(obj)/%, %, $(filter $(obj)/%, $(FIT_CONFIG_DTBS))))
+> +DTC_FLAGS +=3D -@ -L
 > +endif
 > +endif
 > +
->  # Composite DTB (i.e. DTB constructed by overlay)
->  multi-dtb-y :=3D $(call multi-search, $(dtb-y), .dtb, -dtbs)
->  # Primitive DTB compiled from *.dts
+>  DTC_FLAGS +=3D $(DTC_FLAGS_$(target-stem))
+> =20
+>  # Set -@ if the target is a base DTB that overlay is applied onto
 > diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 19e96b30a122f..e08e35d4ed747 100644
+> index e08e35d4ed747..af2d3e5084249 100644
 > --- a/scripts/Makefile.lib
 > +++ b/scripts/Makefile.lib
-> @@ -427,8 +427,33 @@ quiet_cmd_fit =3D FIT     $@
->  		--name '$(UIMAGE_NAME)' $(FIT_EXTRA_ARGS) \
+> @@ -418,6 +418,9 @@ quiet_cmd_uimage =3D UIMAGE  $@
+>  # ----------------------------------------------------------------------=
+-----
+> =20
+>  MAKE_FIT :=3D $(srctree)/scripts/make_fit.py
+> +# External fdtfactor tool from upstream dtc (requires matching pylibfdt)
+> +FDTFACTOR ?=3D fdtfactor
+> +FDTFACTOR_ARGS ?=3D --strip-local-fixups
+> =20
+>  # Use this to override the compression algorithm
+>  FIT_COMPRESSION ?=3D gzip
+> @@ -428,7 +431,9 @@ quiet_cmd_fit =3D FIT     $@
 >  		$(if $(findstring 1,$(KBUILD_VERBOSE)),-v) \
 >  		$(if $(FIT_DECOMPOSE_DTBS),--decompose-dtbs) \
-> +		$(if $(FIT_CONFIG_FILE),--config $(FIT_CONFIG_FILE)) \
->  		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^)
-> =20
-> +# If FIT_CONFIG is specified on the command line (either relative to $(s=
-rctree)
-> +# or relative to arch/$(SRCARCH)/boot/dts/), locate that file and extrac=
-t the
-> +# list of .dtb files to build.
-> +ifdef FIT_CONFIG
-> +FIT_CONFIG_REL :=3D $(firstword $(patsubst $(abs_srctree)/%,%,\
-> +	$(patsubst $(srctree)/%,%,$(patsubst ./%,%,$(wildcard \
-> +	$(FIT_CONFIG) \
-> +	$(srctree)/$(FIT_CONFIG) \
-> +	$(srctree)/arch/$(SRCARCH)/boot/dts/$(FIT_CONFIG))))))
-> +ifeq ($(FIT_CONFIG_REL),)
-> +$(error FIT_CONFIG '$(FIT_CONFIG)' not found)
-> +endif
-> +FIT_CONFIG_FILE :=3D $(srctree)/$(FIT_CONFIG_REL)
-> +ifndef FIT_CONFIG_DTBS
-> +export FIT_CONFIG_DTBS :=3D $(addprefix $(dir $(FIT_CONFIG_REL)), \
-> +	$(shell $(MAKE_FIT) -C $(FIT_CONFIG_FILE) --list-dtbs))
-> +$(if $(FIT_CONFIG_DTBS),,$(error Failed to parse DTB list from $(FIT_CON=
-FIG_FILE)))
-> +endif
+>  		$(if $(FIT_CONFIG_FILE),--config $(FIT_CONFIG_FILE)) \
+> -		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^)
+> +		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^) \
+> +		$(if $(FIT_FACTOR_DTBS),&& $(FDTFACTOR) $(FDTFACTOR_ARGS) \
+> +			$(if $(findstring 1,$(KBUILD_VERBOSE)),-s) -F $@)
 
 [Severity: Medium]
-Does $(dir $(FIT_CONFIG_REL)) prepend a leading ./ to every entry in
-FIT_CONFIG_DTBS when FIT_CONFIG points to a file in the root of $(srctree)?
+As reported by Simon Glass on RFC [1], can composite DTBs built via
+cmd_fdtoverlay reach fdtfactor with incomplete /__local_fixups__ when
+FIT_FACTOR_DTBS=3D1 is used without FIT_DECOMPOSE_DTBS=3D1?
 
-When FIT_CONFIG_REL has no slash (or when FIT_CONFIG is passed with a
-leading ./ in an out-of-tree build so $(patsubst ./%,%,...) runs before
-$(srctree)/ is stripped), $(dir $(FIT_CONFIG_REL)) evaluates to ./.  In
-scripts/Makefile.dtbs, $(filter $(obj)/%, $(FIT_CONFIG_DTBS)) compares
-against $(obj) without a leading ./, so nothing matches, dtb-y is cleared
-across all DTS directories, and no DTBs are built.  Stripping ./ from
-$(dir $(FIT_CONFIG_REL)) and running $(patsubst ./%,%,...) after stripping
-$(srctree)/ and $(abs_srctree)/ would avoid this.
+Although DTC_FLAGS passes -@ -L to dtc for the base .dtb and .dtbo inputs,
+fdt_overlay_apply() in the in-tree scripts/dtc/libfdt/fdt_overlay.c merges
+__overlay__ and __symbols__ into the target DTB without merging the
+overlay's /__local_fixups__.  When FIT_DECOMPOSE_DTBS is not set,
+make_fit.py packs those composite .dtb blobs into image.fit, leaving
+fdtfactor without local fixup entries for phandle properties originating
+from the overlays.
 
-[ ... ]
+Until in-tree libfdt preserves overlay /__local_fixups__, should
+FIT_FACTOR_DTBS imply --decompose-dtbs (or reject composite DTBs when
+FIT_DECOMPOSE_DTBS is not enabled)?
 
-> diff --git a/scripts/make_fit.py b/scripts/make_fit.py
-> index 9bd35aa721191..0c0af80426411 100755
-> --- a/scripts/make_fit.py
-> +++ b/scripts/make_fit.py
-
-[ ... ]
-
-> @@ -322,9 +397,20 @@ def _process_dtbs(args, fsw, entries, fdts):
-> =20
->      # First figure out the unique DTB files that need compression
->      todo =3D []
-> -    file_info =3D []  # List of (fname, model, compat, files) tuples
-> +    file_info =3D []  # List of (fname, model, compat, files, props) tup=
-les
-> +
-> +    if args.config:
-> +        config =3D parse_config(args.config)
-> +        by_name =3D {os.path.basename(fn): fn for fn in args.dtbs}
-> +        config_dir =3D os.path.dirname(args.config)
-> +        dtb_configs =3D [
-> +            (by_name.get(dtb, os.path.join(config_dir, dtb)), props)
-> +            for dtb, props in config.items()
-> +        ]
-> +    else:
-> +        dtb_configs =3D [(fname, {}) for fname in args.dtbs]
-
-[Severity: Medium]
-Will by_name.get(dtb, ...) always miss in out-of-tree (O=3D) builds when a
-.fitconfig section header includes a subdirectory path such as
-[google/lga-blazer.dtb]?
-
-by_name is keyed by os.path.basename(fn), so any dtb key containing a
-slash never matches and falls back to os.path.join(config_dir, dtb).
-Because scripts/Makefile.lib sets FIT_CONFIG_FILE in $(srctree),
-config_dir points into the source tree rather than $(objtree) where the
-compiled .dtb and .dtb.cmd files live, causing process_dtb() to fail with
-FileNotFoundError.  Looking up os.path.basename(dtb) (or matching the
-suffix against args.dtbs) would find the built DTB in $(objtree).
+[1] https://lore.kernel.org/r/CAFLszTh6vmFGVD4_Reewe9p4QqQjN=3DCVJ3SgfQKosA=
+hedJpAQA@mail.gmail.com
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261113210918.3562=
-61-1-dianders@chromium.org?part=3D2
+61-1-dianders@chromium.org?part=3D3
