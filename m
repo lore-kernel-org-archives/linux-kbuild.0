@@ -1,71 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.107.87.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794690594;
-	b=12mtXCG7LrJXwLqjtqZ4KRaSwM7eqXyHga5V9WEP7dRAWdnWOrheGmlZTw/jyi4rsBLF
-	 kyybNpyQjNcK7xGODOB8nSCfksYjlqUdqkmB07W4d09KnLybXeLgNU8ax0aM0DcEUr5ry
-	 KgtvE3KvH0pmC7MAegl0VKWvot33bLNCPNnEMnqMpR0dqEAXO5ZAiSuAewxR8rhojiXUX
-	 v1h7+NF1adhNVIYwfme6c7JqtJru0wyevqb4VRwVAeZgcRODRYi6p9k+MOsDB4zE2qNH7
-	 xhwo390vZDZzxktvtSAsEip/3fgT3d1mOY168DU+0/OesDXjOxp/edZbt5Oiz8QkWZw==
+	t=1794736799;
+	b=JBOF0je7M4INlaQ26PnTWuz76DXn3OiOLCEtfQIBNxGNdK91nPtx+IS3pf6uqpPj0ZAS
+	 c0ODQpKfWLkex4JdvCqkmRXfSoDoE4Bycb3NoZDvfJWSUDSSX7TuLq32zW1d8NRRSAEqX
+	 Se8UvjDIHctlb1adP1wD2PAJKo6vxoE0xZsILr14iPLCA4cFEPpIcG53Qd6pAuIZxyAl9
+	 5maAFZlQjnA9GPq5OloWWy39HGHssAq4b9PR/SQS+nXlxadjkWWeviRBICbWFP4tffmKl
+	 AYgfYHUyGoq0xtaawJInyECb6L1jxOQR6WJQgZuxTDTy61mL3XQAcDrHAW6wLKwMRhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794690594;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=LPh65sIV6PUIbo3zIpRD+buIIKCEHZbaq/2yXyMObYI=;
-	b=iiSezzyctsjozBjACKo6gNule8OpnYWBjjrfHxPu3YmE2UiG/MO6f8T0xtaSGnaTghpH
-	 V+KyKWY4a8ZG7N9vSJTSwYlQxU5JyqbzKXBkluJUEZSTF6CVMhIYJUY3hop9OaAuB2sh7
-	 7yqvnTSdi9iXwlt3QYeMmfVxlYFwDQ/oLnPuduaJh0eQyqHI80MkTSMV+Z4228zCFSNuB
-	 TtWtaE9xRO5rRr0CTddelG9fJSCYvay6FkqUtAblGWnGsgc76M+aZ2VN+8kueN1Rszks5
-	 B64MddRetBPT1vzKM+ZcBFLUpXEy4EcqxkyvfyJkkze8x1OBjKYJdWVgje6AuRZ8KFA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794736799;
+	h=DMARC-Filter:Received:Received:Received:Received:DKIM-Filter:
+	 DKIM-Signature:X-Virus-Scanned:Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type;
+	bh=+DXmqs0E676ODKybrV6QyE/W3Q8TgRTJUTKm1ALuxQg=;
+	b=dfw6yz/GverNkqXHF8d7weReckuYXimIq7Gn/8qOq6YRoRn1QWicWf/Tp4Uv9+Rf1yf6
+	 SulSghjIpG51juCdjxa3+Dq/UKcXhgCgSyuMmpZxCur/Sths2DzS2+fFlbJAzDlwA9GQo
+	 nkGvma8R77LtD7v93yfeSixr88S3XRJbIszmR/uL/SmiSLjvY+ruDarkmJleWM8Rv3u94
+	 UkAXFZbncU70WcMrWQp34DYxpQ21LleGVRIZFUiHvSGdQ7WhV5UqT2w03meIYizhIh525
+	 JaxylIquTUmndFG2I8rTxSa+W+QrWlu862JHtW8HzxiiE4ulLJ5ItueSqZXp1ZOpG0A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nEytx9ko;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=tngtech.com;
+	spf=pass smtp.mailfrom=tngtech.com;
+	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=B3YJey0e;
+	arc=none smtp.remote-ip=34.107.87.41
+Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BB7606A323;
-	Sat, 14 Nov 2026 21:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4FA606A31E
+	for <linux-kbuild@vger.kernel.org>; Sun, 15 Nov 2026 09:59:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7E4FA606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nEytx9ko
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A96E1F000C5;
-	Sat, 14 Nov 2026 21:09:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794690593;
-	bh=LPh65sIV6PUIbo3zIpRD+buIIKCEHZbaq/2yXyMObYI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=nEytx9kouZeM48F1z1Y0aL8GdxUiYJgYk6D+C8m0RzqPw824OX1ke50vky+/Xv4S8
-	 XhsjcvOYvUzW7zG0Br/pYzZEhqRatnQnRjIjLJxYGy6omsAfnw78AHDekEotTnJxPH
-	 wTYXFXdga41g+Q7f9/sB94Hv/gt2CgeUhU8e+Z/IlZPMNKvhDVmahTd9XiiqA2zO7b
-	 7Zf5FgW3FmHol1gejs4F5CQpPHwLDD4zwUBs4p8GLy5hXcoi9nNYM4FqKDalRdE3xH
-	 /bzr/fRUpslDVRoPdppI5i+HFBSaLOEk6/8cURL2hS2e+AwP+bEDuOkpGt1TkH3kAv
-	 tUVPavBFsY8WQ==
-Message-ID: <sashiko-outbox-215034@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 3/5] kbuild: fit: Add opt-in FIT_FACTOR_DTBS
- support using fdtfactor
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Douglas Anderson" <dianders@chromium.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Konrad
- Dybcio" <konradybcio@kernel.org>
-Cc: "Julius Werner" <jwerner@chromium.org>, "Michal Simek" <michal.simek@amd.com>,
- =?utf-8?b?QW5kcsOpIERyYXN6aWs=?= <andre.draszik@linaro.org>, "Simon Glass" <sjg@chromium.org>, "Peter
- Griffin" <peter.griffin@linaro.org>, linux-kbuild@vger.kernel.org, "Tudor
- Ambarus" <tudor.ambarus@linaro.org>, "Chen-Yu Tsai" <wenst@chromium.org>, "Will
- Deacon" <will@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>, Devicetree@vger.kernel.org, "Catalin
- Marinas" <catalin.marinas@arm.com>, "Nicolas Schier" <nsc@kernel.org>, "Saravana
- Kannan" <saravanak@kernel.org>, "Brian Norris" <briannorris@chromium.org>, "Alice
- Ryhl" <aliceryhl@google.com>, "Jonathan Corbet" <corbet@lwn.net>, "Josh
- Poimboeuf" <jpoimboe@kernel.org>, =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>, "Manuel
- Ebner" <manuelebnerli@mailbox.org>, "Marco Elver" <elver@google.com>, "Mark
- Rutland" <mark.rutland@arm.com>, "Mauro Carvalho Chehab" <mchehab+huawei@kernel.org>,
- =?utf-8?b?UGV0ZXIgWmlqbHN0cmEgKEludGVsKQ==?= <peterz@infradead.org>, "Randy
- Dunlap" <rdunlap@infradead.org>, "Rong Xu" <xur@google.com>, "Shuah Khan" <skhan@linuxfoundation.org>
-In-Reply-To: <20261113130858.RFC.v2.3.I4a691041bb6d31e5ab2fde8cd4139ca72ee72c5b@changeid>
-References: <20261113210918.356261-1-dianders@chromium.org>
- <20261113130858.RFC.v2.3.I4a691041bb6d31e5ab2fde8cd4139ca72ee72c5b@changeid>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 14 Nov 2026 21:09:52 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=B3YJey0e
+Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 43AF23FF28;
+	Sun, 15 Nov 2026 10:59:46 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 1D29D1F8BCF;
+	Sun, 15 Nov 2026 10:59:46 +0100 (CET)
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id OFpZ-9ZfGYwf; Sun, 15 Nov 2026 10:59:40 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 908A21FB945;
+	Sun, 15 Nov 2026 10:59:40 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 908A21FB945
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1794736780;
+	bh=+DXmqs0E676ODKybrV6QyE/W3Q8TgRTJUTKm1ALuxQg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=B3YJey0eTik0zgpxV7OkLlxQVJWr/Xxs/PnszGzv4GzYO5S2jcePFjURXEKazudVq
+	 sFhdAn4+wAsHO6lui+sQbmNuJF26ofrPjEo65Z2p/06gawBU1HTfJA8ojspFn5Zh2g
+	 7zJcqldw0Ynlz/5WCod9cnCwTr8syRRt5/4mULtuGFCxW6tyHehRJNIklGfllszNFw
+	 79VUpf57FTqBEzAXOAqb+8Y+HgE4ZUEWdNW050sVy0YL5WcnjPFQF7hboD0XNP97Ie
+	 FZCmnQ+6R+81yv9o9dMIWevTXGigqiTbi4nuICFdrWHwRPK/dITGEmTg7QQ71zQ7o7
+	 eErLyIXUxINGQ==
+X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 8iiX1pR4RsoN; Sun, 15 Nov 2026 10:59:39 +0100 (CET)
+Received: from [192.168.0.168] (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 7F3101F8BCF;
+	Sun, 15 Nov 2026 10:59:39 +0100 (CET)
+Message-ID: <223d3feb-bf67-4b74-b79c-c86ed6c4109e@tngtech.com>
+Date: Sun, 15 Nov 2026 10:59:37 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -74,86 +74,207 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 6/7] scripts/sbom: use make_prereqs to determine build
+ inputs
+To: sashiko-reviews@lists.linux.dev, nathan@kernel.org, nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org,
+ gregkh@linuxfoundation.org, kstewart@linuxfoundation.org,
+ maximilian.huber@tngtech.com
+References: <20261102202308.3209536-1-luis.augenstein@tngtech.com>
+ <20261102202308.3209536-7-luis.augenstein@tngtech.com>
+ <sashiko-outbox-195988@kernel.org>
+Content-Language: en-US
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+In-Reply-To: <sashiko-outbox-195988@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------GGEae0dYDa3BCbFFkujjys87"
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] kbuild: fit: incomplete __local_fixups__ on composite DTBs
-  with FIT_FACTOR_DTBS
---
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------GGEae0dYDa3BCbFFkujjys87
+Content-Type: multipart/mixed; boundary="------------zxj0c6i483GKp2nfbyC6o6fN";
+ protected-headers="v1"; hp="clear"
+Message-ID: <223d3feb-bf67-4b74-b79c-c86ed6c4109e@tngtech.com>
+Date: Sun, 15 Nov 2026 10:59:37 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 6/7] scripts/sbom: use make_prereqs to determine build
+ inputs
+To: sashiko-reviews@lists.linux.dev, nathan@kernel.org, nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org,
+ gregkh@linuxfoundation.org, kstewart@linuxfoundation.org,
+ maximilian.huber@tngtech.com
+References: <20261102202308.3209536-1-luis.augenstein@tngtech.com>
+ <20261102202308.3209536-7-luis.augenstein@tngtech.com>
+ <sashiko-outbox-195988@kernel.org>
+Content-Language: en-US
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+In-Reply-To: <sashiko-outbox-195988@kernel.org>
 
-commit b1fb21de907c618079fb42ef4673839c84598f6a
-Author: Douglas Anderson <dianders@chromium.org>
+--------------zxj0c6i483GKp2nfbyC6o6fN
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-kbuild: fit: Add opt-in FIT_FACTOR_DTBS support using fdtfactor
+T24gMTEvMy8yNiAyMToyMywgc2FzaGlrby1ib3RAa2VybmVsLm9yZyB3cm90ZToNCj4gW1Nl
+dmVyaXR5OiBNZWRpdW1dDQo+IE9uIGEgY2xlYW4gYnVpbGQgd2l0aCBDT05GSUdfQkxLX0RF
+Vl9JTklUUkQ9eSwgZG9lcyBDbWRGaWxlLmdldF9kZXBlbmRlbmNpZXMoKQ0KPiBtaXNzIHVz
+ci9kZWZhdWx0X2NwaW9fbGlzdCAob3IgZmlsZXMgZnJvbSBDT05GSUdfSU5JVFJBTUZTX1NP
+VVJDRSkgd2hlbg0KPiBidWlsZGluZyB0aGUgZGVwZW5kZW5jeSBncmFwaCBmb3IgdXNyL2lu
+aXRyYW1mc19kYXRhLmNwaW8/DQo+IA0KPiBJbiB1c3IvTWFrZWZpbGUsICQob2JqKS9pbml0
+cmFtZnNfZGF0YS5jcGlvIGlzIGJ1aWx0IHZpYSAkKGNhbGwNCj4gaWZfY2hhbmdlZCxpbml0
+ZnMpOg0KPiANCj4gICAgLWluY2x1ZGUgJChvYmopLy5pbml0cmFtZnNfZGF0YS5jcGlvLmQN
+Cj4gICAgJChvYmopL2luaXRyYW1mc19kYXRhLmNwaW86ICQoc3JjdHJlZSkvc2NyaXB0cy9n
+ZW5faW5pdHJhbWZzLnNoIFwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNj
+cmlwdHMvZ2VuX2luaXRfY3BpbyAkKGRlcHNfaW5pdHJhbWZzKSBGT1JDRQ0KPiAgICAgICAg
+ICAgICQoY2FsbCBpZl9jaGFuZ2VkLGluaXRmcykNCj4gDQo+IFJhdGhlciB0aGFuIGxpc3Rp
+bmcgJChyYW1mcy1pbnB1dCkgYXMgYSBkaXJlY3QgTWFrZSBwcmVyZXF1aXNpdGUsIHVzci9N
+YWtlZmlsZQ0KPiBwYXNzZXMgaXQgb24gdGhlIGNvbW1hbmQgbGluZSB0byBnZW5faW5pdHJh
+bWZzLnNoLCB3aGljaCB3cml0ZXMgZGVwc19pbml0cmFtZnMNCj4gaW50byB1c3IvLmluaXRy
+YW1mc19kYXRhLmNwaW8uZCB3aGVuIGV4ZWN1dGVkLg0KPiANCj4gT24gYSBjbGVhbiBidWls
+ZCwgdXNyLy5pbml0cmFtZnNfZGF0YS5jcGlvLmQgZG9lcyBub3QgZXhpc3Qgd2hlbiBNYWtl
+IHBhcnNlcw0KPiB1c3IvTWFrZWZpbGUsIHNvICQoZGVwc19pbml0cmFtZnMpIGV4cGFuZHMg
+dG8gZW1wdHkgd2hlbiAkKGNtZC1wcmVyZXFzKSBpcw0KPiByZWNvcmRlZCBpbnRvIG1ha2Vf
+cHJlcmVxc191c3IvaW5pdHJhbWZzX2RhdGEuY3Bpby4gQmVjYXVzZSBpZl9jaGFuZ2VkIGlz
+IHVzZWQNCj4gcmF0aGVyIHRoYW4gaWZfY2hhbmdlZF9kZXAsIHVzci8uaW5pdHJhbWZzX2Rh
+dGEuY3Bpby5jbWQgYWxzbyBoYXMgbm8gZGVwc18NCj4gZW50cnksIGxlYXZpbmcgb25seSBn
+ZW5faW5pdHJhbWZzLnNoIGFuZCBnZW5faW5pdF9jcGlvIGluIG1ha2VfcHJlcmVxc18gKGJv
+dGgNCj4gb2Ygd2hpY2ggYXJlIGZpbHRlcmVkIG91dCBieSBzaG91bGRfaW5jbHVkZV9kZXBl
+bmRlbmN5KCkpLg0KPiANCj4gUHJldmlvdXNseSwgc2F2ZWRjbWRfcGFyc2VyIGV4dHJhY3Rl
+ZCAkKHJhbWZzLWlucHV0KSBmcm9tDQo+IHNhdmVkY21kX3Vzci9pbml0cmFtZnNfZGF0YS5j
+cGlvIHZpYSBfcGFyc2VfZ2VuX2luaXRyYW1mc19jb21tYW5kKCkuIFdpdGggb25seQ0KPiBz
+ZWxmLm1ha2VfcHJlcmVxcyBhbmQgc2VsZi5kZXBzIGluc3BlY3RlZCwgdXNyL2luaXRyYW1m
+c19kYXRhLmNwaW8gaGFzIG5vDQo+IHRyYWNrZWQgaW5wdXQgZGVwZW5kZW5jaWVzIGFmdGVy
+IGEgY2xlYW4gYnVpbGQsIGV2ZW4gdGhvdWdoDQo+IF9nZXRfcHJpbWFyeV9wdXJwb3NlKCkg
+aW4gc2NyaXB0cy9zYm9tL3Nib20vc3BkeF9ncmFwaC9rZXJuZWxfZmlsZS5weSBzdGlsbA0K
+PiBsaXN0cyBkZWZhdWx0X2NwaW9fbGlzdCBhcyBhIHRyYWNrZWQgZGF0YSBmaWxlLg0KDQpB
+Y2tub3dsZWRnZWQuIFRoaXMgaXMgYSByZWFsIGdhcCBmb3IgYSBjbGVhbiBidWlsZCB3aXRo
+IHRoZSBkZWZhdWx0DQppbml0cmFtZnMuIFByZXZpb3VzbHksIHRoZSBjb21tYW5kIHBhcnNl
+cnMgZm91bmQgdGhpcyBkZXBlbmRlbmN5DQpjaGFpbjoNCg0KaW5pdHJhbWZzX2RhdGEubw0K
+ICAgLT4gaW5pdHJhbWZzX2luY19kYXRhDQogICAtPiBpbml0cmFtZnNfZGF0YS5jcGlvDQog
+ICAtPiB1c3IvZGVmYXVsdF9jcGlvX2xpc3QNCg0KVGhlIGxhc3QgZWRnZSB0byB1c3IvZGVm
+YXVsdF9jcGlvX2xpc3QgYXBwZWFycyBpbiBzYXZlZGNtZF8sIGJ1dCBub3QNCmluIG1ha2Vf
+cHJlcmVxc18sIHNvIHRoZSBuZXcgaW1wbGVtZW50YXRpb24gbm8gbG9uZ2VyIHJlY29yZHMg
+aXQgaW4NCnRoZSBTQk9NLg0KDQpUaGUgb2xkIHBhcnNlciB3YXMgYWxzbyBub3QgY29tcGxl
+dGUsIHRob3VnaC4gSXQgb25seSBmb3VuZCB0aGUNCnRvcC1sZXZlbCBDT05GSUdfSU5JVFJB
+TUZTX1NPVVJDRSBhcmd1bWVudCwgbm90IHRoZSBhY3R1YWwgZmlsZXMNCnJlc29sdmVkIGJ5
+IGdlbl9pbml0cmFtZnMuc2guIGdlbl9pbml0cmFtZnMuc2ggd3JpdGVzIHRoZSByZXNvbHZl
+ZA0KZmlsZXMgdG8gdXNyLy5pbml0cmFtZnNfZGF0YS5jcGlvLmQsIGFuZCBNYWtlIGNhbiB1
+c2UgdGhlbSBhcw0KcHJlcmVxdWlzaXRlcyBvbiBzdWJzZXF1ZW50IHJlYnVpbGRzLiBUaGUg
+bmV3IGltcGxlbWVudGF0aW9uIHRoZXJlZm9yZQ0KbWlzc2VzIHRoZSBkZXBlbmRlbmNpZXMg
+b25seSBvbiBjbGVhbiBidWlsZHMuDQoNClRoZSBwcm9wZXIgZml4IHdvdWxkIHByb2JhYmx5
+IGJlIHRvIHB1dCB0aGUgZGVwZW5kZW5jeSBpbmZvcm1hdGlvbg0KZGlyZWN0bHkgaW50byB0
+aGUgaW5pdHJhbWZzX2RhdGEuY3Bpby5jbWQgZmlsZSBpbnN0ZWFkIG9mIGtlZXBpbmcgaXQN
+Cm9ubHkgaW4gdGhlIHNlcGFyYXRlIGN1c3RvbSAuZCBmaWxlLiBnZW5faW5pdHJhbWZzLnNo
+IHdvdWxkIHRoZW4gZW1pdA0KYSBmaXhkZXAtY29tcGF0aWJsZSBkZXBmaWxlLCB0aGUgaW5p
+dHJhbWZzIHJ1bGUgd291bGQgc3dpdGNoIGZyb20NCmlmX2NoYW5nZWQgdG8gaWZfY2hhbmdl
+ZF9kZXAsIGFuZCBmaXhkZXAgd291bGQgZ2VuZXJhdGUgdGhlIGZpbmFsDQouY21kLg0KDQpJ
+IHdvdWxkIG5vdCBzZWUgdGhpcyBhcyBhIGJsb2NraW5nIGlzc3VlIGZvciB0aGlzIHBhdGNo
+IHNlcmllcy4gVGhlDQpvbGQgcGFyc2VyIHdhcyBhbHNvIGluY29tcGxldGUuIFRoZSBwcm9w
+ZXIgZml4IGxpZXMgb3V0c2lkZSB0aGUgU0JPTQ0KdG9vbCBhbmQgd2UgYXJlIG5vdCBhaW1p
+bmcgdG8gYWNoaWV2ZSAxMDAlIGNvbXBsZXRlbmVzcyB3aXRoIHRoaXMNCnBhdGNoIHNlcmll
+cy4NCg0KPiANCj4gW1NldmVyaXR5OiBNZWRpdW1dDQo+IERvZXMgZXhjbHVkaW5nIHIiLipc
+LnBsJCIgaW4gX0NPTVBJTEVEX0VYQ0xVREVfUEFUVEVSTlMgKGFuZCByZW1vdmluZyAucGwg
+ZnJvbQ0KPiB0aGUgc291cmNlIHN1ZmZpeCBsaXN0IGluIF9nZXRfcHJpbWFyeV9wdXJwb3Nl
+KCkpIHVuaW50ZW50aW9uYWxseSBkcm9wDQo+IGNoZWNrZWQtaW4gUGVybGFzbSBjcnlwdG9n
+cmFwaGljIHNvdXJjZSBmaWxlcyBmcm9tIHRoZSBTQk9NPw0KPiANCj4gUGVybCBoZWxwZXIg
+c2NyaXB0cyB1bmRlciBzY3JpcHRzLyBhcmUgYWxyZWFkeSBtYXRjaGVkIGJ5DQo+IHIiXnNj
+cmlwdHMvKD8hbW9kdWxlLWNvbW1vblwuYyQpIi4gT3V0c2lkZSBzY3JpcHRzLywgdGhlIC5w
+bCBmaWxlcyByZWNvcmRlZCBpbg0KPiBtYWtlX3ByZXJlcXNfICh2aWEgaWZfY2hhbmdlZCBp
+biBsaWIvY3J5cHRvL01ha2VmaWxlIGFuZA0KPiBhcmNoL3Bvd2VycGMvY3J5cHRvL01ha2Vm
+aWxlKSBhcmUgUGVybGFzbSBzb3VyY2UgZmlsZXMgdGhhdCBnZW5lcmF0ZSAuUyBmaWxlcw0K
+PiBpbiBvYmpfdHJlZToNCj4gDQo+ICAgIGxpYi9jcnlwdG8vcG93ZXJwYy9hZXNwOC1wcGMu
+cGwNCj4gICAgbGliL2NyeXB0by9wb3dlcnBjL2doYXNocDgtcHBjLnBsDQo+ICAgIGxpYi9j
+cnlwdG8vbWlwcy9wb2x5MTMwNS1taXBzLnBsDQo+ICAgIGxpYi9jcnlwdG8vcmlzY3YvcG9s
+eTEzMDUtcmlzY3YucGwNCj4gICAgYXJjaC9wb3dlcnBjL2NyeXB0by9hZXNwMTAtcHBjLnBs
+DQo+ICAgIGFyY2gvcG93ZXJwYy9jcnlwdG8vZ2hhc2hwMTAtcHBjLnBsDQo+IA0KPiBUaGVz
+ZSAucGwgZmlsZXMgYXJlIHRoZSBodW1hbi13cml0dGVuIHNvdXJjZSBmaWxlcyBjYXJyeWlu
+ZyB0aGUgY29weXJpZ2h0IGFuZA0KPiBTUERYLUxpY2Vuc2UtSWRlbnRpZmllciBoZWFkZXJz
+LCB3aGljaCBhcmUgYWJzZW50IGZyb20gdGhlIGdlbmVyYXRlZCAuUyBmaWxlcy4NCj4gDQo+
+IENvbnZlcnNlbHksIEFXSyBzY3JpcHRzIHN1Y2ggYXMgbGliL3JhaWQvcmFpZDYvdW5yb2xs
+LmF3ayBhbmQNCj4gYXJjaC94ODYvdG9vbHMvY3B1ZmVhdHVyZW1hc2tzLmF3ayBhcmUgaG9z
+dCBidWlsZCBoZWxwZXIgc2NyaXB0cyByYXRoZXIgdGhhbg0KPiBkYXRhIGZpbGVzLCB5ZXQg
+LmF3ayBpcyBub3QgZXhjbHVkZWQgaGVyZSBhbmQgaXMgaW5zdGVhZCBjbGFzc2lmaWVkIGFz
+IGRhdGEgaW4NCj4gX2dldF9wcmltYXJ5X3B1cnBvc2UoKS4gU2hvdWxkIC5hd2sgYmUgZXhj
+bHVkZWQgaW4gX0NPTVBJTEVEX0VYQ0xVREVfUEFUVEVSTlMNCj4gd2hpbGUga2VlcGluZyAu
+cGwgb3V0c2lkZSBzY3JpcHRzLyBjbGFzc2lmaWVkIGFzIHNvdXJjZSBpbg0KPiBfZ2V0X3By
+aW1hcnlfcHVycG9zZSgpPw0KDQpBbHNvIGFja25vd2xlZGdlZC4gU29tZSAucGwgZmlsZXMg
+YXJlIGdlbnVpbmUgc291cmNlIGZpbGVzLCBhbmQgaXQNCndvdWxkIGJlIGNvbnNpc3RlbnQg
+dG8gaW5jbHVkZSB0aGVtLiBIb3dldmVyLCBJIHNlZSBubyBjbGVhciBhdXRvbWF0aWMNCmNy
+aXRlcmlvbiBmb3IgZGlzdGluZ3Vpc2hpbmcgZ2VudWluZSAucGwgc291cmNlcyBmcm9tIGhv
+c3QgaGVscGVyDQpzY3JpcHRzLiBJIHdvdWxkIGtlZXAgdGhlIGdlbmVyYWwgZXhjbHVkZSBy
+dWxlIGJ1dCBpbnRyb2R1Y2UgYSBuZXcNCmluY2x1ZGUgbGlzdCBmb3IgZXhjZXB0aW9ucyB0
+byB0aGUgZ2VuZXJhbCBydWxlIGxpa2UgdGhlIGZpbGVzDQptZW50aW9uZWQgYWJvdmUuDQoN
+CkV4Y2x1ZGluZyAuYXdrIGZpbGVzIGlzIHJlYXNvbmFibGUuIFRoZXkgYWN0IGFzIGhlbHBl
+ciBzY3JpcHRzDQpnZW5lcmF0aW5nIHRoZSBvdXRwdXQgdHlwaWNhbGx5IGJhc2VkIG9uIGFu
+IGFjdHVhbCBzb3VyY2UgZmlsZS4gVGhlDQpTQk9NIHNob3VsZCBpbmNsdWRlIHRoZSBzb3Vy
+Y2UgZmlsZS4gRXhjbHVkaW5nIHRoZSAuYXdrIGlzIG1vcmUNCmNvbnNpc3RlbnQgd2l0aCBl
+eGNsdWRpbmcgb3RoZXIgaGVscGVyIHNjcmlwdHMgYW5kIHRvb2xzLiBJIHdpbGwNCmV4Y2x1
+ZGUgLmF3ayBmaWxlcyBpbiB2NSBvZiB0aGlzIHNlcmllcy4NCg0KPiBbU2V2ZXJpdHk6IE1l
+ZGl1bV0NCj4gQmVjYXVzZSBzaG91bGRfaW5jbHVkZV9kZXBlbmRlbmN5KCkgc3RyaXBzIGVp
+dGhlciBvYmpfdHJlZSBvciBzcmNfdHJlZSBhbmQNCj4gbWF0Y2hlcyBmaWx0ZXJfcGF0aCBh
+Z2FpbnN0IGFsbCBwYXR0ZXJucyBpbiBfQ09NUElMRURfRVhDTFVERV9QQVRURVJOUywgZG8g
+dGhlDQo+IHByZWZpeCBydWxlcyBmb3Igc2NyaXB0cy8sIHRvb2xzLywgYW5kIGFyY2gvW14v
+XSsvdG9vbHMvIGZpbHRlciBvdXQgdHJhY2tlZA0KPiBzb3VyY2UsIGRhdGEsIGFuZCBsaW5r
+ZXIgc2NyaXB0IGlucHV0cz8NCj4gDQo+IEZpcnN0LCByIl5hcmNoL1teL10rL3Rvb2xzLyIg
+aXMgbGlzdGVkIHVuZGVyIHRoZSBjb21tZW50IGZvciBzY3JpcHRzIGFuZCB0b29scw0KPiBp
+biBvYmpfdHJlZSwgYnV0IGFwcGx5aW5nIGl0IHRvIHNyY190cmVlIHBhdGhzIGV4Y2x1ZGVz
+IGFyY2hpdGVjdHVyZSBkYXRhIGFuZA0KPiBzeXNjYWxsIHRhYmxlIGZpbGVzIHVuZGVyIGFy
+Y2gvPGFyY2g+L3Rvb2xzLywgc3VjaCBhczoNCj4gDQo+ICAgIGFyY2gvYXJtNjQvdG9vbHMv
+Y3B1Y2Fwcw0KPiAgICBhcmNoL2FybTY0L3Rvb2xzL3N5c3JlZw0KPiAgICBhcmNoL2FybTY0
+L3Rvb2xzL3N5c2NhbGxfMzIudGJsDQo+ICAgIGFyY2gvYXJtNjQvdG9vbHMvc3lzY2FsbF82
+NC50YmwNCj4gICAgYXJjaC9hcm0vdG9vbHMvc3lzY2FsbC50YmwNCj4gICAgYXJjaC9hcm0v
+dG9vbHMvbWFjaC10eXBlcw0KPiAgICBhcmNoL3NoL3Rvb2xzL21hY2gtdHlwZXMNCj4gDQo+
+IEV2ZW4gdGhvdWdoIF9nZXRfcHJpbWFyeV9wdXJwb3NlKCkgaW4NCj4gc2NyaXB0cy9zYm9t
+L3Nib20vc3BkeF9ncmFwaC9rZXJuZWxfZmlsZS5weSBleHBsaWNpdGx5IGNsYXNzaWZpZXMg
+Y3B1Y2FwcywNCj4gbWFjaC10eXBlcywgc3lzcmVnLCBhbmQgLnRibCBhcyBkYXRhIGZpbGVz
+LCB0aGV5IGFyZSBmaWx0ZXJlZCBvdXQgYmVmb3JlDQo+IHJlYWNoaW5nIEtlcm5lbEZpbGUu
+DQo+IA0KPiBTZWNvbmQsIHIiXnNjcmlwdHMvKD8hbW9kdWxlLWNvbW1vblwuYyQpIiBleGNs
+dWRlcyBzY3JpcHRzL3N5c2NhbGwudGJsIGluDQo+IHNyY190cmVlICh1c2VkIGJ5IHNjcmlw
+dHMvTWFrZWZpbGUuYXNtLWhlYWRlcnMpIGFzIHdlbGwgYXMgc2NyaXB0cy9tb2R1bGUubGRz
+DQo+IGluIG9ial90cmVlIGFuZCBzY3JpcHRzL21vZHVsZS5sZHMuUyBpbiBzcmNfdHJlZSAo
+bGlua2VkIGludG8gZXZlcnkgbG9hZGFibGUNCj4gbW9kdWxlIHZpYSBzY3JpcHRzL01ha2Vm
+aWxlLm1vZGZpbmFsLCBkZXNwaXRlIC5sZHMgYmVpbmcgYWRkZWQgdG8NCj4gX2dldF9wcmlt
+YXJ5X3B1cnBvc2UoKSBpbiB0aGlzIGNvbW1pdCkuDQo+IA0KPiBUaGlyZCwgciJedG9vbHMv
+IiBleGNsdWRlcyBDIGFuZCBoZWFkZXIgZmlsZXMgaW4gc3JjX3RyZWUgdW5kZXIgdG9vbHMv
+bGliL2JwZi8NCj4gKHN1Y2ggYXMgdG9vbHMvbGliL2JwZi9yZWxvX2NvcmUuYywgdG9vbHMv
+bGliL2JwZi9idGZfaXRlci5jLA0KPiB0b29scy9saWIvYnBmL2J0Zl9yZWxvY2F0ZS5jLCBh
+bmQgdG9vbHMvbGliL2JwZi9yZWxvX2NvcmUuaCkgdGhhdCBhcmUgZGlyZWN0bHkNCj4gaW5j
+bHVkZWQgYnkga2VybmVsL2JwZi8qLmMgYW5kIHJlY29yZGVkIGluIGRlcHNfa2VybmVsL2Jw
+Zi8qLm8uDQoNCkFja25vd2xlZGdlZC4gVGhlIGJyb2FkIGRpcmVjdG9yeSBmaWx0ZXJzIGFy
+ZSB0b28gY29hcnNlIGFuZCBjYW4NCmV4Y2x1ZGUgZ2VudWluZSBrZXJuZWwgaW5wdXRzLiBJ
+IHdpbGwga2VlcCB0aGUgZ2VuZXJhbCBleGNsdXNpb25zIGZvcg0KaG9zdCB0b29scyBhbmQg
+aGVscGVyIHNjcmlwdHMsIGJ1dCBhZGQgdGhlIG1lbnRpb25lZCBmaWxlcyB0byB0aGUNCm5l
+dyBpbmNsdWRlIGxpc3QuDQoNCi0tIA0KTHVpcyBBdWdlbnN0ZWluICogbHVpcy5hdWdlbnN0
+ZWluQHRuZ3RlY2guY29tICogKzQ5MTUyMjUyNzU3NjENClRORyBUZWNobm9sb2d5IENvbnN1
+bHRpbmcgR21iSCwgQmV0YS1TdHIuIDEzLCA4NTc3NCBVbnRlcmbDtmhyaW5nDQpHZXNjaMOk
+ZnRzZsO8aHJlcjogRHIuIFJvYmVydCBEYWhsa2UsIFRob21hcyBFbmRyZXMsIE1vcml0eiBQ
+cmlueg0KQXVmc2ljaHRzcmF0c3ZvcnNpdHplbmRlcjogSGVucmlrIEtsYWdnZXMNClNpdHo6
+IFVudGVyZsO2aHJpbmcgKiBSZWdpc3RlcmdlcmljaHQ6IEFtdHNnZXJpY2h0IE3DvG5jaGVu
+ICogDQpIYW5kZWxzcmVnaXN0ZXJudW1tZXI6IEhSQiAxMzUwODINCg0K
 
-This commit adds opt-in support for factoring DTBs inside a compiled FIT
-image into shared base DTBs and per-board overlays using fdtfactor when
-FIT_FACTOR_DTBS is set.
+--------------zxj0c6i483GKp2nfbyC6o6fN--
 
-> diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
-> index cc14fc905ea3b..bc0c62617a7c2 100644
-> --- a/scripts/Makefile.dtbs
-> +++ b/scripts/Makefile.dtbs
-> @@ -126,6 +126,14 @@ DTC_FLAGS +=3D -Wnode_name_chars_strict \
->               -Wunique_unit_address
->  endif
-> =20
-> +# When FIT_FACTOR_DTBS is set, pass -@ -L to dtc so the built DTBs retai=
-n the
-> +# /__symbols__ and /__local_fixups__ nodes required by fdtfactor.
-> +ifneq ($(FIT_FACTOR_DTBS),)
-> +ifneq ($(filter arch/$(SRCARCH)/boot/dts%, $(obj)),)
-> +DTC_FLAGS +=3D -@ -L
-> +endif
-> +endif
-> +
->  DTC_FLAGS +=3D $(DTC_FLAGS_$(target-stem))
-> =20
->  # Set -@ if the target is a base DTB that overlay is applied onto
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index e08e35d4ed747..af2d3e5084249 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -418,6 +418,9 @@ quiet_cmd_uimage =3D UIMAGE  $@
->  # ----------------------------------------------------------------------=
------
-> =20
->  MAKE_FIT :=3D $(srctree)/scripts/make_fit.py
-> +# External fdtfactor tool from upstream dtc (requires matching pylibfdt)
-> +FDTFACTOR ?=3D fdtfactor
-> +FDTFACTOR_ARGS ?=3D --strip-local-fixups
-> =20
->  # Use this to override the compression algorithm
->  FIT_COMPRESSION ?=3D gzip
-> @@ -428,7 +431,9 @@ quiet_cmd_fit =3D FIT     $@
->  		$(if $(findstring 1,$(KBUILD_VERBOSE)),-v) \
->  		$(if $(FIT_DECOMPOSE_DTBS),--decompose-dtbs) \
->  		$(if $(FIT_CONFIG_FILE),--config $(FIT_CONFIG_FILE)) \
-> -		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^)
-> +		--compress $(FIT_COMPRESSION) -k $< @$(word 2,$^) \
-> +		$(if $(FIT_FACTOR_DTBS),&& $(FDTFACTOR) $(FDTFACTOR_ARGS) \
-> +			$(if $(findstring 1,$(KBUILD_VERBOSE)),-s) -F $@)
+--------------GGEae0dYDa3BCbFFkujjys87
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-[Severity: Medium]
-As reported by Simon Glass on RFC [1], can composite DTBs built via
-cmd_fdtoverlay reach fdtfactor with incomplete /__local_fixups__ when
-FIT_FACTOR_DTBS=3D1 is used without FIT_DECOMPOSE_DTBS=3D1?
+-----BEGIN PGP SIGNATURE-----
 
-Although DTC_FLAGS passes -@ -L to dtc for the base .dtb and .dtbo inputs,
-fdt_overlay_apply() in the in-tree scripts/dtc/libfdt/fdt_overlay.c merges
-__overlay__ and __symbols__ into the target DTB without merging the
-overlay's /__local_fixups__.  When FIT_DECOMPOSE_DTBS is not set,
-make_fit.py packs those composite .dtb blobs into image.fit, leaving
-fdtfactor without local fixup entries for phandle properties originating
-from the overlays.
+wsF5BAABCAAjFiEEJzBrWn4qHw5a0jAXeVyKys3c+zQFAmr5gooFAwAAAAAACgkQeVyKys3c+zTF
+cg/9Gu9jc6nvnVSEl3hoLyuq+fI+DmwhLw6U2UsUi91L2RENomb6hIUI9sWls6L0B29TXG6//B+M
+aXDThZcy5vS6yu6OjWYDTYIvepSvowefRhBAQCfGaktf27vnuYd5oJiezRCjJ+jQ9ELlYKoDc1h4
+egFH0DDdGW8QFYIfXN9eiRcS3XM+1I+Jp/Ozt0PpTUcDzGtQ7IGG6CzjZZhZgyAaLAP0HV/BgDdq
+k4DxRy24GtrrI0F4lCoaUY3w1AKkhbTZcFCsZg57Hz4YZXslcVS+R5G5pLGHbBnq1zUvJIW1gsN+
+gRz+RCqSYa0TBFhqN3x1+Hfq/gWN+lzpwozw05PN0+dG9enLBgy21P472+Jewl5irJTwzwJl4RYk
+/XVA8psibffYNvnmomGqJIClw61aoioqtfsCTd6PdCrWAmLg/gI24vq/mf5Sent2I8nXxsTLe6Nn
+tBVJacMwrDoIWgdTNrGukVRKcPcGA7UEUZ81loMaPmSjYtWdBfOhlSvAUffM+kHjUefikhhFtCzc
+YfQtrBgPQ3LHgjULJMXtA382hovWB6cpIsNpKH+lYYyViy6Mj1arJ8F1Xy+UFnxESdS4tJxb1tj3
+TsYWSd6yBIvGfR5DOGhwh6sicFes1jOuRzDZK17baPWDIPmBOrqC/qLngWHjAA4gnUrUk8e1XSxV
++lQ=
+=s6h7
+-----END PGP SIGNATURE-----
 
-Until in-tree libfdt preserves overlay /__local_fixups__, should
-FIT_FACTOR_DTBS imply --decompose-dtbs (or reject composite DTBs when
-FIT_DECOMPOSE_DTBS is not enabled)?
-
-[1] https://lore.kernel.org/r/CAFLszTh6vmFGVD4_Reewe9p4QqQjN=3DCVJ3SgfQKosA=
-hedJpAQA@mail.gmail.com
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261113210918.3562=
-61-1-dianders@chromium.org?part=3D3
+--------------GGEae0dYDa3BCbFFkujjys87--
