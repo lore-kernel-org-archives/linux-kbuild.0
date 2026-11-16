@@ -1,89 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794845527;
-	b=UkprY7fJep6ba8Gy7uQODU+GwwPyrIlIysPQpBEUhYsWDXfgpC9O6KsxlOvSTnhnN+Pr
-	 y0zDNzmqKDJNuPzjQkRceeXxlfo4gtF1ynjRO4j2IeN8qUSgUIXWKCQJFr9plTfOgx8Pr
-	 gOczkHHxjHIsbZKEy2IMBCjFresXe6Tyo98TQxiRlAeQTveU6EmSyGPUBmVSRCvNpNtDf
-	 q2s1ykpeGNQ3bOgG3FBxtQ7FwV0YDMzmjXi1RbQW52b721SsbPVP0MzJK90NGMa13IDk/
-	 LfPApCIjAHwX8+7Q+gKEh4SbzdK+9n5yqK5hWCTIF/J+N1lZ9l9lHsh/tDgJJuckpDA==
+	t=1794845878;
+	b=J2MHuWpVwgskK5ciD+uz/Qja06gpPRYLC6Ib9vq+fTJ8yDpUmDi4WZhA0rV6f1NbJJQr
+	 nhZlWKKgAmCvUsNSNHSuPeE4wjYrI5Y6sjW2sY5wZSSqgoojrIAaYLj4I5YF1DfqERjnS
+	 O+QAfchBqR0IaPh5MO63KRuP+faPNGt1chxXtxnU0fowFgXjlEytEFcbEujsRJVMUkmgw
+	 euihWfPJNqbg11jBVGJgdZwB04/3u4cgQqHY9rwXSVEBtnZy+F+l5WUrEJxiCO68dxdUo
+	 Ja2WmBKFQ2ldML7SmctLmh2smCPNSxpfWLwuzU+fj/e5tVg/BcF29G8feGSnuF7Xg3Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794845527;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	a=rsa-sha256; c=relaxed/relaxed; t=1794845878;
+	h=Received:DKIM-Signature:Date:From:To:Subject:Message-ID:
 	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=eMi9ZFhkE0g9eHaFRZ1y6HmO/hbDG1jboX2Mkur63Xc=;
-	b=I/vP1U6bCzVkQ83x0E3dB//rLTnBWspwpWwXo89gArm9+Aps2rfmIZYaECq8V9ltQ+sf
-	 43GPcxtTb2dyt61M/dhPfzImJx/hbVwemMW0X/duLHqGy3i9tb65wNz/2Du4iSSRzeGSZ
-	 D2+eUdEwcdbbvlU4jIjhuyUduGSD31mTLJI248l7OkyQkaixUPPH2piNlG2p7tvj2YvOr
-	 5tvXgdrU0TdDKkbbrU5nYEh5aQZ82yXABXfFZ5/4QDm+Mexulb7hqHkQO0NA/Cl3RAv7n
-	 QUMFBVXNFdwvmIPWtGQjtV77EbnqXvRL1gqtTdM5EGvwYU8kEataZc4HOxLAI8pzxVQ==
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=SfYOB7Ty0pCYb2nC1eyV5BC3WSCxR60P35W/OeXWh3U=;
+	b=4yzekDj9oMoT5dyNpDhwtESES1JQl1Wqu4ov8S2j6MzwHSjOPcVbRY7BviocERhLjaTx
+	 iQuW6sKy74w1isdETuM/8//+aE+Jw/ou743bCJgd9ciWtF8uaPfO7k6WKxbkuTpbL27JP
+	 isksTSLZ7zGtPR8EiEi3pUnBrhTH8jpq9JVgQ3xBjDhoUTG5L4bQ8r9DGbrmldHIgVQQL
+	 oR4S5mVqnesVYRvSEjKJxAfol4E9mWqcx/LEDlX5NfES8gkmsya3dzOHrhzDvit3tSM4a
+	 /z4XL/tOiVnxj4OBvOFC3KQZdcz++4GffYpKGbySOghOYPuSgjPInx6tMtXBLQjJYrw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yl+l6VZh;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8wTJ9qX;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 60798606A31C;
-	Mon, 16 Nov 2026 16:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id EA58E606A323;
+	Mon, 16 Nov 2026 16:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yl+l6VZh
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 71E221F000C4;
-	Mon, 16 Nov 2026 16:12:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8wTJ9qX
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 151021F000C4;
+	Mon, 16 Nov 2026 16:17:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794845526;
-	bh=eMi9ZFhkE0g9eHaFRZ1y6HmO/hbDG1jboX2Mkur63Xc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Yl+l6VZhpCHqKI1JbRoxDoO7EOngz5CZL1wNeQwFlSc4/hMWB9H2/J+eY2F8l3kqi
-	 0i/R2x7PVkYtcMUZ2hsnuAMRRNs+0+V06VTcIiqRA+QKo5QfIVwXj1iX6TkISspfa4
-	 0AWSA7MH6avwHyWgXAqsAWxKxjQ9petB3706gDv1+0vO0Zn48mXrmRISXxpS6nCNI+
-	 0bb0ZRRMzaipctVput/M4n2ygIEfxmVrGDNekIHaVPRiJV30r/0gcCYhzbz9fkrtoO
-	 MM5Tz50cKlqMQzOQ1KUiCAv0FgHdy+3KuE3qPVAuj6ZuB1jUd0Hq/XNRGaWP26udaT
-	 kCZcZFtr2Zxhw==
-Date: Mon, 16 Nov 2026 17:04:15 +0100
+	s=k20260515; t=1794845877;
+	bh=SfYOB7Ty0pCYb2nC1eyV5BC3WSCxR60P35W/OeXWh3U=;
+	h=Date:From:To:Subject:References:In-Reply-To;
+	b=k8wTJ9qXMAYMMp8fVdyY3tzE5G50vfQuLllT96f9g52tkvYXnS0wOxGXYjR1YZLfm
+	 wAEBSF8wKSjOfzZqrkXw9Mx6TbsxxLC8gNJum08TR6/dEm9iWReHUzVDWPMFIDEocf
+	 AAgiey7T+49cDMcQ0uYToMOrgrF/wkZPsxYAsGFAdEBKZRCqZaO01/ehK/AxEgITPU
+	 6/qDSQnOwbVBBjsK3Fa60WORGs3Ei5cYvZ+Rfh81ewgPbUJOS5Z+iNJQPblCaVxXWe
+	 149SmnehwEskp749QBDUFVzLKi9JnwQ4Bw283pOeuX3AecK9nUq1PG0pYkmHF2LpxP
+	 876PVCjuGUEvw==
+Date: Mon, 16 Nov 2026 17:15:08 +0100
 From: Nicolas Schier <nsc@kernel.org>
-To: "Ahmed S. Darwish" <darwi@linutronix.de>
-Cc: Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 00/10] tools: Introduce a kernel configuration checker
-Message-ID: <avspf8UQmUNskLx-@levanger>
+To: Nathan Chancellor <nathan@kernel.org>,
+	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kbuild: depmod: fallback to
+ /boot/System.map-KERNELRELEASE
+Message-ID: <avssDBUtw0dhlpKT@levanger>
 Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	"Ahmed S. Darwish" <darwi@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Ogness <john.ogness@linutronix.de>,
-	Derek Barbosa <debarbos@redhat.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>,
-	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
-	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20261106091922.7560-1-darwi@linutronix.de>
- <avQNdicGzL3De556@derry.ads.avm.de>
- <avWy2r1BcDatzwo1@lx-t490>
+	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20261016111106.221542-1-adriangarciacasado42@gmail.com>
+ <20261016-lyrical-original-woodlouse-3cfb2c@l-nschier-aarch64>
+ <179392018201.309869.11526061626002654500.b4-reply@b4>
+ <aviwMdFX5CpBfB0Y@levanger>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -93,48 +65,114 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <avWy2r1BcDatzwo1@lx-t490>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aviwMdFX5CpBfB0Y@levanger>
 
-On Thu, Nov 12, 2026 at 01:36:42PM +0100, Ahmed S. Darwish wrote:
-> Hi Nicolas,
+On Sat, Nov 14, 2026 at 08:02:09PM +0100, Nicolas Schier wrote:
+> On Thu, Nov 05, 2026 at 04:09:42PM -0700, Nathan Chancellor wrote:
+> > On 2026-10-16 16:22 +0200, Nicolas Schier wrote:
+> > > On Fri, Oct 16, 2026 at 01:11:06PM +0200, Adrián García Casado wrote:
+> > > > When installing external modules (M=...) against packaged kernel headers
+> > > > such as linux-headers built via 'make bindeb-pkg', ${objtree}/System.map
+> > > > is absent because System.map is located in:
+> > > > /boot/System.map-${KERNELRELEASE}
+> > > > 
+> > > > Currently, scripts/depmod.sh only checks ${objtree}/System.map and skips
+> > > > running depmod with a warning, leaving newly installed out-of-tree
+> > > > modules unindexed in modules.dep.
+> > > > 
+> > > > Fall back to ${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE} when
+> > > > ${objtree}/System.map is not readable so that depmod runs properly
+> > > > during external module installation.
+> > > > 
+> > > > Signed-off-by: Adrián García Casado <adriangarciacasado42@gmail.com>
+> > > > ---
+> > > >  scripts/depmod.sh | 13 +++++++++----
+> > > >  1 file changed, 9 insertions(+), 4 deletions(-)
+> > > > 
+> > > > diff --git a/scripts/depmod.sh b/scripts/depmod.sh
+> > > > index 3c34fecac..d6d1b9547 100755
+> > > > --- a/scripts/depmod.sh
+> > > > +++ b/scripts/depmod.sh
+> > > > @@ -12,9 +12,14 @@ KERNELRELEASE=$1
+> > > >  
+> > > >  : ${DEPMOD:=depmod}
+> > > >  
+> > > > -if ! test -r "${objtree}/System.map" ; then
+> > > > -	echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
+> > > > -	exit 0
+> > > > +system_map="${objtree}/System.map"
+> > > > +if ! test -r "${system_map}" ; then
+> > > > +	if test -r "${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}" ; then
+> > > > +		system_map="${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}"
+> > > > +	else
+> > > > +		echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
+> > > > +		exit 0
+> > > > +	fi
+> > > >  fi
+> > > >  
+> > > >  # legacy behavior: "depmod" in /sbin, no /sbin in PATH
+> > > > @@ -25,7 +30,7 @@ if [ -z $(command -v $DEPMOD) ]; then
+> > > >  	exit 0
+> > > >  fi
+> > > >  
+> > > > -set -- -ae -F "${objtree}/System.map"
+> > > > +set -- -ae -F "${system_map}"
+> > > >  if test -n "$INSTALL_MOD_PATH"; then
+> > > >  	set -- "$@" -b "$INSTALL_MOD_PATH"
+> > > >  fi
+> > > > -- 
+> > > > 2.39.5
+> > > > 
+> > > 
+> > > Thanks for report and patch.
+> > > 
+> > > For the record, this is what I can find in Debian's Linux packages:
+> > > 
+> > > Debian puts a dummy System.map to /lib/modules/$(KERNELVER)/System.map 
+> > > (linux-image-$(KVER)-$(DEBVER)-$(ARCH).deb) and the real System.map is 
+> > > only available in linux-image-$(KVER)-$(DEBVER)-$(ARCH)-dbg package 
+> > > at /usr/lib/debug/lib/modules/$(KVER)-$(ARCH)/System.map.
+> > > 
+> > > So, do we need a valid System.map for out-of-tree modules?
+> > 
+> > Yeah, how does this work for the main Debian packages? Do they just not
+> > expecte modules.dep to be generated for external modules if System.map
+> > is not in a standard location? Or maybe nobody cares?
 > 
-> On Wed, 11 Nov 2026, Nicolas Schier wrote:
-> >
-> > Thanks!  I know some people who are definitly interested in such a
-> > config policy checker.
-> >
+> Supplying '-F ../path/to/System.map -e' to depmod enables checking all
+> installed modules for unresolved symbols.  The in-tree scripts/depmod.sh
+> wrapper script always adds '-e -F ${objtree}/System.map', or fails if
+> System.map is not there (cp. report above).  Debian installs a dummy
+> /boot/System.map-${KVER}, but that will not be used automatically by
+> anything (as far as I can see).
 > 
-> Great, thanks!
+> Thus, AFAIK System.map is required only for checking against unresolved
+> symbols in the just installed kernel modules, whether they are built
+> in-tree or out-of-tree.
 > 
-> I hope this leads to more mainline kernel configuration policies as well.
+> > > At a first glance, you patch looks good to me.  But lets way some days 
+> > > for other feedback.
+> > 
+> > I don't have a particular opinion on this patch other than maybe this is
+> > being patched in the wrong place? Perhaps we should be fixing this in
+> > scripts/package/install-extmod-build? scripts/package/PKGBUILD copies
+> > System.map to its external module build folder already.
+> > scripts/package/kernel.spec copies it to /lib/modules/<rel>, not
+> > /lib/modules/<rel>/build. Unifying those in in install-extmod-build
+> > would avoid having to change it here (since /boot/System.map-<rel> seems
+> > like a Debian-ism that we are hard coding here). I trust your judgement
+> > though.
 > 
-> On the user-space side, it's one of the reasons I'm versioning the schema
-> in v2.  This way, projects like systemd can ship their own kernel policy
-> file, and that policy will be guaranteed to work with all future versions
-> of this tool.
+> Yeah, I think you're right: we should fix in install-extmod-build and
+> unify the install for all packaging targets by putting System.map to the
+> build directory, as that's where scripts/depmod.sh expects to find it.
 > 
-> So it's all mainline-first; both kernel upstream and userspace downstream.
-> 
-> > Please prepare a new MAINTAINERS entry in a respin.
-> 
-> Sure.
-> 
-> Beside a separate entry for the checker itself, I'll also add:
-> 
->     F: tools/kconfig-audit/policies/preempt_rt.yml
-> 
-> to the 'Real-time Linux (PREEMPT_RT)' entry.
-> 
-> > Are you planning to maintain it after inclusion?
-> 
-> Yes, I'll be happy to maintain it.
-> 
-> Would it be OK if one or two people from the Kconfig side also step-up as
-> reviewrs?  Julian? Nicolas? Nathan?
+> I am preparing a patch for that.
 
-Sorry, I am out-of-time already.
+https://lore.kernel.org/linux-kbuild/20261116-package-install-system-msp-to-build-dir-v1-1-ec53d3d39146@kernel.org/
 
 -- 
 Nicolas
