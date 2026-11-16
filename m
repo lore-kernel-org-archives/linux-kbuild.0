@@ -1,81 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.13
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794817929;
-	b=3d8zDSLZpId7iy7QmTS/sjswQV66ytdx0aNde6wVWwnJrB7v7OjEfo+SP808+HHXpFJJ
-	 O3sYUtqMhEN7nyHcwEsH6IuhVjjJjHIvikfn+7mr9DG4KCE6v6x970ysAzDtlHSIceU2p
-	 Fsjd5nwSYXPBO02ysRnyRADw9HhGIMY68x8gBaOllz/Suw00tEVPS+A2btkaHP0y2LlyG
-	 l8SsPvKYI+iAy5AmkM26Ca166CUXryh9Qjmiy8t9WqfyFNY3iaLCCi+fsafRV3Ho9sIy7
-	 GK74HviNWk/H4cOqP8mmf6ehVkGrIqr8lJNSiwptacIPLAj2dxruzqDZgo03bTPnTzg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794817929;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
-	 Organization;
-	bh=FOaaLcXypvRxpjlgQdCsx2GFSz0rpiQmt2LrucvpSSg=;
-	b=jO2HqavaR4v22EqZPD+/DKEY3WALuxgAMf8T8KLAlBG4nEE53TRuXE8EWpzRNkX5EmxA
-	 CTVxdd0KYnW93TTjaN8PpNxxpp1/kKiFX6n1+qggGw88FuuwE/f47dnpMfNrQOOhT5q/Q
-	 aH8sVDgpeTBCoPum3iHBCAKIjDH5dQHNK0GlLidQvhwIMPOKk0+POduRSrT596OdjE82M
-	 isoIZ4XxCTIB95KDNyUyk4FF+v82V+TYJts4mf0FdjrVPEcxiZuhkUlK8d1m3eMEgh4R6
-	 fA9WFoIw2Ntz8eYqXG5kYJYhzwuoBY39M2Q4pMoBTyX1tDhv6QnvtahD7wIBcRZCj9A==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=nx4ID9nC;
-	arc=none smtp.remote-ip=198.175.65.13
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.46
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794821305;
+	b=Fel+hmHtOnUB6/vFR+jSEIo/i9OrUB6164o8KfENdK0iRbjLm8Ve/RVuI6M9T678010i
+	 CSJdSt+piyIrdvHKDmWrv7L/NI1cDOXTzSjfK4VSNmCW48S9jlZAlhV/rWJFHiM0G04xD
+	 rEy0Whkn0dFaV2JffyDM6DQftSJptCYXQOdOOz/72nDhimQwbmaPQixRga3vTHycP5kW1
+	 CAuff2NP4LlDrxs7fKlYuymdexe3qfPirZlgYiFxkjQRFhkkqjaNFzwJVV695LPze0LIT
+	 Wg310uCdbjEIff0lA9UbkDMvovMmP5vXQ3NwNQq6QwSbFiM9XegvGQt15bnaUVPUo4A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794821305;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=ck90Ja76i/8lWIveQHIjZjSAi6Th5hdRNv6kbv7cOjM=;
+	b=D2Lm6OdqE8sJN9a43gvnqpTPuF6Z4n2m006XlYjdsFhZdJtw108TMJzWFCn1M+qVQUq5
+	 X0MR0FNKlQFRrpEM5EJ+Ol8urHhCl9hhCfYZeB1sE2y70ej6abD75ixNWrGS2CtOan+Rh
+	 rn4VqAWVLo9sZiH5/ba7jlu7sUjFlQ37AVaPE1Ayq9HZPDQXygsO2AcVdSc9aGvM5xXwG
+	 wgsp1UAKd2Z1naweA7+MNnkegXRQ8JH7CfiiKOdTLaAIXxz//HnMZxHiJzcY17EMxS4ke
+	 F9NLpQl80L6UtgGn1idnmN2aqGlrBzceQpFf41HSabdcQfKM+BAte/JkTGyT1s+ng/Q==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AIlnNq3s;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.46
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6B9606A31C;
-	Mon, 16 Nov 2026 08:32:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE6B9606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4EF606A323
+	for <linux-kbuild@vger.kernel.org>; Mon, 16 Nov 2026 09:28:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D4EF606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=nx4ID9nC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794817929; x=1826353929;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Oxgth3AmwsvDCZ0PPMMWStXKhRuGGRFGSdZPZKjlpDc=;
-  b=nx4ID9nCNoH2ANSISn0iJXP9WQliQ1TJDjglB1GJXwpxK3TZAnvcjwcu
-   4vgPqyD7FV0baSSCxB2bgn5X2Emk4hxKNquFZGJy3+4U57yKe+yTp5Ky7
-   H7JYWckmEAfpC0ZBHuXruGOEGn9NgJkt0ytgh9WNELbpB3YJGlfwIlgmJ
-   EWfqTyUEn3neQCwD3rb7RvN7dZHULXIfOa3JOHrxe+XVoQA+fqdxIVv40
-   M7ruLQ0apvPi3YjYwHoJVaO8JB/yGyZQod0EGJEe12PwNvoeigXY0iuQ0
-   czIIRqQ27AI31UuXH9w5UN02GN2Rey+RrtlFnThiM/YFbckubdTJXjLH9
-   g==;
-X-CSE-ConnectionGUID: S1wdVBe+R1WY2IPnabDWTw==
-X-CSE-MsgGUID: mutc59IgT0GYZIx2ILBuyw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11967"; a="3420446"
-X-IronPort-AV: E=Sophos;i="6.27,216,1787036400"; 
-   d="scan'208";a="3420446"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2026 00:32:06 -0800
-X-CSE-ConnectionGUID: 8jMWouKuTNKr4POp4yhemQ==
-X-CSE-MsgGUID: 92679GxuTEKHrdwtS8+k/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,216,1787036400"; 
-   d="scan'208";a="9681522"
-Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.90])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2026 00:31:58 -0800
-Date: Mon, 16 Nov 2026 10:31:56 +0200
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
-	". Boqun Feng" <boqun@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kbuild@vger.kernel.org
-Subject: Re: rant on Rust in kernel
-Message-ID: <avq_fOVO4dina23a@ashevche-desk.local>
-References: <avXdJyqNNqopuH2_@ashevche-desk.local>
- <CANiq72nw+g=RTvR-zZh29D0=MOwNYboNSeKkNr_Z4v74Q4hn1w@mail.gmail.com>
- <avc-fQWSvmtHhtCO@ashevche-desk.local>
- <CANiq72=RbzZHgZEMfLkDRQx-_PoxEfgL_Ar8figchde5u5qc=Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AIlnNq3s
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5c09dbe96b1so178577e87.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Nov 2026 01:28:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794821303; cv=none;
+        d=google.com; s=arc-20260327;
+        b=AtrXEmYR3Zwk219IOqC3uS82POfp5vk+My14mlr4hzKn6lLwzLK8ozDXshaHVvusQN
+         Z+UzNTiGyCwORntXmNEFF2/6zrIcOF0CeurQW7e5E7zlrS8dPYaKut8n3JBSOTzqvUbQ
+         IA7lUvEVgV4IjI23inGdGE4qCEL69h3DEvLmf8Wx/Efu7Zcadv5DHsPuOb/mcLV+YCXb
+         FYbrfp7vwKmHHZyuVX2IULiwCkS1b34pDlwzKscW4mM+VKkTAtN+H88SvIl2DY6b95IH
+         i6PRhlyAcumGzYNEOGS+QgOqiaIL2FS3QPSsPxsDAjgD0vq+kGA8HfmhTu8mOHNeNmlm
+         1bbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ck90Ja76i/8lWIveQHIjZjSAi6Th5hdRNv6kbv7cOjM=;
+        fh=CwpLcEgZWRKXQGA9OPBHnZEJkg8F42i+MRYuPjuxSHY=;
+        b=c27OM6/06sfAQrewzEQHmxgFAaceDImhJLXYsSfzgxdVvIH7OT+z31a7t9oZb+rLEs
+         BZcdD2tVj8YCr+MUboMNYGXc0SIXunLECsh120TNbhFeU/uu8KPsypV+mtE0tMOCywRg
+         znwygHEeWPoj0WzpxX6ERc99zrTcJecs3uFYhcLXzP8MFKPwl1WpwZgjxlDSNUtuDS5P
+         MS4O6qR0BeujSUfh+1MGfDLPdMet1qMLbkxnxnZHErodt+/7ygTijNjO9vy2+2lMdwXl
+         kgs7D3qSSqFHL6HM+f1V37M8OYQhgIf+ElC/2DcnlErJkA4mTjSCHKf+J/IxPDr49hl7
+         6jTQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794821303; x=1795426103; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ck90Ja76i/8lWIveQHIjZjSAi6Th5hdRNv6kbv7cOjM=;
+        b=AIlnNq3sWtmeGAfjFpzBQFpa0xHgKF71/0tJ6OC1UiXLm167IjJ1qN1Sv6o3v5l4dl
+         Brk38APQ5UkqTOX+jcBHmmN+M11prghglr708nx3aQvU6P69rmWfoc7EvAWe1M+FJ1Yj
+         GAMioZ1Xno0vHQFE/deUYiXuRdjcCBhm0kUmIeR5WW9e9Iz1/hpcfu+Y8naAsd05eQLP
+         tPLjTGmO8vB+WmzutBP6n4l4GJIJcVnzLzWRl/9cOMLdXE0YtDjQeXkfRHsOAEZLN8if
+         rt/+uhNEQAinHeee2B7+daV4dyMX0h97RFhhSall+MGuDKYLGlv+9Ugh6OHLmfBqTQLe
+         Gukw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794821303; x=1795426103;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ck90Ja76i/8lWIveQHIjZjSAi6Th5hdRNv6kbv7cOjM=;
+        b=ObEQ6rk5C7PManNzNY4UC78ll4KCMorcIqZ4fAvuJFbmqLhcplYqVhpwPpIUPyBXRT
+         2iOyWHz4giMwNeOd6GlHww8R67f7wOJy+qI0zHUhrGUCmfMgcdgfR1fr4acwJRwSVOXM
+         ouwLwCDNtAJBVDMI/gzBG+FU6+T/iiou7MT/UKS5VtS64PMcQiKzIQdpnUnHVeji88PJ
+         O57U7y5cc0w0vnKz9ywOs8sKwY0uJgz/TtxIec4+jPU2liyyzSZ5QBXi19YkI+v/wx4z
+         VxxPxcaCtkVHSlzJ9xABzjhOZhyy8oC9N/Alv9k3mBJMG8KurfxHLEZCfG2tFGoi3hXz
+         ZDvQ==
+X-Forwarded-Encrypted: i=1; AL+hErEE95SXwBU0Rn5ouRu3P0i81gUPpHiTevqJIET8tyjPKjMofLXv4e9jFZD9zcrFkkhpHMm27iGlMeC0mHA=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8eAjL74lxnH2dA4jl29Hj7rY+eM8VoA8/NyhNceErqwnSBzRYu
+	RQ3rYGzgiWjGlesa/eYdYFRp9kVQLooiJD6i03sh7Z6wANTHDX2vR5ADUXdY6Pl5ZgIqRIYUVTf
+	iv86IYFRobnIFE4o+ri0TmyRUBmtY98XmtQ==
+X-Gm-Gg: AYBFou0f/TwyQIVoS8jS9xmc5ZSr9zahf/gR88qlEVw0xIm5/bMUi0UeAfK4gh21JCV
+	LUdr8p9XNQyG0jDCkA72yIekxT/ZcN6cDawDbOsYAoQgZVZXVYEP6NpkeDpjQoef0uryp9N81Gs
+	uTBcpR8Hpr8GsXrKMAqjV18m01J9YCAipimeM4xixPNpTC+0+Cr83R02njAGWBV29UUnoS5d5XV
+	mGU5PT9ITPOJCSf1z/W33st6VxkpLLGuFPKGlFO8njfxXLsA6mJikWbNpuzT1dw/IyvV+HvZOZx
+	GXBpJ4NzdXAZkeIrC2r4UrNKECrSPtsanaIHTBVIq0zMFSR5OpM+CF0oPyKoVZmky3cm8vRS/Zw
+	Hsl390u6gyCTd7EvoRRliMS+MU7QMD1dXBs2Dl5ls0eUfoYKfjTgeZ1TcfZc8q+7VlOkhWSOWG1
+	PJkA6cqvLl1l5Ci7FY9hc3FhuwMfy6H+VCs4U3tW3aEJskQ3UHrXGR1JnAJrRlLSRG4R+oFHcrY
+	/udQMHQI77aBR+VdknirB9rAUCMIJL/xU3tBxyE7kjM1AyZuYiuFBhIfvsDa0I3QgW5vi/BTsc=
+X-Received: by 2002:a05:6512:108a:b0:5c0:b5c:4084 with SMTP id
+ 2adb3069b0e04-5c1705d663fmr4451137e87.1.1794821303323; Mon, 16 Nov 2026
+ 01:28:23 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -85,58 +106,33 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72=RbzZHgZEMfLkDRQx-_PoxEfgL_Ar8figchde5u5qc=Q@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+References: <avXdJyqNNqopuH2_@ashevche-desk.local> <CANiq72nw+g=RTvR-zZh29D0=MOwNYboNSeKkNr_Z4v74Q4hn1w@mail.gmail.com>
+ <avc-fQWSvmtHhtCO@ashevche-desk.local> <CANiq72=RbzZHgZEMfLkDRQx-_PoxEfgL_Ar8figchde5u5qc=Q@mail.gmail.com>
+ <avq_fOVO4dina23a@ashevche-desk.local>
+In-Reply-To: <avq_fOVO4dina23a@ashevche-desk.local>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 16 Nov 2026 10:28:12 +0100
+X-Gm-Features: Aa3M54r8jDUBL9-W_6ysQ9RsXI7srtGqUzJ6kqt-NYARrfePXpS4XD1GBsJdusg
+Message-ID: <CANiq72mWNJ6qpxUrsGHGiRHeqb=uHMzqEuYLOkK50i40T=yHNw@mail.gmail.com>
+Subject: Re: rant on Rust in kernel
+To: Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Danilo Krummrich <dakr@kernel.org>, ". Boqun Feng" <boqun@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 14, 2026 at 01:22:48PM +0100, Miguel Ojeda wrote:
-> On Fri, Nov 13, 2026 at 5:44 PM Andy Shevchenko
-> <andriy.shevchenko@intel.com> wrote:
-> >
-> > Yes, indeed. Any idea what to do (see below)?
-> >
-> > Ah, it seems I was mistaken, the distro is Debian trixie which sounds like stable.
-> > Unstable is on my desktop.
-> 
-> If you want to build with Rust enabled, then you need to either change
-> LLVM or `bindgen` to fit the equation above.
+On Mon, Nov 16, 2026 at 9:32=E2=80=AFAM Andy Shevchenko
+<andriy.shevchenko@intel.com> wrote:
+>
+> You mean for the in-kernel builds or in general? If you are talking for
+> the former, this needs to be fixed as the version  we supply via LLVM mak=
+e
+> parameter (as you can see in my command line examples). Another story if
+> this is broken on the clang level (but then how kernel is built?).
 
-For now I'm fine without Rust. With Rust I have only problem with the build
-time (assuming the build errors are addressed by on of the solutions you
-mentioned below).
+Hmm... I don't understand what you are asking, sorry. Can you please clarif=
+y?
 
-> So, for instance, you could build with an older LLVM (e.g. LLVM 19 is
-> the default one in Debian stable). If LLVM 22 is around you may need
-> to use `LIBCLANG_PATH` to point to an older one.
-
-You mean for the in-kernel builds or in general? If you are talking for
-the former, this needs to be fixed as the version  we supply via LLVM make
-parameter (as you can see in my command line examples). Another story if
-this is broken on the clang level (but then how kernel is built?).
-
-> Or, if you want to use LLVM 22, then you could install the `bindgen`
-> from Debian testing or unstable (they have 0.72.1, which is new enough
-> for LLVM 22, and checking in a Debian trixie container the build
-> succeeds).
-
-> Or you could build yourself a `bindgen` from scratch:
-> 
->   cargo install --locked bindgen-cli
-> 
-> That is the easiest route, and takes just about a minute to build, but
-> requires trusting something else than your distribution. If you do,
-> you can use `make BINDGEN=...` to point to it, or you can just put it
-> in your `$PATH`.
-> 
-> I hope that helps.
-
-Right, thanks!
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Cheers,
+Miguel
