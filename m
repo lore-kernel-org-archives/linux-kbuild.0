@@ -1,61 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.107.87.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794845878;
-	b=J2MHuWpVwgskK5ciD+uz/Qja06gpPRYLC6Ib9vq+fTJ8yDpUmDi4WZhA0rV6f1NbJJQr
-	 nhZlWKKgAmCvUsNSNHSuPeE4wjYrI5Y6sjW2sY5wZSSqgoojrIAaYLj4I5YF1DfqERjnS
-	 O+QAfchBqR0IaPh5MO63KRuP+faPNGt1chxXtxnU0fowFgXjlEytEFcbEujsRJVMUkmgw
-	 euihWfPJNqbg11jBVGJgdZwB04/3u4cgQqHY9rwXSVEBtnZy+F+l5WUrEJxiCO68dxdUo
-	 Ja2WmBKFQ2ldML7SmctLmh2smCPNSxpfWLwuzU+fj/e5tVg/BcF29G8feGSnuF7Xg3Q==
+	t=1794851557;
+	b=xhmkCnVfFX08Py8CRO0tCWtgXAxaITJxB9zZpTMoIiw4duZvaWROrv2qpQYrXJIq3lJ5
+	 xTT1tDkWWDy0H2vJjNYXMLLzKwH7AF5y28hnGiwkmZntxEWXxpQDTkOXT5cVtAorR6VbW
+	 6Bhzr0uKAsoQI1JQZUuzBjv9w7LlSRjhJ8kP1w3lyue4qpz/xN//SwwGc/yciwr35RAua
+	 rgAzshRQXQAkofN119U2yD5q1tUz6ESz/pAPFCRvYwTkTaduvgBEg+/UBkHlJVYBC22iT
+	 LKeQr1GoZXDCYhLw4dft1IhLwiYJegf9Gsd9hMu4IsxazRKLQDFh+l2nBvHq4jH9vIg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794845878;
-	h=Received:DKIM-Signature:Date:From:To:Subject:Message-ID:
-	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=SfYOB7Ty0pCYb2nC1eyV5BC3WSCxR60P35W/OeXWh3U=;
-	b=4yzekDj9oMoT5dyNpDhwtESES1JQl1Wqu4ov8S2j6MzwHSjOPcVbRY7BviocERhLjaTx
-	 iQuW6sKy74w1isdETuM/8//+aE+Jw/ou743bCJgd9ciWtF8uaPfO7k6WKxbkuTpbL27JP
-	 isksTSLZ7zGtPR8EiEi3pUnBrhTH8jpq9JVgQ3xBjDhoUTG5L4bQ8r9DGbrmldHIgVQQL
-	 oR4S5mVqnesVYRvSEjKJxAfol4E9mWqcx/LEDlX5NfES8gkmsya3dzOHrhzDvit3tSM4a
-	 /z4XL/tOiVnxj4OBvOFC3KQZdcz++4GffYpKGbySOghOYPuSgjPInx6tMtXBLQjJYrw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794851557;
+	h=DMARC-Filter:Received:Received:Received:Received:DKIM-Filter:
+	 DKIM-Signature:X-Virus-Scanned:Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=EdI2oVsvQC5OFdto8AriHpSCqCbKSvTZiieheT9HSLc=;
+	b=sUuOdZzPfaefg1Zh7H94/3YzhezziVHu4ClK97lYvX+jrqgZ36l38fcGASW/YnU3MivO
+	 SjTCAz5qZDEMOH1pOdNeeaIZl0oOic6NcFddRwLHRSyPLvhspzyb0m9Ems48aif43O1T7
+	 2fkUKEnaCkm12AhcU1jxYkhZtYZHgGyqiYAMYokDwT9LRc3Xu4a2qTRk9+S9uxV7nCfs1
+	 J/zVXqhriTWtP4XLzAWkmewcva0ejD+szl7t50g6qpVeQ3IDQlKhh5bbBBjFKPJNk31Py
+	 JMN1kKOB9V6ckSqNBUT1wk4wUbit7G53fR187GUH9q5eAYn6iz5+NAeespexF/jnOaw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8wTJ9qX;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=tngtech.com;
+	spf=pass smtp.mailfrom=tngtech.com;
+	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b="aHvXo/oO";
+	arc=none smtp.remote-ip=34.107.87.41
+Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id EA58E606A323;
-	Mon, 16 Nov 2026 16:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C26606A8AB;
+	Mon, 16 Nov 2026 17:52:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3C26606A8AB
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8wTJ9qX
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 151021F000C4;
-	Mon, 16 Nov 2026 16:17:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794845877;
-	bh=SfYOB7Ty0pCYb2nC1eyV5BC3WSCxR60P35W/OeXWh3U=;
-	h=Date:From:To:Subject:References:In-Reply-To;
-	b=k8wTJ9qXMAYMMp8fVdyY3tzE5G50vfQuLllT96f9g52tkvYXnS0wOxGXYjR1YZLfm
-	 wAEBSF8wKSjOfzZqrkXw9Mx6TbsxxLC8gNJum08TR6/dEm9iWReHUzVDWPMFIDEocf
-	 AAgiey7T+49cDMcQ0uYToMOrgrF/wkZPsxYAsGFAdEBKZRCqZaO01/ehK/AxEgITPU
-	 6/qDSQnOwbVBBjsK3Fa60WORGs3Ei5cYvZ+Rfh81ewgPbUJOS5Z+iNJQPblCaVxXWe
-	 149SmnehwEskp749QBDUFVzLKi9JnwQ4Bw283pOeuX3AecK9nUq1PG0pYkmHF2LpxP
-	 876PVCjuGUEvw==
-Date: Mon, 16 Nov 2026 17:15:08 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>,
-	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kbuild: depmod: fallback to
- /boot/System.map-KERNELRELEASE
-Message-ID: <avssDBUtw0dhlpKT@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20261016111106.221542-1-adriangarciacasado42@gmail.com>
- <20261016-lyrical-original-woodlouse-3cfb2c@l-nschier-aarch64>
- <179392018201.309869.11526061626002654500.b4-reply@b4>
- <aviwMdFX5CpBfB0Y@levanger>
+	dkim=pass (2048-bit key) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=aHvXo/oO
+Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 8C3B43FC18;
+	Mon, 16 Nov 2026 18:52:35 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 80D5C1FBB5B;
+	Mon, 16 Nov 2026 18:52:35 +0100 (CET)
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id NBVpBYFZJC7q; Mon, 16 Nov 2026 18:52:34 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id C031D1FBB9B;
+	Mon, 16 Nov 2026 18:52:34 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz C031D1FBB9B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1794851554;
+	bh=EdI2oVsvQC5OFdto8AriHpSCqCbKSvTZiieheT9HSLc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=aHvXo/oOMuFdHiB1T5gPyQjXdmblt1FtpGL4cPsPOdg20tNowBm1cP0U2tV2idoVe
+	 3vSATRG69nfMV+5cYe/7m/GX2j8GdNfR97a8vweYj14iICEwrUm5csXqf1mR3MMKPi
+	 4gIMl8vax0/0o7hA6vM5HwPX8VyKxQeqtKSZLC3qP6216t03+SP14/qun8Rs+BOdu+
+	 Rv/IcPun3NZu6UR2D2HG5LWLqBKP7qA+/Sr/tZrF5MnO87qu5UTBCMavEplHW/bxgw
+	 RVmsTzkdz/Pv408JsAezNq6qGhx1h2AAGXvR/w8RK6IaE4kQHDzsfVQIXq5UdJ/KiH
+	 tXX7lnzAzGrpQ==
+X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 7rUrEhQM9lsQ; Mon, 16 Nov 2026 18:52:34 +0100 (CET)
+Received: from luis-Precision-5480.int.tngtech.com (unknown [193.30.133.7])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id 447601FBB5B;
+	Mon, 16 Nov 2026 18:52:34 +0100 (CET)
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+To: nathan@kernel.org,
+	nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org,
+	gregkh@linuxfoundation.org,
+	kstewart@linuxfoundation.org,
+	maximilian.huber@tngtech.com,
+	Luis Augenstein <luis.augenstein@tngtech.com>
+Subject: [PATCH v5 2/7] kbuild: refactor fixdep to collect dependencies before printing
+Date: Mon, 16 Nov 2026 18:51:49 +0100
+Message-ID: <20261116175215.1337416-3-luis.augenstein@tngtech.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261116175215.1337416-1-luis.augenstein@tngtech.com>
+References: <20261116175215.1337416-1-luis.augenstein@tngtech.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -65,114 +89,229 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aviwMdFX5CpBfB0Y@levanger>
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 14, 2026 at 08:02:09PM +0100, Nicolas Schier wrote:
-> On Thu, Nov 05, 2026 at 04:09:42PM -0700, Nathan Chancellor wrote:
-> > On 2026-10-16 16:22 +0200, Nicolas Schier wrote:
-> > > On Fri, Oct 16, 2026 at 01:11:06PM +0200, Adrián García Casado wrote:
-> > > > When installing external modules (M=...) against packaged kernel headers
-> > > > such as linux-headers built via 'make bindeb-pkg', ${objtree}/System.map
-> > > > is absent because System.map is located in:
-> > > > /boot/System.map-${KERNELRELEASE}
-> > > > 
-> > > > Currently, scripts/depmod.sh only checks ${objtree}/System.map and skips
-> > > > running depmod with a warning, leaving newly installed out-of-tree
-> > > > modules unindexed in modules.dep.
-> > > > 
-> > > > Fall back to ${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE} when
-> > > > ${objtree}/System.map is not readable so that depmod runs properly
-> > > > during external module installation.
-> > > > 
-> > > > Signed-off-by: Adrián García Casado <adriangarciacasado42@gmail.com>
-> > > > ---
-> > > >  scripts/depmod.sh | 13 +++++++++----
-> > > >  1 file changed, 9 insertions(+), 4 deletions(-)
-> > > > 
-> > > > diff --git a/scripts/depmod.sh b/scripts/depmod.sh
-> > > > index 3c34fecac..d6d1b9547 100755
-> > > > --- a/scripts/depmod.sh
-> > > > +++ b/scripts/depmod.sh
-> > > > @@ -12,9 +12,14 @@ KERNELRELEASE=$1
-> > > >  
-> > > >  : ${DEPMOD:=depmod}
-> > > >  
-> > > > -if ! test -r "${objtree}/System.map" ; then
-> > > > -	echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
-> > > > -	exit 0
-> > > > +system_map="${objtree}/System.map"
-> > > > +if ! test -r "${system_map}" ; then
-> > > > +	if test -r "${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}" ; then
-> > > > +		system_map="${INSTALL_MOD_PATH}/boot/System.map-${KERNELRELEASE}"
-> > > > +	else
-> > > > +		echo "Warning: modules_install: missing 'System.map' file. Skipping depmod." >&2
-> > > > +		exit 0
-> > > > +	fi
-> > > >  fi
-> > > >  
-> > > >  # legacy behavior: "depmod" in /sbin, no /sbin in PATH
-> > > > @@ -25,7 +30,7 @@ if [ -z $(command -v $DEPMOD) ]; then
-> > > >  	exit 0
-> > > >  fi
-> > > >  
-> > > > -set -- -ae -F "${objtree}/System.map"
-> > > > +set -- -ae -F "${system_map}"
-> > > >  if test -n "$INSTALL_MOD_PATH"; then
-> > > >  	set -- "$@" -b "$INSTALL_MOD_PATH"
-> > > >  fi
-> > > > -- 
-> > > > 2.39.5
-> > > > 
-> > > 
-> > > Thanks for report and patch.
-> > > 
-> > > For the record, this is what I can find in Debian's Linux packages:
-> > > 
-> > > Debian puts a dummy System.map to /lib/modules/$(KERNELVER)/System.map 
-> > > (linux-image-$(KVER)-$(DEBVER)-$(ARCH).deb) and the real System.map is 
-> > > only available in linux-image-$(KVER)-$(DEBVER)-$(ARCH)-dbg package 
-> > > at /usr/lib/debug/lib/modules/$(KVER)-$(ARCH)/System.map.
-> > > 
-> > > So, do we need a valid System.map for out-of-tree modules?
-> > 
-> > Yeah, how does this work for the main Debian packages? Do they just not
-> > expecte modules.dep to be generated for external modules if System.map
-> > is not in a standard location? Or maybe nobody cares?
-> 
-> Supplying '-F ../path/to/System.map -e' to depmod enables checking all
-> installed modules for unresolved symbols.  The in-tree scripts/depmod.sh
-> wrapper script always adds '-e -F ${objtree}/System.map', or fails if
-> System.map is not there (cp. report above).  Debian installs a dummy
-> /boot/System.map-${KVER}, but that will not be used automatically by
-> anything (as far as I can see).
-> 
-> Thus, AFAIK System.map is required only for checking against unresolved
-> symbols in the just installed kernel modules, whether they are built
-> in-tree or out-of-tree.
-> 
-> > > At a first glance, you patch looks good to me.  But lets way some days 
-> > > for other feedback.
-> > 
-> > I don't have a particular opinion on this patch other than maybe this is
-> > being patched in the wrong place? Perhaps we should be fixing this in
-> > scripts/package/install-extmod-build? scripts/package/PKGBUILD copies
-> > System.map to its external module build folder already.
-> > scripts/package/kernel.spec copies it to /lib/modules/<rel>, not
-> > /lib/modules/<rel>/build. Unifying those in in install-extmod-build
-> > would avoid having to change it here (since /boot/System.map-<rel> seems
-> > like a Debian-ism that we are hard coding here). I trust your judgement
-> > though.
-> 
-> Yeah, I think you're right: we should fix in install-extmod-build and
-> unify the install for all packaging targets by putting System.map to the
-> build directory, as that's where scripts/depmod.sh expects to find it.
-> 
-> I am preparing a patch for that.
+fixdep currently writes the .cmd file content while parsing the .dep
+file. Separate the parsing from the printing: parse_dep_file() now
+collects the source file and all dependencies in a list, and
+print_dep_file() emits the assignments afterwards. No functional
+change intended.
 
-https://lore.kernel.org/linux-kbuild/20261116-package-install-system-msp-to-build-dir-v1-1-ec53d3d39146@kernel.org/
+Co-developed-by: Maximilian Huber <maximilian.huber@tngtech.com>
+Signed-off-by: Maximilian Huber <maximilian.huber@tngtech.com>
+Signed-off-by: Luis Augenstein <luis.augenstein@tngtech.com>
+---
+ scripts/basic/fixdep.c | 109 ++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 92 insertions(+), 17 deletions(-)
 
--- 
-Nicolas
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 54063d98044..f514ef606ec 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -114,6 +114,17 @@ struct item {
+ 	char		name[];
+ };
+=20
++struct dep_item {
++	struct dep_item	*next;
++	char		name[];
++};
++
++struct dep_info {
++	char			*source;
++	struct dep_item		*deps;
++	struct dep_item		*last_dep;
++};
++
+ #define HASHSZ 256
+ static struct item *config_hashtab[HASHSZ], *file_hashtab[HASHSZ];
+=20
+@@ -163,16 +174,42 @@ static bool in_hashtable(const char *name, int len,=
+ struct item *hashtab[])
+ 	return false;
+ }
+=20
++/*
++ * Append a dependency or include/config/<SYM> path to the info linked l=
+ist.
++ */
++static void dep_info_add(struct dep_info *info, const char *name, int le=
+n)
++{
++	struct dep_item *dep =3D xmalloc(sizeof(*dep) + len + 1);
++
++	memcpy(dep->name, name, len);
++	dep->name[len] =3D '\0';
++	dep->next =3D NULL;
++
++	if (info->last_dep)
++		info->last_dep->next =3D dep;
++	else
++		info->deps =3D dep;
++	info->last_dep =3D dep;
++}
++
+ /*
+  * Record the use of a CONFIG_* word.
+  */
+-static void use_config(const char *m, int slen)
++static void use_config(const char *m, int slen, struct dep_info *info)
+ {
+ 	if (in_hashtable(m, slen, config_hashtab))
+ 		return;
+=20
+-	/* Print out a dependency path from a symbol name. */
+-	printf("    $(wildcard include/config/%.*s) \\\n", slen, m);
++	/* Build a dependency path from a symbol name. */
++	static const char config_path[] =3D "include/config/";
++	char *path;
++	int path_len =3D sizeof(config_path) - 1 + slen;
++
++	path =3D xmalloc(path_len);
++	memcpy(path, config_path, sizeof(config_path) - 1);
++	memcpy(path + sizeof(config_path) - 1, m, slen);
++	dep_info_add(info, path, path_len);
++	free(path);
+ }
+=20
+ /* test if s ends in sub */
+@@ -186,7 +223,12 @@ static int str_ends_with(const char *s, int slen, co=
+nst char *sub)
+ 	return !memcmp(s + slen - sublen, sub, sublen);
+ }
+=20
+-static void parse_config_file(const char *p)
++/*
++ * Scan dependency p for CONFIG_ words, map each to an
++ * include/config/ path and append to the dep_info list if not
++ * already included.
++ */
++static void parse_config_file(const char *p, struct dep_info *info)
+ {
+ 	const char *q, *r;
+ 	const char *start =3D p;
+@@ -205,7 +247,7 @@ static void parse_config_file(const char *p)
+ 		else
+ 			r =3D q;
+ 		if (r > p)
+-			use_config(p, r - p);
++			use_config(p, r - p, info);
+ 		p =3D q;
+ 	}
+ }
+@@ -253,13 +295,9 @@ static int is_no_parse_file(const char *s, int len)
+ 	       str_ends_with(s, len, ".so");
+ }
+=20
+-/*
+- * Important: The below generated source_foo.o and deps_foo.o variable
+- * assignments are parsed not only by make, but also by the rather simpl=
+e
+- * parser in scripts/mod/sumversion.c.
+- */
+-static void parse_dep_file(char *p, const char *target)
++static struct dep_info parse_dep_file(char *p)
+ {
++	struct dep_info info =3D {};
+ 	bool saw_any_target =3D false;
+ 	bool is_target =3D true;
+ 	bool is_source =3D false;
+@@ -375,13 +413,12 @@ static void parse_dep_file(char *p, const char *tar=
+get)
+ 			 */
+ 			if (!saw_any_target) {
+ 				saw_any_target =3D true;
+-				printf("source_%s :=3D %s\n\n", target, p);
+-				printf("deps_%s :=3D \\\n", target);
++				info.source =3D xstrdup(p);
+ 				need_parse =3D true;
+ 			}
+ 		} else if (!is_ignored_file(p, q - p) &&
+ 			   !in_hashtable(p, q - p, file_hashtab)) {
+-			printf("  %s \\\n", p);
++			dep_info_add(&info, p, q - p);
+ 			need_parse =3D true;
+ 		}
+=20
+@@ -389,7 +426,7 @@ static void parse_dep_file(char *p, const char *targe=
+t)
+ 			void *buf;
+=20
+ 			buf =3D read_file(p);
+-			parse_config_file(buf);
++			parse_config_file(buf, &info);
+ 			free(buf);
+ 		}
+=20
+@@ -403,6 +440,40 @@ static void parse_dep_file(char *p, const char *targ=
+et)
+ 		exit(1);
+ 	}
+=20
++	return info;
++}
++
++static void free_dep_info(struct dep_info *info)
++{
++	struct dep_item *dep, *next;
++
++	for (dep =3D info->deps; dep; dep =3D next) {
++		next =3D dep->next;
++		free(dep);
++	}
++	free(info->source);
++}
++
++/*
++ * Important: The below generated source_foo.o and deps_foo.o variable
++ * assignments are parsed not only by make, but also by the rather simpl=
+e
++ * parser in scripts/mod/sumversion.c.
++ */
++static void print_dep_file(const char *target, const struct dep_info *in=
+fo)
++{
++	static const char config_path[] =3D "include/config/";
++	const struct dep_item *dep;
++
++	printf("source_%s :=3D %s\n\n", target, info->source);
++	printf("deps_%s :=3D \\\n", target);
++
++	for (dep =3D info->deps; dep; dep =3D dep->next) {
++		if (!strncmp(dep->name, config_path, sizeof(config_path) - 1))
++			printf("    $(wildcard %s) \\\n", dep->name);
++		else
++			printf("  %s \\\n", dep->name);
++	}
++
+ 	printf("\n%s: $(deps_%s)\n\n", target, target);
+ 	printf("$(deps_%s):\n", target);
+ }
+@@ -410,6 +481,7 @@ static void parse_dep_file(char *p, const char *targe=
+t)
+ int main(int argc, char *argv[])
+ {
+ 	const char *depfile, *target, *cmdline;
++	struct dep_info info;
+ 	void *buf;
+=20
+ 	if (argc !=3D 4)
+@@ -419,10 +491,13 @@ int main(int argc, char *argv[])
+ 	target =3D argv[2];
+ 	cmdline =3D argv[3];
+=20
++	buf =3D read_file(depfile);
++	info =3D parse_dep_file(buf);
++
+ 	printf("savedcmd_%s :=3D %s\n\n", target, cmdline);
++	print_dep_file(target, &info);
+=20
+-	buf =3D read_file(depfile);
+-	parse_dep_file(buf, target);
++	free_dep_info(&info);
+ 	free(buf);
+=20
+ 	fflush(stdout);
+--=20
+2.43.0
+
