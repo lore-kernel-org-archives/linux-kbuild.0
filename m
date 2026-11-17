@@ -1,60 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.226.149.38
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794911673;
-	b=I7HJIcD9uvqbo3Ppik1fDNDg21Ga+LXrCr8acFgE9NluewgXh2/suv973JMNRHeS64k8
-	 CxziTXq0q6B+W59EpZyOirFexGmv0Z3vzBMjbMUi3ZjT1S0TPPkBcz7npXx0fg+XOBDMI
-	 lU6EpqKAFIzkzsDYyFC9IfGMBgYOTOB7zxOJrcu34hPk/ghiE3f171TjVlDFJ9cbkBd+n
-	 +BhgC/9ZTCTQN9sFmND3CG08JXEg4ra+bM91fbWzPrlXgyF8vIHVP8YHvJhKxtvBLbxZt
-	 wSEc0HbpCxBbPGfpqqlf9x3U0h8Y9zOSfyLKdHws0sYbztK8iVKTuD7bIo4ZdBDXEow==
+	b=KqTjMv6Jscd9ZwiFtxD9Fmz70054Tii41aGnkPsW3b/+ppTyNVShW0eJklbfjZ6RwNl/
+	 KKCKFlKEye+rU++4Iwel+FS4x/74zWAgri/Kw+JxCdBBk8lSnOcCMgoeCTXRpim7Dnb2c
+	 faPnoX3w+SgBgN5vFQh3JMq9evxdtXgN0ppc1KH9iCMhhq34bWGVCGIITVFEY2QCqpNs/
+	 fN1oyKrzF/W23hDFMSM4rOI6IFwIHjTy8Ea8Jo52MFaCoda9fNCsuCHRnIrnTZ02ZcJL6
+	 0vm6FYRF1xk/ElYnu7aKEN3fkOfSgVmc12HLHUJJ44jRNUBdpL8mUybQ0+9SnGVYSDg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794911673;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
 	 Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=gyCboiXkDM4sFNhzx8ixRgWUWapO47fNOVLMbMEovwQ=;
-	b=e+bKdK09C2/LU1vosA3ESPiamZ4stGjsmWnTEli5Mku1X39zF4qbzajcmEFq2n7aAZ0G
-	 DjW3rdzoQqr/205uQPvkRum8sVpeN9q1Fj/xmNmVn+e38dOyAUMeofKIlkUDoAdM00ft9
-	 P9WipssOlIfETLuOzJB5soCy3LymU7+2RPuL8mTVXB7HfVw6ypB6UcW6awEu8hbnUosS+
-	 SzVrar94wIdz6U78pZd8WojbaHMmUqJYD+Di2pdXNMV3obfjcEaa+Df5Tc9vQpsyidcsT
-	 8+jHsF+Du6oLl2u34Ngsaojm4WuALk29H9rQAPeuz539UVk6w+wI/SSObqTCKGfHw/g==
+	bh=37iDBptCE2ZrJlMFxYJAk0bxOtV0FMRo/dCU28/YQmE=;
+	b=xEZ3wB5YWRWFlwIXuFxuydVst1zknRxiZtAZOO1P/gGukDQ5FXaOsI1eynhX7yViX//+
+	 /edUSN107ChosP9KzdY+fRplWv9WofQVdcikdcMLKhHT21jgWQjzY5dWnSgh7qG4AhrWs
+	 SyWcACMIunlvXhDt3GT/IMI77gh6RxjQMUmfCZS8Vidg+CFED/h3JwNiA9PMmPIYj/HVw
+	 H01NPE7osF8LRVBN0V6vvmtKd7ZzGCc7zvoEZH6am2PjSUgkxHsFIYcPavtIuQeWtW9oa
+	 aVi8xiZ9UCr6X4Ch+tps8qVBENSJVhNPAnt0jvqYuhMV92G8t58gwOKrIR95tLUymdw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=fail header.from=gmail.com;
 	spf=pass smtp.mailfrom=runbox.com;
-	dkim=pass header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=cAZBcKWw;
-	arc=none smtp.remote-ip=185.226.149.37
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	dkim=pass header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=NtJQ2PlI;
+	arc=none smtp.remote-ip=185.226.149.38
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB85606A32A;
-	Tue, 17 Nov 2026 10:34:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1FB85606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2760606A31C;
+	Tue, 17 Nov 2026 10:34:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F2760606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=cAZBcKWw
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	dkim=pass (2048-bit key, unprotected) header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=NtJQ2PlI
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xTGW9-001QY6-76; Tue, 17 Nov 2026 11:34:25 +0100
+	id 1xTGW6-002LjL-Nw; Tue, 17 Nov 2026 11:34:22 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=gyCboiXkDM4sFNhzx8ixRgWUWapO47fNOVLMbMEovwQ=; b=cAZBcKWwHFktSP3WOBDQvdW1V9
-	niffqjgs+Z45VnN1IFyvyW9520Z62ekVmr9J03/u2nytLuK+hq6LzhHG4JVvSX/nV3+XvUXBEkTUc
-	tqYnoqKkzBls1NMSXIr9Fpuyoyh0+KGXnS08wdWMa/zi2/HVTQcPoiLKhuAQHmUrTXIGnphNkTso3
-	T9gA6IbuqQ97+HZw1TSyhCKuy3TjYrUqCiQ9I3rpEZomIUrgg0HItj/mzlToie/BHu+f2mNAIHxW0
-	DE1g8yO114DX/v0R6sqFljnudppjfnjDzk6zBRVwsIytQZo5+ZYGvJXZcAPhs/afMA5V4q15MtfLm
-	JFQYjSyA==;
+	bh=37iDBptCE2ZrJlMFxYJAk0bxOtV0FMRo/dCU28/YQmE=; b=NtJQ2PlIj3OofBz3PApFqWRCWB
+	h1a4Gq3WFCjRojbEPMOywpLSDMfnn8RVPXaVpETZ0F9lLwVhj4E43EI1HJWUFePmkxyDnjd1NjCXE
+	AwYXQove47MsQfXAf8RpgzNA/FJFE62sRbI5N0zIbAr8WRNitqynR1Hq+O5qnp6LdBSjbpykEPWGH
+	HZKQddNYr0TzRPtJbeybe+ewgbMnu21icrRquwN3toOTENuAmjGejqsW0jaHnZxfpC+xqCln5Ordy
+	nipPaDHq6CuVxPdBhf7olIElpWqNisKxdTr/hjxnUWk5ePo6mUuN23nRBw3AZhJ1Q20pWlA3b7Wsr
+	lEoPrZsQ==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1xTGW3-0002FL-OL; Tue, 17 Nov 2026 11:34:19 +0100
+	id 1xTGW1-0002ex-A6; Tue, 17 Nov 2026 11:34:17 +0100
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1xTGVp-005qHU-TR;
-	Tue, 17 Nov 2026 11:34:06 +0100
+	id 1xTGVo-005qHU-Kk;
+	Tue, 17 Nov 2026 11:34:04 +0100
 From: David Laight <david.laight.linux@gmail.com>
 To: Petr Mladek <pmladek@suse.com>,
 	Kees Cook <kees@kernel.org>,
@@ -70,9 +70,9 @@ Cc: Luis Chamberlain <mcgrof@kernel.org>,
 	Andrii Nakryiko <andrii@kernel.org>,
 	Samuel Wu <wusamuel@google.com>,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v4 next 10/13] scripts/kallsyms: Keep full expansion of tokens
-Date: Tue, 17 Nov 2026 10:33:49 +0000
-Message-Id: <20261117103352.1244657-11-david.laight.linux@gmail.com>
+Subject: [PATCH v4 next 08/13] kallsyms: Optimise symbol name search
+Date: Tue, 17 Nov 2026 10:33:47 +0000
+Message-Id: <20261117103352.1244657-9-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261117103352.1244657-1-david.laight.linux@gmail.com>
 References: <20261117103352.1244657-1-david.laight.linux@gmail.com>
@@ -87,342 +87,391 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Expand the full string when a new compression token is allocated.
-Saves the recursive expansions later on.
-It means that token 0 could be used earlier, but the reverse
-order is maintained so that the output files can be compared.
+Change the alphabetically ordered lookup table (kallsyms_seqs_of_names)
+to one that indexes the table of compressed names rather than the
+array of symbol values.
+This removes all the linear scans during the binary search for the symbol
+name.
+Once the name has been found a second binary search of the 'markers' array
+followed by a linear scan for the symbols address gives the symbol value.
 
-The entries for the initial tokens [0-9A-Za-z_.] are now no different
-and don't need special casing.
+This linear scan is done once for each address returned, whereas the old
+code did the scan for each of the ~17 comparisons in the binary search
+(and the binary search was done twice for a symbol that appears once).
 
-Change find_best_token() to return -1 if there are no tokens
-(eg if the input file is very small) to save the caller rechecking
-token_profit[].
+For normal kernels the index table stays at 24 bits per symbol (now host
+ordered), but a 32 bit table is used if necessary (probably only for
+allyesconfig builds - which needs 26 bits on x86-64).
 
-Save the original symbol name length and check that the expanded
-symbol has the same length.
+Use the low bit of the index table value to indicate that the symbol has
+the same name as the previous one.
+Use this to avoid the second lookup to find if the name is unique, speed
+up the search for the first symbol with a given name, and simplify
+kallsyms_on_each_match_symbol().
 
-No change to generated output.
+Speeds up lookup by name by a factor of about 12, and makes a massive
+difference to the time taken to lookup symbols that occur 100s or
+1000s (or maybe 10000s) of times.
+
+The slowest 'lookup by name' changes being a symbol that is duplicated a lot
+to one that is very long.
+
+Build for BE kernels correctly flips the byte order in the index table.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
 
-About 3ms (in 175ms) can be saved by keeping a copy of the name
-itself and avoiding expand_symbol(), but it is messy.
-And another 18ms by doing the alphabetic sort in a thread.
-
 v3:
-- Reworked on top of the changes in 7.4-rc1
-- Avoid printf("%s", NULL) on initial 'no symbol' build.
-  While fine with glibc, other libs dump core.
+- Use a discrimant union for the name table instead of weak symbols.
+  Undefined weak symbols can't be guaranteed to be zero and a build
+  mismatch left both undefined.
+- Patch the kallsyms_off_size_24 static key from an initcall,
+  the first name lookup might not be allowed to sleep.
+  Leave a conditional in the 32bit offset case, it is unlikely
+  to be needed for a real kernel.
+- Merge in the following patch that optimised the scan for duplicates.
 
-v4: No change.
+v4:
+- Fix build for BE kernels on BE hosts.
+- Use helpers sym_entry_type() and sym_entry_name().
 
- scripts/kallsyms.c | 156 +++++++++++++++++++++++++--------------------
- 1 file changed, 88 insertions(+), 68 deletions(-)
+ kernel/kallsyms.c          | 162 ++++++++++++++++++++++++-------------
+ kernel/kallsyms_internal.h |   7 +-
+ scripts/kallsyms.c         |  49 +++++++----
+ 3 files changed, 148 insertions(+), 70 deletions(-)
 
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index f1c952a94e01..a63e0ce833f9 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -36,7 +36,8 @@
- 
- struct sym_entry {
- 	unsigned long long addr;
--	unsigned int len;
-+	unsigned short len;
-+	unsigned short orig_len;
- 	unsigned int seq;
- 	unsigned char sym[];
- };
-@@ -76,12 +77,21 @@ struct sym_arr {
- /* Every pair of bytes is a token. */
- #define NR_TOKENS	0x10000
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index d18d78e626db..fd42a1a8ed3e 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -177,6 +177,36 @@ static unsigned int get_symbol_offset(unsigned long pos)
+ 	return name - kallsyms_names;
+ }
  
 +/*
-+ * token_profit[token_index(first, second)] is the number of times the characters
-+ * first and second appear adjacent (in that order) and is usually the same
-+ * as the number of bytes saved (the profit) by replacing the pair with
-+ * a single byte token.
++ * Find the value of a symbol given the offset in the compressed stream.
 + */
- static int token_profit[NR_TOKENS];
-+/* The symbols that contain each pair of characters. */
- static struct sym_arr token_syms[NR_TOKENS];
- 
- /* the table that holds the result of the compression */
--static unsigned char best_table[256][2];
--static unsigned char best_table_len[256];
-+static struct best_table {
-+	char           *str;		/* Full expansion, '\0' terminated */
-+	unsigned short len;		/* Length of str */
-+} best_table[256];
- 
- static void stamp(const char *where)
- {
-@@ -204,6 +214,7 @@ static struct sym_entry *add_symbol(unsigned long long addr, char type,
- 	sym = xmalloc(sizeof(*sym) + len + 1);
- 	sym->addr = addr;
- 	sym->len = len;
-+	sym->orig_len = len;
- 	sym->sym[0] = type;
- 	strcpy(sym_entry_name(sym), name);
- 
-@@ -356,29 +367,17 @@ static void write_incbin(unsigned long *bin_offset, unsigned long size)
- 	*bin_offset += size;
- }
- 
--/* uncompress a compressed symbol. When this function is called, the best table
-- * might still be compressed itself, so the function needs to be recursive */
--static int expand_symbol(const unsigned char *data, int len, char *result)
-+static unsigned int expand_symbol(const unsigned char *data, int len, char *result)
- {
--	int c, rlen, total=0;
--
--	while (len) {
--		c = *data;
--		/* if the table holds a single char that is the same as the one
--		 * we are looking for, then end the search */
--		if (best_table[c][0]==c && best_table_len[c]==1) {
--			*result++ = c;
--			total++;
--		} else {
--			/* if not, recurse and expand */
--			rlen = expand_symbol(best_table[c], best_table_len[c], result);
--			total += rlen;
--			result += rlen;
--		}
--		data++;
--		len--;
-+	struct best_table *bt;
-+	unsigned int total = 0;
++static unsigned long get_name_address(unsigned int name_offset)
++{
++	unsigned int low, pos, high;
 +
-+	while (len--) {
-+		bt = best_table + *data++;
-+		memcpy(result + total, bt->str, bt->len);
-+		total += bt->len;
- 	}
--	*result=0;
-+	result[total] = 0;
- 
- 	return total;
++	low = 0;
++	high = ((kallsyms_num_syms - 1) >> 8) + 1;
++
++	while (high - low > 1) {
++		pos = low + (high - low) / 2;
++		if (name_offset >= kallsyms_markers[pos])
++			low = pos;
++		else
++			high = pos;
++	}
++
++	pos = kallsyms_markers[low];
++	for (low <<= 8; pos < name_offset; low++) {
++		unsigned int len = kallsyms_names[pos];
++		if (len & 0x80)
++			len += (kallsyms_names[pos + 1] << 7) - 0x7f;
++		pos += 1 + len;
++	}
++
++	return kallsyms_sym_address(low);
++}
++
++
+ unsigned long kallsyms_sym_address(int idx)
+ {
+ 	/* non-relocatable 32-bit kernels just embed the value directly */
+@@ -185,66 +215,87 @@ unsigned long kallsyms_sym_address(int idx)
+ 	return (unsigned long)offset_to_ptr(kallsyms_offsets + idx);
  }
-@@ -410,7 +409,7 @@ static void sort_symbols_by_name(void)
+ 
+-static unsigned int get_symbol_seq(int index)
+-{
+-	unsigned int i, seq = 0;
++static DEFINE_STATIC_KEY_FALSE(kallsyms_off_size_24);
+ 
+-	for (i = 0; i < 3; i++)
+-		seq = (seq << 8) | kallsyms_seqs_of_names[3 * index + i];
++/*
++ * Get the offset into the compressed list of names for the n'th
++ * symbol in the 'sorted by name' list.
++ * Returns 'offset << 1 | is_duplicate_name'.
++ * To save memory (the array can have 200k+ entries) the values are usually
++ * 24 bit (host ordered) but will be 32 bit if necessary.
++ */
++static inline unsigned int get_symbol_name_offset(unsigned long index)
++{
++	if (static_branch_likely(&kallsyms_off_size_24) ||
++	    unlikely(kallsyms_offs_of_names.size == 24)) {
++		u8 *off = kallsyms_offs_of_names.offs + index * 3;
++#if !defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
++		return ((struct {unsigned int v:24 __packed; } __packed *)off)->v;
++#else
++#if defined(__BIG_ENDIAN)
++		return (*(u32 *)(off - 1)) & 0xffffff;
++#else
++		return (*(u32 *)(off - 1)) >> 8;
++#endif
++#endif
++	}
+ 
+-	return seq;
++	return ((u32 *)&kallsyms_offs_of_names.offs)[index];
+ }
+ 
+-static int kallsyms_lookup_names(const char *name,
+-				 unsigned int *start,
+-				 unsigned int *end)
++static int kallsyms_set_kallsyms_off_size(void)
+ {
++	if (kallsyms_offs_of_names.size == 24)
++		static_branch_enable(&kallsyms_off_size_24);
++
++	return 0;
++}
++early_initcall(kallsyms_set_kallsyms_off_size);
++
++static int kallsyms_lookup_names(const char *name, unsigned int *start)
++{
++	unsigned int mid, off;
++	int low, high;
+ 	int ret;
+-	int low, mid, high;
+-	unsigned int seq, off;
+ 
+ 	low = 0;
+ 	high = kallsyms_num_syms - 1;
+ 
+-	while (low <= high) {
++	for (;;) {
++		if (low > high)
++			return -1;
+ 		mid = low + (high - low) / 2;
+-		seq = get_symbol_seq(mid);
+-		off = get_symbol_offset(seq);
+-		ret = kallsyms_strcmp_symbol(off, name);
+-		if (ret > 0)
++		off = get_symbol_name_offset(mid);
++		ret = kallsyms_strcmp_symbol(off >> 1, name);
++		if (ret > 0) {
+ 			low = mid + 1;
+-		else if (ret < 0)
+-			high = mid - 1;
+-		else
+-			break;
+-	}
+-
+-	if (low > high)
+-		return -ESRCH;
+-
+-	low = mid;
+-	while (low) {
+-		seq = get_symbol_seq(low - 1);
+-		off = get_symbol_offset(seq);
+-		if (kallsyms_strcmp_symbol(off, name) != 0)
+-			break;
+-		low--;
+-	}
+-	*start = low;
+-
+-	if (end) {
+-		high = mid;
+-		while (high < kallsyms_num_syms - 1) {
+-			seq = get_symbol_seq(high + 1);
+-			off = get_symbol_offset(seq);
+-			if (kallsyms_strcmp_symbol(off, name) != 0)
++			continue;
++		}
++		if (!ret) {
++			/*
++			 * Found a match, but need the first one.
++			 * Most symbols (and all exported/global ones) only occur
++			 * once, most of the others only occur a small number of
++			 * times so it is worth doing a linear scan that avoids the
++			 * kallsyms_strcmp_symbol() call.
++			 * However some symbols occur a large number of times
++			 * (_sub_D_65535_0 is repeated 24610 times in an x86-64
++			 * allyesconfig, __func__.0 442 in a more normal kernel).
++			 * Avoid a long linear scan by returning to the binary
++			 * search if a short linear search is fruitless.
++			 */
++			unsigned int scan = 16;
++			while ((off & 1) && scan--)
++				off = get_symbol_name_offset(--mid);
++			if (!(off & 1))
+ 				break;
+-			high++;
+ 		}
+-		*end = high;
++		high = mid - 1;
+ 	}
+ 
+-	return 0;
++	*start = mid;
++
++	return off;
+ }
+ 
+ /* Lookup the address for this symbol. Returns 0 if not found. */
+@@ -257,9 +308,9 @@ unsigned long kallsyms_lookup_name(const char *name)
+ 	if (!*name)
+ 		return 0;
+ 
+-	ret = kallsyms_lookup_names(name, &i, NULL);
+-	if (!ret)
+-		return kallsyms_sym_address(get_symbol_seq(i));
++	ret = kallsyms_lookup_names(name, &i);
++	if (ret >= 0)
++		return get_name_address(ret >> 1);
+ 
+ 	return module_kallsyms_lookup_name(name);
+ }
+@@ -289,17 +340,20 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, unsigned long),
+ int kallsyms_on_each_match_symbol(int (*fn)(void *, unsigned long),
+ 				  const char *name, void *data)
+ {
+-	int ret;
+-	unsigned int i, start, end;
++	int name_offset, ret;
++	unsigned int sym_number;
+ 
+-	ret = kallsyms_lookup_names(name, &start, &end);
+-	if (ret)
++	name_offset = kallsyms_lookup_names(name, &sym_number);
++	if (name_offset < 0)
+ 		return 0;
+ 
+-	for (i = start; !ret && i <= end; i++) {
+-		ret = fn(data, kallsyms_sym_address(get_symbol_seq(i)));
++	do {
++		ret = fn(data, get_name_address(name_offset >> 1));
++		if (ret)
++			break;
+ 		cond_resched();
+-	}
++		name_offset = get_symbol_name_offset(++sym_number);
++	} while (name_offset & 1);
+ 
+ 	return ret;
+ }
+diff --git a/kernel/kallsyms_internal.h b/kernel/kallsyms_internal.h
+index 81a867dbe57d..11fb0de92ede 100644
+--- a/kernel/kallsyms_internal.h
++++ b/kernel/kallsyms_internal.h
+@@ -13,6 +13,11 @@ extern const char kallsyms_token_table[];
+ extern const u16 kallsyms_token_index[];
+ 
+ extern const unsigned int kallsyms_markers[];
+-extern const u8 kallsyms_seqs_of_names[];
++
++/* Although constant, size is volatile for better code generation. */
++extern struct {
++	volatile unsigned int size;	/* 24 or 32 */
++	unsigned char offs[];		/* int:24[] or int:32[] */
++} kallsyms_offs_of_names;
+ 
+ #endif // LINUX_KALLSYMS_INTERNAL_H_
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 77a4c964f1b8..39426f736cb7 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -408,7 +408,7 @@ static void sort_symbols_by_name(void)
  
  static void write_src(void)
  {
--	unsigned int i, k, len, off, off_size, table_size;
-+	unsigned int i, k, off, off_size, table_size;
+-	unsigned int i, k, len, off, seq;
++	unsigned int i, k, len, off, off_size, table_size;
  	unsigned int best_idx[256];
- 	unsigned int *markers, markers_cnt, markers_mask;
+ 	unsigned int *markers, markers_cnt;
  	unsigned long bin_offset = 0;
-@@ -427,10 +426,9 @@ static void write_src(void)
- 	output_label("kallsyms_token_table");
- 	off = 0;
- 	for (i = 0; i < 256; i++) {
--		len = expand_symbol(best_table[i], best_table_len[i], buf);
- 		best_idx[i] = off;
--		off += len + 1;
--		printf("\t.asciz\t\"%s\"\n", buf);
-+		off += best_table[i].len + 1;
-+		printf("\t.asciz\t\"%s\"\n", best_table[i].str);
- 	}
- 	printf(".size kallsyms_token_table, . - kallsyms_token_table\n");
- 	printf("\n");
-@@ -457,19 +455,15 @@ static void write_src(void)
- 	write_incbin_header("names", &bin_offset);
- 	off = 0;
- 	for (i = 0; i < table_cnt; i++) {
--		unsigned int se_len, len_len;
-+		unsigned int len_len;
+@@ -458,7 +458,7 @@ static void write_src(void)
  		unsigned char len[2];
  
  		se = table[i];
- 		se->seq = off;
+-		se->seq = i;
++		se->seq = off;
  
--		/* The length must be less than that of the original symbol. */
--		if (!se->len || se->len > KSYM_NAME_LEN)
--			errx(EXIT_FAILURE, "symbol %d has corrupt compressed length %d",
--			     i, se->len);
--
--		/* Generate the original name */
--		se_len = expand_symbol(se->sym, se->len, buf);
-+		/* Generate the original name in a temporary buffer */
-+		if (expand_symbol(se->sym, se->len, buf) != se->orig_len)
-+			errx(EXIT_FAILURE, "symbol %d has corrupt compressed data", i);
+ 		/* The length must be less than that of the original symbol. */
+ 		if (!se->len || se->len > KSYM_NAME_LEN)
+@@ -490,7 +490,7 @@ static void write_src(void)
+ 			if ((i & 0xFF) == 0)
+ 				markers[i >> 8] = off;
  
- 		/* Encode length with ULEB128. */
- 		if (se->len <= 0x7F) {
-@@ -504,8 +498,8 @@ static void write_src(void)
- 		off += len_len + se->len;
+-			printf("\t.byte\t%u", len[0]);
++			printf("\t/* n:%u */\t.byte\t%u", off, len[0]);
+ 			if (len_len == 2)
+ 				printf(",%u", len[1]);
  
- 		/* Restore the original name. */
--		se->len = se_len;
--		memcpy(se->sym, buf, se_len + 1);
-+		se->len = se->orig_len;
-+		memcpy(se->sym, buf, se->len + 1);
+@@ -505,6 +505,7 @@ static void write_src(void)
+ 		memcpy(se->sym, buf, se_len + 1);
  	}
  	write_incbin(&bin_offset, off);
- 	table_size = off;
-@@ -623,7 +617,7 @@ static void write_src(void)
- 	write_incbin_header("end", &bin_offset);
- }
++	table_size = off;
+ 	printf(".size kallsyms_names, . - kallsyms_names\n");
+ 	printf("\n");
  
--static unsigned int token_index(unsigned char first, unsigned char second)
-+static unsigned int token_index(unsigned int first, unsigned int second)
- {
- 	return first + (second << 8);
- }
-@@ -633,6 +627,16 @@ static unsigned int sym_token_index(const unsigned char *symbol, int first_idx)
- 	return token_index(symbol[first_idx], symbol[first_idx + 1]);
- }
- 
-+static unsigned int token_first(unsigned int token)
-+{
-+	return token & 0xff;
-+}
-+
-+static unsigned int token_second(unsigned int token)
-+{
-+	return token >> 8;
-+}
-+
- /* table lookup compression functions */
- 
- /* count all the possible tokens in a symbol */
-@@ -723,22 +727,23 @@ static void build_initial_token_table(void)
- }
- 
- static unsigned char *find_token(unsigned char *str, int len,
--				 const unsigned char *token)
-+				 unsigned int want)
- {
-+	unsigned int token = token_index(0, *str++);
- 	int i;
- 
- 	for (i = 0; i < len - 1; i++) {
--		if (str[i] == token[0] && str[i+1] == token[1])
--			return &str[i];
-+		token = token_index(token_second(token), *str++);
-+		if (token == want)
-+			return str - 2;
+@@ -563,7 +564,7 @@ static void write_src(void)
+ 			       out_bin_file ? '\n' : '\t');
+ 		}
+ 		if (!out_bin_file)
+-			printf("/* %c %s */\n",
++			printf("/* n:%u %c %s */\n", table[i]->seq,
+ 			       sym_entry_type(table[i]), sym_entry_name(table[i]));
  	}
- 	return NULL;
- }
+ 	printf(".size kallsyms_offsets, . - kallsyms_offsets\n");
+@@ -574,23 +575,41 @@ static void write_src(void)
+ 	sort_symbols_by_name();
+ 	stamp("sort by name");
  
- /* replace a given token in all the valid symbols. Use the sampled symbols
-  * to update the counts */
--static void compress_symbols(const unsigned char *str, int compressed_chr)
-+static void compress_symbols(unsigned int token_idx, int compressed_chr)
- {
--	const unsigned int token_idx = sym_token_index(str, 0);
- 	struct sym_arr *arr = &token_syms[token_idx];
- 	unsigned int sym_idx, j, len, size;
- 	unsigned char *p1, *p2;
-@@ -751,7 +756,7 @@ static void compress_symbols(const unsigned char *str, int compressed_chr)
- 		p1 = table[sym_idx]->sym;
- 
- 		/* find the token on the symbol */
--		p2 = find_token(p1, len, str);
-+		p2 = find_token(p1, len, token_idx);
- 		if (!p2) continue;
- 
- 		/* decrease the counts for this symbol's tokens */
-@@ -770,7 +775,7 @@ static void compress_symbols(const unsigned char *str, int compressed_chr)
- 			if (size < 2) break;
- 
- 			/* find the token on the symbol */
--			p2 = find_token(p1, size, str);
-+			p2 = find_token(p1, size, token_idx);
- 
- 		} while (p2);
- 
-@@ -790,8 +795,8 @@ static int find_best_token(void)
- {
- 	int i, best, bestprofit;
- 
--	bestprofit=-10000;
--	best = 0;
-+	bestprofit = 0;
-+	best = -1;
- 
- 	for (i = 0; i < ARRAY_SIZE(token_profit); i++) {
- 		if (token_profit[i] > bestprofit) {
-@@ -805,29 +810,39 @@ static int find_best_token(void)
- /* this is the core of the algorithm: calculate the "best" table */
- static void optimize_result(void)
- {
-+	struct best_table *bt, *first, *second;
-+	unsigned int len;
- 	int i, best;
-+	char *str;
- 
--	/* using the '\0' symbol last allows compress_symbols to use standard
--	 * fast string functions */
-+	/* Use the '\0' symbol last so the output is unchanged */
- 	for (i = 255; i >= 0; i--) {
-+		bt = best_table + i;
-+		/* Ignore tokens used for the original character codes. */
-+		if (bt->len)
-+			continue;
- 
--		/* if this table slot is empty (it is not used by an actual
--		 * original char code */
--		if (!best_table_len[i]) {
--
--			/* find the token with the best profit value */
--			best = find_best_token();
--			if (token_profit[best] == 0)
--				break;
--
--			/* place it in the "best" table */
--			best_table_len[i] = 2;
--			best_table[i][0] = best & 0xFF;
--			best_table[i][1] = (best >> 8) & 0xFF;
-+		/* Find the token that appears most often. */
-+		best = find_best_token();
-+		if (best < 0)
-+			break;
- 
--			/* replace this token in all the valid symbols */
--			compress_symbols(best_table[i], i);
--		}
-+		/* Replace this token in all the valid symbols. */
-+		compress_symbols(best, i);
-+
-+		/* Generate the full name for this token ... */
-+		first = best_table + token_first(best);
-+		second = best_table + token_second(best);
-+		len = first->len + second->len;
-+		str = xmalloc(len + 1);
-+		str[len] = 0;
-+		memcpy(str, first->str, first->len);
-+		memcpy(str + first->len, second->str, second->len);
-+
-+		/* ... and save. */
-+		free(bt->str);
-+		bt->str = str;
-+		bt->len = len;
- 	}
- }
- 
-@@ -839,10 +854,15 @@ static void insert_real_symbols_in_table(void)
+-	output_label("kallsyms_seqs_of_names");
+-	write_incbin_header("seq_of_names", &bin_offset);
++	off_size = table_size < (1u << 23) ? 24 : 32;
++	output_label("kallsyms_offs_of_names");
++	printf("\t.long\t%u\n", off_size);
++	write_incbin_header("offs_of_names", &bin_offset);
  	for (i = 0; i < table_cnt; i++) {
- 		for (j = 0; j < table[i]->len; j++) {
- 			c = table[i]->sym[j];
--			best_table[c][0]=c;
--			best_table_len[c]=1;
-+			best_table[c].len = 1;
+ 		se = table[i];
+-		seq = se->seq;
++		off = se->seq << 1;
++		if (i && se->len == table[i - 1]->len &&
++		    !memcmp(sym_entry_name(se), sym_entry_name(table[i - 1]), se->len - 1))
++			/* Mark that this is a duplicate of the previous symbol */
++			off |= 1;
+ 		if (out_bin_file) {
+-			unsigned int seq_be = htobe32(seq);
+-			fwrite((char *)&seq_be + 1, 1, 3, out_bin_file);
++			unsigned int off_te = big_endian ? htobe32(off << (32 - off_size)): htole32(off);
++			fwrite(&off_te, 1, off_size / 8 , out_bin_file);
+ 		} else {
+-			/* The three spaces before the tab line up the comments */
+-			printf("\t.byte\t%u,%u,%u   \t/* %8d %c %s */\n",
+-				seq >> 16, (seq >> 8) & 0xff, seq & 0xff,
+-				seq, sym_entry_type(se), sym_entry_name(se));
++			if (off_size == 32) {
++				printf("\t.long\t%#4x", off);
++			} else {
++				if (big_endian)
++					off = __builtin_bswap32(off) >> 8;
++				/* The trailing three spaces line up the comments */
++				printf("\t.byte\t%u,%u,%u   ",
++					off & 0xff, (off >> 8) & 0xff, off >> 16);
++			}
++			printf("\t/* n:%-8d %c %s */\n",
++				se->seq, sym_entry_type(se), sym_entry_name(se));
  		}
  	}
-+
-+	for (i = 0; i <= 255; i++) {
-+		best_table[i].str = xmalloc(2);
-+		best_table[i].str[0] = best_table[i].len ? i : 0;
-+		best_table[i].str[1] = 0;
-+	}
- }
+-	write_incbin(&bin_offset, table_cnt * 3);
+-	printf(".size kallsyms_seqs_of_names, . - kallsyms_seqs_of_names\n");
++	write_incbin(&bin_offset, table_cnt * (off_size / 8));
++	/* Add a terminator without the 'duplicate' flag. */
++	if (off_size == 24)
++		printf("\t.byte\t0,0,0\n");
++	else
++		printf("\t.long\t0\n");
++	printf(".size kallsyms_offs_of_names, . - kallsyms_offs_of_names\n");
  
- static void optimize_token_table(void)
+ 	stamp("write name index");
+ 
 -- 
 2.39.5
 
