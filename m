@@ -1,100 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.48
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794870459;
-	b=NY05mv5SYYz+p2EoXYspG/q5Jw/jy2DdNCLXAxcVKDrWYiILeRnWZTBPZsp4FbKqeAjV
-	 HlP83Zi93WX3SeYXiCd+Rvc04jnqakqdpu1KiJD8hYHbW8dV37PqVKfexTgbxip27QB8V
-	 88lZMB5Oh/MB+73Xy2wf46EWXaEdg2WZlLCxiY+t8kiOxwBZ/c6hsYgMl3rs7d08L28uV
-	 8+OeV0+N55M4Q17rsM1ia+81IbSPvA7YNh7FUIm5j3abD5cb6YLAgCcgoAcQMTjGfBG29
-	 L489QDzp3tzZ2ZeY4fnbFsrEHK28njBW7h3QWk4FmB2HywZ4jgJMuRD+a+wVZtGIuhw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794870459;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.69
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794890108;
+	b=Eqz0PjkLjSBWhgPXEorH7l3ywj09sudkrLGYf7PcB3bbE3/AE/jvo5GyEtavpYhOlIoy
+	 HMoO2Ers0pDle3BPBfxLQL+U/dYomm+WB/xbZfZtyiH27DlPHv+qTxne8CZK5UqSdCITL
+	 A0OvipJPWKQP0qC2qTjpxhLXjgxkAC5IHoNOHE3vqmebsfyF7B/2kH1oAQY/uUaD9F92t
+	 2gTy8FXy40oPhLeAj6VSX8YhFGOrdeKpvG4h4zzGa52pvdkRqMngW7anD3K0UneZr8Hpa
+	 68fjytA8ATlFdqkCFSbqR08KpsYLNtwtplU4d6CILDcNfAHE+0jaajk0fjfFiH6JLEw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794890108;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Content-Type:Content-Transfer-Encoding;
-	bh=ydCDBPssTz3ncKEW3MVclnuDfOEc/UHcPxQp8+aHet0=;
-	b=hHCLgiqKbXckjDz4OHW8XbqNecqqDl5i00Qs+PP5eP88M1iC7O3yoGbsJT4f8YJOnE24
-	 wMSeHPUSfiQUQZ1gdmbEF560myNUeegbkh/SkU8C/BfzDElkUxTyDRDiv9Wavcr3Fm9j5
-	 bxdvw/FNOsPr2S3Y6mEWC0gbgDR6G56Xi6lQZcqgKVDnmCgCu/+MrqktS7OHUWIVEqsBa
-	 x3x+2ft47Mpn9J5X/3WikJY8BJHwTlds5gf9oB2vhcvS6XXzy3QEhwNTmSSMStPFVnNaO
-	 Ww1RAKmv1N7CdYiOO+kMcjF0LPgvPrmP9XdZO5i1SUDP9oehPUcboWJTjgh8q94ZK1A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GXUgnO3L;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.48
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=9ljMd+8qHZtmdzxzGXfXq4+janfrVyX1V/6KLR49owU=;
+	b=Pfu1Zzdag8zdb+c1LNcQtUoguLyQiPqTpUYp6h8f+xCh7As2llm0+E3ZZOQsVTtCMuNQ
+	 GHcQo7E+BcpcOv3N+qVGvZMrjV4qwvuKnrsoA6UV0xbjYJov+RXH236CVsHDQjYsZwgqv
+	 E5fwftCRsLbPGrFGMBqbTP3RDpk2+i0ujEpIbkKk5pCXlO78pI84t/jR0YLzA2oOz/ckK
+	 h5hkGD5zH+tJs9OaSz9LuVfQ6jfX6w9fK2wY9lckQ3BeAg8xjyix/YO92W0kJ5dQVoz6x
+	 E8G6TBwzUqD2W05APb3KcmYAIGHpqcK1Nwya8vTf7inHZI8tthToZPKfYZjfNpWCJHQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hRy90PAP;
+	arc=none smtp.remote-ip=209.85.216.69
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4A2606A8A7
-	for <linux-kbuild@vger.kernel.org>; Mon, 16 Nov 2026 23:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C4A2606A8A7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F67606A32C
+	for <linux-kbuild@vger.kernel.org>; Tue, 17 Nov 2026 04:35:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D6F67606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GXUgnO3L
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c4d30639709so564836566b.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Nov 2026 15:07:38 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794870457; cv=none;
-        d=google.com; s=arc-20260327;
-        b=rI02HGCbBERlVKY5RRbtwxEAStMvb7GWioST0qNi1eKwX3UqEsX/rrN1onad+rnzT/
-         JYhY94hZmIpdCm7vUcbkdeCITxnPlubgrqkI6TBcnxMN6Ejy0KNdhk914OJ/vuz5ht8f
-         MRg2i5NvkM6ZEPaOIih9PmkjcIt/FDkU6rPNWj09B2rrjmaUwaYgAruTDPj6CufLK3Q3
-         sCGRf0XTQxAgGLwzPxBfFyHg4DyeTZU/SaN+hHYxDGss9jwm7ncZSqUZaYHv6as7ONcu
-         tepZ8vvyicEnV4bCpXJck7o/z5AMNLBs8ZI5A/lKg8fKKUTpklaTQm+w36Xk0TQZTaB3
-         qNUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ydCDBPssTz3ncKEW3MVclnuDfOEc/UHcPxQp8+aHet0=;
-        fh=7hlBydLx8x72ECj0szDlkOqrI9PsJoxGGc4VQ8QMJyA=;
-        b=U9oFguZgzycpqXEeZ99NWqwKppqzztedEVibxxQe45SXZ9KLwGFrb5tFRcV/cZiysq
-         y0/kk8cXxLwqQY67oTiyNYTA4PUvfGZTG3vhUoH0RVV2F2s51WwrfSmFlU/yIw5lbphi
-         2uqXoWY6LEgmPS4FZjL3RS4VDG4HiusRHLxCiok8ZlBc3Xj3x1gPt+4j5Efy/dH5alCk
-         hVRBLTv0hddKyisF12GYIephqGIF7EYevwbFo0VDYsd9ikq8jbt64nCzULlI+yzqqFK2
-         ZItkM++EiLx72V5aYtMqwszkD1n+EwruQra6xaZUo/NcpuLOzubs/svuV1x9048mxWhf
-         K5nw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hRy90PAP
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3ad30487d55so3218195a91.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Nov 2026 20:35:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794870457; x=1795475257; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:to:subject:message-id:date
-         :from:in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ydCDBPssTz3ncKEW3MVclnuDfOEc/UHcPxQp8+aHet0=;
-        b=GXUgnO3L2sX8jIe+JNGQHMfQH4z2uwWV5JtvWCT2CP6vZsmGvh7V8LHDnLv5us4vZv
-         PEXDM5ZhMNcx+fZgl8/G2Sppg6qPE0xzgWMuUxkpGID1la1F4r0X0cHFgtpcMTicfc4B
-         ti54w8E5pr+fj6IIovREg8N7kBD21RQHst8BZrAfYsIa83lW+8ck1ic7YnUrjnblVK1k
-         5A6MZ/6kYf+G4RDusB0KsfmrXB5HORmm616WjSWNCp65k1n++j4+QVXBIA5sG3a25AY8
-         WbJkyRX2cfW0bMKbGu2YUnRGdqviWBxMJ+tTbtBuJisaefMtwVulUH63CJyb+vUZCMeo
-         FZJQ==
+        d=google.com; s=20260707; t=1794890107; x=1795494907; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=9ljMd+8qHZtmdzxzGXfXq4+janfrVyX1V/6KLR49owU=;
+        b=hRy90PAPuzLiC1Ugzow1TqtYICVR0C/3m9NpC/vL5oLQYPg+GMvdStu0VTqU9YJ/uo
+         sQjCyubE25syH9V+O3bwTt/MPCTRKW0T+tQCrlr27bSmfATVS4elvLUGAbA9Z6cqb29M
+         981NMSmqQjtvX1LhpBKfSQMDX8uhG5MgO8vEFip3vUKirgx4qehkhvJij7szW6WlEQiy
+         reOcS+Nt3FeJ+euRqQ9xLAkLACMmx9rGQK+rcOOa1kcCxmuh5/ubqEQXrxACoxAoxaWW
+         6/m/ZGHwHyL8zRCcKnbdvnUfABykJg1v9q6GvlkbsLflwACioNF3PgGLLnyYfl9kxGxo
+         Ihkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794870457; x=1795475257;
-        h=content-transfer-encoding:content-type:to:subject:message-id:date
-         :from:in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ydCDBPssTz3ncKEW3MVclnuDfOEc/UHcPxQp8+aHet0=;
-        b=mxeHkUR435JAJDs0GWu+yrFK5UtrkIArzY8ggarkA5J/z/uYmtSfQi8x4gE35y3CcE
-         8DlKc1RlKesqvlO+Rc6GK6sXkFLErlkMVe1C4r2qP6NctFNjqbZIS/Q/LdSjTC6jFM5j
-         xnK0jb0D/H2pCCQkKNAi2pCBp6IuCNwR3bamnZGX1W3bTT0AMEtpWjyzpMkrIh3Vh2zs
-         X2Y3avVr1ftzKlDPE397sfSmKEo2PTPHUkBn2gCjh9F34CNSTmj3iUI1kqmuJXMFtajs
-         YzGXQM1b7gFmDVBYVyb7BnRJl3ugipxH+FUGwfIqARyLi7p8o4RvIma84KImrTj5xh++
-         WaOg==
-X-Forwarded-Encrypted: i=1; AL+hErFi87q7QiiEQnzH31eBY4fBvzj9xntL2/+SnVC+KeARALxI6SiqYpW1jeEBZssBw6OgOm8/ibXwmeQsjoY=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/LDuGl/usYafDkhWuL0UsLBAiWw5x8VRWCbMJQmyYFasg4yDsG
-	HDWh5hkUorXLKI2xUPsd8g+vM/Zcrd67edhaKAGZq1do0EfZf3RgNSeEB+PeYpDdk/cEs5VczZG
-	OWds4jGOAKPL+RkAHfIdmg6KhViRdcKq73g==
-X-Gm-Gg: AYBFou3j1OYOmF64cubVTtguk1d/7y6amrSniS57jXe9M9Qco2qKNhJ3DD2MXdp2X+S
-	S3is4vdXQAca7GF6ZSIadSxy3bsioL2B3qo6tz9l/W7GYIoxrYnigNFIE4Uwc+vlQkny7XHKph0
-	U6caS9+YXKFereh1O7QvtZW96Qx2tmTmWELCjRKHS/E4GwDXIa0ef8Q5TJjswtUIN3iO4PYuZXE
-	hqMlgA6gdijDKRR6hLTTSDqZoBaqm7BBnDPnIfDor/Qaset0r0HtJKst3YjuhpndxFEuEHm8xRP
-	jOpQLDXEfzdyL5zJ7Gsbk+ilCKYGJn0z6UvtV6H4EbWjs2SwmNsyD5bH4gdXt8lxIGApcIazTuf
-	Q8CTraqNwJGgeU+VRLfuLgafbk11eE25o9WasKPgKXlmhqEgHEMQFjnv3a9x8+7rhOd2Qtfdn6S
-	3xREF7FOk+QK1eBiSXKWwMaeAkRymLvbdyJB/OfjmDS6vHAleL
-X-Received: by 2002:a17:907:6e87:b0:c49:cf3a:a324 with SMTP id
- a640c23a62f3a-c5096409dbcmr975144266b.22.1794870456872; Mon, 16 Nov 2026
- 15:07:36 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794890107; x=1795494907;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=9ljMd+8qHZtmdzxzGXfXq4+janfrVyX1V/6KLR49owU=;
+        b=MyHMKqaBLuSKBDTO1iG7s5Xq/W/j3RLs5/gljBZrgdbsoQ1EBED7z4S3Vx9ODZW5Ui
+         lge+8UcEX8RNqIAWzupPSolPQuCLNjqBZ4Owzm6nlTiEW7VDNnQ/2awpvOMF9rtvrrO3
+         GgxW4A6t8RrzRWphjG06hOmAL75k1afYHnl19XhPXfuQ3j5O9hOuP/eJ8mmYOGOpfDyU
+         mVczI87GGBCLDOsHyEf9U6djKIkbDIYLZWEB1jIItik8AwV6QwjkGvWgyNjaJm5V9D1e
+         2cVRiif3i4mnmC1Eo9W9G9QR8ztO5/4SOKd4g0+OcuYCJCZ8gAdgDZmCk4fWiyOvCj/H
+         WrIA==
+X-Forwarded-Encrypted: i=1; AL+hErH//Qq1E2K82p8xWyo3K+VFlVUwE9V0w1/4keeCbzfvXnDkRiApSv/QyzdG3eEXUXEtWp38AHV/x2CoELs=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8vMbb0Ru3tUkNpkci+UVlL4N6gb1Pbl+vv+7pTTH3IFwoVcCA7
+	tO9ROjaIOBdSjyY/HzZR6r+g8s4jFgXE4918Pgx4BJT0Zj69Xz36q8vIDDvPK8xjHzbDrqb/Y02
+	VlyGB0mMJTZw8/pqDCnrMDfFTxA==
+X-Received: from pgfd23-n2.prod.google.com ([2002:a05:6a02:6557:20b0:cd6:1195:61cb])
+ (user=dylanbhatch job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:3841:b0:3a6:e99b:bbdb with SMTP id 98e67ed59e1d1-3b1b0cfe3d9mr12853706a91.50.1794890106931;
+ Mon, 16 Nov 2026 20:35:06 -0800 (PST)
+Date: Tue, 17 Nov 2026 04:34:52 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -103,136 +75,187 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20261006161155.862736-1-voytikd@gmail.com> <179454594618.814257.8646757102444143940.b4-reply@b4>
- <aviuyR8CO027Ch5R@levanger>
-In-Reply-To: <aviuyR8CO027Ch5R@levanger>
-From: Dmitry Voytik <voytikd@gmail.com>
-Date: Tue, 17 Nov 2026 00:07:10 +0100
-X-Gm-Features: AclHuK-E8ZWp4c2bm5JSmaB0I-NH5LuZseQXBYxydSLLee4ppPsCK12Q3gVM4Ug
-Message-ID: <CAAX90H2ajNcAtKREMY5YWf-CtS=WQ-A7K1SpQNJBXN757Qc8Pg@mail.gmail.com>
-Subject: Re: [PATCH v7] scripts/config: honor $KBUILD_OUTPUT by default
-To: Nicolas Schier <nsc@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Dmitry Voytik <voytikd@gmail.com>, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
+Message-ID: <20261117043504.1021063-1-dylanbhatch@google.com>
+Subject: [RFC PATCH 00/12] arm64, unwind: add .lr_unwind unwinder for reliable stacktrace
+From: Dylan Hatch <dylanbhatch@google.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Weinan Liu <wnliu@google.com>, 
+	Jens Remus <jremus@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, llvm@lists.linux.dev, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, Indu Bhagat <ibhagatgnu@gmail.com>, 
+	Prasanna Kumar T S M <ptsm@linux.microsoft.com>, live-patching@vger.kernel.org, 
+	Dylan Hatch <dylanbhatch@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Nathan and Nicolas,
+Implement a build-time .eh_frame-to-.lr_unwind table generator and
+in-kernel unwinder for arm64. The primary goal is to support reliable
+stacktrace (arch_stack_walk_reliable()) across in-kernel exception
+boundaries (pt_regs).
 
-On Sat, Nov 14, 2026 at 7:57=E2=80=AFPM Nicolas Schier <nsc@kernel.org> wro=
-te:
->
-> On Thu, Nov 12, 2026 at 09:59:06PM -0700, Nathan Chancellor wrote:
-> > Hi Dmitry,
-> >
-> > On 2026-10-06 18:11 +0200, Dmitry Voytik wrote:
-> > > If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
-> > >
-> > > Fix the issue when the script silently updates a stale .config in
-> > > the root directory, while the user expects ${KBUILD_OUTPUT}/.config
-> > > to be updated.
-> > > Handle properly if the config file is a relative path.
-> > >
-> > > The problem can be worked around with --file, but this is easy to mis=
-s,
-> > > and is inconsistent with how the Makefile and other tools work
-> > > (e.g., scripts/diffconfig).
-> >
-> > I was finally able to sit down and look at this a little bit more. I
-> > think we can avoid the use of realpath altogether, which would avoid
-> > most of what Sashiko is complaining about. I tested the following diff
-> > with your examples and they appear to pass without any issues. Please
-> > give it a shot.
+On arm64, normal stack unwinding follows frame pointer (x29) chains.
+However, when an asynchronous exception or interrupt occurs inside the
+kernel, the frame pointer chain alone is insufficient to unwind reliably
+from the interrupted context (pt_regs):
 
-I have tested and all tests passed.
-Thanks for the patch!
-I'll send a v8. Please feel free to change/add tags as necessary.
-Thanks.
+  1. Before the prologue updates x29 (mov x29, sp), after the epilogue
+     restores x29/x30, or throughout a leaf function, the interrupted
+     function's return address is live in x30 (pt_regs->regs[30]) while
+     x29 still points to the caller's frame record.
+  2. Between saving the frame record on the stack (e.g.
+     stp x29, x30, [sp, #-N]!) and updating x29 (mov x29, sp), or in
+     functions where the compiler restores x29/x30 before adjusting sp,
+     the interrupted function's frame record resides at [sp + sp_off]
+     while x29 still points to the caller's frame record.
+  3. Inside the function body after mov x29, sp, [x29] points to the
+     interrupted function's own frame record and x30 may have been
+     clobbered by nested calls.
 
->
-> Thanks, somehow the sashiko mail missed my inbox.
->
-> realpath on Linux uses '-E' behaviour by default, which is what we want:
-> check existence of all directory path components of the given path.
-> Adding the POSIX '-E' option explicitly should solve the non-Linux
-> issues.
->
-> As a follow-up, I would like to add support for $KCONFIG_CONFIG as well.
->
-> > I think we can drop most of the reproduction and
-> > examples in the commit message. If you want to include them for others,
-> > please put it below the '---' where you have the changelog, as I don't
-> > think it needs to end up in git history.
->
-> +1
->
-> But still thanks for providing the test examples, it was and is indeed
-> helpful for my follow-up tests.
->
-> >
-> > diff --git a/scripts/config b/scripts/config
-> > index 32428ea909c2..497551538433 100755
-> > --- a/scripts/config
-> > +++ b/scripts/config
-> > @@ -144,6 +144,22 @@ while [[ $# -gt 0 ]]; do
-> >       fi
-> >  done
-> >
-> > +# If no '--file' was specified, use KBUILD_OUTPUT as the base if it ex=
-ists
-> > +if [[ "$FN" =3D ".config" && -n "$KBUILD_OUTPUT" ]]; then
-> > +     if [[ ! -d "$KBUILD_OUTPUT" ]]; then
-> > +             echo "KBUILD_OUTPUT is set ('$KBUILD_OUTPUT') but does no=
-t exist or is not a directory." >&2
-> > +             echo "Create it before running $myname or use '--file' to=
- specify configuration file." >&2
-> > +             exit 1
-> > +     fi
-> > +     FN=3D"$KBUILD_OUTPUT/$FN"
-> > +fi
-> > +# Turn FN into an absolute path if it is relative so that '--refresh' =
-works on
-> > +# the correct file. This does not use realpath, as $FN may not exist y=
-et.
-> > +case "$FN" in
-> > +     /*) ;;
-> > +     *) FN=3D"$PWD/$FN" ;;
-> > +esac
-> > +
-> >  set -- "${CMDS[@]}"
-> >  if [ "$1" =3D "" ] ; then
-> >       usage
-> > @@ -200,10 +216,10 @@ while [ "$1" !=3D "" ] ; do
-> >               ;;
-> >
-> >       --state|-s)
-> > -             if grep -q "# ${CONFIG_}$ARG is not set" $FN ; then
-> > +             if grep -q "# ${CONFIG_}$ARG is not set" "$FN" ; then
-> >                       echo n
-> >               else
-> > -                     V=3D"$(grep "^${CONFIG_}$ARG=3D" $FN)"
-> > +                     V=3D"$(grep "^${CONFIG_}$ARG=3D" "$FN")"
-> >                       if [ $? !=3D 0 ] ; then
-> >                               echo undef
-> >                       else
-> > @@ -229,7 +245,7 @@ while [ "$1" !=3D "" ] ; do
-> >               ;;
-> >
-> >       --refresh)
-> > -             yes "" | make oldconfig KCONFIG_CONFIG=3D$FN
-> > +             yes "" | make oldconfig KCONFIG_CONFIG=3D"$FN"
-> >               ;;
-> >
-> >       *)
-> >
-> > --
-> > Cheers,
-> > Nathan
-> >
->
-> Looks good to me, thanks.
->
-> Reviewed-by: Nicolas Schier <nsc@fjasle.eu>
+Without knowing which state holds at the interrupted PC, the unwinder
+cannot determine whether pt_regs->regs[30] is a valid frame or a
+duplicate of [x29 + 8], nor can it recover a frame record at
+[sp + sp_off] before x29 is updated, forcing arch_stack_walk_reliable()
+to reject stack traces that cross an in-kernel exception boundary.
+
+This RFC is proposed as an alternative to an SFrame [1] based solution:
+[2]. While SFrame works well with recent GNU binutils (2.46+), it is not
+yet supported by LLVM/Clang toolchains. Conversely, compiler-generated
+.eh_frame tables (-fasynchronous-unwind-tables, enabled by
+CONFIG_UNWIND_TABLES) are supported today by both GCC and Clang/LLVM,
+and arm64 already includes a DWARF .eh_frame parser in
+arch/arm64/kernel/pi/patch-scs.c for dynamic Shadow Call Stack patching.
+
+Rather than retaining bulky raw .eh_frame sections in kernel memory and
+interpreting variable-length DWARF CFI opcodes during stack unwinding,
+this series introduces a build-time host tool (scripts/gen_lr_unwind)
+that reuses and extends arm64's .eh_frame parser (<asm/eh_frame.h>) to
+distill .eh_frame into compact, fixed-width .lr_unwind_fde and
+.lr_unwind_ranges sections, and strips .eh_frame from the final vmlinux
+and module binaries.
+
+Each annotated function is described by an 8-byte struct lr_fde entry
+(32-bit PC-relative start_offset + 32-bit range_desc), sorted at build
+time by scripts/sorttable (and at module load time) for O(log N) lookup.
+Each instruction range within a function is classified into one of three
+exception-boundary unwind modes:
+  - LR_UNWIND_LIVE: x30 holds the return address, x29 is the caller's FP
+  - LR_UNWIND_FP:   [x29] holds the saved {x29, x30} frame record
+  - LR_UNWIND_SP:   [sp + sp_off] holds the saved {x29, x30} frame record
+
+Functions with non-standard x30 spills (such as frameless leaf functions
+spilling x30 without x29) are omitted from .lr_unwind_fde so the
+unwinder treats them as unreliable.
+
+For functions following the canonical 4-phase LIVE -> FP/SP -> SP -> LIVE
+layout (prologue <= 31 insns, body <= 4095 insns, epilogue/return <= 15
+insns each, and sp_off <= 496 bytes), the ranges and sp_off are packed
+directly into the 32-bit range_desc word of struct lr_fde; functions
+with more ranges or larger lengths reference 2-byte lr_range_t entries
+in .lr_unwind_ranges. Across vmlinux, .lr_unwind_fde and
+.lr_unwind_ranges total ~800-935 KiB (~4x smaller than raw .eh_frame).
+
+This series is available on github: [3].
+
+Structure of the series:
+  - Patches 1-6: Enable .eh_frame generation for CONFIG_ARM64_LR_UNWIND,
+    factor the .eh_frame parser out of patch-scs.c into <asm/eh_frame.h>,
+    extend it to track CFA and x29/x30 state, and implement
+    scripts/gen_lr_unwind (including --dump) to emit .lr_unwind sections.
+  - Patch 7: Teach scripts/sorttable to sort .lr_unwind_fde at build time.
+  - Patches 8-9: Add in-kernel .lr_unwind lookup, optional boot/module
+    validation (CONFIG_ARM64_LR_UNWIND_VALIDATION), and module support.
+  - Patches 10-11: Annotate call_on_irq_stack() and arm64 leaf assembly
+    functions (SYM_LEAF_FUNC_START / SYM_LEAF_FUNC_END) with CFI
+    directives so they are covered by .lr_unwind.
+  - Patch 12: Use .lr_unwind in arch/arm64/kernel/stacktrace.c to
+    reliably unwind across in-kernel exception boundaries.
+
+Ref:
+[1]: https://sourceware.org/binutils/docs/sframe-spec.html
+[2]: https://lore.kernel.org/all/20261117020648.323464-1-dylanbhatch@google.com/
+[3]: https://github.com/dylanbhatch/linux/tree/eh_frame
+
+Dylan Hatch (11):
+  arm64, unwind: build with .eh_frame and add gen_lr_unwind skeleton
+  arm64: factor .eh_frame parser out of patch-scs.c into
+    <asm/eh_frame.h>
+  arm64: eh_frame: track CFA and x29/x30 register state in CFI parser
+  arm64, unwind: parse .eh_frame into .lr_unwind entries in
+    gen_lr_unwind
+  scripts/gen_lr_unwind: emit .lr_unwind_fde and .lr_unwind_ranges
+  scripts/gen_lr_unwind: add --dump option to inspect .lr_unwind tables
+  scripts/sorttable: sort .lr_unwind_fde by start_offset
+  arm64, unwind: add in-kernel .lr_unwind lookup and validation
+  arm64/module, unwind: add .lr_unwind support for modules
+  arm64, crypto/lib: annotate leaf functions with CFI info
+  unwind: arm64: use .lr_unwind to unwind interrupt frames
+
+Weinan Liu (1):
+  arm64: entry: add unwind info for call_on_irq_stack()
+
+ MAINTAINERS                            |   1 +
+ arch/arm64/Kconfig                     |  20 +
+ arch/arm64/crypto/aes-ce-ccm-core.S    |  12 +-
+ arch/arm64/crypto/aes-neonbs-core.S    |  16 +-
+ arch/arm64/crypto/ghash-ce-core.S      |  20 +-
+ arch/arm64/crypto/sm4-ce-ccm-core.S    |  16 +-
+ arch/arm64/crypto/sm4-ce-cipher-core.S |   4 +-
+ arch/arm64/crypto/sm4-ce-core.S        |  44 +-
+ arch/arm64/crypto/sm4-ce-gcm-core.S    |  16 +-
+ arch/arm64/crypto/sm4-neon-core.S      |  12 +-
+ arch/arm64/include/asm/eh_frame.h      | 552 +++++++++++++++++
+ arch/arm64/include/asm/linkage.h       |  33 +
+ arch/arm64/include/asm/lr_unwind.h     | 149 +++++
+ arch/arm64/include/asm/module.h        |   6 +
+ arch/arm64/include/asm/module.lds.h    |   2 +-
+ arch/arm64/include/asm/scs.h           |   7 -
+ arch/arm64/include/asm/sections.h      |   3 +
+ arch/arm64/kernel/Makefile             |   5 +
+ arch/arm64/kernel/entry.S              |  12 +-
+ arch/arm64/kernel/lr_unwind.c          | 395 ++++++++++++
+ arch/arm64/kernel/module.c             |  11 +
+ arch/arm64/kernel/pi/patch-scs.c       | 259 +-------
+ arch/arm64/kernel/setup.c              |   3 +
+ arch/arm64/kernel/stacktrace.c         |  85 ++-
+ arch/arm64/kernel/vmlinux.lds.S        |  27 +-
+ arch/arm64/lib/clear_user.S            |   4 +-
+ arch/arm64/lib/copy_from_user.S        |   4 +-
+ arch/arm64/lib/copy_page.S             |   4 +-
+ arch/arm64/lib/copy_to_user.S          |   4 +-
+ arch/arm64/lib/memchr.S                |   4 +-
+ arch/arm64/lib/memcmp.S                |   4 +-
+ arch/arm64/lib/memcpy.S                |   8 +-
+ arch/arm64/lib/memset.S                |   8 +-
+ arch/arm64/lib/mte.S                   |  28 +-
+ arch/arm64/lib/strchr.S                |   4 +-
+ arch/arm64/lib/strcmp.S                |   4 +-
+ arch/arm64/lib/strlen.S                |   4 +-
+ arch/arm64/lib/strncmp.S               |   4 +-
+ arch/arm64/lib/strnlen.S               |   4 +-
+ arch/arm64/lib/strrchr.S               |   4 +-
+ arch/arm64/lib/tishift.S               |  12 +-
+ scripts/.gitignore                     |   1 +
+ scripts/Makefile                       |   2 +
+ scripts/Makefile.modfinal              |  10 +-
+ scripts/Makefile.vmlinux_o             |   8 +-
+ scripts/gen_lr_unwind.c                | 821 +++++++++++++++++++++++++
+ scripts/link-vmlinux.sh                |   2 +-
+ scripts/sorttable.c                    |  50 +-
+ 48 files changed, 2325 insertions(+), 383 deletions(-)
+ create mode 100644 arch/arm64/include/asm/eh_frame.h
+ create mode 100644 arch/arm64/include/asm/lr_unwind.h
+ create mode 100644 arch/arm64/kernel/lr_unwind.c
+ create mode 100644 scripts/gen_lr_unwind.c
 
 
-Thank you both for your time!
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.56.0.679.gc527c65306-goog
+
