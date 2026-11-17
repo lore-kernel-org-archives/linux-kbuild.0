@@ -1,88 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.107.87.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794943522;
-	b=UAWUP+K7lufw0dATEOq90jJeLKeiP1Or3vakZqvWt2WM9qt8lqDiYaIVt8IPaEONogXd
-	 DAcJJsQRjdhs/an7gM0XRENMCaDycKO5Q4J9oVt96sX/Rk0OcRj0fbyAVHGHZOmfdrZSz
-	 /Ms2L8G46Xy2eDe/PbJRimlSr9MSvlFjVozOyIPtpvc2qPtynTLs2sywAozyVXLlmhjQt
-	 lvEtnqUAgGiYwtmqTjXO1IxM52DpdDRxjEDXain1pW/enk6Y7XZau28qVZ7274Ydbx2ip
-	 K8+Gz1YSgYIkNqvRXNETzwv619SMieubtA9t7I41b7KMU3li0/ckm7AKuSWrP6C7ROw==
+	t=1794945814;
+	b=iIXl8c8/FZWd1ynt/TTzE5TJr5BiX+Uuhl/FOSsCRY5aYONP4h4FyG/lFfQkhA29wnZ/
+	 mEmYux0QoosTiUD6HGxXOmhVpZOWXn8XufXUWlmOtnZPZHQIeGzH245H844fpcJIWMlqf
+	 +TYXBbXbMA7eYE5T8ggHmnd5QsW+XInEcwnDnAnJfM32Nsn0ecCyrw/fR3A8QjSqIXQfT
+	 RYmbLsmaFhpotenaUtRsCy/+Sl0xxToaVQHzSSLbd5i/wETpXcXSexfSNqoAIZgJMDG5o
+	 d6v+bUPsozHQht3vqlp10J8mmviu9QpJFbx7Gp/vG/mok9J8YjFDu6LJOZQ7Q8d/zNg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794943522;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Sender:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type;
-	bh=B8MjyhYguiwLesyCEY4OhpKHbfRfW8qAAwEpxRAKXd0=;
-	b=uvdvkOpSBqa0v32mx0hMpzMfR6UXBDbXeLKbUDC+4ejJ556YrEds6AY0fRItG2LUaqdE
-	 zOSBV90PxZF9annSNNknEG0ICLqPnB1FeqCI3cmFoMAP1GX9gmdx144IajvXe9SeiRD2A
-	 NqGFRIlMy8A8awzghhO/LvN/J2RfA+vFLbQCoxJt+rxzq4f9yeiBVD9X2oZiDvvkgrlXM
-	 L5CKAu96nLda4/vYIv7LTVh/kFvB3tCo1xdXymP73rbyaDlZ+R63xTWYVHw7KEhsLYygT
-	 xtC6P8QcE4E6dYbk7DOzCg4yooo7UqGyLxfkhYvQDEUz/B06IN0K3ZQF78Fctf9eZYA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794945814;
+	h=DMARC-Filter:Received:Received:Received:Received:DKIM-Filter:
+	 DKIM-Signature:X-Virus-Scanned:Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type;
+	bh=uyyTnPsw7Ii2zbJiwxPIj01iC+D/M15OetanJcm5Djg=;
+	b=BH2MaXPSJ90/IEgZyzufBT8rGmmVk8NK+MVna8ZHrFCCJlx9ETRZPwiJzs0OqQqFpNo0
+	 X3lzL484WdJ1hiUbEz7NmOtl+Ys8F+FmTNf7PLUtArXc8CkcIp0ewwmyUjW74CBEmr78C
+	 dK6twhhocucoPtWyWsJvKUbnDDIFMqBXCr5SeTPTGgoL5e45apiSBM3t6nxwU3L7mRirL
+	 8nQ0x1kuq3tyseEoWH1mukLWN1v5abuq7O4MkHlYNeTo6af7y68FTqkfIntj/RA9T0zC/
+	 62I6YzTz3NYiLwC7XTECZdPcU2CvjP3I/H0EN4pfAe5kbq+eBSbPLwWaH+HNISnX4Ow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bkDKKmQE;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=tngtech.com;
+	spf=pass smtp.mailfrom=tngtech.com;
+	dkim=pass header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b="Tpp43/QH";
+	arc=none smtp.remote-ip=34.107.87.41
+Received: from mailout.tng.vnc.biz (mailout.tng.vnc.biz [34.107.87.41])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE85606A32C
-	for <linux-kbuild@vger.kernel.org>; Tue, 17 Nov 2026 19:25:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EFE85606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58855606A32A
+	for <linux-kbuild@vger.kernel.org>; Tue, 17 Nov 2026 20:03:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 58855606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tngtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tngtech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bkDKKmQE
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a140e7405dso2358495e9.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Nov 2026 11:25:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794943520; x=1795548320; darn=vger.kernel.org;
-        h=content-type:in-reply-to:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:sender:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=B8MjyhYguiwLesyCEY4OhpKHbfRfW8qAAwEpxRAKXd0=;
-        b=bkDKKmQErNzaF6smeftQWBOpWfgtjVM5vGBkntiPqeIhKc4VhM+KvNPs0pA0sgqXwt
-         VimIqchx3dU0UBKYCYuJvXdRTBDbSUbjYoVurn2OnxsofUYJXXovQgNJ02XbR/2I1iRz
-         yQY5tOLcoY0VtUg6HQJ2zMgyrpnM21Ygbz+BrUWj0jgdwCzx2RGvdybIxlDU2dYvU9tj
-         xTZNk/2tXq85So1kTNLLOZm1bkiu7JM8gElovAUhHyyAsR8i7iDjbbPE3tKvmnXx9XcJ
-         STuTEDgGKm3r8clrf2XCGF6J+JGGGFI3F6LWZxudUeh2hhoXB3CcUpxrSXkFABEecj0O
-         oBjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794943520; x=1795548320;
-        h=content-type:in-reply-to:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:sender:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=B8MjyhYguiwLesyCEY4OhpKHbfRfW8qAAwEpxRAKXd0=;
-        b=PsGKMS1Ml3QI+n5//kwErBForzV3s5AY0K2PThA2+qxgmQVo/V1qnxyi+DiPdXlEvy
-         Hft3t20c6B41s4tQ8exsEN7A+hBMWbmv4R95Hz1rSisOiZEBedhHvR1haqf80ZUygRxa
-         qiBVg7GBEwnZYlBeybgGtZngR8qKiZso4PSm/pgr6Dd+Y7CiO6Fd2CTAFIUxAtCSBTgv
-         Y8abQMCTJDy/cH3Qzql9XfEoXLveqzcSOcclPkKTSsYvcWgnzlh5Jj3+CwHnA2rXQsax
-         5jemz3KIs1KPI1kfbP4Wt7AHQy4oVBhSQYz50mL6TXDtXo7K4vTEVUCk4lM2xaPh1nmU
-         j1mw==
-X-Forwarded-Encrypted: i=1; AL+hErFXIlkOfYmXP3auRp/tW113FvKYKgKLmyauNM82LTzBAGZzgiQvR90togXmsau/pD+CUSAMcqs5FaZhkwo=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/wbMguNrdRKs2+Ei3eDz6Hm+2v7aM+R8JhwLprUrsPugG+lqE1
-	eWLPx+wpsjr05yLbc0OuzvO2mg9yO24hB9DdD4JjFPIduAovR9NW5Hzf2IleFISx
-X-Gm-Gg: AYBFou2ie15VuUlCXUaf9HEPjEh3Be5pva70moQ68lK43QyzPGAqnsKyTE/revVQiG6
-	96582Tpx23AprAGrhJ7gNiLp73Nm6Rt/ldwmd8sKWJxUjU6fdiPWY4htBh7fiMxZ1eZ24d1m732
-	7Bih+SmvEC60p29uLw8u3Z9VJz34XB8w+Axg5RRg0IURa+INouqcX1UiOtQu7MMIqTzWiQCG7SF
-	R/IWbzSNLy2D5FXflPvSrXNDS05gKMVREmyKx8Cwr48d9G4nYlT6hYlGYuoRdoELmlL2dSXHOk+
-	fUO2s7fcYgduF00uA1xFRF46/mTKHTy3+O68N/JJzD9SsJohXs6dlrnvoCQO/tvmkgfH2sxTSLX
-	iQnQMBxPGM3JpKlRejwt3BaIQn4nr87KsSyTi4pju45Zu84W1wJisYHKk2uh8hqnLAoevH7nA+Z
-	F/HYVc5SvdqkFZQ+Wpn2hCP4BSDlsOSlRfCTD4iFNQBkbfYUDsH6XI0yr2Pr27tmbJEPWWd7/ev
-	qMjBx4IB6d4BtsSP1SmBHSFEWYSF6oMmDbrm6njQfdxbmQyTpFOSmu+4OCNvDOZPhdFW/mmsFPi
-	GY9H7m5BsxcO/3LGtZXUoaIWc1n/dJR5wVTNhBN+q2T/7/WQo5n2U/H8iQ/X2l/9ceuIcgEnjZf
-	cWjQW6xwdCxgHwgYX33CFFg==
-X-Received: by 2002:a05:600c:1c03:b0:4a3:5aea:21e5 with SMTP id 5b1f17b1804b1-4bb7da1392emr3582515e9.9.1794943520032;
-        Tue, 17 Nov 2026 11:25:20 -0800 (PST)
-Received: from [10.128.10.232] (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb7d256f64sm6615065e9.1.2026.11.17.11.25.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Nov 2026 11:25:19 -0800 (PST)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <26f53b63-2f75-4fa4-bf6f-d3495e4e5cb0@gmail.com>
-Date: Tue, 17 Nov 2026 19:25:17 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=tngtech.com header.i=@tngtech.com header.a=rsa-sha256 header.s=B14491C6-869D-11EB-BB6C-8DD33D883B31 header.b=Tpp43/QH
+Received: from zmproxy.tng.vnc.biz (zmproxy.tng.vnc.biz [172.16.1.23])
+	by mailout.tng.vnc.biz (Postfix) with ESMTPS id 619F740625;
+	Tue, 17 Nov 2026 21:03:22 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 44DB71FBB9B;
+	Tue, 17 Nov 2026 21:03:22 +0100 (CET)
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id Mouwf1Q8IWXB; Tue, 17 Nov 2026 21:03:21 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTP id 9C6291FBC2C;
+	Tue, 17 Nov 2026 21:03:21 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 zmproxy.tng.vnc.biz 9C6291FBC2C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tngtech.com;
+	s=B14491C6-869D-11EB-BB6C-8DD33D883B31; t=1794945801;
+	bh=uyyTnPsw7Ii2zbJiwxPIj01iC+D/M15OetanJcm5Djg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=Tpp43/QH66fHlxODqWhzxEZXmbdYeeasX8GgSxUBLZrKitXj6UGZW0qw7maqLFWik
+	 Al42hFrkC0NiUvMv23eMMCnIgNEOuOYW8x1EX7QSsEraUGekl1hbe9xvzciKILbZKl
+	 Q/eOTu5rpGr97Qs99fC4pTXbM7tvomTiQXuQp20cO8GwWEYCkHT/9R4YDvgNUTSEEy
+	 09tR3LQOg/uBFqXY8ODIemucitdVm55HyTIAXBpq4FIjPsaBvJ30Z7iqKcuXJGAR8D
+	 jDlMrIAaNcjCeP8hlN180hH4ZwVRTtbWXEsScPT2+UBCL3DWc16l4lzelkNaPyK/ep
+	 ogoyPqlMqLnYg==
+X-Virus-Scanned: amavis at zmproxy.tng.vnc.biz
+Received: from zmproxy.tng.vnc.biz ([127.0.0.1])
+ by localhost (zmproxy.tng.vnc.biz [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id OkUBGHKpgxRN; Tue, 17 Nov 2026 21:03:21 +0100 (CET)
+Received: from [192.168.0.168] (ipservice-092-209-236-032.092.209.pools.vodafone-ip.de [92.209.236.32])
+	by zmproxy.tng.vnc.biz (Postfix) with ESMTPSA id DDAD51FBB9B;
+	Tue, 17 Nov 2026 21:03:20 +0100 (CET)
+Message-ID: <99eee19a-9761-48c0-a097-c115c4782c36@tngtech.com>
+Date: Tue, 17 Nov 2026 21:03:18 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -93,229 +76,139 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8] scripts/config: honor $KBUILD_OUTPUT by default
-To: Dmitry Voytik <voytikd@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nsc@kernel.org>
-Cc: Nicolas Schier <n.schier@fritz.com>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org
-References: <20261117132513.52725-1-voytikd@gmail.com>
+Subject: Re: [PATCH v5 4/7] kbuild: record cmd-prereqs in .cmd files
+To: sashiko-reviews@lists.linux.dev, nathan@kernel.org, nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org,
+ gregkh@linuxfoundation.org, kstewart@linuxfoundation.org,
+ maximilian.huber@tngtech.com
+References: <20261116175215.1337416-1-luis.augenstein@tngtech.com>
+ <20261116175215.1337416-5-luis.augenstein@tngtech.com>
+ <sashiko-outbox-219281@kernel.org>
 Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20261117132513.52725-1-voytikd@gmail.com>
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+In-Reply-To: <sashiko-outbox-219281@kernel.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------h9NH4JQ2nsmywqa2RPKACNQG"
+ boundary="------------ifMQBf5U1i40GslSf02eGMt5"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------h9NH4JQ2nsmywqa2RPKACNQG
-Content-Type: multipart/mixed; boundary="------------1ksFLSAbDFp3BUVtXrT4MIm0";
+--------------ifMQBf5U1i40GslSf02eGMt5
+Content-Type: multipart/mixed; boundary="------------C5RD8l2JFHi00i5rpxJzfEfw";
  protected-headers="v1"; hp="clear"
-Message-ID: <26f53b63-2f75-4fa4-bf6f-d3495e4e5cb0@gmail.com>
-Date: Tue, 17 Nov 2026 19:25:17 +0000
+Message-ID: <99eee19a-9761-48c0-a097-c115c4782c36@tngtech.com>
+Date: Tue, 17 Nov 2026 21:03:18 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8] scripts/config: honor $KBUILD_OUTPUT by default
-To: Dmitry Voytik <voytikd@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nsc@kernel.org>
-Cc: Nicolas Schier <n.schier@fritz.com>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org
-References: <20261117132513.52725-1-voytikd@gmail.com>
+Subject: Re: [PATCH v5 4/7] kbuild: record cmd-prereqs in .cmd files
+To: sashiko-reviews@lists.linux.dev, nathan@kernel.org, nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org,
+ gregkh@linuxfoundation.org, kstewart@linuxfoundation.org,
+ maximilian.huber@tngtech.com
+References: <20261116175215.1337416-1-luis.augenstein@tngtech.com>
+ <20261116175215.1337416-5-luis.augenstein@tngtech.com>
+ <sashiko-outbox-219281@kernel.org>
 Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20261117132513.52725-1-voytikd@gmail.com>
+From: Luis Augenstein <luis.augenstein@tngtech.com>
+In-Reply-To: <sashiko-outbox-219281@kernel.org>
 
---------------1ksFLSAbDFp3BUVtXrT4MIm0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+--------------C5RD8l2JFHi00i5rpxJzfEfw
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Hi Dmitry,
+DQoNCk9uIDExLzE3LzI2IDE4OjUyLCBzYXNoaWtvLWJvdEBrZXJuZWwub3JnIHdyb3RlOg0K
+PiBbU2V2ZXJpdHk6IExvd10NCj4gRG9lcyBjbWQtcHJlcmVxcyBpbmNsdWRlIHRvb2xzL29i
+anRvb2wvb2JqdG9vbCBvbiBpbmNyZW1lbnRhbCBidWlsZHMgd2hpbGUNCj4gb21pdHRpbmcg
+aXQgb24gY2xlYW4gYnVpbGRzPw0KPiANCj4gSW4gc2NyaXB0cy9NYWtlZmlsZS5saWIsIGNt
+ZF9nZW5fb2JqdG9vbGRlcCBhcHBlbmRzIGEgc3RhbmRhbG9uZSBydWxlIHRvDQo+IHRoZSAu
+Y21kIGZpbGUgYWZ0ZXIgY21kX2FuZF9maXhkZXAgb3IgY21kX2FuZF9zYXZlY21kIHJ1bnM6
+DQo+IA0KPiBzY3JpcHRzL01ha2VmaWxlLmxpYjoNCj4gY21kX2dlbl9vYmp0b29sZGVwID0g
+JChpZiAkKG9ianRvb2wtZW5hYmxlZCksIHsgZWNobyA7IGVjaG8gJyRAOiAkJCh3aWxkY2Fy
+ZCAkKG9ianRvb2wpKScgOyB9ID4+ICQoZG90LXRhcmdldCkuY21kKQ0KPiANCj4gT24gYSBj
+bGVhbiBidWlsZCwgJChkb3QtdGFyZ2V0KS5jbWQgZG9lcyBub3QgZXhpc3QgeWV0LCBzbyAk
+KHJlYWwtcHJlcmVxcykNCj4gYW5kIG1ha2VfcHJlcmVxc188dGFyZ2V0PiBkbyBub3QgaW5j
+bHVkZSAkKG9ianRvb2wpLiAgT24gYW4gaW5jcmVtZW50YWwNCj4gcmVidWlsZCwgTWFrZSBp
+bmNsdWRlcyB0aGUgcHJldmlvdXMgLmNtZCBmaWxlIGFuZCBhZGRzIHRvb2xzL29ianRvb2wv
+b2JqdG9vbA0KPiB0byAkXiBhbmQgJChyZWFsLXByZXJlcXMpLiAgQmVjYXVzZSBpdCBpcyBu
+ZWl0aGVyIGluICQoZGVwc18kQCkgbm9yIGluIHRoZQ0KPiBjb21waWxlciBkZXBmaWxlLCBu
+ZWl0aGVyIGNtZC1wcmVyZXFzIG5vciBmaXhkZXAgZmlsdGVycyBpdCBvdXQsIGxlYXZpbmcN
+Cj4gbWFrZV9wcmVyZXFzXzx0YXJnZXQ+IGluY29uc2lzdGVudCBiZXR3ZWVuIGNsZWFuIGFu
+ZCBpbmNyZW1lbnRhbCBidWlsZHMuDQoNCm1ha2VfcHJlcmVxcyBpcyB3cml0dGVuIGJlZm9y
+ZSBLYnVpbGQgYXBwZW5kcyB0aGUgb2JqdG9vbCBkZXBlbmRlbmN5DQpydWxlIHRvIHRoZSAu
+Y21kIGZpbGUuIFRoZXJlZm9yZSwgTWFrZSBkb2VzIG5vdCB5ZXQga25vdyBhYm91dA0Kb2Jq
+dG9vbCBkdXJpbmcgdGhlIGluaXRpYWwgYnVpbGQuIE9uIHRoZSBuZXh0IGJ1aWxkLCBNYWtl
+IHJlYWRzIHRoZQ0KLmNtZCBmaWxlIGFuZCBpbmNsdWRlcyB0aGUgYXBwZW5kZWQgb2JqdG9v
+bCBkZXBlbmRlbmN5IGluICReLiBJZiB0aGUNCnRhcmdldCBpcyByZWJ1aWx0LCBtYWtlX3By
+ZXJlcXMgcmVjb3JkcyBvYmp0b29sIGFzIHdlbGwuDQoNCkkgdGhpbmsgdGhpcyBiZWhhdmlv
+ciBpcyBmaW5lLiBvYmp0b29sIGJlY29tZXMgYSBNYWtlIHByZXJlcXVpc2l0ZQ0Kb25seSBh
+ZnRlciB0aGUgaW5pdGlhbCBidWlsZCwgc28gaXQgaXMgY29uc2lzdGVudCBmb3IgaXQgdG8g
+YXBwZWFyDQppbiBtYWtlX3ByZXJlcXMgb25seSBhZnRlciBhIHJlYnVpbGQuDQoNCkZvciB0
+aGUgU0JPTSB0aGlzIGlzIGlycmVsZXZhbnQgYmVjYXVzZSBvYmp0b29sIGlzDQpmaWx0ZXJl
+ZCBvdXQgYW55d2F5LiBDbGVhbiBhbmQgaW5jcmVtZW50YWwgU0JPTXMgYXJlIHRoZXJlZm9y
+ZSB0aGUNCnNhbWUuIEkgd291bGQga2VlcCB0aGlzIGJlaGF2aW9yIGFzLWlzIHJhdGhlciB0
+aGFuIGludHJvZHVjaW5nDQpzcGVjaWFsLWNhc2UgbG9naWMgZm9yIG9ianRvb2wuDQoNCj4g
+W1NldmVyaXR5OiBNZWRpdW1dDQo+IERvICcuLyctcHJlZml4ZWQgaGVhZGVyIGRlcGVuZGVu
+Y2llcyBmYWlsIHRvIG1hdGNoIGluIGJvdGggY21kLXByZXJlcXMgYW5kDQo+IHByaW50X21h
+a2VfcHJlcmVxcygpIG9uIGluY3JlbWVudGFsIGJ1aWxkcz8NCj4gDQo+IEtidWlsZCBwYXNz
+ZXMgaW5jbHVkZSBwYXRocyBiZWdpbm5pbmcgd2l0aCAnLi8nIChzdWNoIGFzIC1JLi9pbmNs
+dWRlIGFuZA0KPiAtaW5jbHVkZSAuL2luY2x1ZGUvbGludXgva2NvbmZpZy5oKSwgc28gdGhl
+IGNvbXBpbGVyIGRlcGZpbGUgYW5kDQo+IGRlcHNfPHRhcmdldD4gcmVjb3JkIHBhdGhzIHdp
+dGggYSBsZWFkaW5nICcuLycuICBXaGVuIE1ha2UgcGFyc2VzDQo+ICc8dGFyZ2V0PjogJChk
+ZXBzXzx0YXJnZXQ+KScgb24gYW4gaW5jcmVtZW50YWwgYnVpbGQsIGl0IHN0cmlwcyBsZWFk
+aW5nDQo+ICcuLycgZnJvbSB0YXJnZXQgbmFtZXMgd2hlbiBwb3B1bGF0aW5nICReIGFuZCAk
+KHJlYWwtcHJlcmVxcykuDQo+IA0KPiBBcyBhIHJlc3VsdCwgJChmaWx0ZXItb3V0ICQoZGVw
+c18kQCksICQocmVhbC1wcmVyZXFzKSkgaW4gY21kLXByZXJlcXMgYW5kDQo+IHRoZSBzZWVu
+X3ByZXJlcXNfaGFzaHRhYiBsb29rdXAgaW4gcHJpbnRfbWFrZV9wcmVyZXFzKCkgY29tcGFy
+ZSAnLi8nLXByZWZpeGVkDQo+IHN0cmluZ3MgYWdhaW5zdCBzdHJpcHBlZCB0b2tlbnMgaW4g
+cHJlcmVxcy4gIEV2ZXJ5ICcuLyctcHJlZml4ZWQgaGVhZGVyIGluDQo+IGRlcHNfPHRhcmdl
+dD4gKGluY2x1ZGluZyBoZWFkZXJzIHJlbW92ZWQgc2luY2UgdGhlIHByZXZpb3VzIGJ1aWxk
+KSB0aGVuDQo+IGxlYWtzIGludG8gbWFrZV9wcmVyZXFzXzx0YXJnZXQ+IG9uIGluY3JlbWVu
+dGFsIHJlYnVpbGRzLg0KPiANCj4gU3RyaXBwaW5nIGxlYWRpbmcgJy4vJyB3aGVuIG5vcm1h
+bGl6aW5nIGRlcHNfPHRhcmdldD4gaW4gY21kLXByZXJlcXMgYW5kDQo+IHdoZW4gaW5zZXJ0
+aW5nIG9yIGxvb2tpbmcgdXAgZW50cmllcyBpbiBwcmludF9tYWtlX3ByZXJlcXMoKSB3b3Vs
+ZCBhbGxvdw0KPiBib3RoIGZpbHRlcnMgdG8gbWF0Y2ggdGhlIHBhdGhzIGluICQocmVhbC1w
+cmVyZXFzKS4NCg0KQ29uZmlybWVkIGFuZCByZXByb2R1Y2VkIHRoaXMgaW4gYW4gaW4tdHJl
+ZSBidWlsZCBmb3INCmtlcm5lbC9raGVhZGVyc19kYXRhLnRhci54ei4gZ2VuX2toZWFkZXJz
+LnNoIHJlY29yZHMgaXRzIHNvdXJjZS1saXN0DQplbnRyaWVzIHdpdGggYSBsZWFkaW5nICIu
+LyIuIE9uIHRoZSBuZXh0IGJ1aWxkLCBNYWtlIHJlcG9ydHMgdGhvc2UNCnByZXJlcXVpc2l0
+ZXMgaW4gJF4gd2l0aG91dCB0aGUgbGVhZGluZyAiLi8iLCBzbyB0aGUgZXhpc3RpbmcgZmls
+dGVyDQpmYWlscyB0byByZW1vdmUgdGhlbSBmcm9tIGNtZC1wcmVyZXFzLg0KDQpXaXRoIENP
+TkZJR19JS0hFQURFUlM9eSwgYSBmb3JjZWQgaW5jcmVtZW50YWwgYnVpbGQgZXhwYW5kcyBt
+b3JlIHRoYW4NCjcwMDAgcGF0aHMgaW50byBtYWtlX3ByZXJlcXMuIFRoZSByZXN1bHRpbmcg
+c2hlbGwgY29tbWFuZCBleGNlZWRzIHRoZQ0KbWF4aW11bSBhcmd1bWVudCBzaXplIGFuZCBm
+YWlscyB3aXRoICJBcmd1bWVudCBsaXN0IHRvbyBsb25nIi4NCg0KVG8gZml4IHRoaXMgdGhl
+IHByZWZpeCAiLi8iIHNob3VsZCBiZSByZW1vdmVkIGJlZm9yZSBjb21wYXJpbmcNCnByZXZp
+b3VzIGRlcHNfIHdpdGggcmVhbC1wcmVyZXFzLiBJIHdpbGwgYWRkIHRoaXMgbm9ybWFsaXph
+dGlvbiBpbiB2NjoNCg0KY21kLXByZXJlcXMgPSAkKGNhbGwgZXNjc3EsIFwNCgkkKGZpbHRl
+ci1vdXQgJChwYXRzdWJzdCAuLyUsJSwkKGRlcHNfJEApKSwgJChyZWFsLXByZXJlcXMpKSkN
+Cg0KLS0gDQpMdWlzIEF1Z2Vuc3RlaW4gKiBsdWlzLmF1Z2Vuc3RlaW5AdG5ndGVjaC5jb20g
+KiArNDkxNTIyNTI3NTc2MQ0KVE5HIFRlY2hub2xvZ3kgQ29uc3VsdGluZyBHbWJILCBCZXRh
+LVN0ci4gMTMsIDg1Nzc0IFVudGVyZsO2aHJpbmcNCkdlc2Now6RmdHNmw7xocmVyOiBEci4g
+Um9iZXJ0IERhaGxrZSwgVGhvbWFzIEVuZHJlcywgTW9yaXR6IFByaW56DQpBdWZzaWNodHNy
+YXRzdm9yc2l0emVuZGVyOiBIZW5yaWsgS2xhZ2dlcw0KU2l0ejogVW50ZXJmw7ZocmluZyAq
+IFJlZ2lzdGVyZ2VyaWNodDogQW10c2dlcmljaHQgTcO8bmNoZW4gKiANCkhhbmRlbHNyZWdp
+c3Rlcm51bW1lcjogSFJCIDEzNTA4Mg0KDQo=
 
-On 11/17/26 13:25, Dmitry Voytik wrote:
-> If $KBUILD_OUTPUT is set, use it by default if --file is not passed.
+--------------C5RD8l2JFHi00i5rpxJzfEfw--
 
-I guess this isn't inaccurate, but it should perhaps mention for
-completeness that 'scripts/config' will also now default to using
-'$KBUILD_OUTPUT' if passing '.config' with '--file'.
-
->=20
-> Fix the issue when the script silently updates a stale .config in
-> the root directory, while the user expects ${KBUILD_OUTPUT}/.config
-> to be updated.
-> Handle properly if the config file is a relative path.
->=20
-> The problem can be worked around with --file, but this is easy to miss,=
-
-> and is inconsistent with how the Makefile and other tools work
-> (e.g., scripts/diffconfig).
->=20
-> How to reproduce the issue:
-> 	make mrproper
-> 	export KBUILD_OUTPUT=3D.out
-> 	make defconfig
-> 	./scripts/config \
-> 	       -e CONFIG_UBSAN
-> Error reported:
-> 	grep: .config: No such file or directory
->=20
-> Signed-off-by: Dmitry Voytik <voytikd@gmail.com>
-> Suggested-by: Nathan Chancellor <nathan@kernel.org>
-> ---
-> How the patch was tested:
-> 	make mrproper
-> 	export KBUILD_OUTPUT=3D.out
-> 	make defconfig
-> 	grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config || echo "OK"
->=20
-> Test the basic usage:
-> 	./scripts/config -e CONFIG_UBSAN
-> 	grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config && echo "OK"
->=20
-> Test --refresh picks up correct config file by using $KBUILD_OUTPUT:
-> 	./scripts/config -d CONFIG_UBSAN
-> 	grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config && echo "FAIL"
-> 	./scripts/config --refresh -e CONFIG_UBSAN
-> 	grep "CONFIG_UBSAN=3Dy" $KBUILD_OUTPUT/.config && echo "OK"
->=20
-> Test --file takes precedence over $KBUILD_OUTPUT and a relative
-> path is handled properly:
-> 	./scripts/config -d CONFIG_UBSAN
-> 	mkdir .out2
-> 	cp .out/.config .out2/.my_config
-> 	grep "CONFIG_UBSAN=3Dy" .out2/.my_config  && echo "FAIL"
-> 	./scripts/config --file .out2/.my_config --refresh \
-> 	       -e CONFIG_UBSAN
-> 	grep "CONFIG_UBSAN=3Dy" .out2/.my_config && echo "OK"
-> 	ls .out/.out2 && echo "FAIL"
-> 	ls .out/.out && echo "FAIL"
->=20
-> Test --file can accept files with hyphen:
-> 	./scripts/config -d CONFIG_UBSAN
-> 	cp .out/.config -- -my_config
-> 	grep "CONFIG_UBSAN=3Dy" -- -my_config && echo "FAIL"
-> 	./scripts/config  --refresh \
-> 	       -e CONFIG_UBSAN --file -my_config
-> 	grep "CONFIG_UBSAN=3Dy" -- -my_config && echo "OK"
-> ---
-> v8:
->  * Nathan Chancellor ironed out the patch to the acceptable state
-> v7:
->  * Adressed https://sashiko.dev/#/patchset/20261006142337.821859-1-voyt=
-ikd%40gmail.com
-> v6:
->  * Per Nathan Chancellor's suggestions, simplified
->  * https://lore.kernel.org/
-> lkml/179121581235.2275809.12565811683284940522.b4-review@b4/
-> v5:
->  * Per Nathan Chancellor's suggestion, improved handling $FN path by
->    realpath
->  * https://lore.kernel.org/
-> lkml/179097210878.309835.10523307262544578337.b4-review@b4/
->  * Documented the new test scenario in the git commit message
-> v4:
->  * Addressed Nicolas Schier's comments - dropped the change how '--refr=
-esh'
->    is handled
->  * Implemented conversion of $FN to the absolute path which helps with
->    '--refresh' and relative paths
->  * Documented testing steps in the commit message
-> v3:
->  * Added an example in the commit message how to reproduce the issue
-> v2:
->  * Addressed comments by sashiko:
->    * https://sashiko.dev/#/patchset/20260920064350.17999-1-voytikd%40gm=
-ail.com
->    * use basename when --refresh is used
->    * remove echo which can be misleading when --file is passed
-> v1:
->  * https://lore.kernel.org/all/20260920064350.17999-1-voytikd@gmail.com=
-/
-> ---
->  scripts/config | 22 +++++++++++++++++++---
->  1 file changed, 19 insertions(+), 3 deletions(-)
->=20
-> diff --git a/scripts/config b/scripts/config
-> index 32428ea909c2..13b87b7f316a 100755
-> --- a/scripts/config
-> +++ b/scripts/config
-> @@ -144,6 +144,22 @@ while [[ $# -gt 0 ]]; do
->  	fi
->  done
-> =20
-> +# If no '--file' was specified, use KBUILD_OUTPUT as the base if it ex=
-ists
-> +if [[ "$FN" =3D ".config" && -n "$KBUILD_OUTPUT" ]]; then
-
-Right so this will give different results with:
-    '--file .config'
-and:
-    '--file ./.config'
-
-but maybe that was intentional -- i.e. we're assuming a user passing
-'.config' intends it to be '$KBUILD_OUTPUT/.config' while a user passing
-'./.config' would intend CWD/.config?
-
-> +	if [[ ! -d "$KBUILD_OUTPUT" ]]; then
-> +		echo "KBUILD_OUTPUT is set ('$KBUILD_OUTPUT') but does not exist or =
-is not a directory." >&2
-> +		echo "Create it before running $myname or use '--file' to specify co=
-nfiguration file." >&2
-> +		exit 1
-> +	fi
-> +	FN=3D"$KBUILD_OUTPUT/$FN"
-> +fi
-> +# Turn FN into an absolute path if it is relative so that '--refresh' =
-works on
-> +# the correct file. This does not use realpath, as $FN may not exist y=
-et.
-> +case "$FN" in
-> +	/*) ;;
-> +	*) FN=3D"$PWD/$FN" ;;
-> +esac
-> +
->  set -- "${CMDS[@]}"
->  if [ "$1" =3D "" ] ; then
->  	usage
-> @@ -200,10 +216,10 @@ while [ "$1" !=3D "" ] ; do
->  		;;
-> =20
->  	--state|-s)
-> -		if grep -q "# ${CONFIG_}$ARG is not set" $FN ; then
-> +		if grep -q "# ${CONFIG_}$ARG is not set" "$FN" ; then
->  			echo n
->  		else
-> -			V=3D"$(grep "^${CONFIG_}$ARG=3D" $FN)"
-> +			V=3D"$(grep "^${CONFIG_}$ARG=3D" "$FN")"
->  			if [ $? !=3D 0 ] ; then
->  				echo undef
->  			else
-> @@ -229,7 +245,7 @@ while [ "$1" !=3D "" ] ; do
->  		;;
-> =20
->  	--refresh)
-> -		yes "" | make oldconfig KCONFIG_CONFIG=3D$FN
-> +		yes "" | make oldconfig KCONFIG_CONFIG=3D"$FN"
->  		;;
-> =20
->  	*)
-> -- 2.56.1
->=20
-
-Tested-by: Julian Braha <julianbraha@gmail.com>
-Reviewed-by: Julian Braha <julianbraha@gmail.com>
-
---------------1ksFLSAbDFp3BUVtXrT4MIm0--
-
---------------h9NH4JQ2nsmywqa2RPKACNQG
+--------------ifMQBf5U1i40GslSf02eGMt5
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wnsEABYIACMWIQT6qjll++tIFxF8TUPElYPCBXNxIAUCavyqHQUDAAAAAAAKCRDElYPCBXNxIKGe
-AP4pDmqqFsz3r95g9aqPdO3jTxBzN/dky9iQK/BePfsGgAEAoNorCzArcpVk28VeKaS+ISJBOQdx
-Im02pG67wW/PBQA=
-=ybVr
+wsF5BAABCAAjFiEEJzBrWn4qHw5a0jAXeVyKys3c+zQFAmr8swcFAwAAAAAACgkQeVyKys3c+zSn
+1A//U9t4M3B5f67cBXIo6aL8Ls7YKBx6z6L/Dz6FY5/X8r5xxyZu1FFARL8n4ttNW6pF6Ak+0SIl
++bwcz0nSHvprk+OYv6Xi5Te1yaMu4+93jA7qhjRruh0dE7Rc8oGHS86Sn7TNmGjudNlgXoie4dSl
+BEhgXHIBjRUTYEV/E+Fjvsu+Tvpb742HxN2fNoozdtpVdTWCVkohtgjYKqEgfPtLCjld1zwSqoTd
+wYzNe7UEzmZkZzXjHvgdOCyQEaPgFv4zWkiolnI/9jCY4E2kkR4u1WQT6cvmzr5Dntsn5dSfwrGn
+EYwFQpQ/AExAXziqC9k8/MP2Is0UJxhXNilXKIJDmyqLk7Y9Uv4eBtMjAF84hDG18FaGTCZbk4k8
+U3T+Mpo0aXe3J0MsTuOZ9zXZzFvz5nMNKOeZKMJVQLdaZfncxj/icC6UqAhvhVpE1sCqmBNCb2WB
+Tpsjs0/xgKT55cFM9PUmEfyP8fxadpF/eLSypwVpKO5yY1+hHSmrknxE6nHHQk5EKu1wSvYIoh9r
+QI2p2iS6Y3NIhxCvbMC3tvBOd3DGBitdgvhzL36bYh+XKrsl+1s2SHsj/o9LOuwZGC0+Wl/14F9O
+yno6k7J9x48p29tXjD4vaII8Jy4ZJD//sQ0140ltWGImOUhr2kFhZo2GcNPpHoUjXc0V+GhJnUtq
+ll8=
+=fzPu
 -----END PGP SIGNATURE-----
 
---------------h9NH4JQ2nsmywqa2RPKACNQG--
+--------------ifMQBf5U1i40GslSf02eGMt5--
