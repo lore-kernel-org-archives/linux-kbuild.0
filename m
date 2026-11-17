@@ -1,102 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.179
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794897477;
-	b=esSoagv8ux7BohNbDi2mzx8vVaKb75l6z0pepSnA/WrXIJE+ryK4OKshnVppAuMqkIL+
-	 f679BV1RO/62chQju97OofTdsTO72rwQclzfylMy/q0U8G+frp63ayfkdrI+2fG3gw7kR
-	 iZbhuuUc6yI/trZF9o52EwgXEsEvDR7vHVa1XWoBoZUWGj64rwtSiemZbwzXVoiDZJMXP
-	 x0hPQ6rHr287pSJI/7QO1QmOLdwOJ18zYXy1OjpVWTIXml7qxDRUWH6a3T7kIv3Xu7HDH
-	 7Ilh1EURQ+gJuRMYsS52TyiF4POWzewTue5++7SB5SwQk0HZhhiG+KhcAMTj/HkfAbw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794897477;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=8/vn2gJipiD85BsJ1Ku8SNmRl9thwiwlJMFECHzYcD0=;
-	b=4dP8kf+dJbM4jdtuW9kcvBM4gc7BOeUiHAo+AfExfB0M68CLJ8/veCfLOcNIrbedT9Et
-	 GZCXXtbbmVy9yXihZrNOXep8bUcgQX2fFLQblMkmvDmu9Hylr6+koY66ihuV/lhr2Tg1m
-	 AOApSAgKfOgvUcsuAWUep8TyUJOaGSt3VB4ynJdTwHRF7TQu1tcLlZfnUYplFJINH+5FT
-	 JAXgn63GJegaVSous8T8bPMuVJwmqwoP/xlB319Uq3Jl+GXe5tUI8ACo6fWeh4EqoIRi5
-	 zKmNiMTMT997HIJm/b5kf/JWsWyujd6HjpLffoBO6RlK+tDS/cPo13oWV5Qtu2+BkmQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=fZw3HLQ0;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.179
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.226.149.38
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794911672;
+	b=1lBECtge8AabIgtDnchklAc9hNoPL0KVB8ZrbRH4H0o9bYmTI0VGlkuTGCEuOUOUJSXZ
+	 C5kaekRLQlDVgsqNC00U3+RiRckgSezwtdogoEm+eV2LvnsK6su0NVUpTleYYnNgiVzdF
+	 sVtQzis0EyD0YMfb7ltpWay7qvAiGZ/pYjedgUZ0F45xbEHsy/RA9EmNNPLy4tqkAtwGf
+	 471sOhAuoxQydnGngwfTgtiY17wtSBEbhX9ir1b4BepJ5ffgV2ICEW9VWbizfPY/Og8Kt
+	 zd35I7wmL5sBY1NLJlay1OkH7DlZpPozkJhUS9UTa0BSpIQQGN+EmB+r0B0Y9YUZ+bQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794911672;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:From:To:Cc:
+	 Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=9MJrcZ1ojZlX1FTxvVn2f3i7uCSB0bosDH9zsPLqw8s=;
+	b=p50MYUn81KWrOI+tQM5qes8usi0nYYetBH5YrsE9UxCin352LG1HyCuUvGy7d8PCExde
+	 SJImiXC8JoKBzPN9Nl+tjSbwg4pWdcF/Z9caSwpeCU/+4q1YVbeWxfxHWoWkH4QeeDz6x
+	 +xtBdXD/K+L+7R58MmqVNZdI6876Qz3D0FKPHHVW1d0kmLXHLE8/n8PHVbJ9JAVGfcFAt
+	 HPPlgmCHJLWGYgDKrK3ptX1hb/YSFbuDWNAJ6Ps/qH8D5j9gOMXEEgr3EPjD/R8Rw2cCs
+	 /gVDhGsGPaEwFazsbqqOxkeVzfu7MU4N/F1S6ZlCamNPqRwR0fOcSiAiFMiW0BVugRg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=fail header.from=gmail.com;
+	spf=pass smtp.mailfrom=runbox.com;
+	dkim=pass header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=e+gOGl+m;
+	arc=none smtp.remote-ip=185.226.149.38
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08F0606A31C
-	for <linux-kbuild@vger.kernel.org>; Tue, 17 Nov 2026 06:37:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F08F0606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F281D606A332;
+	Tue, 17 Nov 2026 10:34:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F281D606A332
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=fZw3HLQ0
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-3adf04a55f5so4372781fa.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Nov 2026 22:37:56 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794897475; cv=none;
-        d=google.com; s=arc-20260327;
-        b=qhoxZr4lXF5vyM1R87Xipe61HUxq5YkcjqPBTYZQ4mc5ME1VrC/Z+/a9Yy0DEQb35J
-         OGaG5h1T1g5pqiVMYldfJl2wOyme4k/mcABeFE5aCPm8e11/UM9Yez1+eg+YNEXH06Ub
-         XmQfRPSPQwqfPoxjZSD4zBshqncCuSotoIKdJuTFwaJv8oiNSATVL0zGzxKoWgEAj0sR
-         epGlPv9gjHrOtqhQacF0+nW+Iv5Oaef+4j8X/teoe9k8Hq2NqrlMqBA17xE64kSxreXI
-         uzFHWVDpzWuYqeZRg0K3HAi8cm1orSUjpt5EXrqB0iq6dsBWaH74n/d/hPlLKcwMNiqg
-         sVfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8/vn2gJipiD85BsJ1Ku8SNmRl9thwiwlJMFECHzYcD0=;
-        fh=z1yGkr4BXSFlHUOuw2v7w2AoL3cn48oyMJ/s69hI1J0=;
-        b=ltNLyvI024AiH7GN6dHW4krerYvt7IvJwGBUtu53wp9y9H9zU/dwf0SPCGmOXMEcLp
-         tSA1JgxIX5T9njYNLa/FyJX5eFgeJld/LGEJkSmWGTR+M/wQIIW5aO+2/iGCB6g1Cx/Q
-         94wnyNXfeL+hNQJ1TnUX7/dr6wiRDc8GujhNfgFHqYAquIILlSfy7R1uH7AUPYWZ7x7H
-         uyed3QMQeK2KMshCqj2YVoN/TTUCJ4B+Y6+agv+iYbkdwJxy3dzEJfheEvWFxXDLPVU0
-         vpvA3X7r6Yd1+qD22cy53UH4SM3gvqPXWklsnU7vOgZNaerpV3ohRm9PPaZco5VyLiTY
-         sO+Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794897475; x=1795502275; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=8/vn2gJipiD85BsJ1Ku8SNmRl9thwiwlJMFECHzYcD0=;
-        b=fZw3HLQ0nzuknu6xZZPoDZvl/L7k7TrZwsx5O6x0BB261gDfe1j2et0Foeg5z5mrdz
-         pdov38qEG4e1cj1Xgv+BF7QG8EpS3uTPToJ/cPxM2P3pBo1pKt88mp1j6l8Lr9opRwrT
-         UQol3T/ikaaqCg/kx4o+Pd7HKYdjzlhzq7ad2AaU1FYx4ATArJAAzvoJ61gTlvmuHGY0
-         O6JvkVZ1OeI8Wuw/z/I9wPty9+oUFsd5ZIVwdZbnK2TVy5pfasGtQ3u+l7nglYvngY15
-         oFQLd6ZP6sSDU4BH7A31BLLxMC5vw8UQ7K+BTZZJadCh3+IJ+RKhSEbeZVDIcTdJoU7H
-         innQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794897475; x=1795502275;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8/vn2gJipiD85BsJ1Ku8SNmRl9thwiwlJMFECHzYcD0=;
-        b=tv4fxZx1KwikthecEzD5XYB2ydGtmi4Wi3AprgbVUByDMEN0vfjBcJMoH6vDRN7UZ5
-         x1S7J7y81NdJJ5+m2Oe+24I3LSjCfqalt7EYdfnZo6izhxRRGMZEvQluZKxAUJ/V1ntF
-         UqJvOFNrjdLip79ZsUOyCJn6j/+MizkNHxTr9UHF6Q2PotCTAA009wYguvjat1fEtey/
-         lk7vtWZ0RhRmdETLhoGilBuXlz8Rg2W2GaMMboS3xQx5GdZUQ2QsLiZuEH/8gVBnF0rh
-         2FopU2t/zBgcrDnklG8a1aj7AcDmD2C7uLT2FSuG4emlJ7CC0WnkKlyEFluZ7iSx7Dms
-         pUVQ==
-X-Forwarded-Encrypted: i=1; AL+hErGpJx7vLO4XMsTmQMooqPptTnvo4/9t+JzAmISDArp9g8PWm4Ggfz9jpy+FdbdJ34vsPqqc7VZDRNEGpP4=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+Tx0zBBcziIYbcMoudmRJ9KymbmQ2JGipvsQaKmtRuUAvdjDzb
-	sc5mRmgpU2hZl9RcG5f9d5X+Twx6dcx2CWhAaA1kuNtZYqY7Cc/E2vg7SAJeovdQIeI5342VUTB
-	d7tsd5wA+abF6/ABEPFu7Q9B+xTX5Sx0=
-X-Gm-Gg: AYBFou2L1gEvM7Wfks7kQail5wSJBVFYM6/06b83jIwK3zGIJyD+iy3OSQH/Y2D7cxl
-	U4/gYyGTnR7k5g+iaHyMdx53A323j9rVkaEqRG6zHU7g89/FjYtFvwRcqI28JCxYlheEw3eK5fy
-	oNuRlXf2+0J56anXD1KUV4sVxg+FXyau+IghGu6FdeH+zWa/u+1pnnrSuV34ZdtfmEfaPfnKlJl
-	PTwhSbOj/WlTi8z3uU6ZllGabV9DlKaQdFvE5Tz0j224C792wVwziG3wEaSiz3hN+JBKFpXHIUz
-	7iovVEv+W1MCZdgHXH91uJzeMzFLWHFs3Gbl6r0a9sgdOW7+EC5o7IbfvRhYnxqWlc7no479VX8
-	ymTSUMZkjVNyk2ohA738xFRVNPLV8SXWM4gPfEu8sGRNITy+0lc1+YfZhVtPtVpsa8vgyHm8xuA
-	l/HInNXgYqHenQdyBfJbtbsby5CjzRfM6v34DJi49MLHNfBTdTa8obmbff201YUUuTdD4jlnCiD
-	KOnUjAmCYNrcolFr6KJ+E9iUT35X6Q3Dq+S/NQVLkizxQKSbtkJikIX0jurw7Ugmazp2/ASBw==
-X-Received: by 2002:a05:6512:3e0d:b0:5bf:a66f:e5e with SMTP id
- 2adb3069b0e04-5c17058b108mr5667796e87.0.1794897475024; Mon, 16 Nov 2026
- 22:37:55 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=runbox.com header.i=@runbox.com header.a=rsa-sha256 header.s=selector1 header.b=e+gOGl+m
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <david.laight.linux_spam@runbox.com>)
+	id 1xTGW6-002LjE-Hl; Tue, 17 Nov 2026 11:34:22 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
+	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
+	:Message-Id:Date:Subject:Cc:To:From;
+	bh=9MJrcZ1ojZlX1FTxvVn2f3i7uCSB0bosDH9zsPLqw8s=; b=e+gOGl+miKSeeZfAt7BgYzQ6+R
+	Ii1lLL2KRY6cn6uGZt6JrvSHJhBNBun60q0YvnTyRpLv68ftCvlLWXLJJA2N36fq52/krLalKQZNd
+	QNkYrofBH5K8/ERFgaW7D5z6762siXE5YMLpzgxSs1ozYwJEocuRJIKKpHdzZtNRXfbd0knHmLuEe
+	WWVYG5lHrFXYxykigMMvXgF4bURotUFH6J1fT9Uxt5L22EkzIEvk9jzdxY2MyOVtm1At0stpMAEK/
+	Z0o6gu2cIp3ZwL6YZbfdUd9W+Pn7LU8HvBFncCz43DDEn6anEOdSbjQ/JR0B48qo1GfRxC5dC/JBD
+	/8gvA0aw==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <david.laight.linux_spam@runbox.com>)
+	id 1xTGW1-0002et-3g; Tue, 17 Nov 2026 11:34:17 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.95)
+	id 1xTGVn-005qHU-AV;
+	Tue, 17 Nov 2026 11:34:03 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Petr Mladek <pmladek@suse.com>,
+	Kees Cook <kees@kernel.org>,
+	David Laight <david.laight.linux@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Jim Cromie <jim.cromie@gmail.com>,
+	Lorenzo Stoakes <ljs@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>,
+	Andrey Grodzovsky <andrey.grodzovsky@crowdstrike.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Samuel Wu <wusamuel@google.com>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v4 next 06/13] kallsyms: Improve selftest test_perf_kallsyms_lookup_name() output
+Date: Tue, 17 Nov 2026 10:33:45 +0000
+Message-Id: <20261117103352.1244657-7-david.laight.linux@gmail.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20261117103352.1244657-1-david.laight.linux@gmail.com>
+References: <20261117103352.1244657-1-david.laight.linux@gmail.com>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -106,113 +85,335 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261018175457.87803-1-ojeda@kernel.org>
-In-Reply-To: <20261018175457.87803-1-ojeda@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 17 Nov 2026 07:37:43 +0100
-X-Gm-Features: Aa3M54p7eBlg9yL8nKjCRYF_cKn6fvAcKLXbakSS16n9mf6XS8H5ekFNr6S-Wr4
-Message-ID: <CANiq72mrpgxyb4d9C5p1KS0n87GmYTXcyUX+dhZ39T2vRtOQwA@mail.gmail.com>
-Subject: Re: [PATCH] x86/rust: use `-Zindirect-branch-cs-prefix` for RETPOLINE builds
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Sami Tolvanen <samitolvanen@google.com>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	stable@vger.kernel.org, Kent Overstreet <kent.overstreet@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 18, 2026 at 7:55=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wro=
-te:
->
-> The C compiler is asked to add a `cs` prefix to the `call` and `jmp`
-> instructions that go through the indirect thunks for the `r8`-`r15`
-> registers, which makes them 6 bytes long instead of 5. That gives
-> `patch_retpoline()` enough room to inline them, e.g. as `lfence; call
-> *%r11` for `spectre_v2=3Dretpoline,lfence`.
->
-> However, Rust code does not get the prefix, e.g. for a
-> `CONFIG_MITIGATION_RETPOLINE=3Dy` build:
->
->     $ objdump -dr rust/kernel.o
->     ...
->       e2b: e8 00 00 00 00        call   e30 <...>
->                 e2c: R_X86_64_PLT32  __x86_indirect_thunk_r11-0x4
->
-> Moreover, since commit 4a1e02b15ac1 ("x86,retpoline: Optimize
-> patch_retpoline()"), `emit_indirect()` assumes there is enough room
-> for the inlined sequence -- e.g. with `spectre_v2=3Dretpoline,lfence`,
-> the kernel warns and dies while patching a site inside `core`:
->
->     WARNING: arch/x86/kernel/alternative.c:736 at apply_retpolines+0x2ee/=
-0x400, CPU#0: swapper/0/0
->     ...
->     Call Trace:
->      <TASK>
->      ? _RNvMs6_NtNtCshS2CUL9MEDn_4core3fmt8buildersNtB5_9DebugList21finis=
-h_non_exhaustive+0x5b/0xd0
->      ...
->      alternative_instructions+0x1d/0x60
->      arch_cpu_finalize_init+0x5a/0xb0
->      start_kernel+0x1f4/0x280
->
-> Similarly, paranoid FineIBT rewrites each kCFI call site into a fixed
-> 20-byte sequence, i.e. the 14 bytes of the kCFI check plus a 6-byte
-> call. For a 5-byte call, that overwrites the first byte of the next
-> instruction, corrupting Rust code:
->
->     SMP alternatives: Using paranoid FineIBT CFI
->     ...
->     Oops: double fault: 0000 [#1]
->     ...
->     RIP: 0010:_RNvNtCsdVypMZsLRAh_4core3fmt5write+0x1e9/0x210
->     Code: ... b8 68 81 16 9f 41 3b 43 f5 2e 4d 8d 5b f0 75 fd 41 ff e3 <c=
-c> c0 eb 02 b0 01 ...
->     ...
->     Kernel panic - not syncing: Fatal exception in interrupt
->
-> Non-paranoid FineIBT is not affected, since it only rewrites the kCFI
-> check and leaves the call itself to `apply_retpolines()`.
->
-> We added support for `-Zindirect-branch-cs-prefix` [1][2] in Rust 1.91.0
-> [3]. Thus pass it for `RETPOLINE` builds when possible, which makes all
-> sites indeed get the prefix:
->
->       e3c: 2e e8 00 00 00 00     cs call e42 <...>
->                 e3e: R_X86_64_PLT32  __x86_indirect_thunk_r11-0x4
->
-> The kernel above boots fine with `spectre_v2=3Dretpoline,lfence`, inlinin=
-g
-> the Rust sites as well.
->
-> For older Rust compilers, set the LLVM module flag instead, which
-> has the same code-generation effect. This means that every Rust version
-> that the kernel supports gets the prefix, that the kernel boots fine with
-> `spectre_v2=3Dretpoline,lfence`, and that paranoid FineIBT no longer
-> corrupts.
->
-> In addition, add it to our target modifier workaround for `rustdoc`.
->
-> Cc: stable@vger.kernel.org # 6.18.y+
-> Link: https://github.com/rust-lang/rust/issues/116852 [1]
-> Link: https://github.com/rust-lang/compiler-team/issues/899 [2]
-> Link: https://github.com/rust-lang/rust/pull/140740 [3]
-> Reported-by: Kent Overstreet <kent.overstreet@linux.dev>
-> Assisted-by: LLM
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+- Fix the compression percentage output to show 50.05% not 60.5%.
+- Improve the test stability/reproducability by taking the faster of
+  two calls to kallsyms_lookup_name().
+- Check that kallsyms_lookup_name() returns the expected address
+  unless the symbol is duplicated.
+- Report the names of the min/max symbols.
+- Output an 8 line 64 entry histogram of the times taken.
+- This shows there is a reasonably normal distribution with a small
+  number of much slower outliers that don't really affect the average.
 
-Applied to `rust-fixes` -- thanks everyone!
+Additionally:
+- Add a very long symbol to check the handling of two byte lengths.
+- Do the test_perf_kallsyms_lookup_name() last because it can take long
+  enough that the CPU frequency changes and the times reported by the
+  other tests can change.
+- Mark all the test functions noinline_for_stack since they all have a
+  quite large on-stack structure.
 
-Cheers,
-Miguel
+Example output (after all these patches)
+kallsyms_on_each_symbol() traverse all: 7742950 ns
+kallsyms_on_each_match_symbol() traverse all: 951 ns
+kallsyms_lookup_name() looked up 123312 symbols, average 200 ns
+        fastest 60 ns (_rs.0)
+        slowest 662 ns (The_time_has_come_the_Walrus_said_To_talk_of_many_things_Of_sho)
+        Distribution, 20ns per column, 2916 counts per *:
+        |         **
+        |        ****
+        |        ****
+        |        ****
+        |       ******
+        |       *******
+        |      *********
+        |   ******************  **    * * *
+
+Signed-off-by: David Laight <david.laight.linux@gmail.com>
+---
+
+v3:
+- Previously patch 3.
+- Fix build when CONFIG_KALLSYMS_ALL set.
+- Fix compression ratio print (50.05% not 50.5%)
+Unchanged in v4 (apart from a minor change to the commit message).
+
+ kernel/kallsyms_selftest.c | 169 ++++++++++++++++++++++++++++---------
+ 1 file changed, 127 insertions(+), 42 deletions(-)
+
+diff --git a/kernel/kallsyms_selftest.c b/kernel/kallsyms_selftest.c
+index 0db79237fe54..f7fef70ed2c8 100644
+--- a/kernel/kallsyms_selftest.c
++++ b/kernel/kallsyms_selftest.c
+@@ -22,6 +22,8 @@
+ 
+ 
+ #define MAX_NUM_OF_RECORDS		64
++#define HISTOGRAM_BUCKETS		64
++#define HISTOGRAM_RESOLUTION		10
+ 
+ struct test_stat {
+ 	int min;
+@@ -29,39 +31,60 @@ struct test_stat {
+ 	int save_cnt;
+ 	int real_cnt;
+ 	int perf;
+-	u64 sum;
+ 	char *name;
+ 	unsigned long addr;
+ 	unsigned long addrs[MAX_NUM_OF_RECORDS];
+ };
+ 
++struct lookup_name_info {
++	unsigned int count;
++	unsigned int min;
++	unsigned int max;
++	u64 sum;
++	char min_name[64];
++	char max_name[64];
++	unsigned int histogram[HISTOGRAM_BUCKETS];
++	unsigned int scale;
++};
++
+ struct test_item {
+ 	char *name;
+ 	unsigned long addr;
+ };
+ 
+-#define ITEM_FUNC(s)				\
+-	{					\
+-		.name = #s,			\
+-		.addr = (unsigned long)s,	\
+-	}
+-
+-#define ITEM_DATA(s)				\
++#define _TEST_ITEM(s)				\
+ 	{					\
+ 		.name = #s,			\
+ 		.addr = (unsigned long)&s,	\
+ 	}
+ 
++#define TEST_ITEM(s) _TEST_ITEM(s)
+ 
+ static int kallsyms_test_var_bss_static;
+ static int kallsyms_test_var_data_static = 1;
+ int kallsyms_test_var_bss;
+ int kallsyms_test_var_data = 1;
+ 
++/* This is 509 characters, compresses to about 330 */
++#define kallsyms_very_long_name \
++The_time_has_come_the_Walrus_said_To_talk_of_many_things\
++_Of_shoes_and_ships_and_sealing_wax_Of_cabbages_and_kings\
++_And_why_the_sea_is_boiling_hot_And_whether_pigs_have_wings\
++\
++_O_Oysters_said_the_Carpenter_Youve_had_a_pleasant_run\
++_Shall_we_be_trotting_home_again_But_answer_came_there_none\
++_And_this_was_scarcely_odd_because_Theyd_eaten_every_one\
++\
++_The_moon_was_shining_sulkily_Because_she_thought_the_sun\
++_Had_got_no_business_to_be_there_After_the_day_was_done\
++_Its_very_rude_of_him_she_said_To_come_and_spoil_the_fun
++
++static int kallsyms_very_long_name = 1;
++
+ static int kallsyms_test_func_static(void)
+ {
+ 	kallsyms_test_var_bss_static++;
+-	kallsyms_test_var_data_static++;
++	kallsyms_test_var_data_static += kallsyms_very_long_name;
+ 
+ 	return 0;
+ }
+@@ -79,16 +102,17 @@ __weak int kallsyms_test_func_weak(void)
+ }
+ 
+ static struct test_item test_items[] = {
+-	ITEM_FUNC(kallsyms_test_func_static),
+-	ITEM_FUNC(kallsyms_test_func),
+-	ITEM_FUNC(kallsyms_test_func_weak),
+-	ITEM_FUNC(vmalloc_noprof),
+-	ITEM_FUNC(vfree),
++	TEST_ITEM(kallsyms_test_func_static),
++	TEST_ITEM(kallsyms_test_func),
++	TEST_ITEM(kallsyms_test_func_weak),
++	TEST_ITEM(vmalloc_noprof),
++	TEST_ITEM(vfree),
+ #ifdef CONFIG_KALLSYMS_ALL
+-	ITEM_DATA(kallsyms_test_var_bss_static),
+-	ITEM_DATA(kallsyms_test_var_data_static),
+-	ITEM_DATA(kallsyms_test_var_bss),
+-	ITEM_DATA(kallsyms_test_var_data),
++	TEST_ITEM(kallsyms_test_var_bss_static),
++	TEST_ITEM(kallsyms_test_var_data_static),
++	TEST_ITEM(kallsyms_very_long_name),
++	TEST_ITEM(kallsyms_test_var_bss),
++	TEST_ITEM(kallsyms_test_var_data),
+ #endif
+ };
+ 
+@@ -101,7 +125,7 @@ static int stat_symbol_len(void *data, const char *name, unsigned long addr)
+ 	return 0;
+ }
+ 
+-static void test_kallsyms_compression_ratio(void)
++static noinline_for_stack void test_kallsyms_compression_ratio(void)
+ {
+ 	u32 pos, off, len, num;
+ 	u32 ratio, total_size, total_len = 0;
+@@ -148,43 +172,104 @@ static void test_kallsyms_compression_ratio(void)
+ 	pr_info("| nr_symbols | compressed size | original size | ratio(%%) |\n");
+ 	pr_info("|---------------------------------------------------------|\n");
+ 	ratio = (u32)div_u64(10000ULL * total_size, total_len);
+-	pr_info("| %10d |    %10d   |   %10d  |  %2d.%-2d   |\n",
++	pr_info("| %10d |    %10d   |   %10d  |  %2d.%02d   |\n",
+ 		kallsyms_num_syms, total_size, total_len, ratio / 100, ratio % 100);
+ 	pr_info(" ---------------------------------------------------------\n");
+ }
+ 
++static int is_duplicate(void *data, unsigned long addr)
++{
++	return (*(int *)data)++;
++}
++
+ static int lookup_name(void *data, const char *name, unsigned long addr)
+ {
+-	u64 t0, t1, t;
+-	struct test_stat *stat = (struct test_stat *)data;
++	struct lookup_name_info *info = data;
++	unsigned int i, t0, t1, t;
++	unsigned long got_addr;
+ 
++	/* Improve the stability by taking the fastest of two calls. */
+ 	t0 = ktime_get_ns();
+ 	(void)kallsyms_lookup_name(name);
+ 	t1 = ktime_get_ns();
+-
+ 	t = t1 - t0;
+-	if (t < stat->min)
+-		stat->min = t;
++	got_addr = kallsyms_lookup_name(name);
++	t0 = ktime_get_ns();
++	if (t0 - t1 < t)
++		t = t0 - t1;
+ 
+-	if (t > stat->max)
+-		stat->max = t;
++	if (addr != got_addr) {
++		int c = 0;
+ 
+-	stat->real_cnt++;
+-	stat->sum += t;
++		if (!kallsyms_on_each_match_symbol(is_duplicate, name, &c)) {
++			pr_info("got %ld not %ld for %s\n", got_addr, addr, name);
++			return 1;
++		}
++	}
++
++	info->count++;
++	info->sum += t;
++
++	if (t < info->min) {
++		info->min = t;
++		strscpy(info->min_name, name);
++	}
++
++	if (t > info->max) {
++		info->max = t;
++		strscpy(info->max_name, name);
++	}
++
++	/* Create a histogram of the times */
++	t = (t / HISTOGRAM_RESOLUTION) >> info->scale;
++	while (t >= HISTOGRAM_BUCKETS) {
++		t >>= 1;
++		info->scale++;
++		for (i = 0; i < HISTOGRAM_BUCKETS / 2; i++)
++			info->histogram[i] = info->histogram[2 * i] + info->histogram[2 * i + 1];
++		for (; i < HISTOGRAM_BUCKETS; i++)
++			info->histogram[i] = 0;
++	}
++	info->histogram[t]++;
+ 
+ 	return 0;
+ }
+ 
+-static void test_perf_kallsyms_lookup_name(void)
++static noinline_for_stack void test_perf_kallsyms_lookup_name(void)
+ {
+-	struct test_stat stat;
+-
+-	memset(&stat, 0, sizeof(stat));
+-	stat.min = INT_MAX;
+-	kallsyms_on_each_symbol(lookup_name, &stat);
+-	pr_info("kallsyms_lookup_name() looked up %d symbols\n", stat.real_cnt);
+-	pr_info("The time spent on each symbol is (ns): min=%d, max=%d, avg=%lld\n",
+-		stat.min, stat.max, div_u64(stat.sum, stat.real_cnt));
++	struct lookup_name_info info;
++	unsigned int idx, scale, row;
++	char line[HISTOGRAM_BUCKETS];
++	int len;
++
++	memset(&info, 0, sizeof(info));
++	info.min = ~0u;
++	kallsyms_on_each_symbol(lookup_name, &info);
++	pr_info("kallsyms_lookup_name() looked up %d symbols, average %lld ns\n",
++		info.count, div_u64(info.sum, info.count));
++	pr_info("\tfastest %u ns (%s)\n", info.min, info.min_name);
++	pr_info("\tslowest %u ns (%s)\n", info.max, info.max_name);
++
++	scale = 0;
++	for (idx = 0; idx < HISTOGRAM_BUCKETS; idx++) {
++		if (scale < info.histogram[idx])
++			scale = info.histogram[idx];
++	}
++	row = 8;
++	scale /= row;
++	pr_info("\tDistribution, %uns per column, %u counts per *:\n",
++		HISTOGRAM_RESOLUTION << info.scale, scale);
++	while (row--) {
++		memset(line, ' ', sizeof(line));
++		len = 0;
++		for (idx = 0; idx < HISTOGRAM_BUCKETS; idx++) {
++			if (info.histogram[idx] > row * scale) {
++				len = idx + 1;
++				line[idx] = '*';
++			}
++		}
++		pr_info("\t|%.*s\n", len, line);
++	}
+ }
+ 
+ static int find_symbol(void *data, const char *name, unsigned long addr)
+@@ -207,7 +292,7 @@ static int find_symbol(void *data, const char *name, unsigned long addr)
+ 	return 0;
+ }
+ 
+-static void test_perf_kallsyms_on_each_symbol(void)
++static noinline_for_stack void test_perf_kallsyms_on_each_symbol(void)
+ {
+ 	u64 t0, t1;
+ 	struct test_stat stat;
+@@ -240,7 +325,7 @@ static int match_symbol(void *data, unsigned long addr)
+ 	return 0;
+ }
+ 
+-static void test_perf_kallsyms_on_each_match_symbol(void)
++static noinline_for_stack void test_perf_kallsyms_on_each_match_symbol(void)
+ {
+ 	u64 t0, t1;
+ 	struct test_stat stat;
+@@ -254,7 +339,7 @@ static void test_perf_kallsyms_on_each_match_symbol(void)
+ 	pr_info("kallsyms_on_each_match_symbol() traverse all: %lld ns\n", t1 - t0);
+ }
+ 
+-static int test_kallsyms_basic_function(void)
++static noinline_for_stack int test_kallsyms_basic_function(void)
+ {
+ 	int i, j, ret;
+ 	int next = 0, nr_failed = 0;
+@@ -425,9 +510,9 @@ static int test_entry(void *p)
+ 	}
+ 
+ 	test_kallsyms_compression_ratio();
+-	test_perf_kallsyms_lookup_name();
+ 	test_perf_kallsyms_on_each_symbol();
+ 	test_perf_kallsyms_on_each_match_symbol();
++	test_perf_kallsyms_lookup_name();
+ 	pr_info("finish\n");
+ 
+ 	return 0;
+-- 
+2.39.5
+
