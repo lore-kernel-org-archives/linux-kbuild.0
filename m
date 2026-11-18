@@ -1,102 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.42
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795036350;
-	b=I4IW7sFOV1vFdz3JPvew8VnpIQmdRVpDkwjQIRZLQhbEvfxUCYtYmqZMyH8sVTImctge
-	 z98C0LGPvqL4HP9zNFrCDvE+w2YyGSvqPvA9MuSza1C2WERpxQq5/ZDPvvCVQqm0W995w
-	 3Y21kiG2ptqoHQiaGnFdNhAgJJIOsqfT7voZ4fJLMKyFV/y8811gUA34EFFcAB3ogRgzt
-	 n0bWcZTX4B/qpUzrRAOlIhjvPvq6wyjSTiXfNqrN1b/i7HFDr/CDkNCAE6ZOhjH8v3wir
-	 z5Op8PnULTO6upKVkZYxyIEqWVvWx5WpZ3XXUxcBhShac5w6IXGZKXSappY+GS+kXpQ==
+	t=1795040335;
+	b=uiXK1QELhuY++YL2iP+sT5WM0FoPAhIqYXHjcjUIJKHMUAQ3ozeWIVY3IqCzyxp/F9C9
+	 FeM6CV2H+eGVCN4SZMg5LQOJ+aj7QGMZF/EDaM273CxuGojG6QaADDZPO5ZFSG33iav8S
+	 EjTfScrtTE3fXiJ4lSeSCwsdDr/TdLnbHmepymMaSSHOoZaUnDUO94ZbJVB25pzqfkjoE
+	 kryI7p/97b13GukyqL9SxIAgsi9zV/HVcR0jdAV6sNhctmQjEkRU7qjXQ0el7jHx6MPxQ
+	 wDiAr+xRJZxjgDnlyAhy98LdZra1Fr7uaStWjbEHp6hOF4+JuyPAt5zH6OjjofwRQtw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795036350;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795040335;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=iyuJEUSnhfZBYucVp4eRtPGdLz1TIibG6v1tSdR3rQU=;
-	b=ZjFzVbdhYGHPbavKfxD5iB22KTkQWebsG6+EGf0KVUjKvN6P+5Y1UTPmqgiW2ZHtpSk8
-	 RIlGhMCOwX/GaZHl9Of8P7OhmNWHhVx+egotqYDr5fOH74Aegbw8TLwOb+1QBf16MBJsW
-	 F3jzNY5yadM+qvJCMiuDZ9qjFKT9qBO8wvNj3cJT6FqYxzgn2VjyvzkoUCTCbiksqmI1z
-	 TRENPqMPczwkG6FIw6SEF3AvgH3qAQu/LKmTsWdzBFSISI1k7clghniDMfaJvpwLdu8Ah
-	 Zn3CGpGRtpqRWZF5qM4IB4W7sWkduhzWX6DlmB82EtSczVg87qFTvsr+bOgTFTjlIJA==
+	bh=pPh8uj9XpZA6e+Lv41Z3C0qJdEEXOaN7sStIO34U/iw=;
+	b=gOeTWHKFGBaxwS7NJEfHOYzRsfBS/2lKxseK2JvWkpGPedDlXIh68eBHagUE5vIJNioC
+	 wKbjqlbxzsHw3b8NQVxpM0pr+WPDEV7hixXK8r3uEja7N4PooUfAaf2aaY/8ewqBcA1Mr
+	 f4uS2J46COMeeU2j+Qd8jFSLIBIZYpKt6DlKMcdl6uM1Y4GX2rj2six2RutJFP0LbgBep
+	 RV6qqmW2aziFkAssb+5r2Wv0MF1snfJSv0CwfCH1aJDJFb7QDn3OSiMJ8DkEiTlV8elHS
+	 tBzlNkCLRIr+4BWMDTHrjVoJ8Nq/uFXhforb1NNEVSX7CGhNTHYr4DUrqYumNEYwfMQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Dmlfi5TX;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.46
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=DhwrPv4G;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.42
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58361606A338
-	for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 21:12:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 58361606A338
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3B8606A325
+	for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 22:18:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CA3B8606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Dmlfi5TX
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-49d05d51553so11114875e9.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 13:12:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795036348; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=DhwrPv4G
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a018493d57so20215e9.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 14:18:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795040333; cv=none;
         d=google.com; s=arc-20260327;
-        b=XZqO4PLR/NDYy2KaPbXREGfy0U9vHxUPSXb0kUvbg547bw2COQYm4oaPIU/tIhtrSn
-         bFyn7vIEGi5a+4l7q0SNm3SCZ8i0C5gH0u7658+14yUvLSsDt3P0xZCawL0ULidosYHK
-         F1InrBsPD1JIAyovAMeyPoxA7bb52Au1fSanH6hvG2jOX8LGN1yHjFnL0KL+2qzf2tKf
-         SHHlLa1A7n4F9joIrWJ/HcEH9y5wXw6CoK9Ln/3qj8KmXb0a1Mi36zP/r+IFJFdJsyz3
-         ODamG9tvX7uNZwUZEO1plS5uwhO3cGs84O3yZXBlyFPZ3q8aM3fjm86sm5LomJQvBTpK
-         pb2Q==
+        b=cQYBmvw+CWCmSHwbj1xFQ4kdd9mzIAAJA/pG48E01Ffo6DEQ9ygZ9s6/SPr3NrQGIN
+         wrNM89wWea1qnZy4iutpwTPqHLj3QeabFpu/FoUtMzn9N2ybMd6ZksOS6T8JxyyJVNkk
+         TlTV3zkunnIVLJJuptOqQYo7TY8KazUF4HRzyI3rVtngrMU6x4qkE3wwpqxuTXWt4RDx
+         XG0XflrdGgv296EWBA0deEhhK/o58TpaNmCaXWWl8YNC2lGGZRIpv0t6x3atnWPbISGc
+         oWFcbH8y18LrxGEKZ4Zibp3YvN3oKaF3tOvqk8b7x2YqA5hPubjK2YLwbJk3RymW9Zlj
+         i/PA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=iyuJEUSnhfZBYucVp4eRtPGdLz1TIibG6v1tSdR3rQU=;
-        fh=hqs2HSTXH6IVomF5w9ZQ8HKAu1Ri9M1G7W7bI3MVhrM=;
-        b=bpG1tvf33a2llNjpD7lCmmoLFnJSzFhUmSET+skVzy8d05t5qDEDRGSyyfXRn3uhfz
-         XAerlMNog12EJAQykL/cqu/HcUil8eHSz8QY/XIhVyfawsYw9NzLahrWPvBuH5DPxLDw
-         cHUDQABalc7bEql2fyoGysz7T6IopTWHP2u5Q2Vb+D5ni32A3OhZXDLtpjScxBqtVPG0
-         fdTqHDAXAOcjKUQaxGfCj0C3SKbVgeH/9oGB7D0lTuPVEfQvP7J4tIl8ZEyuIxpeV+ap
-         wM6hk2ECywxfVGm3du0IJoxpJ1eOCEkylBgZzwCvVJOvJZl2p9tFBLleQI8pNBQJVYqf
-         XUYQ==;
+        bh=pPh8uj9XpZA6e+Lv41Z3C0qJdEEXOaN7sStIO34U/iw=;
+        fh=p1uVo9cb08wB24dyYTH8C2CSa+NV6xLTERLHv6xkzyo=;
+        b=W83NJpT6fihe4+SrgvPtpC/b5SO0w5X96nZo6TOPpnk/ft0MLinlegxb5wOHlP+Kac
+         U1AVr79MtdzonnNkV++ohjhXntI9v7QDCKwQgqszxmWuDkfgLDKK9+LXtD7KDYRlCy66
+         rQIMNGP1gVjfALAbXdqHIAE1UbEflL+J7KhI2EI9FW0mfhKjk/xCyRNBhEr2JrndTAaY
+         +woQZvayY0I4wGFaPTOwIzFOgB6Depv3IPAPZ2WcOAbIvS+C62FI4cYRn5rnh8KRf1pD
+         RdGY1qgFGcopGGBLjFx76bT1skU78lSd5g5VqFsgM772FSy3f+uw+Tv9TJp9JTIJ4PEM
+         2/3A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795036348; x=1795641148; darn=vger.kernel.org;
+        d=google.com; s=20260707; t=1795040333; x=1795645133; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=iyuJEUSnhfZBYucVp4eRtPGdLz1TIibG6v1tSdR3rQU=;
-        b=Dmlfi5TXCpgDfmBFbH12jFEe+eCqYa9u6tv4aC1RqtyZ/ewYF1YnHznurBJhjQI/DQ
-         u/dcKvXcZeaJqWBCeOn7NVywvmG42klldHAPVRQFasYnZXYwdzbYpEhTu6F8vm03+Ta4
-         SxNefPrMhaJ8G3t+vmrdMY42SH5aPl3kgAzRl9bPNzKhx+qwkjBv6piDBvcFUyEdbGLW
-         deLwCvXb5Y+o7OEwFLA/O1yyR95FRCCyxncKkMnMxivGphWF+NZRspdK5GnRPdB5zrT6
-         GDBJ7tmEVuQ8DA/aMMdu622h11nPCWWWgOKjTKEZtGPSw+0PORvcGF2feFgXpu8WHpec
-         IH3Q==
+        bh=pPh8uj9XpZA6e+Lv41Z3C0qJdEEXOaN7sStIO34U/iw=;
+        b=DhwrPv4GGFiOVke3X6njuMQROCZZTT+xdWguHN9Ve4ls24tJInBkCDQToNg2sTOH/7
+         9fkhOJ7HqD7c58NdQDY7sym37Km0fntvXNnHSLiComuANprVK86/akMKEQtOmRk1K9xO
+         JES0ONp3tAzKlLidLptHk3TFMkYlZ1Hvyx5PdcqkASrzNWnsmeIBpBPXdjrilkGx/6cD
+         K+L5mYzqtqK2/8ulA2EwqsRtFXiw30sGQybhL4DTr6C9ZWTA47PRumYSiqWHNmNcZW+C
+         Byy1W1ngeI4hePMxMzk+5U3fmHmoAzAy7yzhoofr7fZIleSiMd01npReSTAdbkh1M6ZN
+         KBew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795036348; x=1795641148;
+        d=1e100.net; s=20260707; t=1795040333; x=1795645133;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=iyuJEUSnhfZBYucVp4eRtPGdLz1TIibG6v1tSdR3rQU=;
-        b=fuNcBrSrGfWVz3OFXrdpCk4YSint1vj4ERriixjJK+8ZjQbHYYHnsaBYpVy6NIYFku
-         JQu2PRGd/r/8TQw9anJPmHTI4Lk3Nv0IDu7nsMCbBsxyCff3/RKOhV8qXgDGYTsTdZCl
-         DCpRJrdrMPlQ23xdKCOpmqeNwMbOyo/x6xxGk7Q83XVLFzVQJn/L3UDvLtX+d7c6avGl
-         XXTPnPWpV10Q8UsKdLmvTIkTFyAV/vmLT6bPc48c9sa4WOV0SDNt6fgd5Hq5vcokiohX
-         S5wlsYHMBHjt9saF+z6OBqsRYLWdnvSyociC5VkkUc1qQ91wAzccKfCoZXlKxt/ixNhv
-         6Thg==
-X-Forwarded-Encrypted: i=1; AL+hErHYquitT6GlElj723G4975w/e2tvWCfW8mJvPDgnddhKkr+Xqha2tnSNO9+SWigcPZMjd1IAPUOSvYvXl8=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+m39F2W+NspHHwoVofluLneY3dq+UeLSDlIwqCjBXMdWpi7Wu8
-	lYoIKxlgYyh0ENp3Ag6zaHwQK7y90yfcO/3WDZczfhOtrKujeTvXyCYLRcUPOs1+qfbchiUzZU1
-	TAvtcXIuIV4scivWC0ZCFzl03TVwnAZyJpLdviwFu
-X-Gm-Gg: AYBFou1CfQ+jefckEDw2tuGdbZq+XA+qq/kJGLDcFfoVOtQsakNyK1OWQ68tWkgtQ8N
-	tIkx4V5uUZdxNtil/sGIEvkH+cjrdKsPB1zhHWxX3fGomvOkNV04jkZBwYz20tO3NMFuMT6tALv
-	qFN/imQ736RdYQ7mS48q3oeP6Iegq2iwERjqMsxpJZlG49ZDFtbLgNO6yFCw4XKDV7if0+EzDdM
-	keJy2POShqoShnzhL0kDf1JbXti0y3Azmzzh3FWRC6I9imysc6Zhb+gad2ZUiUOdDW75+RW+HSd
-	WJv8F+M1vPlLizOC3WuTH90+esJUvDXR5yszqav2OwzsNwTvJ4d7QYBOS3ywpsYgYmYvsOIrz/E
-	BpWLXLKiSMGZoaCO7NuoOzynAoJLCKijr49hoyDbYb7I8T+Onh4yKz0w/Ncc892n4f3R38k3a+y
-	+8p5Xfnv1Py4j4nDx/caV0R2H8YZk6bFo5jrXH4EkLDPiwPU/R4u3dHEJvEEF59vThoQ6pfD+WD
-	1gOr0fhgHHwIyvizQOJbfPWb1x6votl/8Om0A==
-X-Received: by 2002:a05:600c:c8f:b0:4bb:69b2:d3b3 with SMTP id
- 5b1f17b1804b1-4bb7da3f50amr85274465e9.27.1795036347018; Wed, 18 Nov 2026
- 13:12:27 -0800 (PST)
+        bh=pPh8uj9XpZA6e+Lv41Z3C0qJdEEXOaN7sStIO34U/iw=;
+        b=2ffpInGk9YMyuTUMnDTWqAOmD0usyGQ59u+euCfFfZoRrW7Bw4eA8rflt4fnRsgSod
+         Ncm4BCgghdG6GmOzNCRvLWvY+FqeBFiVPhaR/T6gcGI9amSbEQDftizK9D+CrrfKi++a
+         233CL5DTxKexcTsykMgOyPX7N+TCpQxmcMIemyns8KJuhDrFasZeOxP2PX1x0GuGsSC+
+         +zR0cwnmDvekSlScUQ4J6GyJlAIeZKjgFMJyceKGxFNH2xT8D7LpZgUcU//d331D544V
+         EuCcYNBBZmZZdJyHMb44DGvdcCThaCXAqsvrSIlLiF2HWHLWZYjUrTY4zpSNHqFivKUo
+         cCBA==
+X-Forwarded-Encrypted: i=1; AL+hErE27Ilrk/42FttWbGqY2apG26t7HcKpPKViGxbQEm8uI9+9U0clh7cX7fp2kOy7TlMIOx7sM1xzmI3cGGE=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+LxXbzTtg/TfmDX/MLzGrbTMmb0oWbh0XY0dk6e8LwvIrc9Qqq
+	RUA0zZ6vvD4/pyPDxUy4mLMgdtWbEyYQH0zBlyj10LrVWeA0T6CXmAj3Qq22ZmwLQBBKK9L9GZP
+	ku/yVvFEnKiZmU6OPsEud3+HYJ7Jha50ryrwWUtTQ
+X-Gm-Gg: AYBFou3VX6RAZY5fFNO8YO0CJmxxwwQvnvqNo5I0EZnn4ybJ/msJ/L8FVeO5UMfOw+8
+	fcIt4b0bFLtzDRAbUpIaCqTIgMyoavEgUbDLpXxjEPv6pd/tWbxibwubRJVFoHhhn4USKr8OyKB
+	P8vYD+4iCZTeJdo/ZdmsqN8kNZrGt7HeAQdBDUXFVnL53MoBfwFPP1+SDPjhL85TToSC3n4GaUj
+	Uk8paiYrPZkQWLzNDqBIYtdWQzFx4+WY+maqmQVEWvo+jzGBf61Ln+OLPF5x4ItnUEkmnDCrfz6
+	Skar6LGpSE1bMupfZVA7iIJW6qIemq0d9UUmVDt/lPtiVbH3STjasiZhhbITQVkxGSIeJQP5Hp1
+	5eruIBYhmXhF3y/oCiqKkCQrCfJS0MLgI9A==
+X-Received: by 2002:a05:600c:c083:b0:4a2:a8c:22ae with SMTP id
+ 5b1f17b1804b1-4bb840fdcf6mr76245e9.12.1795040332631; Wed, 18 Nov 2026
+ 14:18:52 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -107,12 +105,11 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 References: <20261118-rust-merge-functions-v1-1-fe86126522b9@google.com>
- <CAKwvOd=iOXmF9DS8iopFZEgsqORe6eHokpF_-3-jEfD7yPuDFA@mail.gmail.com> <CAH5fLgidhnPbP=xXQ3162w6q0U6rWHPZ9Mu6-E5va4_CXyanOg@mail.gmail.com>
-In-Reply-To: <CAH5fLgidhnPbP=xXQ3162w6q0U6rWHPZ9Mu6-E5va4_CXyanOg@mail.gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Wed, 18 Nov 2026 13:12:15 -0800
-X-Gm-Features: Aa3M54rwqBnTNo9s7KzOH39H6ui7-iQszvNlrDcPs70i2RE6J983km-iNd7m9tM
-Message-ID: <CAKwvOdkNWp4us-zNPw8Pp3J6TVev3nTRsjPrjd9w9M66w2Qbzg@mail.gmail.com>
+In-Reply-To: <20261118-rust-merge-functions-v1-1-fe86126522b9@google.com>
+From: Sami Tolvanen <samitolvanen@google.com>
+Date: Wed, 18 Nov 2026 14:18:15 -0800
+X-Gm-Features: Aa3M54qrYLCi1kdI6tOsVZ4Mm-8YCYtqxNVjxhU4bWLFHJjIpemXwQLKhaF114s
+Message-ID: <CABCJKucCD8RTVTg=_PuWTDLVaV+h8T7=whx+kLuxKq1Bpi3NrQ@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: rust: disable function merging unconditionally
 To: Alice Ryhl <aliceryhl@google.com>
 Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -122,75 +119,40 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Migu
 	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
 	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
 	Alexandre Courbot <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Matthew Maurer <mmaurer@google.com>, Sami Tolvanen <samitolvanen@google.com>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Matthew Maurer <mmaurer@google.com>, 
 	Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
 	llvm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 18, 2026 at 12:11=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> =
-wrote:
+On Wed, Nov 18, 2026 at 5:09=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> w=
+rote:
 >
-> On Wed, Nov 18, 2026 at 7:48=E2=80=AFPM Nick Desaulniers
-> <ndesaulniers@google.com> wrote:
-> >
-> > On Wed, Nov 18, 2026 at 5:09=E2=80=AFAM Alice Ryhl <aliceryhl@google.co=
-m> wrote:
-> > >
-> > > Function merging causes various different issues:
-> > >
-> > > * For CONFIG_CFI there's an LLVM bug causing functions with different
-> > >   CFI hashes to get merged. This can lead to crashes at runtime.
-> >
-> > Do you have a link to a bug filed against llvm?
+> Function merging causes various different issues:
 >
-> https://github.com/llvm/llvm-project/issues/217629
+> * For CONFIG_CFI there's an LLVM bug causing functions with different
+>   CFI hashes to get merged. This can lead to crashes at runtime.
+> * For gendwarfksyms it causes functions with different CRCs to get
+>   merged. This leads to broken MODVERSIONS information if the function
+>   changes in the future so that it can no longer be merged.
+> * Wrong backtraces when a crash occurs in a merged function.
+> * Possibly also issues with pahole/BTF as the merged function's debug
+>   info is lost.
 >
-> > > * For gendwarfksyms it causes functions with different CRCs to get
-> > >   merged. This leads to broken MODVERSIONS information if the functio=
-n
-> > >   changes in the future so that it can no longer be merged.
-> > > * Wrong backtraces when a crash occurs in a merged function.
-> > > * Possibly also issues with pahole/BTF as the merged function's debug
-> > >   info is lost.
-> > >
-> > > These issues are new to Rust because in clang, function merging is of=
-f
-> > > by default, so these things have never come up before. Because of thi=
-s,
-> >
-> > I've never heard of function merging (in clang). I've heard of
-> > -Wl,--icf=3D{none,safe,all), a linker flag.  Is rustc setting that by
-> > default, implicitly?
-> > https://github.com/ClangBuiltLinux/linux/issues/1598
+> These issues are new to Rust because in clang, function merging is off
+> by default, so these things have never come up before. Because of this,
+> turn this option off for all configurations.
 >
-> No, this isn't linker ICF. rustc doesn't pass --icf, and in any case
-> kbuild invokes rustc with --emit=3Dobj and does the final link itself, so
-> rustc's linker arguments never come into play.
->
-> What I'm referring to is LLVM's MergeFunctions IR pass
-> (llvm/lib/Transforms/IPO/MergeFunctions.cpp). It runs as part of the
-> optimization pipeline, within a single codegen unit, before any object
-> file is emitted. Clang only enables it with the cc1-only flag
-> -fmerge-functions, which the kernel never passes, so C code in the
-> kernel never sees it.
+> Link: https://lore.kernel.org/all/avy_9SPRaPSKD8b4@google.com/
+> Fixes: ac61506bf2d1 ("rust: Use gendwarfksyms + extended modversions for =
+CONFIG_MODVERSIONS")
+> Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+> ---
+>  Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks, consider amending these relevant links and details into your
-commit message.
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
 
->
-> rustc, however, enables it by default whenever optimizing for speed or
-> size (opt-level 2, 3, s or z), which covers both kernel configurations.
-> It uses the "aliases" mode: when two functions have identical bodies,
-> one is deleted and its symbol becomes a GlobalAlias to the other. You
-> can turn it off with -Zmerge-functions=3Ddisabled.
->
-> Alice
-
-
-
---=20
-Thanks,
-~Nick Desaulniers
+Sami
