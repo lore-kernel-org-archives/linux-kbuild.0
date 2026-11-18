@@ -1,104 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.96.99
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795007753;
-	b=L0T2nEm0e5yT4DD52DUkDcngEFVp2HvnsxvHyVH9iJclHZub7reKi0kht87ADzmaaJ3C
-	 WUh3ZHmmacIZqQ317AjlxNNc6mDHfFsyR8P2IFEXsZeVQVnXrgRcxH9DdfL+HmWjN4HPy
-	 /t8SiphexPh/jy0ZUg/XCqJ7W9I1nM3c74TEuyV3/ap9J0KHvSKD7jExy9gGNH7yf0T1A
-	 rEUeuC2tEySaX9CmnviCpoWcM4ukBbsU8+pT3FCPmn1K4A9bOu7urhSt7Mvx8xLPwVn7z
-	 Nw69Rz2AdBPO59bdgURTjVGl41RWZz4vOOOJZ7SoiqEd/y6i945i7wdnlRyle2Oexdg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795007753;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:To:Cc:Subject:
-	 From:X-Mailer:References:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
-	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=IBTW2QYj/Psia5swpWkFv+idj/v8sTnzeQ/86NpmGGk=;
-	b=GEkKueE8svniCtyCzn4OHONpM1wGjzLvKnBprxBcUH0h6MHD92htoikvi4TTInpFkdlv
-	 uw/ZEGvYHJ5aTy0qeHKdaP1c6wrKdEkn73sA6UNE6doQmE2wf4RtzMR81uYgu/Ywh2/pw
-	 VD8PU6XpYDXZGsZorSMD0Ux6vgH7cIRkk/z3BUuugu7avqLik0PtsXZIoLQZPk1EymFER
-	 r9jC0JrXAimgopZYK+yb/s66ZwYgFMl1QXLsILmLiufUbA36OzxZqw+7Pmv1i8o14Pa3L
-	 i1sqZc9mKbidT4LywYybdsu/TDjhuU9KBkrhspTl8HF5wmE2iMOZjTxoHclVe7p6+zg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=garyguo.net;
-	spf=pass smtp.mailfrom=garyguo.net;
-	dkim=pass header.d=garyguo.net header.i=@garyguo.net header.a=rsa-sha256 header.s=selector1 header.b=PKXSzVve;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.96.99
-Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022099.outbound.protection.outlook.com [52.101.96.99])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795007990;
+	b=uGnaym0/FpeIawb/xaGAFR3SZtAXDpN1e1SB4C+lpYJ75amP3PxZu244+ALXNqDksIht
+	 npIC0lwFe9YiSn1tPaHsEaQvmfW95l7mn3WTR4J5Im5qdogdf5Rh447bKSycTHsjXcY0y
+	 GhdSQvQ0aYexEKp6h0oOAmJFx9fchZrx+sCErHt2t4zZlBiCRiZalP0WG9KN6awZa10dZ
+	 p0XpWMYROjJLlAZ7FnW4Qr4JteBnjGeypxIBSwlJZfGsVTWIU6JSz6ejJpSe0Eo6Kuxjf
+	 gWETrfCMLNoWiqhP/1hr1g7NkN6Gq4DEuJ4B61RU07V10r/bziIHH4ZYcci3EjKp2xg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795007990;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=93Uj5YlJiJDUPqQt02zfaVf+8qWZByKLyR/rRwtPCWI=;
+	b=dkAbfeWVEHVEfwABaxSQxMpK633QzAQSesmkYIiMEd31YfZlU1ddZXr3cXuuggkjfLMO
+	 fA+Mbg8anqLuOinVcDibg8coDuPlz4kyEWkFFcOit5Hvc0YZkV8IGahLPaekls99fwuFw
+	 BaPgCz0RzsoAVdVxoK+Huvh2q3eAuAzIcbK1c2KAeYY7yHJ9vgaO/euylQIA/t6pu68UO
+	 AEb89g2CossaKdxoxutbHMZNTSc4SF0fBxGKZunu1wOFJY57G6kxvGXJEjOPlasCvxHdT
+	 Z3gCcEFX7zXUDTJZB0yOWH/ecavAxNlAIBwiZuYRkanQSOcwefgu9+99b/qjKd++O5w==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=suse.com;
+	spf=pass smtp.mailfrom=suse.com;
+	dkim=pass header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=Y434dVE3;
+	arc=none smtp.remote-ip=209.85.128.43
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30043606A31C;
-	Wed, 18 Nov 2026 13:15:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30043606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28878606A320
+	for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 13:19:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 28878606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=garyguo.net header.i=@garyguo.net header.a=rsa-sha256 header.s=selector1 header.b=PKXSzVve
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EEIlKKAK61br212sCJmc+7AGQlONkpHK8Li8tlbg2PQgWwsby8lcb0UlohTeKTmiAc0Nk33b7S2sbQxezHw8IMo01GsyZgVSar25ktrgnM8DC+eAq6hbyU6jMoJTr9d5fyLU+b/lhADRrtqZfEEjGNurQr46M2USNvO3UT1OVBxvB4l7kLti12ZIluL+QtLnUf7tfpCh+dCI7YBFGH4+jM8ZG+/QqctHifroS5EuTbVtYUhLb3ZaKWOoXikBy+gPaMRRwMWTLvwP8DUXzhQ0zB0FxwcBBAq7rcbRGgTa/CIM9D2maX++hkP7YaoGEB8NXJ7WpwAWIhTN08h3/o19Vg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IBTW2QYj/Psia5swpWkFv+idj/v8sTnzeQ/86NpmGGk=;
- b=f9WiIwp3hqmqrR7HE9iKNy+m7ZbhhyrvtYRkjsRke5cLxwIdI+LNBM/q1gZ3rnb30BtlfpqP+oG9Hi2nfIyTJTkRCtVvextZ884DOlpy4Oz/5nIfk2Gs8OuQav/2JN6dQOgb4+k3smm8c3ZzajDuaUAV0TzeeZt0F33Ko1Fp5pQcJiMsw0MyHwLKUZYq+yYHlXVBqPrVWVa3thgBD+nPXLlWIy9/Juq/rngGyNgxKqFEA1PBW9yemksIZJtAXUGT8JzbpM2Hvo6L6y7hUbkbP7AkXKk0BLGEGvLmla+Qbxl8vRFaq5HfplcWzvjAJIJ43N4LlnK7KvzIXYgQ1VCzHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IBTW2QYj/Psia5swpWkFv+idj/v8sTnzeQ/86NpmGGk=;
- b=PKXSzVveJxCwxO3SpQMmRj3oZkP9dmzlBePBqZGlMm37uhRz1pNq9nKkqBHDeKA3fEpYx89swDA00qaH+HbHsF4SjyzAgSwJbzujUnPjxp+cQp+4Ia27d01EB1wSSIr53h7C0ExFVZ3cp9z7LSQdEIM4lFWVAdTJQdqg6xxhseQ=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1cb::9)
- by CWLP265MB5971.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1d0::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.14; Wed, 18 Nov
- 2026 13:15:49 +0000
-Received: from CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
- ([fe80::55f6:f98b:7fad:c6e3]) by CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
- ([fe80::55f6:f98b:7fad:c6e3%2]) with mapi id 15.21.0615.013; Wed, 18 Nov 2026
- 13:15:49 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 18 Nov 2026 13:15:48 +0000
-Message-Id: <DMYD53NKY6UM.M1A2EY4TRSA7@garyguo.net>
-To: "Alice Ryhl" <aliceryhl@google.com>, "Nathan Chancellor"
- <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Miguel Ojeda"
- <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>, "Gary Guo"
- <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
- Hindborg" <a.hindborg@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
- "Danilo Krummrich" <dakr@kernel.org>, "Daniel Almeida"
- <daniel.almeida@collabora.com>, "Tamir Duberstein" <tamird@kernel.org>,
- "Alexandre Courbot" <acourbot@nvidia.com>, =?utf-8?q?Onur_=C3=96zkan?=
- <work@onurozkan.dev>, "Nick Desaulniers" <ndesaulniers@google.com>, "Bill
- Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
- "Matthew Maurer" <mmaurer@google.com>, "Sami Tolvanen"
- <samitolvanen@google.com>, "Masahiro Yamada" <masahiroy@kernel.org>
-Cc: <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>, <llvm@lists.linux.dev>
-Subject: Re: [PATCH] kbuild: rust: disable function merging unconditionally
-From: "Gary Guo" <gary@garyguo.net>
-X-Mailer: aerc 0.22.0
-References: <20261118-rust-merge-functions-v1-1-fe86126522b9@google.com>
-In-Reply-To: <20261118-rust-merge-functions-v1-1-fe86126522b9@google.com>
-X-ClientProxiedBy: LO4P123CA0263.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:194::16) To CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:400:1cb::9)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.a=rsa-sha256 header.s=google header.b=Y434dVE3
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so10753165e9.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 05:19:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1795007988; x=1795612788; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=93Uj5YlJiJDUPqQt02zfaVf+8qWZByKLyR/rRwtPCWI=;
+        b=Y434dVE3SaNsU7j3zoVT/FqTeXOB/+iRps4Z3i9BHLEz16vp4YjcfNzKf32fOzWv6f
+         eLeYkeG+4gEEPYjS6PldWx89jyh9HDErDo8HeM57clCniLe+MUlN5PYZUcmrAMa1v7Jc
+         7Oy/U84NreNYGujiplHDk9Bhhah6+efymLH5FPBDDSbHDpa/Qky5dUma5aQVNdLmPbZs
+         r1Ele7NPgsy+GCRTfiKLfXMMnzImTDu+3f+KqygFKUNnAmXddHBR1ABUOf2/yafZTvpm
+         OuLWQSFfEst3Df1lwW9Mr7dKwtErIsHGLO6zoijeYaDK/eN++wMmx3Wbhb5MKaUEUlnf
+         zxJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795007988; x=1795612788;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=93Uj5YlJiJDUPqQt02zfaVf+8qWZByKLyR/rRwtPCWI=;
+        b=doVL4Lhjs4/cDMnniMykFijlnYgM7ppgfLgSR7XaKFaEqpnqr2umVyY/zuolhqpbeG
+         TTyVAodBI6l2rpHpih/58DBkdzrujNZxUVlNBwuwXS1+ooq/QWp+ehKZU49P0l0SxecR
+         jNW8FGr5fzGbRZSotbTf0tqtOx63Jy4VRYi6eP5zBkz5L+SuHjklQIueXe4jtarcwRTA
+         WxFjgrq2cOhYFM9AqKdf0k0Hfc19Vrawu66ev4eUHQrJnw89lNknf8kGb7GdgpfwfynP
+         wbThZK5HCD3oOFw82e1wuvEAItqlmAaxmuacTy3BpVb80iLX5npN+xGdZnpfw2/Tw136
+         BR+w==
+X-Forwarded-Encrypted: i=1; AL+hErHjo3POOPRCIiX1QoGM/YZT5RPoJtUD4rK1iTJ6iw1k1Sj40yA3jNjAe9VXLMuQC6SYvVat0yCoGXslvj4=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/ZF58H+6vq+uPKRNwBA/i3ELPx8CIfoztMU52QhqlYIrQWQXF9
+	ML9CrPwFT9PqDUg/Q4wGfYdS1WrqtqFASv8KwePQgvuevs8YRtCdpRZh0BrcJPoEdL0+iWw9lq5
+	es+ZVOU8=
+X-Gm-Gg: AYBFou15zfJDKJMNAD0+KdE1X1ggwUYOYzUMFWm7qfIDjKthA647cAyvYra/b+nHxqC
+	jhTqQQNgtpFPfv+SMQ+VbMRYI+7f2XyiannJHjnheKhTpBISl7ZqmdIqGce4+3PJi+rtmOK3CQG
+	LKoqYBYaN0V19xLRTZ7nnTbCsRn0srUBFNb8MTYjO5lP339ZCSFRLafJO8Pht7XxXngb82CnHLC
+	Fp31L7NInEqv6Hg6EDhmqnnpdFh0IbRLBrOCSk1LdyvdaxP6RwGVXogJRrvbDpHsE3KpU6yCSpZ
+	Pu9it41Ioj8XV4VIV1dD/7XJE0J7GxVvW6yj6ISehfW1EnWww9/t+v5A0QKxCHF1Ez3xRD0H3m3
+	PX8JRDipprvOiFe3SJj6PIAM52jMjccD1fppSc/glq4RX+egzN7WfnR3G4WGRp2aPvDdD86DAkj
+	74lmCCMRXRiRifzFuc5CBnemVdD54H7ODlsWTXLp4LAG6JSDKTsFTyjkpCVgyXXhITJ6b5yZPgc
+	WItrBvEM3QZD3AdZTsnN2NLnstn7/8b7mK88Dh3LQ/mKgC07ThfKUB2LfsmfI2mjbbPPupco8I0
+	x4z/NvSNv++hKHCFT/KpcxG9IABic0obEZgN/CaS1dZZn7PAw6NaDYBuTchP9iYLoA==
+X-Received: by 2002:a05:600c:1f82:b0:4bb:6848:d433 with SMTP id 5b1f17b1804b1-4bb7da4f53fmr49945395e9.26.1795007988353;
+        Wed, 18 Nov 2026 05:19:48 -0800 (PST)
+Received: from ?IPV6:2a07:de40:8100:0:89a9:fd0e:583d:4a53? ([2001:af0:8000:1409:193:86:92:181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb783f8154sm156191165e9.4.2026.11.18.05.19.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Nov 2026 05:19:48 -0800 (PST)
+Message-ID: <59295e13-8324-4749-9e0d-e018b78ae2d7@suse.com>
+Date: Wed, 18 Nov 2026 14:19:47 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -108,94 +93,329 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP265MB6051:EE_|CWLP265MB5971:EE_
-X-MS-Office365-Filtering-Correlation-Id: af85fa9c-3e23-4ea7-5858-08df45761034
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|7416014|366016|10070799003|1800799024|921020|261021123027099003|261022075727099003|56012099006|10067099003|261021121427099003|261102123227099003|261009223027099003|22082099003|18002099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	wyC6wZ9tp8ROgXbPQNb450w+QRLRhoIcytU3uSLQhDSipWMf4d5piy+0ixuHBSHeM0WsI1gwr30oFSXrvrFMd3pNoR/9UNkjNb5A0vjLRCWKx+ZXtK0hisvKXC+XBLbBkrgNGHN1MQxPne/gl6GNiYHRJQntQ2x19eNUGYsZ1X4Fr54tUD5zdKUlPUTMLcFKJRmw1be4Yn2vcsZsBCwZ+lltClEY2bvPoA9dTZWL22qJJHrofoNRm8ZGX+OlTrpYOSQO1SyRBDr6kFgzw6pmQY4Xx6qYhu6DoUqrrlHewhoR+OpTsiVE2HcQk1jUqbhLn89hp/mGXbeJJhJLNaa4JKndYwLKpXnlRLzMA7o6PIG95gyz212xXvNnD4NC39b4obQwu0XVpY96v7Z+r9ZdQNlrInfr/uArzyAwVYypxQF8nxM7e+v8q+IGTcgPgXEiiBkJUHbMnqPpEzamyazuOMmQX1JNvRLtSR1McdMwo05uRBiL8Y1qtHdSgmqbKXQNBjAW+aJda1lVDwrnNUqcyHdEQjeG+i4uknDmGNAvVO4Ht5LXf8cwCk6gNtSH0np8jqyPZsNjHPS52CMPWZkavG94z9pmikSuAKDgFOujH0RuUtL59ZZAy0EUfKeL+5ROxDv5NBHZAInelZPejGix5knj0EVjFaTI31FIMoDnchQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(366016)(10070799003)(1800799024)(921020)(261021123027099003)(261022075727099003)(56012099006)(10067099003)(261021121427099003)(261102123227099003)(261009223027099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eVhDM2FVZGVkanVJYVkvcW5zbnJYRmMzcEUxOEUxYW5MMjM5TCs4eG8rcTcx?=
- =?utf-8?B?VjJtL09hKzE1c2c0Q2Zmano4SHc5Z25SRG1QZFl3TzVvUUxFTHJNS2huWlhG?=
- =?utf-8?B?cjNnVlRxbnlzTmRMenVLQ21TRlMvMTVMQ2wrcVpSaHlDYjd4NElCZW5udHVQ?=
- =?utf-8?B?ZGlWYzZndm9uSlpUR2p4WkR3RUp5SThDTGlzRk1jQnFndlN3cFRkanhOQ28z?=
- =?utf-8?B?V01RQ1JFb0w5dFlRcUFEdWhHWUJBODdkYnIyMCtFV3EvdFhyTmNrYmlKOWxu?=
- =?utf-8?B?KzJDZHkrOTBGOS9zaTBkcDVPQVVhMGhOTFQvVjdZdDEwUGE0VkpUTjdxcXV5?=
- =?utf-8?B?bUdPd0hPbWJXdmhBcE1uZFJ2b21EV1MzejZvTThUQkhpTDVkcTJQYi9Xa2Vr?=
- =?utf-8?B?dDhmVVdjVmlwN3V1d3ZSRjJubkRxUTQrVTNYcmsyT2FpbFJ3dGJwTDRuN1pX?=
- =?utf-8?B?T2ZtSXRMenkxbXhtR3NlT3B1LzdGM29PSzlNS3VQaGdMODNMczc4ek80OU1B?=
- =?utf-8?B?c2pFcFVjemhGOExzRGZxcXlzZWZJaUFkVkhBdzBYTUFTMzNYcEwyTENvNU1t?=
- =?utf-8?B?UVlCTWFva2oxWkFYbnBuT1g2SStTZlU0aDJsQTJXMGdMbUJqZzJkd0ZyY0RL?=
- =?utf-8?B?eE5kV2d5WmQ2QlhnRTBBb3A5dVM2c2RDb2twaE0zbFNZRzVvdnM5QU5XQk1K?=
- =?utf-8?B?YTY4TlB1eHBaNHVDNFBhR09Wcnpldi9RUjBZbTFwRW8xYXBQUkp1UGp4ZzI5?=
- =?utf-8?B?TkEyZkhmR1FJQ3B4TFNKcFp3WDBob1BYOHZONmJYbWhYamREa3FTRm1LM093?=
- =?utf-8?B?K0g4THU2cUJKaDAwWTc2VHJ4Y0htZVcvN2FUWXZRaHJxcEI1R05WOGRRRGhN?=
- =?utf-8?B?QUVpMnB0Tk1oR0IxSm5QZkt1QlFIODRrNTN5VXJ3NG9qeEQ4VWFja3hMWWto?=
- =?utf-8?B?K1NHamIzT2FoWVBJaU9zTG5LVGVLTVMveUxyVWxpRzh2MWorYnczM1V0MU5Z?=
- =?utf-8?B?bWtKeG9iREU0NmNjL0s4QzYrZGoxdFkxdjB6blVENExPcndpSHpXVjNETHgr?=
- =?utf-8?B?ZFErVml3N3pXTHJFQkoxc2VPODZNSjNvZW5NenZ3b0MyODZxTEdoYlJjMXF3?=
- =?utf-8?B?ZGx4SzVXRGRTNHNzVzc3MjExVmdXTXhtYzV1Mkd4OG1OUTZNcXVVbGpXTjNx?=
- =?utf-8?B?N3ZmeEFNUXQ4dXNmdXVxWHkzZ3FwUndEeWhlRnJrcVFzamxuY0k0VHpTeUFH?=
- =?utf-8?B?eGZCdGpxWXFycFNrYm5jQnhJSEJWbVZzRlJkZjlZbS95enFZN1lHUUgyQnZ4?=
- =?utf-8?B?QXhaNW5OZ0lTeDZDRmtwK2RqOUNDNkJaWEtmaW0zQ2Exd1M0L1FPYThiZTBr?=
- =?utf-8?B?eElzR3kyUFVkLy9DdHk0NVlQS0U5ZzhyQUg4Qzd3elNSUHRtVlcyblRoSHhF?=
- =?utf-8?B?dS9EZTBHZTdlaXVTK2E5TEQyL3BvOUlkZXNaaWtacFR1NHhZZWhKL1FaWkRV?=
- =?utf-8?B?Uko2RDVFcjNhaldaclUxUkx0Z1djVHdVY0RjZnpjWU9XYXp1aTF3Q3lKaXkx?=
- =?utf-8?B?U0RjcXluM2s1eVZDTkxDcHlmV0lUV1NROVRGQWZHOWl0ZDk2RkVVbHcvbFhP?=
- =?utf-8?B?QnpRSS9BUTRBckZyWmFsaUVyR3I4cU5iZWlJN0xlbThYQmxzK2JGeVhIOWJo?=
- =?utf-8?B?ZnZET1pNTi9SMzlGSEpuanI2Qkd0WXEySDBNVTRobVphd2JaM0dWcnFiQjZp?=
- =?utf-8?B?OC9na2FlTmplQnBMS3VQbXpLN0p5UWtuTTZ4anl4M2VSWW9MNHBqNUgxZUkx?=
- =?utf-8?B?WlJZTW4xQU5YbXE4QU82dHJ3YW9zaGlaQXhQSHdnTTlSQ1RIaVZKU3VPSmZ2?=
- =?utf-8?B?Q3JldytCT0h3Zm53WE5jRGNBMGNXYnlkVXpRR1VEd3I1T1l2VWZTSHgwdXhP?=
- =?utf-8?B?b21uN3FJZTA3dWp6WS9KZ1hPY0dDYjV2WWFXYW50ZzFLM0lhR3JxSmpqREFu?=
- =?utf-8?B?RlFzcWl5bXJydHZ4ZWlGdm5lZmh1UXg1c1J5aVBna0dTajFmdmQ3L0FrVEhx?=
- =?utf-8?B?VzZHeWN1QjlBQWE2Um56QjlIN2w0b2VsRzlqcXl6MC9rMVJPV0JranVlNTR0?=
- =?utf-8?B?bjRaa0Q3djhJb1hITHlNMHlZOWxEQUJQak9ibnZvb2NRQVQ0RGt6MCsyeitO?=
- =?utf-8?B?aEQrdlJDR2pGT0htdzJ6K0NRYUR4OFlyeGF5WHZQZWJLbng4aTk1aGdiYjB4?=
- =?utf-8?B?cG1uMGs0UmlLblpsaHA1bEVla3l6d3VjTW02ZGlVWVB6STlFazJ4L3VBOWRI?=
- =?utf-8?B?ZUJKQ1JvNUJLT2pWZUNGZllpWHkwZ0NuRTBRY2NGUkN2eS9jejRVZz09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: af85fa9c-3e23-4ea7-5858-08df45761034
-X-MS-Exchange-CrossTenant-AuthSource: CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2026 13:15:49.1402
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hNW9ONJY95jc8XH9BMvAkHSGFeNMxGaKwURTRSvUuK3rwimGGKnULmHJEhJE1sDK3HqKQNnCN4bAUavBS9f1Dw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP265MB5971
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] module: Add LZ4 module compression
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Daniel Gomez <da.gomez@kernel.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ Nick Terrell <terrelln@fb.com>, David Sterba <dsterba@suse.com>,
+ linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kbuild@vger.kernel.org
+References: <20261115120416.256087-1-pmenzel@molgen.mpg.de>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <20261115120416.256087-1-pmenzel@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed Nov 18, 2026 at 1:09 PM GMT, Alice Ryhl wrote:
-> Function merging causes various different issues:
->=20
-> * For CONFIG_CFI there's an LLVM bug causing functions with different
->   CFI hashes to get merged. This can lead to crashes at runtime.
-> * For gendwarfksyms it causes functions with different CRCs to get
->   merged. This leads to broken MODVERSIONS information if the function
->   changes in the future so that it can no longer be merged.
-> * Wrong backtraces when a crash occurs in a merged function.
-> * Possibly also issues with pahole/BTF as the merged function's debug
->   info is lost.
->=20
-> These issues are new to Rust because in clang, function merging is off
-> by default, so these things have never come up before. Because of this,
-> turn this option off for all configurations.
->=20
-> Link: https://lore.kernel.org/all/avy_9SPRaPSKD8b4@google.com/
-> Fixes: ac61506bf2d1 ("rust: Use gendwarfksyms + extended modversions for =
-CONFIG_MODVERSIONS")
-> Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+On 11/15/26 1:04 PM, Paul Menzel wrote:
+> XZ modules are small but slow to decompress in the kernel. Therefore,
+> support modules compressed in the LZ4 frame format (.ko.lz4), as written
+> by lz4(1). Decode block by block into a scratch buffer and copy into the
+> module pages. Linked blocks keep the last 64 KiB of output in front of
+> the scratch buffer as the dictionary. Verify the header checksum, block
+> checksums, content checksum and content size when the frame has them.
+> Frames with a dictionary ID are rejected.
+> 
+> modules_install uses `lz4 -12 -B4 -BD`: 64 KiB linked blocks are as
+> small as 4 MiB blocks (i915.ko: 3587140 vs 3585364 bytes) and keep the
+> scratch buffer at 128 KiB.
+> 
+> Userspace needs kmod with LZ4 support for depmod and modprobe [1].
+> 
+> On a Dell XPS 13 9310 with an Intel Core i7-1165G7 (Tiger Lake) and an
+> NVMe SSD, decompressing and checking the signatures of the 237 modules
+> loaded during boot takes 624 ms of CPU time with XZ (i915: 91 ms) and
+> 131 ms with LZ4 (i915: 12 ms), measured by calling finit_module() again
+> for each loaded module. The LZ4 modules take 20.3 MB instead of 11.0 MB.
+> Both kernels are v7.4-rc1 with the same patches, including pending
+> lib/xz decoder speed-ups. Ten alternating boots of each kernel:
+> 
+>   | ms (median)                               |  XZ  | LZ4  | change |
+>   +-------------------------------------------+------+------+--------+
+>   | early-i915 (modprobe i915 + dependencies) |  295 |   90 |   -205 |
+>   | first i915 message                        |  738 |  547 |   -192 |
+>   | GDM autologin                             |  973 |  876 |    -96 |
+>   | GRUB start to autologin                   | 1292 | 1197 |    -94 |
+> 
+> QEMU 11.1.2 (KVM, AMD EPYC 7763, 8 vCPUs, module.sig_enforce=1, 10
+> rounds), loading the same 237 modules in dependency order:
+> 
+>   | median                   |   XZ    |   LZ4   | uncompressed |
+>   +--------------------------+---------+---------+--------------+
+>   | one at a time            | 2082 ms | 1499 ms |      1461 ms |
+>   | 8 in parallel, like udev |  619 ms |  573 ms |       593 ms |
+> 
+> Link: https://github.com/kmod-project/kmod/pull/505 [1]
+> Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Reviewed-by: Gary Guo <gary@garyguo.net>
+Which Linux distributions are interested in LZ4 compression for modules
+and plan to use this feature?
 
-> ---
->  Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> diff --git a/kernel/module/decompress.c b/kernel/module/decompress.c
+> index cce098671be97..028b411015f21 100644
+> --- a/kernel/module/decompress.c
+> +++ b/kernel/module/decompress.c
+> @@ -287,6 +287,249 @@ static ssize_t module_zstd_decompress(struct load_info *info,
+>  	kvfree(wksp);
+>  	return retval;
+>  }
+> +#elif defined(CONFIG_MODULE_COMPRESS_LZ4)
+> +#include <linux/bitfield.h>
+> +#include <linux/lz4.h>
+> +#include <linux/sizes.h>
+> +#include <linux/unaligned.h>
+> +#include <linux/xxhash.h>
+> +#define MODULE_COMPRESSION	lz4
+> +#define MODULE_DECOMPRESS_FN	module_lz4_decompress
+> +
+> +/*
+> + * Decoder for the LZ4 frame format written by lz4(1), see
+> + * https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md
+> + *
+> + * Each block is decoded into a scratch buffer and copied into the module
+> + * pages. A linked block may reference up to 64 KiB of the output before
+> + * it, so that much output is kept in front of the scratch buffer.
+> + */
+> +#define LZ4F_MAGIC		0x184d2204
+> +
+> +/* Frame descriptor, FLG byte */
+> +#define LZ4F_FLG_VERSION	GENMASK(7, 6)
+> +#define LZ4F_FLG_BLOCK_INDEP	BIT(5)
+> +#define LZ4F_FLG_BLOCK_CSUM	BIT(4)
+> +#define LZ4F_FLG_CONTENT_SIZE	BIT(3)
+> +#define LZ4F_FLG_CONTENT_CSUM	BIT(2)
+> +#define LZ4F_FLG_RESERVED	BIT(1)
+> +#define LZ4F_FLG_DICT_ID	BIT(0)
+> +
+> +/* Frame descriptor, BD byte */
+> +#define LZ4F_BD_BLOCK_MAXSIZE	GENMASK(6, 4)
+> +#define LZ4F_BD_RESERVED	(BIT(7) | GENMASK(3, 0))
+> +
+> +/* Block size field: the top bit marks a block stored uncompressed */
+> +#define LZ4F_BLOCK_UNCOMPRESSED	BIT(31)
+> +
+> +#define LZ4F_WINDOW_SIZE	SZ_64K
+> +
+> +/* Block maximum sizes for the BD byte's Block MaxSize values 4 to 7 */
+> +static const u32 lz4f_block_max[] = { SZ_64K, SZ_256K, SZ_1M, SZ_4M };
+> +
+> +static int module_lz4_copy_out(struct load_info *info, const u8 *src,
+> +			       size_t len, size_t *total)
+> +{
+> +	while (len) {
+> +		size_t offset = *total % PAGE_SIZE;
+> +		size_t chunk = min_t(size_t, len, PAGE_SIZE - offset);
+> +		struct page *page;
+> +
+> +		if (offset)
+> +			page = info->pages[info->used_pages - 1];
+> +		else
+> +			page = module_get_next_page(info);
+> +		if (IS_ERR(page))
+> +			return PTR_ERR(page);
+> +
+> +		memcpy_to_page(page, offset, src, chunk);
+> +		src += chunk;
+> +		len -= chunk;
+> +		*total += chunk;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int module_lz4_verify_content(struct load_info *info, size_t total,
+> +				     u32 expected)
+> +{
+> +	void *data;
+> +	u32 csum;
+> +
+> +	data = vmap(info->pages, info->used_pages, VM_MAP, PAGE_KERNEL_RO);
+> +	if (!data)
+> +		return -ENOMEM;
+> +	csum = xxh32(data, total, 0);
+> +	vunmap(data);
+> +
+> +	if (csum != expected) {
+> +		pr_err("LZ4-compressed data is corrupt (content checksum)\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static ssize_t module_lz4_decompress(struct load_info *info,
+> +				     const void *buf, size_t size)
+> +{
+> +	const u8 *in = buf, *end = in + size, *desc;
+> +	size_t block_max, total = 0, dict_len = 0;
+> +	u64 content_size = 0;
+> +	u8 *scratch, *out;
+> +	bool linked;
+> +	u8 flg, bd;
+> +	ssize_t retval;
+> +
+> +	if (size < 7 || get_unaligned_le32(in) != LZ4F_MAGIC) {
+> +		pr_err("not an lz4 compressed module\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	desc = in + 4;
+> +	flg = desc[0];
+> +	bd = desc[1];
+> +	in = desc + 2;
+> +	if (FIELD_GET(LZ4F_FLG_VERSION, flg) != 1 ||
+> +	    (flg & LZ4F_FLG_RESERVED) || (bd & LZ4F_BD_RESERVED) ||
+> +	    FIELD_GET(LZ4F_BD_BLOCK_MAXSIZE, bd) < 4) {
+> +		pr_err("LZ4-compressed data has an unsupported frame descriptor\n");
+> +		return -EINVAL;
+> +	}
+> +	if (flg & LZ4F_FLG_DICT_ID) {
+> +		pr_err("LZ4-compressed data needs a dictionary\n");
+> +		return -EINVAL;
+> +	}
+> +	if (flg & LZ4F_FLG_CONTENT_SIZE) {
+> +		if (end - in < 8)
+> +			goto truncated_header;
+> +		content_size = get_unaligned_le64(in);
+> +		in += 8;
+> +	}
+> +	if (end - in < 1)
+> +		goto truncated_header;
+> +	if (*in != ((xxh32(desc, in - desc, 0) >> 8) & 0xff)) {
+> +		pr_err("LZ4-compressed data has a corrupt frame descriptor\n");
+> +		return -EINVAL;
+> +	}
+> +	in++;
+> +
+> +	block_max = lz4f_block_max[FIELD_GET(LZ4F_BD_BLOCK_MAXSIZE, bd) - 4];
+> +	linked = !(flg & LZ4F_FLG_BLOCK_INDEP);
+> +
+> +	scratch = kvmalloc((linked ? LZ4F_WINDOW_SIZE : 0) + block_max,
+> +			   GFP_KERNEL);
+> +	if (!scratch)
+> +		return -ENOMEM;
+> +	out = scratch + (linked ? LZ4F_WINDOW_SIZE : 0);
+> +
+> +	for (;;) {
+> +		u32 block_size;
+> +		size_t len;
+> +		int ret;
+> +
+> +		if (end - in < 4)
+> +			goto truncated;
+> +		block_size = get_unaligned_le32(in);
+> +		in += 4;
+> +		if (!block_size)
+> +			break;
+> +
+> +		len = block_size & ~LZ4F_BLOCK_UNCOMPRESSED;
+> +		if (len > block_max) {
+> +			pr_err("LZ4-compressed data has an oversized block\n");
+> +			retval = -EINVAL;
+> +			goto out;
+> +		}
+> +		if ((size_t)(end - in) < len +
+> +		    (flg & LZ4F_FLG_BLOCK_CSUM ? 4 : 0))
+> +			goto truncated;
+> +
+> +		if ((flg & LZ4F_FLG_BLOCK_CSUM) &&
+> +		    xxh32(in, len, 0) != get_unaligned_le32(in + len)) {
+> +			pr_err("LZ4-compressed data is corrupt (block checksum)\n");
+> +			retval = -EINVAL;
+> +			goto out;
+> +		}
+> +
+> +		if (block_size & LZ4F_BLOCK_UNCOMPRESSED) {
+> +			memcpy(out, in, len);
+> +			ret = len;
+> +		} else if (linked) {
+> +			ret = LZ4_decompress_safe_usingDict(in, out, len,
+> +							    block_max,
+> +							    out - dict_len,
+> +							    dict_len);
+> +		} else {
+> +			ret = LZ4_decompress_safe(in, out, len, block_max);
+> +		}
+> +		if (ret < 0) {
+> +			pr_err("LZ4-decompression failed\n");
+> +			retval = -EINVAL;
+> +			goto out;
+> +		}
+> +
+> +		retval = module_lz4_copy_out(info, out, ret, &total);
+> +		if (retval)
+> +			goto out;
+> +
+> +		if (linked) {
+> +			/* Keep the last 64 KiB as the next block's dictionary. */
+> +			size_t keep = min_t(size_t, dict_len + ret,
+> +					    LZ4F_WINDOW_SIZE);
+> +
+> +			memmove(out - keep, out + ret - keep, keep);
+> +			dict_len = keep;
+> +		}
+> +
+> +		in += len;
+> +		if (flg & LZ4F_FLG_BLOCK_CSUM)
+> +			in += 4;
+> +	}
+> +
+> +	if (!total) {
+> +		pr_err("LZ4-compressed module is empty\n");
+> +		retval = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	if (flg & LZ4F_FLG_CONTENT_CSUM) {
+> +		if (end - in < 4)
+> +			goto truncated;
+> +		retval = module_lz4_verify_content(info, total,
+> +						   get_unaligned_le32(in));
+> +		if (retval)
+> +			goto out;
+> +		in += 4;
+> +	}
+> +
+> +	if (in != end) {
+> +		pr_err("LZ4-compressed module has trailing data\n");
+> +		retval = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	if ((flg & LZ4F_FLG_CONTENT_SIZE) && content_size != total) {
+> +		pr_err("LZ4-compressed data has a wrong content size\n");
+> +		retval = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	retval = total;
+> +	goto out;
+> +
+> +truncated:
+> +	pr_err("LZ4-compressed data is truncated\n");
+> +	retval = -EINVAL;
+> +out:
+> +	kvfree(scratch);
+> +	return retval;
+> +
+> +truncated_header:
+> +	pr_err("LZ4-compressed data is truncated\n");
+> +	return -EINVAL;
+> +}
+>  #else
+>  #error "Unexpected configuration for CONFIG_MODULE_DECOMPRESS"
+>  #endif
 
+I think the module loader shouldn't implement an LZ4 frame decoder
+itself. I'd expect that functionality to be provided by lib/lz4/ and the
+module loader should only be a user of it.
+
+The LZ4 block format implementation in lib/lz4/ is derived from the
+original LZ4 code. Have you considered similarly adapting the original
+LZ4 frame decoder instead of writing a new one?
+
+-- 
+Thanks,
+Petr
