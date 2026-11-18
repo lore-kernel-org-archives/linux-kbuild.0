@@ -1,88 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.44
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795000502;
-	b=eKLgGikrQH+jou2VTU83iTYojWLwD43Gcz1ioQmWGaIem9jZS15XitIgs4gw1PwAmn9u
-	 o/Blfcq7I1ZfzFf03C3I08S8OD5IyYJ2KHuW881tzyPtC+Q6MAyxKVxnGdP5TGRL+NikC
-	 D0fmdN6uoVXsvZtx6GrK4iykZjurMCz70IRkDuH6xIgF1VvPbJG+RKIDTFFNZVwcLLAgc
-	 XMkcNLVLt1TuKaFv2x7ivLnnLPg9ypqt9GGv2vnSpltyrYPyDMybIBUxAIHi86P8OjqJY
-	 lAGxbb+1X6L0HbR4y1/0QeWyIivHjgZ0JkuggnrE1vGEQj5vqZjSG8hxuX74lsqZCSw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795000502;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Sender:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type;
-	bh=6DH0KVmtxdJ4mUifFz/9FMzYO3ur54bwKg2YAmdDwWE=;
-	b=Oeeh+lEu9Hz+5cGQITSuAB1TYLFks1zJsw3zNymufSJ5tssmLVXT4Mj6vSvKvSCbiiuZ
-	 wPTfo1Y6y1EuDkCMft/I2qI+wucAVo5uYSn4Va8K/BbJZddZBh0An8UtwB3uZviB6Il0a
-	 0A1sLovxYI1hitNLo2qYreZpGMb+x04wtTDwLHjJ7FKrLCTZf0P5rw/tcQti+vZ2xBhFH
-	 v41GKheW6CqtpCfif1B9a6NKZv/33e79fiRnZIUBx4lgliG+ML98vMC0RUnqo2bS3EeCQ
-	 jKDc+CFoSwGEcVLWXgmEm3j3Dxo0O29MI1q2gQ0nBBnuClwUNz3qvCKmG7wg6A/QyNg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oEg+AYQh;
-	arc=none smtp.remote-ip=209.85.221.44
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.101.95
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795001151;
+	b=Vf3Vwuqcv3hJL/A/hBbAbMIpLWPo04C5seWLc1qwawRMvsjN/vtfiukflgMz4TAIm2LN
+	 bVCD8Y9dSedqcWd0gsrE4mPHVVlBFODSVqDtlFpmjWduVkuFBeVSNVQoCjSmS6DDLqrQG
+	 F1bJnjgaKnAAIfRA+iZS2M7lnH6rgGLK4KajycOGNRpC1x/mx8t7/bzEccufspQ04SJC8
+	 ZtE/SPIpvdKD+/oZlDzwFt2mOW5jQ/yZK/ggosvD4788dtZcwU6q158PFCnrqzlesUJmg
+	 ngfrqfPJUu2oIn1gRJbe/UtLcImsCV9Gee11FNc3fXBq4viTylTLD6KRCs2zofi6cWQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795001151;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:
+	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:Cc:Subject:
+	 From:To:X-Mailer:References:In-Reply-To:X-ClientProxiedBy:
+	 MIME-Version:X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=S6KS9fD0pLBKmHIHqYmhqFr6ydbJAzSUHd1coRdsPnc=;
+	b=5IYdMuL+4KkYJhAsjiU25Sbqpz7Uovn92Xt5r1UN7X9RYEhYoGoqvVR8yuqaZ4gh6rqK
+	 O9g2EdhYDGVjYUfGh8hNSCX3T0OtTb9cQhYxM7T+wGcDn5sAwZmJef8XwBLcVwU0JWV0f
+	 VKIpCiq2VKigRdmg3xfKQNC/mQl/WhN7vVV2JuySIklDZnHCV7LeOkbc5BrFOuUlWFJRL
+	 vZytkmwpAd4XmN7aim9YQnuYPy4z8e+QdgbgmOPtFBvUZd+t0vutmLWiv2J4PGOV+xK5e
+	 muLnF0j6aVmqoqOcG2EMQRtzu3AUiVZ4Z0Zjj4ICeBj2uhf2FUpo0b6FW6X+mBuTjsg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=garyguo.net;
+	spf=pass smtp.mailfrom=garyguo.net;
+	dkim=pass header.d=garyguo.net header.i=@garyguo.net header.a=rsa-sha256 header.s=selector1 header.b=mW4hqGWi;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.101.95
+Received: from CWXP265CU010.outbound.protection.outlook.com (mail-ukwestazon11022095.outbound.protection.outlook.com [52.101.101.95])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E3B606A331
-	for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 11:15:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84E3B606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03161606A320;
+	Wed, 18 Nov 2026 11:25:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 03161606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oEg+AYQh
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-48e3b22e971so398071f8f.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Nov 2026 03:15:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795000501; x=1795605301; darn=vger.kernel.org;
-        h=content-type:in-reply-to:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:sender:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=6DH0KVmtxdJ4mUifFz/9FMzYO3ur54bwKg2YAmdDwWE=;
-        b=oEg+AYQhdqA61jWzO6wBSI87USRl4RigOLJYa5Z2CXgXY+u9E3Amkb07J1lFkPvlky
-         bNH6BsquAoRqmThBRO3drjEcbnUXl6evUpX3DftN7oeQkT9SXawubzf8rppVNTYsfSmY
-         lpbkIBpjI5bU4JIgJC2b2mq3wtY6IHZIFdCem+IotNNxN56bfi9pwk4oQRuAokzlmYTJ
-         bJiggy6hA6ghD8W0xKP8gtDYI5EZ44nFHYOc+Zx65fL7kp02cnQoBZiwYr4XA1Z0Pcb5
-         TT/d7ast9meiEo+fLvPM8BHOXK8zW3BP14tsb+aLM/D3Mqaef2OVawu5TSaQi5MIoTJh
-         bM3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795000501; x=1795605301;
-        h=content-type:in-reply-to:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:sender:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6DH0KVmtxdJ4mUifFz/9FMzYO3ur54bwKg2YAmdDwWE=;
-        b=CJJ/rNmlj2W83RO9JoxR+EEicxI46nRKJz0CMqAL6hZlHHalDewgDIrdexYGpgUFes
-         4k3icQX575MQwtGNRajil2NO8KJl9DWCLEi7pN5u4sdiBbD3mvz+j8sJoZ8jEmERlcT6
-         xwwwrn9M+XgHeT/EO8gq1rePb40cthdiKZtZP67IBLbLSJxNIvbQoIjO8uJLpIu2bPlG
-         0t7xa48cozplcA97pQts0vloxgs/Llr5UrlvY/yjWIhp4AeH/2QIYca2eFVL/xacPvwP
-         xQ/y3wymhpNRwDNDrlTfI6u+pL9aXLqPyNBTTZhpUyIkT5lh+jRqboJ+blXQPXa32ujB
-         BJ/A==
-X-Forwarded-Encrypted: i=1; AL+hErENNLfdTv31zXm2csFqke7QS6+l8MKbpG/1Knux+aJ0OWpeBkONfAK0jBDj1YMSPDNfS1xwdFCaP+BZBgw=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8Nh2oIRWyjXhNU1I/y3Zq5JsasD3WBk6VmRSn9Lqft8vd7+1SU
-	77hWDlHlrxqgoYBcYb70BAYhCPs9Kzc32kzndwqm4DAJDbhP6dewVKlcWUf1Kg==
-X-Gm-Gg: AZFdTZc8ss+2B8It95zONmwhNXroFdYb42OGRsBPFey5wBbrB718TfEcaHYEAra7XAI
-	MqAZYqmpGNvDwPYX6Mxqgvz4be0qy+36FypIqFYrfUwH6fjtdbUTcThYaSNiNbsmn4mUaA9FxOh
-	Kyng6n+qQcie8yiJHdwUudbMcj42dFUnltFW/ReeHo6pX7NEJlWRQXicIkdrazoSBA4VXPsLfPb
-	ICYsvYDf+j+LLFhzAvAAZWZqKOFaUR0Lcbxvt1BvakHyBMKmnSzTay49JSG+ngxlNTXnJ6NHYq+
-	JrAAfRy74cFPa8RDoSskiizMJTH3hkp/2uz7wj+cXZu+BLCxaYRrqppkdltwW8kBMyEl//UmoVN
-	iyYMqfNjhi9ip6yTGegdmVOgGTgprfUlIRlKc1TKSXTb1kdWmmzRCZJQH6H1IRd0EaGzZsGrck1
-	qc6MDeJ7vpucSzbf7wVldNqVz113OmT0rmooQbKEIniCXnCFAHoMF7OGE2XlQHO2hpjnOY1041r
-	NElzq4z95ZH4NulhDgaWSOCV20hltuUN3rKTzlI6PWaW8nZuziocZuC5o5gyPKnm243h6Mvvais
-	JJS7X9k3WLgh/Xck137V5cB8In/iiJ+RKpAM5uOO5ZsiUGQWqM4BVlEee+Q4/h+yWlnUrCaSKiW
-	SQauA/ldmpljU4457yDtlKZA40gCc3Sr7+SWgRnY=
-X-Received: by 2002:a05:6000:4b1e:b0:499:9f62:d64c with SMTP id ffacd0b85a97d-4a63984a9dcmr4820215f8f.10.1795000500756;
-        Wed, 18 Nov 2026 03:15:00 -0800 (PST)
-Received: from [192.168.0.41] (bl22-190-205.dsl.telepac.pt. [2.83.190.205])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a656095f21sm3965668f8f.38.2026.11.18.03.14.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Nov 2026 03:15:00 -0800 (PST)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <f430727b-0ae4-4210-80d2-cef29109a863@gmail.com>
-Date: Wed, 18 Nov 2026 11:14:59 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=garyguo.net header.i=@garyguo.net header.a=rsa-sha256 header.s=selector1 header.b=mW4hqGWi
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=b5YSrHjmrySolsFJYQ9aVLrKzcJvSzQhuZxEItvOfd43x7CtfA9gkhWdCluew7xcTkD29VPUg+BkIi/6GoGI/cobiMO3MyHxHwRQXRZDtBiCAUIg6QubAghyZsd3HfEf8FdqlYTQ6U+ivzuYzpV+abAjyaML2bLV3y8j5BvYaVID5k9hPSnEcM7NQOoeX5SYMgWWZG4jJoGgCDyRAYboTy5fYUtOu1uUth1YL3o2ooOOjccKgbU+x3IJiplGguemmYVCDgbTdSKw1nCl8Z4wjOdar9UaJI6r8U3m7BP4hskpAK4wEt91zUKYJVKYeZyoeqjlW7p2E/4mKFVR8ZblHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S6KS9fD0pLBKmHIHqYmhqFr6ydbJAzSUHd1coRdsPnc=;
+ b=UL6fYH0opI/kygxp24cdoXyemSsNdlxrFxlj+G/dkhVHkbLIILH/ZFQjW9OOXjKEB9XsmQukF/zHt5XugtGUEHS/PZyz5aJQwUZS+S0V8a767S9vhQmCmdM064QUSY79GbxQD2lvVTiN6ZjU622EmZRR3qPkPbnflRS2hHf22xjfBw23GiuwYl16tPreYQiMlbbTHwkZEsHUCjpMTU/ufWMHrl0rbedB1I/d+wM0Y7/eeLEiNUJ1gwuUYEZXaCk63UtM087XNEAB7eXkc+k/IdbkZB2VFCjIjj/kz42m1OVXjwNIqDW4xob/akPDiNCRjWCdPhVY7iAYMaW+7SPcbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S6KS9fD0pLBKmHIHqYmhqFr6ydbJAzSUHd1coRdsPnc=;
+ b=mW4hqGWiSBd6Gp3Weej1qfTttiMmJhV7Z+PPwk+GCH1FVU/Qtqz/s10Ij/gzO/as6TEGaEJlZn2U0IBgUDhuPSvNT+wezaOJBiKgCcghI7N/6z6+8gUrnXj/7EOvjIO//Y8Crb4rwagcQE74OpzRo2Gtbduy5TrXXrc3dlYpyFA=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1cb::9)
+ by LOCP265MB8642.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:4b5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.14; Wed, 18 Nov
+ 2026 11:25:47 +0000
+Received: from CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::55f6:f98b:7fad:c6e3]) by CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::55f6:f98b:7fad:c6e3%2]) with mapi id 15.21.0615.013; Wed, 18 Nov 2026
+ 11:25:47 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 18 Nov 2026 11:25:46 +0000
+Message-Id: <DMYASURCURHG.2Z417FHDGBR5F@garyguo.net>
+Cc: "Sami Tolvanen" <samitolvanen@google.com>, "Gary Guo"
+ <gary@garyguo.net>, "Nathan Chancellor" <nathan@kernel.org>, "Nicolas
+ Schier" <nsc@kernel.org>, "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng"
+ <boqun@kernel.org>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
+ "Danilo Krummrich" <dakr@kernel.org>, "Daniel Almeida"
+ <daniel.almeida@collabora.com>, "Tamir Duberstein" <tamird@kernel.org>,
+ "Alexandre Courbot" <acourbot@nvidia.com>, =?utf-8?q?Onur_=C3=96zkan?=
+ <work@onurozkan.dev>, "Nick Desaulniers" <ndesaulniers@google.com>, "Bill
+ Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
+ "kernel test robot" <yi1.lai@intel.com>, <linux-kbuild@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <llvm@lists.linux.dev>
+Subject: Re: [PATCH] rust: cfi: disable function merging if CFI is enabled
+From: "Gary Guo" <gary@garyguo.net>
+To: "Alice Ryhl" <aliceryhl@google.com>, "Miguel Ojeda"
+ <miguel.ojeda.sandonis@gmail.com>
+X-Mailer: aerc 0.22.0
+References: <20260820135733.37121-1-gary@kernel.org>
+ <DKTW8F3C5TC1.BE0JLOWMZCTX@garyguo.net>
+ <CABCJKueCgEZ9XePNnJhbxbOP=v5X6-PvFg4poRfo=j6htovJFw@mail.gmail.com>
+ <CANiq72m9v0V5Nnc_E1LUt24ofUUGxbRZdUC-UBz2NEbY_MA=Rg@mail.gmail.com>
+ <avy_9SPRaPSKD8b4@google.com>
+In-Reply-To: <avy_9SPRaPSKD8b4@google.com>
+X-ClientProxiedBy: LO4P265CA0255.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:37c::20) To CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:400:1cb::9)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -92,84 +113,109 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8] scripts/config: honor $KBUILD_OUTPUT by default
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Dmitry Voytik <voytikd@gmail.com>, Nicolas Schier <nsc@kernel.org>,
- Nicolas Schier <n.schier@fritz.com>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org
-References: <20261117132513.52725-1-voytikd@gmail.com>
- <26f53b63-2f75-4fa4-bf6f-d3495e4e5cb0@gmail.com>
- <20261118081025.GA671584@ax162>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20261118081025.GA671584@ax162>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------DEjnDSqXCUaZM19f19vV5pT6"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP265MB6051:EE_|LOCP265MB8642:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2535ec25-1ea4-4dbf-1679-08df4566b124
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|23010399003|7416014|376014|1800799024|10070799003|6133799003|22082099003|18002099003|261009223027099003|56012099006|10067099003|4143699003|261102123227099003|261026140227099003|261026121527099003|261028144727099003|261022105027099003|261021121427099003;
+X-Microsoft-Antispam-Message-Info:
+	UCeY1fxXpzZlyd8FjC5Kc/m3vP1ovefySc61ZJhUmD5w9aExjC2iVDANm3ruWrAC8oTZR1bS6mF0HzJxxcGVMV4B/TlP1/7fgneWfxrLDCvwpn68U8f77vTp8HwcVXeadTWVVVhZeHmp6Owf0IUtQyk2KfPSlb39xq5CkCoKxuVl3NL7riuKxm2AgmDa2AkPUpLyraxADL2ucz9L+vXsVmFC7aB01F8bP8t9Rfh7s1KApriLk9h+wYjaMSrq+RbQ3UnUNkLPIzlxrtyhMU5Bnlno4sIy1oIb8AGtqRx31jetf9s2HMinfNzWwm6HuJGQRLx09/iH1L4Tr6MD3wsfRgikrz4LkB6H+V5UpE7QAe9tocl6ZRRmC1w2P/duuiMhzrGxT7nL5dO7VP6w6t920/AatIKIOT/FRVo0MB8kuVLdclXbHcs3H3O2+IrFC1oNwzTityLEYBu02VvN9nIOquyrJ7I6G+DRwa2i4vnobEP5kqfHfPGyrQOSeuOhO0lc5LndaBB09FRgYyJxbsmJjQRgy16nGy2O+UHuROr5rqu1geihe7HJ3v+V4bNCJQ6EbC6QrzbsygagM5QrjSkwUyuEwjPi6hO5EV3Wd8hYAt6W4mQE0MEnT6DklImSo/Nzd09p5cQw4VTxM+LIAxeK4YEfo9DIzotrhljMlED2x08=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(7416014)(376014)(1800799024)(10070799003)(6133799003)(22082099003)(18002099003)(261009223027099003)(56012099006)(10067099003)(4143699003)(261102123227099003)(261026140227099003)(261026121527099003)(261028144727099003)(261022105027099003)(261021121427099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VGRiY2prT2ZEK1dJbllrZ0FRS2xPK0JRTWpPakQ0NzhMMFFsT1E4OXMxdldO?=
+ =?utf-8?B?dmx4bFFLMkJiRExzLzFXcXNlc2dZTWhVdzZBTjl0UXlpNDF2cHVGUjRJTVlK?=
+ =?utf-8?B?SjRtUUNuL1pFTGlnV29KaHdoWkw5OUNDUFpBenNDY1lvWEdZaXR3bDFSYWhq?=
+ =?utf-8?B?M3BsdzE2WUZHMDkxdjlTbGtaSG4vYTJwVmdhYllqVmRTTVdQVzZEWjRzRmJq?=
+ =?utf-8?B?OVpJbjBjOHBXT3I3SEY0MXNVa3lVTmRZVTRJL0x5YUVFbHkzMldHTFQzZzlk?=
+ =?utf-8?B?dDRTSlg3eWNXeXFhekhPZUpQck1uZ2dheTI4WktaNkJCTUxiUmtlbEY5TzZz?=
+ =?utf-8?B?TVVaY0NqSnIyblZlQjNnWFQzL3gxcXliN1JpZ2JXTERMZUtZdDF4NjJSbCtt?=
+ =?utf-8?B?b1ZiYUptV0FWMlh5elhIYklkRTBTZmdaK3QvUUJNaXJ5ZXJFZk5aNEYycXhP?=
+ =?utf-8?B?MjllM1ZQazhoMHcxSkdrVTFldThGRVpGenZoREN1a3Frb3k2L0pNbHVMd3Y0?=
+ =?utf-8?B?cEJ2RnowSkhtalpSVzRKNTdnODlLMStQVTF5ai9rM1FadFdrRFFyOVhLNFg3?=
+ =?utf-8?B?eUJEWlFHU2doWkpNemhZU1ZWL1V3aS9uRUhsT2ZUQ2lRU29SYVFCYk1CeHhr?=
+ =?utf-8?B?VC9GWjRjMnY2QlBsajBPZWJsMXBFcGhEUktiVXBTWjF5Y3lrb0V4SkJQc1Iv?=
+ =?utf-8?B?aHBEUU0vaDBhNWpJMUtMeVplM3BQbTJCOWJBZU1DODN4WEI4MlNHK2UydkYz?=
+ =?utf-8?B?WjVzdzFKR3BTaGhLc3hndzVQeUtRaVBERGtqYVk3TXJvR3o2NnNHQXduV3lo?=
+ =?utf-8?B?NHhFaU5DdTYvOFpwZkRJRCtZL0kvYnRlN08xekNLQWp5U2dmWTdaL2hYVXpX?=
+ =?utf-8?B?Uk1WRXdOaXpyQk82a2ZnTFlsNDh3SDgwVzl5YlJjcnNqaHNTSitFQVgyeFRz?=
+ =?utf-8?B?dG8xcDJjWDRMalpwdWFkUkYwWGlYRWduRGJ4d2U4b2wzTklqZnZOd2pxbEtQ?=
+ =?utf-8?B?UUNPMEFESGpraTlLL1F2R3JYbWNBdCtjaHNocEV3THZrbUMwMWptbkcvNFRh?=
+ =?utf-8?B?SXlDQmI2SVJZcWhiRWkxdU9HSHQwT2QvZllmcXpPOGpROXc5OEcweVJ3UlRp?=
+ =?utf-8?B?cjlVN1ZqLzU4L2czcHRaeHlNN2x2Q1BtRjNYUjVvanA5NkZrSWhISkdNNkxB?=
+ =?utf-8?B?WEM4NGpPMlk5K3M2QkFHVW5IZkdidGdsUUFSSXlSbmovUFRJZnVGRHl1OHAy?=
+ =?utf-8?B?b3dBQkFvMGxFSlFTVzN4UlIzSURjUGZpcTJmdzh5TDFFbkpTY0Y0Y0xLaE5Q?=
+ =?utf-8?B?R0JIWWZSR0U2SDBhcW5lSzNtNUZKczdpalluS25qc3c1Q0NyTGw1aDFuOUll?=
+ =?utf-8?B?NDF1QnpLTDNoTDBCT1poWVB1Rjh4Y3A2ZTBNaEtVL3ZPYVlWdGttbkFRRXBR?=
+ =?utf-8?B?VkFKODI3cGNyV0FlL2NTQTNrZG5LR0F5YXY0NWI1U04xMEUrZnQxMmdHaUJT?=
+ =?utf-8?B?ZzhLajRkOWJWRkxwWENXYmZoQUd2KzhvY3MwZlgxM0RoYkZTa0JYMG5odG5P?=
+ =?utf-8?B?TDdrNTFyMDkrZDNpeW1YaFlGZTZGcTJlQTFGbmZlc2JVc3V3Z09oaXpuVUps?=
+ =?utf-8?B?OFVadVdOOTBnMitialVTWmFSSkFGWmlXanhTUHlJOFRSa29xd1hkMWFXNXdI?=
+ =?utf-8?B?TEdaKyt1QTZEU01oa2NxY2g5dXdOZGlNWG1relM5UTk5MkdtRmMxL3RUSDVk?=
+ =?utf-8?B?SHdwQkRmclJpeGM2cTFxU25RS01WRGpRQXdVaTZWRXI4elVTRnpXbWM3SjdK?=
+ =?utf-8?B?YnJZY2g1WjRKSkJWdEJqWU11UlRBQ1N4V0p6bjhNeG8wSDZPZ0plRCt1REFv?=
+ =?utf-8?B?VlQzTlFManVtaUxGL0Q1Q0dkYlNKNC9mdXB3S0JSTnlzM282OEN4d0lyNktv?=
+ =?utf-8?B?ckVvMG55bFQxcUhOekM3VUVNOXlNcGV6UkVQSSt5Z3BlSGQ4emZTd2VRQmto?=
+ =?utf-8?B?a0MvYitMeTVpWTJSTXFOR3Z5K3Nndk52RjI0ditPNy9pQ0F4dzRCSjZPSnpS?=
+ =?utf-8?B?Ly9mTDg1SWFyU2tOcU9mRGxjSyt6ZklkdzNwSzR2RXlmRVFDekFSeVJUZHM2?=
+ =?utf-8?B?MXgvVmVQUFZxVTRiazd0clhXaEUxRk9LMFVvSU5PRDN6R0drcWtKdTVkNzB0?=
+ =?utf-8?B?L0lmV0ZCd3crcHRmRHdtS0xEMnhFOVJhSXZUNWZUQjA1cjN3bFg2SGVoQWJC?=
+ =?utf-8?B?MU9YSThLV1diL0w4UlB1ZFByZmpROEdGOW1XREdmUG9SUnIveDc5NlMwTFBx?=
+ =?utf-8?B?TEhVbnA2VHVFLytrL3ZyQ0N1d09JeXVZWnNJUUFQZXpkVHY3Tm01UT09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2535ec25-1ea4-4dbf-1679-08df4566b124
+X-MS-Exchange-CrossTenant-AuthSource: CWLP265MB6051.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2026 11:25:47.2080
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pmsTIrgM3K3dDjD/UUVKcbZohTf/weWO2bJCV5ZsgAeKCr1ZvPwwrROxPbZxE9xXlTKqVhHh1g8abP/ZD3JLsQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LOCP265MB8642
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------DEjnDSqXCUaZM19f19vV5pT6
-Content-Type: multipart/mixed; boundary="------------4WhGp4f0ehBKXWddaVMCg5Iu";
- protected-headers="v1"; hp="clear"
-Message-ID: <f430727b-0ae4-4210-80d2-cef29109a863@gmail.com>
-Date: Wed, 18 Nov 2026 11:14:59 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8] scripts/config: honor $KBUILD_OUTPUT by default
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Dmitry Voytik <voytikd@gmail.com>, Nicolas Schier <nsc@kernel.org>,
- Nicolas Schier <n.schier@fritz.com>, linux-kernel@vger.kernel.org,
- linux-kbuild@vger.kernel.org
-References: <20261117132513.52725-1-voytikd@gmail.com>
- <26f53b63-2f75-4fa4-bf6f-d3495e4e5cb0@gmail.com>
- <20261118081025.GA671584@ax162>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20261118081025.GA671584@ax162>
+On Tue Nov 17, 2026 at 8:58 PM GMT, Alice Ryhl wrote:
+> On Fri, Aug 21, 2026 at 11:20:18AM +0200, Miguel Ojeda wrote:
+>> On Fri, Aug 21, 2026 at 1:43=E2=80=AFAM Sami Tolvanen <samitolvanen@goog=
+le.com> wrote:
+>> >
+>> > The LLVM fix itself is trivial, and it looks like a pull request for
+>> > it already exists. I assume we'll want to drop this flag for fixed
+>> > LLVM versions when they're available.
+>>=20
+>> I will link it in the commit message when I pick it up soon -- already
+>> did in https://github.com/Rust-for-Linux/linux/issues/1132.
+>>=20
+>> I also added the `-Z` flag to https://github.com/Rust-for-Linux/linux/is=
+sues/2.
+>>=20
+>> The `-Zmerge-functions` flag is internal but has been there since Rust
+>> 1.34.0 in upstream commit:
+>>=20
+>>   b91d211b4030 ("Add a target option "merge-functions" taking values
+>> in ("disabled", "trampolines", or "aliases (the default)) to allow
+>> targets to opt out of the MergeFunctions LLVM pass. Also add a
+>> corresponding -Z option with the same name and values.")
+>>=20
+>> so that should be fine, but I will ping upstream Rust so that they are
+>> aware we are using it.
+>>=20
+>> And, yeah, agreed, we probably should remove the flag conditionally
+>> later on, to confirm the bug is gone etc.
+>
+> Function merging should also be disabled with gendwarfksyms. It causes
+> faux::Registration::as_raw() and Page::as_ptr() to get merged, which
+> incorrectly causes the former to get the CRC of the latter.
 
---------------4WhGp4f0ehBKXWddaVMCg5Iu
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Do we not want merging at all, or only when the types are not going to matc=
+h up?
+If somehow the KCFI type metadata is always emitted, will two functions wit=
+h the
+same KCFI type metadata be mergeable for gendwarfksyms purpose?
 
-On 11/18/26 08:10, Nathan Chancellor wrote:
-> On Tue, Nov 17, 2026 at 07:25:17PM +0000, Julian Braha wrote:
->> On 11/17/26 13:25, Dmitry Voytik wrote:
->>> +# If no '--file' was specified, use KBUILD_OUTPUT as the base if it =
-exists
->>> +if [[ "$FN" =3D ".config" && -n "$KBUILD_OUTPUT" ]]; then
->> Right so this will give different results with:
->>     '--file .config'
->> and:
->>     '--file ./.config'
->>
->> but maybe that was intentional -- i.e. we're assuming a user passing
->> '.config' intends it to be '$KBUILD_OUTPUT/.config' while a user passi=
-ng
->> './.config' would intend CWD/.config?
-> It was intentional since I had figured they were passing the default
-> value so they should get the default behavior. Maybe it would be better=
+Best,
+Gary
 
-> to only do this when no '--file' value was provided period though to
-> avoid some unexpected behavior?
-
-All good, I think it's reasonable. Just wanted to confirm the intention
-
-- Julian Braha
-
---------------4WhGp4f0ehBKXWddaVMCg5Iu--
-
---------------DEjnDSqXCUaZM19f19vV5pT6
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQT6qjll++tIFxF8TUPElYPCBXNxIAUCav2IswUDAAAAAAAKCRDElYPCBXNxIF2q
-AP0ZpWOny+OS5jO4uJKuuNIxj7yHNBH5kNRGvz6S460DfAEA8aYa4Ojn8ELvoK+uj62fPziyGEse
-NHrN4e0bq2AyzgA=
-=6xHD
------END PGP SIGNATURE-----
-
---------------DEjnDSqXCUaZM19f19vV5pT6--
