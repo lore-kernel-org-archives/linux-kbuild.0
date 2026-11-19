@@ -1,54 +1,74 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795099046;
-	b=TU2zCScmaK9zT+smQP6Ergx2BuaGwv6gtg2zHK+b8CPgZh4mXuvvV9XctqxITk6y2OcE
-	 fk/Kze+0UF14/8yYosUKESvZ3cFO6hAamM4zBtVgOAJsBpE4WuEbU7EiuNkT0KL1pbVND
-	 d+uiRsCA0IWhl8y8xPfzdZG/Mmop4neCcGe5YQHT3akhXy+8RW5/L6plKANTnqPN7ADf1
-	 EEmErtD5PFy7hceYzoMqRJdfp+tEDxHHPol1l0wPKB9dh1EJOohGOitDyyNK/mne75ERU
-	 ntNWK9jhaJEnPed4LsWfhkRiUFJLTpRRjSMPUWyvQdKM852blWtApyj94HclghTXQng==
+	t=1795099210;
+	b=s9oCUZvwByDSpwzUHh1oa0ECRodWmhVpyDOV910VUzx2jZVOf6MB7L0uFtqmvwBeBm6c
+	 jRMy3mwnjanOlUWMMaluIbmGfelXyPQ5CdRgChnIA620l9pJ/2rhFVv5kKjBM/hxhH3Ql
+	 OUPfxX7aQXKfl/9LIIpmYCLzxx5fcGOGNNXe4WUi1wKM/2T32tXIXSpk02GuYeiYh/xkc
+	 N41aBkolRkQkJoMGeI1OVloKxRbgu7JZ/Jgxxkn68aWzU4wgnqYR2GDIh4pW2Prn39iys
+	 2HcROZPRJ5oHOTMwYsWw/1/XGPIlr9tM6bpCWx0EWTg1JD6tiDUabGaM64wbGlLPQxA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795099046;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=PsufnooHPiIC/Ruws/xkognF39L7enlu3FD8BHA8vzo=;
-	b=vZCyuOfRaK4w5T/gUCxuNZWUi4OaAATg6K+7ShQhOdS/YuIf7Yd5O2jzE7oik1Q44dmc
-	 mC0SCjJYKcY+ywGbgelt/eMk4fZx2i/6/5kCpAz0xLzQ9N5v3G8ssD3I/JpyNidolhA5F
-	 ZyDLClGmiBFPh3KGG6W8wODjD57Iaj7CNQ2tG/fhAamqdeWTPkkh9jn1SpvOGmaJ8x3WA
-	 6XOA79Hq9rp1baeiJSkYOOrJd9uyf8nutsnCzDTgncSpOremWpThsE770b/waf9JNnkc1
-	 n4pACd80+QTVh0Pw37LI5jvVJmxr/KYI/4pIWsIfi0c79E7mXnl1uKAQoMnXouBpyJQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795099210;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=jGUNa2nkwgmbkFv5PZDi3+5NxDpJOH/HW6VIk5Cn1XI=;
+	b=Xa34qynAl3zCFFJs4d3LghFlFMO3dvPGmUv2x12aKGXm4OwhyNkRI/0MkAOGkHIgmBTG
+	 fwPvOx+dNt95rgJnO94mQwWFOZu1bHgR6DviATB/1//3SplRpMCD4ft2PXJfyZDXEHPo/
+	 VJm/pf8qHhycUaSQXW6VpDTVMila/NmmQUUM2oB9WY/JHzi7QhhRwmTuzxfKB1XTgioZb
+	 zhZb1im5H4IfhRe1CZ19fzv53odze51LvmOjnwJIZUvKXV+oVJ2sicDRRXThBlpVtzy/i
+	 2NlR1OmKixt3PD7oDU1UQhmlvyK2mDhycr71N+v+xLMoAyeEneg2RwGmMKXji7cXY4Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LB6XYeRr;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P8Da98U0;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id F082D606A324;
-	Thu, 19 Nov 2026 14:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 03000606A32F;
+	Thu, 19 Nov 2026 14:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LB6XYeRr
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 234E71F000C4;
-	Thu, 19 Nov 2026 14:37:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P8Da98U0
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 497251F000CC;
+	Thu, 19 Nov 2026 14:40:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795099045;
-	bh=PsufnooHPiIC/Ruws/xkognF39L7enlu3FD8BHA8vzo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=LB6XYeRrp/LJnRWTpGTTTVcuXpMK6BDVpHiPeNiME9o/du+3QAdIW0VlOnoZGQQJc
-	 P9uOxIVUAkkI2mfoxFjsMkfL/BlYIT816koQgwnRLdgHJJnIGoLB4lohN96imlf1vC
-	 qWb2iSfxLHfLn7lsaJ72nc4wWOXKKBi+XL/8JVqcTGTc8MNn+O83BxhDJfrRRHiUkv
-	 jk27uQyXLODEdarN45AYYawEBryse8XkkFiyw7m23SqjT8WoIy8sPOkmolIUpoNw8J
-	 +5V4+JxFbC36z036I3Ip3AHB8hK1sep0/piKuK/zfBNwHdKSa5NKA85gcA1Y5ca1jF
-	 xCZtn/n7iXwvQ==
+	s=k20260515; t=1795099209;
+	bh=jGUNa2nkwgmbkFv5PZDi3+5NxDpJOH/HW6VIk5Cn1XI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=P8Da98U0KKGyVjG5Co+Bq3lcopEB0AluEtILidv5HO2nC9IyOWGoRGjYm27bzTqIx
+	 +lW6pso1BJ3BrPzJxPix2npnl41J3OXdsNde4rlJ4Xk33Mfr/2uOKj234ZaQxLFsaN
+	 JHUbeyIxXwLPaI5mqCcxB7neudbJ5YHjlmjUvbCJnEzfr2AGo6qGaBb72MAV7L8wyy
+	 CFQXCc9Tw0dMdoeIYdGl7ZLMA0okVeqgKyTU6Pf/vA4x9SI4OyVKsgMksYPaEOyaLx
+	 rCFP1VQuX+46JDr07Y6DI/ct6ui/VXSAcdZu7oQ2XjGA/E5dOjTOfDtLZjFT0ADzEm
+	 tTU3agC4K7jFw==
 From: Nicolas Schier <nsc@kernel.org>
-To: nathan@kernel.org, Julian Braha <julianbraha@gmail.com>
-Cc: andi@firstfloor.org, ljs@kernel.org, linux-kbuild@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20261112164826.110736-1-julianbraha@gmail.com>
-References: <20261112164826.110736-1-julianbraha@gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: cleanup Kconfig entry
-Message-Id: <179509807402.3081090.2796634294221735987.b4-ty@b4>
-Date: Thu, 19 Nov 2026 15:21:14 +0100
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>,
+	Julian Braha <julianbraha@gmail.com>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Kees Cook <kees@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Charlie Jenkins <thecharlesjenkins@gmail.com>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	linux-riscv@lists.infradead.org,
+	Linus Torvalds <torvalds@linuxfoundation.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v2 0/6] scripts/Kconfig.toolchain: Document minimum supported versions for dynamic checks
+Date: Thu, 19 Nov 2026 15:39:59 +0100
+Message-ID: <179509785409.3080802.12400900075505469862.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
+References: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -59,33 +79,33 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-ce4c1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=686; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=C7DEdzA5S00OjWyV/HPfedRbStx4iCyU6wttFxzpR64=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBq/wXiO/R4GATRdvumkeFc0TW3PAQ2oHyin78c/
- 4MWoyUMMXKJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCav8F4gAKCRAHUgpwFiYS
- aVNiD/4sTudD0HGdLc5HyQ1hd8ZtsJzZK3Mb1P6K6RkKPvOaAC+xfsRybH3464uNgIb7+GbBQsV
- yfnuXK9iH1f3HoYa8AopaV1NwemT1y3txbCyB7R9UKZTl1IjQ3UJjacnph1cRRI6ZtvNN09J+NM
- /3B2i2fmXq3vMTenHcWp/UiYNUa9Z8+ShqP5qG8UlUkxZLaZHk7ih8CTwe5bHr4bM7B3B1kFPyw
- fvdIpxlWCht9k45eg6DAoXLoVMhzNtycF9okN/JdPITmsQoK/4sMP/WRPd3Ry3mW2NctZIBU6eH
- SiUYOkeD+u+7+LWD8i5KHDqyryaQq8kFbsoNXfgmxx5JE00xYn2sKLUnNCIVj0n5Za6Jpe05Qoe
- lgpmYq1im+kvOisO4aMuzwauWh4WazweqOPyMQBFE6rC44rQ1nTTc3JS0OrON2jgy6KFIFk/WGO
- 6oesKRfD3WAlH2oJbFwm1EIYB+CspRh9kuYY9zVdCp52mrCqKI1lnIiP6A0sK47dCkPVMllXImx
- g/xAfieaukm2xG5ZgRSbAVvklXL6UgpPZUoGyIDFH50u+MBPGKddpnIOqsdo2cFInscDFhPoIYt
- HZ5kze84w2xAnWB6CDozFAcbZooyPaxyXDcp5GNXzlpxpVIDdZ0Iw6F2ixoVk9wHHaOsq9aTHBH
- UI5CBXshVSoxdjA==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+Content-Transfer-Encoding: 8bit
 
-On Thu, 12 Nov 2026 16:48:26 +0000, Julian Braha wrote:
-> MAINTAINERS: cleanup Kconfig entry
+On Wed, 11 Nov 2026 17:52:02 -0700, Nathan Chancellor wrote:
+> Now that we have a fairly unified location for compiler and linker
+> feature checks in scripts/Kconfig.toolchain, we should make it easy to
+> clean up the checks as they become obsolete through minimum supported
+> version bumps by documenting when they were first supported. I somewhat
+> modeled this after the documentation in compiler_attributes.h but I did
+> not want it to be as verbose.
+> 
+> [...]
 
-Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+Applied to kbuild/linux.git (kbuild-next-unstable) and applied Kees' R-b
+trailer to 1-3+6, thanks!
 
-[1/1] MAINTAINERS: cleanup Kconfig entry
-      https://git.kernel.org/kbuild/c/d091b9be5239
+[1/6] scripts/Kconfig.toolchain: Remove CONFIG_CC_HAS_NO_PROFILE_FN_ATTR
+      https://git.kernel.org/kbuild/c/aac435fa2bae
+[2/6] scripts/Kconfig.toolchain: Do not dynamically probe '-fno-addrsig'
+      https://git.kernel.org/kbuild/c/836ac9c65e4d
+[3/6] scripts/Kconfig.toolchain: Clean up '-fno-allow-store-data-races' handling
+      https://git.kernel.org/kbuild/c/e2c2434465c8
+[4/6] riscv: checksum: Fix CC_HAS_ASM_GOTO_TIED_OUTPUT check
+      https://git.kernel.org/kbuild/c/f67671cfeafb
+[5/6] Eliminate CONFIG_CC_HAS_ASM_GOTO_TIED_OUTPUT
+      https://git.kernel.org/kbuild/c/fe2493fd4bd9
+[6/6] scripts/Kconfig.toolchain: Document minimum supported versions for dynamic checks
+      https://git.kernel.org/kbuild/c/c71019d89ed4
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped,
@@ -99,5 +119,4 @@ issues are found.
 Best regards,
 -- 
 Nicolas
-
 
