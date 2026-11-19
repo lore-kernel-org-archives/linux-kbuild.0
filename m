@@ -1,16 +1,16 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.65
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.70.39
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795094643;
-	b=eNvdVDqUXDDLKi7KFiZ7QSPvKnZhJNhjqGgpWSzH5joMnG1YIdFs5/fEGKwpHUEFeUos
-	 T+qswO0hDI++48XdVzH/RtGjyeJpbsSA8IGA8Bebd1niWDJRR1C184XWxqp6ZDframDVJ
-	 lt8Af33MiKCWfUwEMFYV8I1G+LuVlH5xpwGhPhXs4KLHMi+ZTgmWkE+ibcjjQgWAhBVTh
-	 6anzRvmcrGaOXW524TYWj751oj4w/4Ra8Z2KyxOArjlF1Bgnbq6QTVuAO0S/S+gd1l2ia
-	 flqLctujqNUPI+DdNQxSxxL5pIfHEeSsbnuSfBnMd7LQe3hkMut6OVRjI4VeclfqSfA==
+	t=1795097616;
+	b=vTLY/WQXDNoMuWlprs6CFF9KpJd2HLDosOA1fQLQyVQ4gSSFXm0zQpuxd4P3N673KbfK
+	 HobQYKkTedKo4WMggQ8sfICLwyuIJXR5bHJGaYkTN9SSeYpvVeHagUkRHY9S0fIsQpxKE
+	 rzrj2WWIh7izqfg5GTNNSdeNdXApnB/XIRo7Mllfv4BuYm9v1hUR2XXt9rKIkP3HmWwkM
+	 E6w0FAymF5BTKLyw06METgltPSKMrmDBzJzIoVpslHLotuDcMUgSXr+U27uh9NrA0hezl
+	 +gTczGmPch/mreMDsI4eMRUFz5PXDEeowxY9a5gKqD+2qnekFqUZP1PqP58Udo5B/WQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795094643;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795097616;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
-	 User-Agent:Content-Language:From:Subject:To:Cc:Content-Type:
-	 Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
+	 User-Agent:Subject:From:To:Cc:References:Content-Language:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
 	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
 	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
 	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
@@ -24,60 +24,59 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=SdYCrdVp0XqnuYHotYtw5UFEIetHJ7MLeqFH40ztQ/E=;
-	b=5hFDVTnqj5pSfPqikmgX5S5mELhEUKLJwVQJdduEkSTPhozRN+T7f3DaOT0MEoYcGJgF
-	 iYx4XgAYtthirZ2BnzhlkVkb7BvJNjARvcm/awkmxzOxv3mUuBbn25h3OyCNo7SwAFZnI
-	 v801sK7EFZAWQmapvoxXj/Gx4HOze+FMEGAeszw+76JlqvCrChHKeFvJo/xzBwwS59Kgf
-	 2MoP2Aebi3V1M+qQRpiSSi+7szODtxrrMjAJUmKF2LTU9tTcDCqrlz/EJf/LWehqBr5Vq
-	 EUeu4wSBM0I3I/J5/5J2w5PMwBH6hiL6Tj4jqz48scpoxgdT8XKKg5C1BP1Byhz9ITQ==
+	bh=/vTTqoR/vcy+eFgmw3dTdgA1asAPBIuIu0TfuV7FAzI=;
+	b=ltGinb6fg/sAr4xVlHBuRGFIqhbKiUQy2R99jEg/aE5OOZlDMyYDTrAlMRT/A+ExrdNe
+	 urbMDOzJtEcflMd5T/H+UIhfN4/wiiCYKyJAjzLW7VTIPi+r+bVM8WbuXZvqPmYxxOKMG
+	 Fp2DwC8OqyjLrDlCMF8/zVci2ahCZrzfi9FJw/vWDBSiBVIPRwYxWIbgj8brUHVuWAx5M
+	 Dc3VwZddWqGGEWGK76a/OLqzCFTUgOQ096ZcP0alMilV7FZg+VT2THBPWInxfE/fn0gNi
+	 l7YzgEDydPGtWNsP69o3kS54+IXjyp74bhcysA2OuXH8+2SzL8THEukmJIbpee6/hHg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=none header.from=est.tech;
 	spf=pass smtp.mailfrom=est.tech;
-	dkim=pass header.d=est.tech header.i=@est.tech header.a=rsa-sha256 header.s=selector1 header.b=S7HcpT3M;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.130.65
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011065.outbound.protection.outlook.com [40.107.130.65])
+	dkim=pass header.d=est.tech header.i=@est.tech header.a=rsa-sha256 header.s=selector1 header.b="GRUjv+V/";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.70.39
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011039.outbound.protection.outlook.com [52.101.70.39])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34E860A2608;
-	Thu, 19 Nov 2026 13:24:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C34E860A2608
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173F3606A320;
+	Thu, 19 Nov 2026 14:13:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 173F3606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=est.tech header.i=@est.tech header.a=rsa-sha256 header.s=selector1 header.b=S7HcpT3M
+	dkim=pass (2048-bit key, unprotected) header.d=est.tech header.i=@est.tech header.a=rsa-sha256 header.s=selector1 header.b=GRUjv+V/
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OIchDvSXP/vjjssh8WBd1fxOiMFN1+2LvlQLr42kDxfXYFN0RYpR4cWhFDNRC125aCVYjOlA2qgUxTQsRMwC2Nn4zjzeTqEl+kEtVhGpVnpdb4NKzSvPZik3aXiCj+Hi3KnhfyYhebh5Uaz+2N3HIoPtawxndbgJwY+YjDy6hVqsAToIRPodaultaCL5obNhqNDvf7Jl2G15PsvsWi6/5lXFGAA9WVicq7gmsNpdjtj+Pq5gA2yfwTJPF8rUQ4KR/yyYAwxWK85HPOuA1Si3/wh0DiOyYUEtUtWLM8o+OH2gRq7WlwCdGiIqgb7H+19nkcI+3K6PNzlE53k5ANgpdQ==
+ b=tvq1LBK8bSEmaN8f2Io0FFYMXpXVW/APpqxT5gozx2OSWrHw3965KsVfkAmXamXfI3M3wwgcBSGWex3CL++P+OhpXh6IFOWo1VFNlrQY7JGaY4Pq6EYIiP/rHauhhEZJ1b5uISxk26iN7JGbA17InHFlTaaBXAAVJFOhEi6ccHHidv3EvNiBI5e+AhddqBgWmIWLyHOxvP/xlIcX1i269P+wkm0u5ESNSBgLW65EGfQ+r3Y0bs0xKBRxmZSIYhkDEnzRkspBSAsW003Dhl1qWh1ycePpAKzh8Os8x0EnU2TMsSbB/Au3M371oUKY0+nuGpVXBoV5S4E3oPiqtzrmew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SdYCrdVp0XqnuYHotYtw5UFEIetHJ7MLeqFH40ztQ/E=;
- b=tT6V6CFowBbcBG8DgeeuUzHwkmKcOpGzgIAvveqEtCfL8Y5OaYhpGYg+8zun16xx8gBvau8F3GVIdMO4p/bZb164nuaHVXRi8+xeRAKrdZ8VLd+p0aeTaTqa0V/TUxlbSnkCXNjWe9D59O0jKuhKkHLC1Q7/nN2rFKrGznFNEzig9PwOJ7LuTXgFyKvHY+23vkt99PhaG0yizzJ4ykBDjvS6JepKqsKISydVkDZONeheePdzQlxStelvKPQmErQDb/+CtsZpyFnBPI+VIz/eFrWtWfvfHaruu/Z/KCT0X6pnKkqMbt0PUfFr4Zg69b9GdOjcQKiozlpWnMRHDbGnHA==
+ bh=/vTTqoR/vcy+eFgmw3dTdgA1asAPBIuIu0TfuV7FAzI=;
+ b=uf28QXs4ADpi7p8hgJTcUHUtuC2Ivq047cwE8K3+S8wHVhsELZV5ZJ2CziKk2z3eAy7dpna+mgTK7GPqwFYJ+ycJv86z9bbdkopDqhdRM6HSEfhCIQLzvlKBC2TiiWQ2hkrMW4XYeGKIOP4VjzLFKv6c3/rILm+sCmf5h2t2s6BNNdJT7rrMIoYS/aXdzo7vd66VMr5+NDan4kAzPlJr28NJI15w+xN1eMu1vzzp0PB1qfXoRqvAqOOAyNU4rJtvkXHL+7yMH9HZ1Xazxx3whAJJr5/FMYNESWIv5Lqcnqo6UflA5vAH1nmu25aN54BZbH7UARLiw1uKJzGb+mvQpw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
  dkim=pass header.d=est.tech; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SdYCrdVp0XqnuYHotYtw5UFEIetHJ7MLeqFH40ztQ/E=;
- b=S7HcpT3MVsO90FhGPOoxMxqw55h1oC30aULnCCLiq7QmVBRIfiAqk+A6y8pbnRKk2dSj4YYEKuNOw/WAbd6tIT8fjuVykxmGOD3x2dTkMjnAt+lKx4kJkK2VVbZfGIDSy93raNVynfTlq1jAjbaOUc3JzKpyYm3yzORJZo8G/8zAROsDtkYEEvC8BbCOlMhtCLDRps/DW3u/U7QacY3rRuwZXx+WmTwGduqdcl4r6VRyCLYYfjd0cKUXiDbgmFOR3coAEYhFs6U75BgewYeg2YmuhfsF1B2CMV5IkhJ1hpXPn3sqFpcr5hNP8cAH4GKFd1aAzzaD8nucjDoI1LGjWQ==
+ bh=/vTTqoR/vcy+eFgmw3dTdgA1asAPBIuIu0TfuV7FAzI=;
+ b=GRUjv+V/wFoyebN+4JIXhIl5mKtWa3MYZ5IOUfMqb8epIfPlqOmUuNrvlxQqSj/b+daGxzHSNfxsNN0xcqXX/McvZcW4lBcViEnK5VoholXu2TU9X5YQeczIncL2DgSCBaLp0ygBEXV5UBBjNLv31VEzRWaHi8LGQTTbLHpdl8NSTRCqzNIIwBl0zQylpWwmpUcwS31B7FH1FIQJuknk8/DFy6gQ9+jfjen6HvcAGdkI0vdvzmrlx4SSqZS24bX5RfrQcw+u4ya2IZA3kn+lcXf2/9DZN/OkK6xCYayxVs58PGsrzQ+NLIqprQesvkcJrdYcMICRTP2+3h88K5rqkA==
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=est.tech;
 Received: from FRWP189MB3398.EURP189.PROD.OUTLOOK.COM (2603:10a6:d10:1a3::22)
- by AM7PPF593EA3408.EURP189.PROD.OUTLOOK.COM (2603:10a6:20f:fff1::695) with
+ by GV4P189MB3631.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:2bc::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.14; Thu, 19 Nov
- 2026 13:23:55 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.639.10; Thu, 19 Nov
+ 2026 14:13:28 +0000
 Received: from FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
  ([fe80::4658:dbd6:d572:896a]) by FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
  ([fe80::4658:dbd6:d572:896a%4]) with mapi id 15.21.0615.013; Thu, 19 Nov 2026
- 13:23:53 +0000
-Message-ID: <624efab4-f1e3-4bd1-8ddc-60bba4b5d798@est.tech>
-Date: Thu, 19 Nov 2026 14:23:51 +0100
+ 14:13:28 +0000
+Message-ID: <9f454ef5-cbcf-4b8e-af18-07fb84507b4e@est.tech>
+Date: Thu, 19 Nov 2026 15:13:26 +0100
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+Subject: Re: v7.4-rc2 kernel build failure when using the upstream LLVM 24
+ with -Wunsequenced-volatile
 From: Yunseong Kim <yunseong.kim@est.tech>
-Subject: v7.4-rc2 kernel build failure when using the upstream LLVM 24 with
- -Wunsequenced-volatile
 To: aaron.ballman@intel.com, Nathan Chancellor <nathan@kernel.org>,
  Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
  <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
@@ -88,10 +87,13 @@ To: aaron.ballman@intel.com, Nathan Chancellor <nathan@kernel.org>,
  Mel Gorman <mgorman@suse.de>, Valentin Schneider <kprateek.nayak@amd.com>
 Cc: llvm@lists.linux.dev, linux-kbuild@vger.kernel.org,
  linux-kernel@vger.kernel.org, thakis@chromium.org
+References: <624efab4-f1e3-4bd1-8ddc-60bba4b5d798@est.tech>
+Content-Language: en-US
+In-Reply-To: <624efab4-f1e3-4bd1-8ddc-60bba4b5d798@est.tech>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0236.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:315::15) To FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
+X-ClientProxiedBy: LO4P265CA0295.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:38f::8) To FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
  (2603:10a6:d10:1a3::22)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
@@ -103,130 +105,110 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: FRWP189MB3398:EE_|AM7PPF593EA3408:EE_
-X-MS-Office365-Filtering-Correlation-Id: de06fe29-115e-4033-7540-08df46405b4a
+X-MS-TrafficTypeDiagnostic: FRWP189MB3398:EE_|GV4P189MB3631:EE_
+X-MS-Office365-Filtering-Correlation-Id: 68f0abe0-bec9-4f91-9379-08df464748a0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|366016|1800799024|376014|7416014|18002099003|261009223027099003|921020|11063799006|261026140227099003|56012099006|261022105027099003|261028144727099003|261021123027099003|261022075727099003|10067099003;
+	BCL:0;ARA:13230040|23010399003|7416014|376014|1800799024|366016|22082099003|18002099003|921020|11063799006|56012099006|261026140227099003|261028144727099003|10067099003|261022105027099003|261022075727099003|261009223027099003;
 X-Microsoft-Antispam-Message-Info:
-	vW+bZ7wAbfaaoC+20Gp3BAlJ5pOzrptHAFGlbC+u9F2a1vinelf/gJ+LXxi7wtc3jAVf8I9oS0T6xIC3/VNmPvxQg3/HDrlhD6MDsGp1vPgRDhonzYGUI1/NfeRZr2Ez6HqsuXURitaAODpmCB+jRZTHn8irNeziFaAiq5jWjF7igG7zaqjm1I4QIICl668bh7rLi9D0K0fUQh1y5JuxHrcHe90AmcAc5YZcxAs5+B68Gx3CirS5U+09UOm2tytverwJ0e0lsBDPzETYwvxe6PcF43RAC2xKHYgmv9cTcreybv9kmfQrBs4sE7Nc2V5XTHBjlIpRt07AmWYEVUztpoorN3ttXnHxhWbuHhs1Hs2sQldoG22hbRAg3fpoRGNQd2vo3+Jt3P6ReWJWM1wZiUWCLW3wCg0RZoNLqwmCCvU3MxIdVCUlUp8a26173Xs/k6ZiEzgzLynqYNvH80kxfjpJnjJusmFg0cdP+tmH13yOBLSQai8+zN+XVZkgphqrFv+8MGLi4EJOrXb6Ok4hLmI2by292k+M/4vthxwq8spYAQsDAt3roOcoWgUuV8UU1J3I6KGFCVRxKftQ38SIk33x5IhMNhRPeyRjKHf9mYfCRZzaF2dql/Y4QL+ZYQZyswR64fJfCO/ftTnpE20oYKXemFcAHlhPrdCOcLC83bivPo3ibF2me/RNCrzdcX7zXiaKaoql5VURJr/jndWT/Q==
+	lF8jx7c1vWDP9vjOZtmMv9wc97cs/f50ynob8edONM2o6SoMre5dzCnytWqHlAQ2X9ZD7KcdyMmevpQMeGpppqETxrhIytuvi38KwTRxUKW0kUvgb3Vbpy/YW2VVCfOIdXAzG8dCMIJot0koU8xyt9CdaeeWyDkb36FUY4LF8/sLTqua6F1MTv7MdAxsxBybMy4dTavxiKqeqVJU3+sO6NniTdBzi4FrFLL/N1yixz0+jZo8gp183SWco4OCN/1V3R8+hBQtRWjJ5J+45nH/6U+xfrrT36Sfq06pvDAb6cspg8ngLfpaUp06DjgryAw8U+8wGbxIp11dPo8IXCwrn3KF8FKHNvJ9/cuhne4L61ZrCbnww1wGk6sn473JMsWaCobBlXFcU3n2k/AVtJxMh97f3BvzZTw8o5PhtDelzgkX4nhmZiINiVsxypVlcCb/iRKTQcjo8F4MGOp3KGhNfUKEj6BO85bFU2sZqVbOHI+GXUgFTTnW7JT6617tFpRwJiVpGuxpFR3ppSzpBsKhgEztWn3ApKS7gKuM3889Hh9c6QIlmwBAL2ZFf2YZFpdsLXkNKPamKYNnS5pp7cjeMaSwKy30KP9LCLiXyO789t/ElQtf8AH8vJAF73FFQa3SlCBkjXWJOR8buQAfkCJBs3Q7J4ao/CfCtqnYbGnI6VM=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRWP189MB3398.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(376014)(7416014)(18002099003)(261009223027099003)(921020)(11063799006)(261026140227099003)(56012099006)(261022105027099003)(261028144727099003)(261021123027099003)(261022075727099003)(10067099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRWP189MB3398.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(1800799024)(366016)(22082099003)(18002099003)(921020)(11063799006)(56012099006)(261026140227099003)(261028144727099003)(10067099003)(261022105027099003)(261022075727099003)(261009223027099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NmRJb1JUQVRsdVovMnczU1R3akN3KzlhdytiT2NDWUVaL205YS83ZFMwbVBC?=
- =?utf-8?B?R0NUa1lFdTVGUzNpTmFqMnp2NkdIYkkxaWVaNzYzS0M4S1B2bk9tZGVQTEJp?=
- =?utf-8?B?dU5FR2k5WEZXUFdsOXI3WXoydkc3SGtPekhnTlVJN25VN3IwZjZwZWQ5VGxj?=
- =?utf-8?B?NGFVdDhEemZDR3U1YlNzMWtHSjIwaFZ1N2tleWRjdkNQYXl5L0QrbkxlRkw5?=
- =?utf-8?B?RFQ1dy8vNGpVRTZlaCt1bnVBQXpNSG5UU1ZsM3hKY3BQelVPQmNQOUIycTNF?=
- =?utf-8?B?K1dRS2lqUzlSWUhTSG1BMlBVaXZOTjMwNUJROWt6alM3bng4OHJyYjRyeHhN?=
- =?utf-8?B?TmZTMVpycGo4cFlmbDhQanUyNCtQd1ptSGZXaklJU0RLdjNXT1JLKzhEbXdH?=
- =?utf-8?B?MG5ZdUpPWFl6WTNGT0xzRHVOWkd6di94MkdmQkZNMkR5YzhXZ3dTRnFDMi9w?=
- =?utf-8?B?UWgzcFpvdkZPRjl2R2QwU3NDa2JoYjE2ZVVsNnFuZU50MXhUc1k3eFpwY3Jy?=
- =?utf-8?B?NFM4Mi9CZm8rV1JITzgzK1lkTmUzTGdIN3I4L3ZtYTVFTzBlM0EvSnR4UE5l?=
- =?utf-8?B?NzZrUXlmNU5Cd21VOTB2bG93YThUaGViZ2FFYnNLWE9YU0YwQ29HYllwMGtP?=
- =?utf-8?B?SWlIek14eTdjQlpBZWVsQS9pcDdYUW9FdlVVNFRweThJUmc1RUFlbjFkQzk1?=
- =?utf-8?B?OTc5R2xlUjN2YXlhTHBPbkVSN29rMURRQ2tIaGsxaHlVOHBJT2VoT0I3Zmt3?=
- =?utf-8?B?UUJEV2lweFBxUG9wZXRtVTFwMzVEWk1WMmlSOVcyT3IwL3gzL3RkWE42STlN?=
- =?utf-8?B?R0g4MjFyd0F0emd2OGtKa0lGWmJuVlkza09uSkJDMFUzdWpxSHpmZUYxMDJl?=
- =?utf-8?B?U2xyVkdxd2p6OURhSU1NRDJIMHg2OTBLZzhCTnJ5L3Zna2dTVnRtc3NESzBF?=
- =?utf-8?B?Z1BjamtZWGh2Y2Z6ekhzdXN0MmxETUFHaEx2Ymh3KzErQ1ArMGtsUkJ1a040?=
- =?utf-8?B?MUNJeTh2WHpaZ1ZtOFZicU9Zd2NNVjZjT3E5UFlaQ3hONDA2SG14UkNtZWNQ?=
- =?utf-8?B?V2JUYmRIVUtNcEhXSis2d0NLTGV0bytJcTdhY3pPRjQzTkI0UlduWmJGaXRR?=
- =?utf-8?B?dVZuZTNQVlJDb2x1WnJTeFdRaStMdkdPSkl2TTF6RStmcDJNbDlzeE9NU2Iz?=
- =?utf-8?B?dS9XQld3QnBlYUxpcS9XZDBqRllVSkVNUHQ2VGJMSE81em9TMGxZcmd2czhL?=
- =?utf-8?B?QUlaSTM1T2I5UitvZXdiTHJKVERQM2hNeGwwOUdleFYwS2lod0tWM0VRRVJi?=
- =?utf-8?B?V1h3RzNrQUI2V0ZjZ2l1R2JJZVhVcmh5c21RdkFDWmRUTURoMUVVdmdyOXM3?=
- =?utf-8?B?L1FDYjdzaDhPM241MTRyVGUySzRkWE9tQXlLZHJyRWJHUUE2cnFNUmFDTitt?=
- =?utf-8?B?RUxDaUhpZ2lCRCt0T0ZVTnpMa05LeG5wTjk5Rml6Q1JFSkl3NTZZWWIrYXc5?=
- =?utf-8?B?Sitha1ZnbFA3WVZ3ZzZ2eXRKZGJYU2RveHVWUEhvSHVHVm1wMGVhTUQyYzRz?=
- =?utf-8?B?eURkRDlZbTY4b0VuK1Z3WmFoWmV0bStQaUduVnlsUTZ0OUltSnRDU3B4Qi9k?=
- =?utf-8?B?dEo4TEFBRlFJdXVsTHVBWVBKRVhHd0RkNUFUdCtPS0lIcWswVDUyajJpeGdD?=
- =?utf-8?B?ZERRYlBsN2tLdGJ1UmZVNWo2YlhETjJWbU12UWxsSSt3ZE1XWW1OMk1BZkpE?=
- =?utf-8?B?MmMyVlJQOWE1cWVSZEptWFVQSXBva2sxOFVUYzNtaFNGcHltczN4WUNpRXhC?=
- =?utf-8?B?dTU3WFk3TlY0MFQ1ZmRPYjNrZjhpMUppUzNRNGNoTVkwZUZSUmJCMzFTVEc1?=
- =?utf-8?B?QjdjTDU0UEdmVVBFT2VkeHZkV2R0QmhDd3ptQUhGdmczNzByQjRWU1NDblhC?=
- =?utf-8?B?M3VQdE5ZQ2IxT041VzFrejdKeHdwdnlrOXBoU1p5ZVlBYllGclhqK2x1UlRt?=
- =?utf-8?B?SGdGQ0lXK0FnY0h1Yk03WjBIWmlleFY0QzdyMkZtWnVuQWRGYmVEOG5vRTlR?=
- =?utf-8?B?MUhacDNCQ3gxODZwa0VzM1FRQ2xRbERmMi9Va29kVUlhT2oxWnduTUZHb0xL?=
- =?utf-8?B?ZC80NGRncHJncS9TaFJiR2RVVGg5aWkrYW51aTh2SXZIUG1iYk1UcDdwaEZV?=
- =?utf-8?B?Z21GWWdPZjJnTWZVZmsvM0NHZDQxeGdueWZYZExCRjRJekhHbGVHdTBHRkxQ?=
- =?utf-8?B?Y21CZHYzSWo2UlRxc1c1UWl5OFNCV3Ixcm05MUlhcWR6QUt3OFdndzk3NmNW?=
- =?utf-8?B?aTFPUnY4REhnL1A5ajA5dUIyTWpBdkNPdVJEb2ErMUhaSVlNbzYrUT09?=
+	=?utf-8?B?VnUrak9zeEZDK1Z0QTNyTFFjaUMzNjRKOFBWOHFRSjVJM0lKQTlDQjRQNUN6?=
+ =?utf-8?B?Um01U0ZKVGVOUkdFK1ZHY09IUENNd2FwSVNkVmFpQkxvVWVaUzE0VS9ZOGEv?=
+ =?utf-8?B?YStlem5xSGtZOUZtOVVpRG1DZStxeGpNQVBFb2thMVZvaXY1Y3luSlQrdmN0?=
+ =?utf-8?B?OFgrYm5GdTFHaVN4TVBXOFU2RjV5T3ViWVY2TDBiWGVpODcrY3BMU2cvODZP?=
+ =?utf-8?B?ZXpWVVR1NlZiMGxyY2x3NVdBeUhzT1NiL3RIMHZUY0N3MWhyRHdDaTFHcGxZ?=
+ =?utf-8?B?dStPQm9HNkcrK2VlRVcrelprUWdNbUY5bUtpdUVvd1lDZ2p0Z0JRUzBXb3RH?=
+ =?utf-8?B?QUg4djYxOENPSzRkSG9XWW1XUU0ybG5QUWlUZXdZQ245UWI1L0NpT29saFRT?=
+ =?utf-8?B?UEl3aE5tdTJnNHBMWmhiRy8yU0JyY3IvY3psQk53dWtOa3lLSXA5S1JBcVQ3?=
+ =?utf-8?B?TzhmbEgvRm1vRFJnUnkyYk95T1VJNTJaSlRZL2dTNHRxeFdKTGtKaGw3TXBk?=
+ =?utf-8?B?SzJ4QkkrRHVPQXcxeml5Tkg5RG5aOWg3OWtEdjZGNUdTdW5uU0VIZmp2NzJh?=
+ =?utf-8?B?ajg1UjRQMTNQdkI0bXlMTUZBRG1yRi9OY3JrMGIvMXkyQU9RM3NSdHorelZU?=
+ =?utf-8?B?RGo0VzFnUy9PV0J3LysxanUxMFEwcGdXcG5YTEdRWm5vR29sbGxNbWhsYUtl?=
+ =?utf-8?B?ck1zVStISTdybXlDUldLczJIWFVUVUhVVGUwWmhrZHpud1Y0YitqUGhLaDlB?=
+ =?utf-8?B?MjJJWEFqQVJ0WWs1RkdiSy9TWFV3RklXWFNpV0hWTEVGa3ZKVm9JalZ3SXdq?=
+ =?utf-8?B?VDZEYlozaDMxT2c1Q1BRMzd2WFg5NHhGZkJkb0J3eklzY09XZjFMK1BubkFz?=
+ =?utf-8?B?ak0xKzB1RjRXNUF6MDlJbHlxT0JhODJ1RGJBaytRQVpOU2lpVUE5eVpIYk1v?=
+ =?utf-8?B?OVZNQ3hPZm9uUjBVTk9GUVdNd0taREh6MmFoV1pqSXJHdUpnb29FczFleGM5?=
+ =?utf-8?B?aWFLSjN6cnJINDdwSGVhVVpDRHB1UUl3eXJodElHYjQvR1cvbTQwc3FDWkYx?=
+ =?utf-8?B?R0l2bUhlSUt1WXp3WWhQUG9semk1RlNpSklJd1M5L3RCU1pNbWdqL0lMRW9w?=
+ =?utf-8?B?UHpJYTlMcUhDc3k1OXoxMzY2MWZ1Zmp4diszMndWRlVWR0dZcmdPT2h6OGdG?=
+ =?utf-8?B?TkNYZUs1cDZmSGJvdVZZeWpJLzBoRVRocjBLTWZLaHBYaVUyY2NwemRnM1Jl?=
+ =?utf-8?B?eWtnMERBYjFQdnFFbUxCQjNlcWpjTUlWT2pzL1ZMK0JVbmVIbnBraldvQTRK?=
+ =?utf-8?B?d1BXVXdwVy81dkUxaXFiK2ZWRGhqMVREZytoOGtKQWNTbHRtLzNMRXJQcllE?=
+ =?utf-8?B?MjFrS0FaU2NkV0Q0citucEVhMWlXTFQ2aU5iKzFYUjZ4S3haV3dYT1FtaVdP?=
+ =?utf-8?B?cU9IeE4zaGo5ZFRHOWp0NHlEQ0QvV0t5b2xWWTJIOE5zdVU5cWV2QjRnckVa?=
+ =?utf-8?B?L2ZPSEtMa2pYSHUyYVFBbGpLNzZleC8vbmZ0dmRJSWxzVk1jbHJOcnNFY3Rw?=
+ =?utf-8?B?T1gzY01Kd3JGNGpNc3dtOTI4Lzhmb3lPMDR4d2pkNTlUbHNuZWJueUhBdmc2?=
+ =?utf-8?B?alNGYWRiR3UrQ2FvTlVYbHEramJBWHVkVDFwUFFVa0hZRml4TlcycXVKcStz?=
+ =?utf-8?B?dWxYM3JhbWJ6SXZ2Rm5KRWtqZ1MrZnJGUmtGWm9SdEZYTlJLcUFiSXo2RFFj?=
+ =?utf-8?B?NVlXZk5yaFFkZmNyTHh3SEVXbFpYVVlaWHRKV3FnV3RrRlF1RmpmZkFXTWVw?=
+ =?utf-8?B?RzV2VW9sTzZCN2dENUNweVNUM0IveXp4d0gxa0pTK0hnNk1CbFlnVWp0NE1t?=
+ =?utf-8?B?Tnd3R3ZUVVNpY01rTTVCaHI4RzZGZzNSNGVJd2g1USsvVHdmZ1BWNXI4MWZV?=
+ =?utf-8?B?RFJ0Z1NRTTI3M0NqNlBlcTMwOHdGTW12bGdKeU1nUVlyTHZTc3hReUs0TjNo?=
+ =?utf-8?B?aEZOZlJKQjAwd2laNEcwbElkSlB0cEF1UHZWT3QyQUEzbFVMOWZYV25kOCtD?=
+ =?utf-8?B?N2tic2dlczByaTNYT0dpcXJQOWoyV0dYTklHSFp5dUZKWHhLVzdhSlowZDNv?=
+ =?utf-8?B?ZURiL2tpeVNKMGxGYmJOZVAzUEdQZmNsT0czeEZXb05XRElEU3RJR09GQkpa?=
+ =?utf-8?B?c0pTREg1bDN5QWdlWHQ4M1lteDFZZXBQdXdaMnU5M2RIS3R3NDRWK2kzYzI4?=
+ =?utf-8?B?Q09oVFBLdmYvcVZIWDRCbkZIclUvUXgreGk3Qk1mSHgrWCt5VUdzdktSVkxq?=
+ =?utf-8?B?VVZlZWN6aCt1MXNlSEQ0R0ZGaHZHUUhONDhweHVpNlhRL1NCMDhmQT09?=
 X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-Network-Message-Id: de06fe29-115e-4033-7540-08df46405b4a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68f0abe0-bec9-4f91-9379-08df464748a0
 X-MS-Exchange-CrossTenant-AuthSource: FRWP189MB3398.EURP189.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2026 13:23:53.4889
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2026 14:13:28.6049
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uqZJ3FB38zqScSHVOJe20u8oq6wUmnaaiPkMIKYPN9im3FFSAvNOFFo4l73oJP34BkNxoRSCGwXiVG5tsKAk1g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PPF593EA3408
+X-MS-Exchange-CrossTenant-UserPrincipalName: x5HDsOl9XAznSKxRYk/NtilnLRTMhTX9crgu+O0H8RILcxem0Qe0ig8MkF33EhXErYHYwj9C3qbAyihHBysavA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV4P189MB3631
 
 Hi,
 
-After https://github.com/llvm/llvm-project/pull/180955 feature
-"[clang] Add check in SemaChecking for multiple unsequenced volatile accesses",
-v7.4-rc2 kernel compiling with the upstream LLVM 24 was failed.
-
-  kernel/sched/build_utility.c:86:
-  kernel/sched/topology.c:2008:29: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced-volatile]
-   1998 |                 .last_balance           = jiffies,
-        |                                           ~~~~~~~
-   1999 |                 .balance_interval       = sd_weight,
-   2000 |
-   2001 |                 /* 50% success rate */
-   2002 |                 .newidle_call           = 512,
-   2003 |                 .newidle_success        = 256,
-   2004 |                 .newidle_ratio          = 512,
-   2005 |                 .newidle_stamp          = now,
-   2006 |
-   2007 |                 .max_newidle_lb_cost    = 0,
-   2008 |                 .last_decay_max_lb_cost = jiffies,
-        |                                           ^
-  1 error generated.
-
-
-Is that mean topology code have a potential issue, or is this a compiler's
-false positive? The same error message can be reproduced on the example
-user space program.
-
-  $ cat jiffies.c
-  extern volatile unsigned long jiffies;
-
-  struct sample {
-      unsigned long a;
-      unsigned long b;
-  };
-
-  void init(struct sample *p)
-  {
-      *p = (struct sample) {
-          .a = jiffies,
-          .b = jiffies,
-      };
-  }
+On 19/11/2026 2:23 pm, Yunseong Kim wrote:
+> Hi,
+> 
+> After https://github.com/llvm/llvm-project/pull/180955 feature
+> "[clang] Add check in SemaChecking for multiple unsequenced volatile accesses",
+> v7.4-rc2 kernel compiling with the upstream LLVM 24 was failed.
+> 
+>   kernel/sched/build_utility.c:86:
+>   kernel/sched/topology.c:2008:29: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced-volatile]
+>    1998 |                 .last_balance           = jiffies,
+>         |                                           ~~~~~~~
+>    1999 |                 .balance_interval       = sd_weight,
+>    2000 |
+>    2001 |                 /* 50% success rate */
+>    2002 |                 .newidle_call           = 512,
+>    2003 |                 .newidle_success        = 256,
+>    2004 |                 .newidle_ratio          = 512,
+>    2005 |                 .newidle_stamp          = now,
+>    2006 |
+>    2007 |                 .max_newidle_lb_cost    = 0,
+>    2008 |                 .last_decay_max_lb_cost = jiffies,
+>         |                                           ^
+>   1 error generated.
+> 
+> 
+> Is that mean topology code have a potential issue, or is this a compiler's
+> false positive? The same error message can be reproduced on the example
+> user space program.
 
 
-  $ clang --version --verbose
-  clang version 24.0.0git (https://github.com/yskzalloc/llvm-project.git 5d20c85f4e1b8755b655bf1782b094fb35ec48d1)
-  Target: x86_64-unknown-linux-gnu
-  Thread model: posix
-  InstalledDir: /home/debian-sid/kcov-dataflow/llvm-project/build-upstream-check/bin
+I didn't realize there was already a patch in progress.
 
-    $ clang -std=gnu11 -Werror=unsequenced-volatile -fsyntax-only jiffies.c
-    jiffies.c:12:14: error: unsequenced accesses to volatile qualified 'jiffies' [-Werror,-Wunsequenced-volatile]
-       11 |         .a = jiffies,
-          |              ~~~~~~~
-       12 |         .b = jiffies,
-          |              ^
-    1 error generated.
+  https://github.com/ClangBuiltLinux/linux/issues/2190
+
+  https://lore.kernel.org/20261116-topology-wunsequenced-v2-1-54611119172b@kernel.org/
 
 
-Thanks!
+Many thanks!
 
 Best regards,
 Yunseong
+
