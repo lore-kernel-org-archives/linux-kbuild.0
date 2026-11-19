@@ -1,66 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=213.97.179.56
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795117665;
-	b=D9mCZVxCpRpNpaVPVDUorHxgVExOQqX+rh6MHHUQvl6+eeH0bPuwiudM//Wa2oy2QsTg
-	 ReQ5zrNVll7rX6r18kgzLDIiKxzMeCvO87UUrPppmrNDw7FdXLkZ7Ujkrg/z05LhCm5FQ
-	 +u+XeAmcdvssijW7n+ssPxRyXXpNmHgNzuc6LDsN58Wt0EEDx+NLCMPETeolZVvq14jYF
-	 OzUxrql5vB28NE/+GKDr7cF28LmHujfukL3/5P90/PQ4a4XaLWSljl4m3Ecm+MrNrJL4C
-	 8dMzYer0InzSPdASepv+cJfi6uJzp23z37R2YralHJT8iA5jzKeWx0daO/QHOoYrM0A==
+	t=1795119720;
+	b=RvZAFQwXd2HFB/kJaUg0F/lwCPTcYGPBrLt9zMy+8hkMtKod6g/P340AJGBtopxVAdBU
+	 e73CX+icWRiyGDqiRt43D28Z+Nsi0i6s/c66nYBatj4KjT94FM67IPvYy55P3rMQJtBPr
+	 Si12U0Uy7sye2nmgfBkhpctz+7ryx40f5pstHvUnBcSxXzydF3oNZ+v3xLKBr/qAzvCv5
+	 rABlz2rqd3JVcaTuP1oORlFu0uCjwTBm887JytaLg/u0HsgCdoXZaEhrzEcbDOt/I0GSd
+	 meEViysp8K0jhe2OiZUgqv92q0MOYoCG8qtMPPRM+r7TXngLR9UUaJKGGj8R2mEJW0g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795117665;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=gkSFi0IrVXipnhVUQwel4oCB1yg9JYW3fJo9NO9I6DQ=;
-	b=OBBfEQw4NqdhiJia/4ofrmJFlwMQsjYkmjJwQt+ioWrO943V5p+UpoQAsKSo9u2SeXhm
-	 98iTK0tXa0Wrw/mnOFQ74ctp/f6rK7u4n7dm60XWAGu1Xd7DkYigkcFKS4J1TFA+ptzP+
-	 lQkDtP97BpxOvNQalDcFwpRN2Z3B4W1vIdzCkSrXAyTJQJviz/OID8PhkutvUs0h7YKKf
-	 OfKb3nVo580eBh1RZrlOWUziH+z4jYPwUdGFsfta15VQs+GnG22K9zPu6OGqEtQwVjj5a
-	 HMuG1L8NIlTs1+fgtVfTrv2ZDI5R9+91A+QFmhEdoA0+j4et5IK7DkR3t09C1sBp1qA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795119720;
+	h=DMARC-Filter:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
+	 In-Reply-To:To:Cc:X-Mailer;
+	bh=A3uG7/gpB0iY92Gq+oLwrC+DGDmsjpq9q8rzd1WGlUw=;
+	b=lMS/jhuGcoEVIzmy1foDvMjSf0gsazWhRCuZvgkeG3xsXPBObKi0C6vPMbbsIThsdKj/
+	 BMp61MTaSSICUyznM8KOhbEAAqbvRJlhSjKhbVxJMNGxlt0VvBfVm8MLQHPEvyB/sNXE1
+	 m2eR4JOs+Da0rQ96k0D3qGiXefIa3xhRKu8hmL56JBIpf4n/K5pkRFUYynrR+4jtE4iIU
+	 dU3YjwGIY3Te1vveb0VDnt487GeQLmwR86I6meDNcyeEtT04ls4dXQyhQcvSvzM9LG9Wg
+	 XL8hGC+x3t6TWVAKrns+rDruW4A8Hzzqrs4+rXcnDnXs+je75VEgGlm1BQCBv+WyaAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oY6D0SbD;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=igalia.com;
+	spf=pass smtp.mailfrom=igalia.com;
+	dkim=pass header.d=igalia.com header.i=@igalia.com header.a=rsa-sha256 header.s=20170329 header.b=kV4zTTtH;
+	arc=none smtp.remote-ip=213.97.179.56
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272C4606A325;
-	Thu, 19 Nov 2026 19:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDA1606A325;
+	Thu, 19 Nov 2026 20:22:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6FDA1606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oY6D0SbD
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C70E1F000C4;
-	Thu, 19 Nov 2026 19:47:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795117664;
-	bh=gkSFi0IrVXipnhVUQwel4oCB1yg9JYW3fJo9NO9I6DQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oY6D0SbDkYs/CqSGwekvQEsLKnBqh8n1TzAkBFWyz0orrqaxlMeBKCke9QpzkZyVV
-	 //GpPI2sOx6KeIqa6sLvPxmEWVRUAaBoiBV3Jsy+PXoetBY2VI1AxPUgrYL4WMoxez
-	 fEpnO+UbiUlTN/SzQtg8YZlnoJStFY0duJ2L6NO4Kxx34N3O/sP71kDe5vWpbXqe6Q
-	 HiRAOj063c0wLkVoNSHdYJFT6uCVicl4XP7VWJOjJQzEiICLg7MPTCWpsOV+9Jh7ox
-	 Zaa/uSqzoROYubg3sVxX7aZ+N/dtvB1h07IFMX9flo92eV6xnsCNRxfEjGGhZTxgWR
-	 //LwXeRFcTfQg==
-Date: Thu, 19 Nov 2026 12:47:38 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Nicolas Schier <n.schier@fritz.com>
-Cc: Sasha Levin <sashal@kernel.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>,
-	Nicolas Schier <nsc@kernel.org>
-Subject: Re: [PATCH 2/2] devicetable-offsets: Get struct cpu_feature from a
- device-id header
-Message-ID: <20261119194738.GC875856@ax162>
-References: <179424040477.1704532.18231793404479518924.b4-ty@b4>
- <av8Uv7EV3sLqUBfr@derry.ads.avm.de>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.a=rsa-sha256 header.s=20170329 header.b=kV4zTTtH
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From:From:Reply-To;
+	bh=A3uG7/gpB0iY92Gq+oLwrC+DGDmsjpq9q8rzd1WGlUw=; t=1795119720; x=2110479720; 
+	b=kV4zTTtHHKrHVrkhdCi5i07vJSe7d/IcV/b/eyTjt5jJr7O2kON8ncijRKo2zTWsPpnTJjXundq
+	rEZMd1Z9C4giVNIwRs889senYbSBcNk0u+bYb8lO8pS7wQsWIQSDEFXmA7A5AufDaONQtgAZANkic
+	GAOa2yyUFEcCROcax7JwEDHj44vpMrnE6k+DgpHcbeuJRyY7LKnZ1sKYLaUwxxpN0xOfOkk77KTlE
+	fGx/usnhrxvcmX78dEJrILjqHDrsC+CvTja+TRErRj/7IcmNf9Zlz4oQyrl6GsPsknTWBmR2KBGA/
+	nc/EBORJstNhYmXLooRVSi2Gjcr9ngb65h+A==;
+Received: from [177.172.124.218] (helo=[192.168.15.100])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1xU8dq-00000001cIK-1ufW;
+	Thu, 19 Nov 2026 21:21:58 +0100
+From: =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+Date: Thu, 19 Nov 2026 17:21:51 -0300
+Subject: [PATCH v10 01/16] syscalls: Make --abis parsing more robust
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -70,45 +59,72 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <av8Uv7EV3sLqUBfr@derry.ads.avm.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20261119-tonyk-syscall_table-v10-1-a7c9ebd900f6@igalia.com>
+References: <20261119-tonyk-syscall_table-v10-0-a7c9ebd900f6@igalia.com>
+In-Reply-To: <20261119-tonyk-syscall_table-v10-0-a7c9ebd900f6@igalia.com>
+To: Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmanon <arnd@arndb.de>
+Cc: Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
+ linux-kbuild@vger.kernel.org, kernel-dev@igalia.com, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+ linux-alpha@vger.kernel.org, linux-s390@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, soc@lists.linux.dev, 
+ linux-mips@vger.kernel.org, sparclinux@vger.kernel.org, 
+ Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ linux-perf-users@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, 
+ Magnus Lindholm <linmag7@gmail.com>, 
+ =?utf-8?q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>
+X-Mailer: b4 0.15.2
 
-On Thu, Nov 19, 2026 at 04:24:47PM +0100, Nicolas Schier wrote:
-> On Mon, Nov 09, 2026 at 05:07:05PM +0100, Nicolas Schier wrote:
-> > Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
-> > 
-> > [2/2] devicetable-offsets: Get struct cpu_feature from a device-id header
-> >       https://git.kernel.org/kbuild/c/50ccc340
-> 
-> I applied this fix on kbuild-next-unstable (and rebased today [1]), two
-> commits after "Move struct cpu_feature to <linux/cpufeature.h>" [2],
-> which is being "fixed" by this patch.
-> 
-> If we keep it this way, a bisect may hit the issue; folding does not
-> look correct to me as that would mix-up related but different things.
+Some archs Makefile have something like this as the rule for making the
+syscall files:
 
-Yeah, good catch.
+  cmd_systbl = $(CONFIG_SHELL) $(systbl) --abis common,$* $< $@
 
-> So my questions:
-> 
->  * Shall we keep it the way it is to keep the original patch order
->    (bisect might fail on the two commits before this patch)?
-> 
->  * Or shall the patch be moved before Uwe's (removing the 'Fixes' tag,
->    and rewriting the commit msg)?
-> 
-> I am in favor of the latter.  Are there any objections?
-> 
-> 
-> [1]: https://git.kernel.org/kbuild/c/f1dc66c38b7eb4b2fb946a2fd6929250ecd2d85a
-> [2]: https://patch.msgid.link/bc9fbf5784f6788e10c749a05d56c42bdb68f3d9.1792144769.git.u.kleine-koenig@baylibre.com
+The $* symbol is evaluated to the variable found at $(uapi)/unistd-%.h,
+where % is 32 or 64, resulting in e.g. `--abis common,32`. Sometimes the
+rule for the file won't have a %, resulting in a trailing comma e.g.
+`--abis common,`.
 
-If history is already being rewritten, I believe it is always good to
-fix potential bisection issues like this. Rewriting the commit message
-(and maybe some of the diff?) and placing it in an order such that the
-build cannot break sounds great to me (but others are free to disagree).
+Currently this input is transformed into (common|). This is problematic
+because grep will then match any ABI because of the trailing `|`. Make the
+syscalls scripts more robust by removing any trailing comma.
+
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: André Almeida <andrealmeid@igalia.com>
+---
+ scripts/syscallhdr.sh | 2 +-
+ scripts/syscalltbl.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/syscallhdr.sh b/scripts/syscallhdr.sh
+index 22e34cd46b9b..bad1ab606a0f 100755
+--- a/scripts/syscallhdr.sh
++++ b/scripts/syscallhdr.sh
+@@ -39,7 +39,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis="($(echo "${2%,}" | tr ',' '|'))"
+ 		shift 2;;
+ 	--emit-nr)
+ 		emit_nr=1
+diff --git a/scripts/syscalltbl.sh b/scripts/syscalltbl.sh
+index 6a903b87a7c2..c4b1f85c2dd6 100755
+--- a/scripts/syscalltbl.sh
++++ b/scripts/syscalltbl.sh
+@@ -33,7 +33,7 @@ while [ $# -gt 0 ]
+ do
+ 	case $1 in
+ 	--abis)
+-		abis=$(echo "($2)" | tr ',' '|')
++		abis="($(echo "${2%,}" | tr ',' '|'))"
+ 		shift 2;;
+ 	-*)
+ 		echo "$1: unknown option" >&2
 
 -- 
-Cheers,
-Nathan
+2.56.1
+
