@@ -1,76 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=212.42.244.94
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795101900;
-	b=aSquxkT647BJlO0ezvEO8dvlboFAYQJp3Pj/6GyaxUPcWC5Z84yxCs7Tkr1pILurQ5lN
-	 2OL1a60onEgSkC2tcLtMpTOf3OYgm1rJl+JON8pD1wlAqZXeHHRr6sEnw5kjAHOK4S/V/
-	 QL0s7SIc2oKIprshhL6iuXfKS/ezoERTRL5YtqUJgi3k9znpcVJhsmku1x0BeHm/qpwy8
-	 AohR6KneQ8nuazgwtSsHsqnOtqLaTRABqWfe3DjYyNVrZC5YST0mPoAnJzjnug/ZoHg1A
-	 m/JJG/rtFIGpx+WLgWyIFrpuCvVf3AR2/DHOy4vJJuxu4ekkS7CggJh/7aZEkvsoTdg==
+	t=1795108149;
+	b=IyQqunSPQ6vRPGE43illR1wus4FyMY6u19V269ypEvG0bF2k9p3ZbDJmk7jKm8bFcEg+
+	 TkBqxzyMX8khLCayxKATZ2hSsdJNTeS/smpg75t9EL6EciQnSY5rW+sN7FJIBOghDWwlh
+	 e3ZJf8vWWdKvvu6n+e9YXDXS0tmtzu6EEbSSyWopUD5HazoamXWtbkqXy2n3+HYEVFKXI
+	 a2KTvMW4qH0CS0T+OIWVkhH1qYbuSaOsX3KvG+VdWsBoqGjvEcx3KeFvnwjnkWYOjaX6B
+	 QZhNKYEMjFZpzKIv4jpQcHSYE0cqSKaRmwjBoxAgwlR5K7K2MHL1GTawoAkEO426HqA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795101900;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-purgate-ID:X-purgate-type:X-purgate-size:X-Notice:
-	 X-purgate:X-purgate:X-pfmilter;
-	bh=UeMwgVjDLnDVqjMPlLrZzad82di4zvuEFr1fKsZ6T0U=;
-	b=R0HaKpD7xaVWLMFiuEWWm/YyLK8DAl3qPnuOX/8/07INFtYwKStCd0d2y9Xk5PaBftZ/
-	 9MQRyu3IOEScLiVC3C/48WvFXyiivSOrI++Hgdiwz5ZMUL9tPkxidf3w/L+xRETTVz9re
-	 hH+SZOEvvPsnlFte78ZunnbKi8C1x0rYvuC2jUtEKJSNHJJGbnoMNV2jNNgJcKIsYfCS0
-	 jSfUEqol3go4i9qFqEdlTemvsN3kvUJkoe7G/A4fCDcA+JDf9XZNclFYr3dIfCS5bAfJ6
-	 Jly3LPp+seLJDbMN817hm5PoQIYdvA2sgw7rdUatltl1MUPQ1bbQdc8yE/x7nd2t1Tg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795108149;
+	h=DMARC-Filter:Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=Ne9pewg3lTR/XwteFRfApk8OTwqtNwxzKqScyzsN66w=;
+	b=WrTvpmCEvfJOqwTF869C15PXxANlqtpfyhOWwiUYN/ka2ZDad15aIkLixxZutFLHJAmX
+	 0zdjY4YC/YPDwh8Z9Peks4aWxqbAjDQQsIweoYEaufHk7KXEnQTzAtR35/6NrfZ+ZuiNu
+	 5WK7X0/WvdFaNw1Br1w49OFUCwi0YRgyMuD+oMI+HICPF/rPLQdN07JJfAwluX51+pj2B
+	 T3keTN0B7ruOxQLsrGpIFFu6PhJFuZlt2x+n7mE38tKzBU7IO5hHNYuo8SN4ZRvClOXyM
+	 VGEhc1TNBaCUZtJdsAK9nLHRbZ2E3ckd4ohga/1qaYbujuKO/kd1VFxYHNAbnAS+N1g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fritz.com;
-	spf=pass smtp.mailfrom=fritz.com;
-	dkim=pass header.d=fritz.com header.i=@fritz.com header.a=rsa-sha256 header.s=mail header.b=KSPq04XI;
-	arc=none smtp.remote-ip=212.42.244.94
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+	dmarc=pass header.from=linutronix.de;
+	spf=pass smtp.mailfrom=linutronix.de;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=nk5tlUNz;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b="G/HsGIbW";
+	arc=none smtp.remote-ip=193.142.43.55
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BBD606A320;
-	Thu, 19 Nov 2026 15:24:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60BBD606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719AF60A3803;
+	Thu, 19 Nov 2026 17:09:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 719AF60A3803
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.a=rsa-sha256 header.s=mail header.b=KSPq04XI
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
-	t=1795101890; bh=VUtPMxOjNKGPZQ6FkAk4L2n05vBEr9KfdwlyPB8FDFE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=KSPq04XIh/icCo8uVqSQs19xHVWrI8882+qMc4rh4bnaLIrVTIRUI5hta3IrnJmKr
-	 LiyH5gQnmHg4hi6fnGQQBTCKUhzPV5pUnddTLwq7tRo1sqFXC60ubABjjxwzr5BZpW
-	 xWTrAU/q3VmuS9xkaoOGD0Jn8oy3l4DTPHEwBClrN0JI8F1idZN9rc232N+9cBlDYK
-	 ACrbDLomre7mciio5dpLUoD4CR9a2MKIulNcOOn2MdgHr/fEhjD84N0ReNb2vbEW0l
-	 Lnh7zob5INdPpt9ISPclBVJ2Qwnd7Kvc739eXQJq5JMQwSX7BtOtazOhV28Kxzl2ng
-	 8sp7wX8P0KG5Q==
-Received: from [212.42.244.71] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
-	(envelope-from <nschier-oss@fritz.com>)
-	id 6aff14c1-b6d3-7f0000032729-7f0000019f2e-1
-	for <multiple-recipients>; Thu, 19 Nov 2026 16:24:49 +0100
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Thu, 19 Nov 2026 16:24:49 +0100 (CET)
-Date: Thu, 19 Nov 2026 16:24:47 +0100
-From: Nicolas Schier <n.schier@fritz.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Sasha Levin <sashal@kernel.org>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>,
-	Nicolas Schier <nsc@kernel.org>
-Subject: Re: [PATCH 2/2] devicetable-offsets: Get struct cpu_feature from a
- device-id header
-Message-ID: <av8Uv7EV3sLqUBfr@derry.ads.avm.de>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=nk5tlUNz;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=G/HsGIbW
+Date: Thu, 19 Nov 2026 18:09:04 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1795108146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ne9pewg3lTR/XwteFRfApk8OTwqtNwxzKqScyzsN66w=;
+	b=nk5tlUNzv4CkFGquuK5XRwERT434B2HGM48+DOITH1b0FzZVYJwiio/Rh/NTG3SO0EmpW0
+	6iBW4QwLZz/JGiGhhjDQXOkTm6mVhQhKLf+NXzfu8az0CMFiFzqHRbbFGi70Wm8siO/A3z
+	9nmd4OgW/7CEGmbUMuDUlYGLSWnpACTEAb0HgTLnuF8+6V/jjKc3gmtcHExi8HKFaFgHV5
+	G5e5jN7qBCIXTRdqUcqHcTITVM9Q1CcPcWvoqzz/qBfIRLbIu/GL2mtOvznhBXy2iyEfZ9
+	5hKNlHafKgBDImJSFvMlpdT/Jta7ymWFKBizC7FDSyMbnhTxp3H2ZB7oL2mOCg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1795108146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ne9pewg3lTR/XwteFRfApk8OTwqtNwxzKqScyzsN66w=;
+	b=G/HsGIbWh5x/anTnl4KMlT5n/w57hjNIWFoGNOlj8JYqHhKary8iohULTfeveAAbPj7daj
+	xlOEnc5c9iT+pSBw==
+From: "Ahmed S. Darwish" <darwi@linutronix.de>
+To: Emanuele Rocca <ema@debian.org>
+Cc: Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Ogness <john.ogness@linutronix.de>,
+	Derek Barbosa <debarbos@redhat.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@amutable.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Luca Boccassi <luca.boccassi@gmail.com>,
+	linux-rt-devel@lists.linux.dev, debian-kernel@lists.debian.org,
+	linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 02/10] kconfig-checker: Introduce PREEMPT_RT
+ configuration rules
+Message-ID: <av8tMAE3LXz8QwH5@lx-t490>
+References: <20261106091922.7560-1-darwi@linutronix.de>
+ <20261106091922.7560-3-darwi@linutronix.de>
+ <avxFRmhBrlKLtQ97@ariel.home>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -80,58 +89,72 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <179424040477.1704532.18231793404479518924.b4-ty@b4>
-X-purgate-ID: 149429::1795101889-B9515B85-B73617E7/0/0
-X-purgate-type: clean
-X-purgate-size: 1742
-X-Notice: Whitelisted
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
-X-pfmilter: host: postfix-mx-03  mail-id: F259FA066E  external: no
+In-Reply-To: <avxFRmhBrlKLtQ97@ariel.home>
 
-Hi,
+Hi Emanuele,
 
-I have a question regarding best-practise:
+On Tue, 17 Nov 2026, Emanuele Rocca wrote:
+>
+> thanks for this useful tool!
+>
 
-On Mon, Nov 09, 2026 at 05:07:05PM +0100, Nicolas Schier wrote:
-> On Mon, 09 Nov 2026 09:14:41 -0500, Sasha Levin wrote:
-> > Since commit cdfdbc11552b ("Move struct cpu_feature to
-> > <linux/cpufeature.h>"), devicetable-offsets.c includes
-> > <linux/cpufeature.h>, which includes <asm/cpufeature.h> on architectures
-> > that select GENERIC_CPU_AUTOPROBE. On loongarch and mips that header
-> > pulls in <asm/elf.h>, and from there <linux/fs.h> and <linux/mmzone.h>,
-> > which need <generated/bounds.h>. devicetable-offsets.c is built before
-> > that header is generated, so even defconfig fails on both:
-> > 
-> > [...]
-> 
-> Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
-> 
-> [2/2] devicetable-offsets: Get struct cpu_feature from a device-id header
->       https://git.kernel.org/kbuild/c/50ccc340
+Thanks!
 
-I applied this fix on kbuild-next-unstable (and rebased today [1]), two
-commits after "Move struct cpu_feature to <linux/cpufeature.h>" [2],
-which is being "fixed" by this patch.
+> > +  - name: CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE
+> > +    expected: y
+> > +    severity: high
+> > +    docs_hint: config
+>
+> The docs mention the following for CPU_FREQ_DEFAULT_GOV_PERFORMANCE:
+>
+> | This is not an absolute rule. Some setups might prefer to clock the
+> | CPU to lower speeds due to thermal packaging or other requirements. The
+> | key is that the CPU frequency remains constant once set.
+>
+> Yet having the rule "severity: high" will presumably make
+> kconfig-checker require CPU_FREQ_DEFAULT_GOV_PERFORMANCE=y in order for
+> validation to pass?
+>
 
-If we keep it this way, a bisect may hit the issue; folding does not
-look correct to me as that would mix-up related but different things.
+Yeah, the expectation is that the RT policy profile recommends the
+"absolute best" kind of configuration.  If the system integrators knows
+what they are doing, then they can override that setting in a rule overlay
+and explain their rationale there.
 
-So my questions:
+> > +  - name_pattern: CONFIG_CPU_FREQ_GOV_(CONSERVATIVE|ONDEMAND|POWERSAVE|USERSPACE)
+> > +    expected: n
+> > +    severity: medium
+> > +    docs_hint: non-performance-cpu-frequency-governors
+>
+> Similarly, by reading your docs, it seems to me that the worst choice
+> for RT workloads is ONDEMAND.
+>
+> | The ONDEMAND governor should not be enabled on a real-time system. Its
+> | frequency changes depend on workload behavior and can significantly harm
+> | determinism.
+>
+> Shouldn't the severity for the CPU_FREQ_GOV_ONDEMAND rule be higher,
+> then?
 
- * Shall we keep it the way it is to keep the original patch order
-   (bisect might fail on the two commits before this patch)?
+That's a very good point, thanks!  I'll separate the recommendations
+severity into:
 
- * Or shall the patch be moved before Uwe's (removing the 'Fixes' tag,
-   and rewriting the commit msg)?
+- CONSERVATIVE and ONDEMAND: these are the worst, as they do change the
+  frequency during the system's lifetime.  Thus, rule severity is high.
 
-I am in favor of the latter.  Are there any objections?
+- POWERSAVE: Frequency is low, but it does not change during the system
+  lifetime.  Thus, rule severity is medium.
 
+- USERSPACE: Fine if the user-space program that knows what it's doing and
+  does not switch frequencies haphazardly.  Thus, rule severity is medium
+  as well.
 
-[1]: https://git.kernel.org/kbuild/c/f1dc66c38b7eb4b2fb946a2fd6929250ecd2d85a
-[2]: https://patch.msgid.link/bc9fbf5784f6788e10c749a05d56c42bdb68f3d9.1792144769.git.u.kleine-koenig@baylibre.com
+Sounds good?
 
--- 
-Nicolas
+--
+Kind regards,
+
+Ahmed S. Darwish
+Linutronix GmbH
