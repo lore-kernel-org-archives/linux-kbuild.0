@@ -1,74 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=212.42.244.94
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795099210;
-	b=s9oCUZvwByDSpwzUHh1oa0ECRodWmhVpyDOV910VUzx2jZVOf6MB7L0uFtqmvwBeBm6c
-	 jRMy3mwnjanOlUWMMaluIbmGfelXyPQ5CdRgChnIA620l9pJ/2rhFVv5kKjBM/hxhH3Ql
-	 OUPfxX7aQXKfl/9LIIpmYCLzxx5fcGOGNNXe4WUi1wKM/2T32tXIXSpk02GuYeiYh/xkc
-	 N41aBkolRkQkJoMGeI1OVloKxRbgu7JZ/Jgxxkn68aWzU4wgnqYR2GDIh4pW2Prn39iys
-	 2HcROZPRJ5oHOTMwYsWw/1/XGPIlr9tM6bpCWx0EWTg1JD6tiDUabGaM64wbGlLPQxA==
+	t=1795101900;
+	b=aSquxkT647BJlO0ezvEO8dvlboFAYQJp3Pj/6GyaxUPcWC5Z84yxCs7Tkr1pILurQ5lN
+	 2OL1a60onEgSkC2tcLtMpTOf3OYgm1rJl+JON8pD1wlAqZXeHHRr6sEnw5kjAHOK4S/V/
+	 QL0s7SIc2oKIprshhL6iuXfKS/ezoERTRL5YtqUJgi3k9znpcVJhsmku1x0BeHm/qpwy8
+	 AohR6KneQ8nuazgwtSsHsqnOtqLaTRABqWfe3DjYyNVrZC5YST0mPoAnJzjnug/ZoHg1A
+	 m/JJG/rtFIGpx+WLgWyIFrpuCvVf3AR2/DHOy4vJJuxu4ekkS7CggJh/7aZEkvsoTdg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795099210;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=jGUNa2nkwgmbkFv5PZDi3+5NxDpJOH/HW6VIk5Cn1XI=;
-	b=Xa34qynAl3zCFFJs4d3LghFlFMO3dvPGmUv2x12aKGXm4OwhyNkRI/0MkAOGkHIgmBTG
-	 fwPvOx+dNt95rgJnO94mQwWFOZu1bHgR6DviATB/1//3SplRpMCD4ft2PXJfyZDXEHPo/
-	 VJm/pf8qHhycUaSQXW6VpDTVMila/NmmQUUM2oB9WY/JHzi7QhhRwmTuzxfKB1XTgioZb
-	 zhZb1im5H4IfhRe1CZ19fzv53odze51LvmOjnwJIZUvKXV+oVJ2sicDRRXThBlpVtzy/i
-	 2NlR1OmKixt3PD7oDU1UQhmlvyK2mDhycr71N+v+xLMoAyeEneg2RwGmMKXji7cXY4Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795101900;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-purgate-ID:X-purgate-type:X-purgate-size:X-Notice:
+	 X-purgate:X-purgate:X-pfmilter;
+	bh=UeMwgVjDLnDVqjMPlLrZzad82di4zvuEFr1fKsZ6T0U=;
+	b=R0HaKpD7xaVWLMFiuEWWm/YyLK8DAl3qPnuOX/8/07INFtYwKStCd0d2y9Xk5PaBftZ/
+	 9MQRyu3IOEScLiVC3C/48WvFXyiivSOrI++Hgdiwz5ZMUL9tPkxidf3w/L+xRETTVz9re
+	 hH+SZOEvvPsnlFte78ZunnbKi8C1x0rYvuC2jUtEKJSNHJJGbnoMNV2jNNgJcKIsYfCS0
+	 jSfUEqol3go4i9qFqEdlTemvsN3kvUJkoe7G/A4fCDcA+JDf9XZNclFYr3dIfCS5bAfJ6
+	 Jly3LPp+seLJDbMN817hm5PoQIYdvA2sgw7rdUatltl1MUPQ1bbQdc8yE/x7nd2t1Tg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P8Da98U0;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=fritz.com;
+	spf=pass smtp.mailfrom=fritz.com;
+	dkim=pass header.d=fritz.com header.i=@fritz.com header.a=rsa-sha256 header.s=mail header.b=KSPq04XI;
+	arc=none smtp.remote-ip=212.42.244.94
+Received: from mail.avm.de (mail.avm.de [212.42.244.94])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 03000606A32F;
-	Thu, 19 Nov 2026 14:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BBD606A320;
+	Thu, 19 Nov 2026 15:24:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60BBD606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fritz.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P8Da98U0
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 497251F000CC;
-	Thu, 19 Nov 2026 14:40:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795099209;
-	bh=jGUNa2nkwgmbkFv5PZDi3+5NxDpJOH/HW6VIk5Cn1XI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=P8Da98U0KKGyVjG5Co+Bq3lcopEB0AluEtILidv5HO2nC9IyOWGoRGjYm27bzTqIx
-	 +lW6pso1BJ3BrPzJxPix2npnl41J3OXdsNde4rlJ4Xk33Mfr/2uOKj234ZaQxLFsaN
-	 JHUbeyIxXwLPaI5mqCcxB7neudbJ5YHjlmjUvbCJnEzfr2AGo6qGaBb72MAV7L8wyy
-	 CFQXCc9Tw0dMdoeIYdGl7ZLMA0okVeqgKyTU6Pf/vA4x9SI4OyVKsgMksYPaEOyaLx
-	 rCFP1VQuX+46JDr07Y6DI/ct6ui/VXSAcdZu7oQ2XjGA/E5dOjTOfDtLZjFT0ADzEm
-	 tTU3agC4K7jFw==
-From: Nicolas Schier <nsc@kernel.org>
+	dkim=pass (2048-bit key) header.d=fritz.com header.i=@fritz.com header.a=rsa-sha256 header.s=mail header.b=KSPq04XI
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fritz.com; s=mail;
+	t=1795101890; bh=VUtPMxOjNKGPZQ6FkAk4L2n05vBEr9KfdwlyPB8FDFE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=KSPq04XIh/icCo8uVqSQs19xHVWrI8882+qMc4rh4bnaLIrVTIRUI5hta3IrnJmKr
+	 LiyH5gQnmHg4hi6fnGQQBTCKUhzPV5pUnddTLwq7tRo1sqFXC60ubABjjxwzr5BZpW
+	 xWTrAU/q3VmuS9xkaoOGD0Jn8oy3l4DTPHEwBClrN0JI8F1idZN9rc232N+9cBlDYK
+	 ACrbDLomre7mciio5dpLUoD4CR9a2MKIulNcOOn2MdgHr/fEhjD84N0ReNb2vbEW0l
+	 Lnh7zob5INdPpt9ISPclBVJ2Qwnd7Kvc739eXQJq5JMQwSX7BtOtazOhV28Kxzl2ng
+	 8sp7wX8P0KG5Q==
+Received: from [212.42.244.71] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.57.1)
+	(envelope-from <nschier-oss@fritz.com>)
+	id 6aff14c1-b6d3-7f0000032729-7f0000019f2e-1
+	for <multiple-recipients>; Thu, 19 Nov 2026 16:24:49 +0100
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu, 19 Nov 2026 16:24:49 +0100 (CET)
+Date: Thu, 19 Nov 2026 16:24:47 +0100
+From: Nicolas Schier <n.schier@fritz.com>
 To: Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Kees Cook <kees@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	llvm@lists.linux.dev,
-	Charlie Jenkins <thecharlesjenkins@gmail.com>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	linux-riscv@lists.infradead.org,
-	Linus Torvalds <torvalds@linuxfoundation.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v2 0/6] scripts/Kconfig.toolchain: Document minimum supported versions for dynamic checks
-Date: Thu, 19 Nov 2026 15:39:59 +0100
-Message-ID: <179509785409.3080802.12400900075505469862.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
-References: <20261111-kconfig-toolchain-updates-v2-0-b2d9415c1757@kernel.org>
+Cc: Sasha Levin <sashal@kernel.org>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+	linux-kernel@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>,
+	Nicolas Schier <nsc@kernel.org>
+Subject: Re: [PATCH 2/2] devicetable-offsets: Get struct cpu_feature from a
+ device-id header
+Message-ID: <av8Uv7EV3sLqUBfr@derry.ads.avm.de>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -78,45 +80,58 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <179424040477.1704532.18231793404479518924.b4-ty@b4>
+X-purgate-ID: 149429::1795101889-B9515B85-B73617E7/0/0
+X-purgate-type: clean
+X-purgate-size: 1742
+X-Notice: Whitelisted
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
+X-pfmilter: host: postfix-mx-03  mail-id: F259FA066E  external: no
 
-On Wed, 11 Nov 2026 17:52:02 -0700, Nathan Chancellor wrote:
-> Now that we have a fairly unified location for compiler and linker
-> feature checks in scripts/Kconfig.toolchain, we should make it easy to
-> clean up the checks as they become obsolete through minimum supported
-> version bumps by documenting when they were first supported. I somewhat
-> modeled this after the documentation in compiler_attributes.h but I did
-> not want it to be as verbose.
+Hi,
+
+I have a question regarding best-practise:
+
+On Mon, Nov 09, 2026 at 05:07:05PM +0100, Nicolas Schier wrote:
+> On Mon, 09 Nov 2026 09:14:41 -0500, Sasha Levin wrote:
+> > Since commit cdfdbc11552b ("Move struct cpu_feature to
+> > <linux/cpufeature.h>"), devicetable-offsets.c includes
+> > <linux/cpufeature.h>, which includes <asm/cpufeature.h> on architectures
+> > that select GENERIC_CPU_AUTOPROBE. On loongarch and mips that header
+> > pulls in <asm/elf.h>, and from there <linux/fs.h> and <linux/mmzone.h>,
+> > which need <generated/bounds.h>. devicetable-offsets.c is built before
+> > that header is generated, so even defconfig fails on both:
+> > 
+> > [...]
 > 
-> [...]
+> Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+> 
+> [2/2] devicetable-offsets: Get struct cpu_feature from a device-id header
+>       https://git.kernel.org/kbuild/c/50ccc340
 
-Applied to kbuild/linux.git (kbuild-next-unstable) and applied Kees' R-b
-trailer to 1-3+6, thanks!
+I applied this fix on kbuild-next-unstable (and rebased today [1]), two
+commits after "Move struct cpu_feature to <linux/cpufeature.h>" [2],
+which is being "fixed" by this patch.
 
-[1/6] scripts/Kconfig.toolchain: Remove CONFIG_CC_HAS_NO_PROFILE_FN_ATTR
-      https://git.kernel.org/kbuild/c/aac435fa2bae
-[2/6] scripts/Kconfig.toolchain: Do not dynamically probe '-fno-addrsig'
-      https://git.kernel.org/kbuild/c/836ac9c65e4d
-[3/6] scripts/Kconfig.toolchain: Clean up '-fno-allow-store-data-races' handling
-      https://git.kernel.org/kbuild/c/e2c2434465c8
-[4/6] riscv: checksum: Fix CC_HAS_ASM_GOTO_TIED_OUTPUT check
-      https://git.kernel.org/kbuild/c/f67671cfeafb
-[5/6] Eliminate CONFIG_CC_HAS_ASM_GOTO_TIED_OUTPUT
-      https://git.kernel.org/kbuild/c/fe2493fd4bd9
-[6/6] scripts/Kconfig.toolchain: Document minimum supported versions for dynamic checks
-      https://git.kernel.org/kbuild/c/c71019d89ed4
+If we keep it this way, a bisect may hit the issue; folding does not
+look correct to me as that would mix-up related but different things.
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
+So my questions:
 
-Patches applied to the kbuild-next-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-next branch in about a week if no
-issues are found.
+ * Shall we keep it the way it is to keep the original patch order
+   (bisect might fail on the two commits before this patch)?
 
-Best regards,
+ * Or shall the patch be moved before Uwe's (removing the 'Fixes' tag,
+   and rewriting the commit msg)?
+
+I am in favor of the latter.  Are there any objections?
+
+
+[1]: https://git.kernel.org/kbuild/c/f1dc66c38b7eb4b2fb946a2fd6929250ecd2d85a
+[2]: https://patch.msgid.link/bc9fbf5784f6788e10c749a05d56c42bdb68f3d9.1792144769.git.u.kleine-koenig@baylibre.com
+
 -- 
 Nicolas
-
