@@ -1,79 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.53
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795083569;
-	b=YHVycdo3RARAdF6nsjw5zCzpBOpgx+t20/x81fN9bUqgUHfstFz7fNZnd940MNSFeOHY
-	 KJJInxsbgkQ3jS6vEa7mIKscyIYL4Pwd//J357W09Xw79c1pJEjX4SMe+xZdgcamL+/pQ
-	 ufHQN/+mg0kmeFjBRsmtNdY/Kfi5r1n/lA1AgoWZ2n2/F3Mpz8BwcNPDMr8toRSAfs7Uk
-	 NnoB+AHWstLz8PuzzkMKa2cwuh6XNkH+ZPnASGcpZ0Kdn51t70k9LfiL4Iyp50p6cg7eo
-	 6pAdutBmP/fxxV9yQwrYgSZfjswQ9ZARl08AZxH9de8UFMm51jwXSseeZSxPFnLf6UA==
+	t=1795084555;
+	b=vuqlsV2DYvE1QPTPTk6Qe0VYcTdp4UwHNpsPOcb0HqxftnT4Naq3yZv6Wrp0qB1uTFyB
+	 4CXVbHiNCMYi8XP4kZOfod70/5J6lml62CXK/saVSi8tWHm2aWTZusMAMbUkoYky8n/W4
+	 98pphA/wniBS0X8DvmEmBIu/KpeBVn7AzLiqb8xv9d+g5y5v89uV/UiLdZ3YZYhCHnw6E
+	 GDin6M2cS5sibn54Jb+Hs+gH7PNKsfD/YXc0KQ+RQEfm6GpcmKZ5WgGGv92pvJRf2LdLI
+	 b/s8FMns7VkD09gi/rJZ76buSpGATU+JWucEs5f5+lRAyigAr2j0YJK8aUpd6OM5vFw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795083569;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=m53aXYmEF4AyDP57cY4Xl9wMUGGgZR0bxPJfdyWOUVs=;
-	b=MkH9XBMRxuNcnTw64nD88R/lOBtu7kLSxzkRx33KywvVMy8vvlDiOXFc1iiCRhyfrE6z
-	 NJWEZbttv8apkX95nL+6CsD+qaEzAjhyq2CkIQhCSYgkvZ+PPOBIIBVQSx3aWvcxcmhXR
-	 1iCb/DTfK7QR1dKvxvsGxjWGXJNp0B0oSXKiLCkzNmxZRtePQfRHcV+4lRjeUGAD5P1we
-	 2RxB5FCm1MClsXsrBmNFsqqHtah03Ejt7RVvpo6UqNRhr8/vorp4ni20ewU9ikeWSyHOl
-	 c3Ka9Opa2GtovSSuVnPpqN0HdpHuXVAaD7Sj0aqsFarnzUhZMAYTOIoGaQUT1fUEzyg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795084555;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=VSgqe+2+NVZ79+o9y80nGA+xBFTNkQAJQWULoWfKhj4=;
+	b=HSvOevO14HL9ou1inegjZEQ/g/jCwstjOvBzLrWtgIekOcud8cHaqkEkEveHCerIaJ8u
+	 bzOtt6j1KaE268CVS7nHbKaXUUm/iCQCXAWU4y3JkhCYS8m/az7m6hqHbl69RmUr9SNUr
+	 tvhjyBL5bhJ4zC2D6M7f9x17doP2FzCCGs1rVsp7JpkGLTu1bBZK7yooURPJY6oi6b59i
+	 Ll76W3vsKClrKeg0p961kzwRqwAYCb+0VSsK61Hy1sMoFVR3KWjktoZZDOHgP/6wZ2teX
+	 kq0QUZ2lLJK4W7pRiEzUYhQ+H/z6iMlo4w/dA/Dbgwq3aYIxIa1ci3pS8vX3eWl6JJw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ij04j8DC;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD7060A260D;
-	Thu, 19 Nov 2026 10:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ij04j8DC
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1795083569;
-	b=UI28g3UJPsx3bzMvU3DBuxIVLXodAvo7ac3eZM5uJKVJ6z4y85TdZ0KWL8zC5X6E7Av4
-	 uRgOMJ8tjZUTNXJLRRwU2CTQAA8JiEEQVAUNz5g047bYh7Nby011+jasafP+mDq46mtQR
-	 I7DMG1goOIUSVyQ1CqiEm/ZixNB/xhWdjfsbSOa8QIVlnwqXbxffaecZMqP0DA+lGzmhc
-	 cT6E7WN7SWVh0kj94v3KamdnT+mQhWFByXSRXBqHdNr5iGKW834U30JYKbm77ndB1ZM6x
-	 0QN0grgX6Dmf0QAzomB0quhHJAMTQbiikKtd3A6AVLs2XV0z+jDY9DlJQdNfYQMSoLg==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1795083569;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=m53aXYmEF4AyDP57cY4Xl9wMUGGgZR0bxPJfdyWOUVs=;
-	b=cmqHubJy5Mh0+HLKSaTr0+e6OttfUdUUHAvMFpLy801Swrjaq5QGmA6BFFAWlQVxrvoh
-	 bLxQwYiRI2qrwimb8CtsMXdiuTVynG4wVVNYgKAzTxH4q3sLr//6PQTqUOCaeYAs3w8+L
-	 vzs1j8ZeV+GH/qE1lMbVrU3722DSPBs22k7CUlPa+Uy9BgeVXQ5jRP7I/hjCq8TP55ZUD
-	 TdH1JEPBf8dlXsrLYcoaksdoqoD9+/K5PKNagqpYd24pwDwYzKwBsWHPew3MRviFOKbBV
-	 CdyMJgE78usLMpGailPnwaOxTaLr0drg/wL6g3mNCwheligCxcR+Hw4gjk+8EEPteqQ==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ndNtRwto;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.53
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id D10541F000C8;
-	Thu, 19 Nov 2026 10:19:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795083569;
-	bh=m53aXYmEF4AyDP57cY4Xl9wMUGGgZR0bxPJfdyWOUVs=;
-	h=From:Date:Subject:To:Cc:Reply-To;
-	b=Ij04j8DC0E+YO1yse0S9bnEYe54f7CfB5kVz43rp3ZGap5AQ3hf1DnsJPzGhSVLF4
-	 0rVZ187ZQ3Fe7RjNvZOeKH1aXY7urASDRh6ghVyN1BkfNUZfBM9kPx/EA62nVAo7/k
-	 zSeK46EP9LJSVM9rjrHJCOSAAGk7/MfeVepeXQs22sf8FT2pc7C46Y7asi3pUlqu2y
-	 AcGq/krdqXApQ5nF4UFSlXO+oVTRqTIDqVQxW7x16SnhKi34jyLxbDVPXtzignM72s
-	 T4MsZiNQ8bG4+T6zRuY+ezyomTH4AqFAu/TyDHVmo1HC65Q/4O4sdqtZqMP3ZIY9nv
-	 G8X6a8NyckQcQ==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 600E64B1FA;
-	Thu, 19 Nov 2026 10:19:28 +0000 (UTC)
-From: Peder Bergan via B4 Relay <devnull+peder.bergan.gmail.com@kernel.org>
-Date: Thu, 19 Nov 2026 11:19:28 +0100
-Subject: [PATCH v2] rust: kbuild: generate a symbol version for
- rust_build_error
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AE7606A324
+	for <linux-kbuild@vger.kernel.org>; Thu, 19 Nov 2026 10:35:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62AE7606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ndNtRwto
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5c1acfdb638so105507e87.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 19 Nov 2026 02:35:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795084553; cv=none;
+        d=google.com; s=arc-20260327;
+        b=r9zOMvxQX2Lh14+a8ljM5WPwMDReM3X5n6BZ+WENtD1v1PwPSb2YkJksZbVl9OwVAB
+         c6W9rQMSN2ZuIBq0sooSNrFb5QbzIPesqRz+k5xH2XgZT7nfV1H7F59y34uR3ONDT2St
+         gx5o3jWUJLIKpF56onorsxG/k1jXoZ8NA+M9m5EybdW4YpRT1vk9dZsl7QMQj7aVOHQ+
+         jJE37yoUto5nYtnD4ng1l7BTdxeHz9ODpGULIVfn6FXZlgEy18EUMJbYzZqa4BRQpfPA
+         AEgVLgPJOy8OTbF4qBi6yHa8EDqyZw5ha0MSSA5p0GUwgrJbpPN4j1klsx7Lrc8wSeqS
+         jtbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=VSgqe+2+NVZ79+o9y80nGA+xBFTNkQAJQWULoWfKhj4=;
+        fh=wjS1o6qABV4wy3Ze3s2p34Nc0VLZtUYx42gRlSQ0uck=;
+        b=Yz/Zm3/9fd/+tBU9MeUp2Gc676M2t9ZpKKbo6AN9BE3eRaKr2LduUX/Jq9lB6sL2Ou
+         N7ODGxrLPC/9oGfZ5syFah59T2LoW9y3kCWftvQYKIflqLreq8cy/xASnyNVG15VkGAw
+         Z2EQNvr8rrwvcP6ibJNq+R+JEgjNDG1Bndovj72aaQi/rQG6z9CIi3PILthL1DduVyNh
+         PkVkzG4neXPu8NQk1It8WPecWhTBWw9iSPSqvrj7Ljl4XtxibLakUnjQ+QmXh9L/IBfG
+         kfJ+O2Vbwe89Jqt1MPpjDVPawcQ+l3k5PM7RxUwoCOn0w4PCbb1p8jwkSqKVtFGUoqP/
+         d2rA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795084553; x=1795689353; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=VSgqe+2+NVZ79+o9y80nGA+xBFTNkQAJQWULoWfKhj4=;
+        b=ndNtRwtomifqkf55G94YIgPKmDQUiD1m8EZ0+rvEQ5fkWplEwCT3vrhuUg0TybVOFc
+         FDFhMom0dL9XIOE8MwORLs3b0sX2v1NcddjdZy61EQI1R+b+77xyN7bQMdYLzPEQcUeA
+         GbHDXy1p6acrSdRhEeh5KCPm/a0R4nREHWcqmHYS8rggx0IEtnl3xzZFq5mo4la95cxg
+         09VZAgLtvaU3CWng6N+vH0dxl16QWS9xS+ATMjZZiov4ZKGz0nw8A1UYvZFV/N5To0mT
+         6wEpigqmx+96yWAIwqBmSPS7X2ChmDnmqaLIJXgL1SspyBHFL96vSQveV7KWzfymuCZ2
+         BJ4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795084553; x=1795689353;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VSgqe+2+NVZ79+o9y80nGA+xBFTNkQAJQWULoWfKhj4=;
+        b=dioUmqMrEcaGRSl/j5XSHauRUUqDwmcxDf+LyjAEU4MNnSmbBndCdqK1VIEZGb4pvl
+         cocG8SaLZBLJPZOgovI7BcLy1iCFQqhpa2iYBqSDw3T5bRA3WOoR/XuKAz2eDjZ/9ViJ
+         FMhyY68rNgbk4JysSjKUqhKdnzxf/eZeFbjN4Nqc9U0zo1TtR15VomMdKtYKRTA1RVMN
+         Ki5NsoxtsjeEPkIPC2LzqigPvNFjEb6Pt3Vx/02ugHahamUYqBwWq+4iyVhFdR4CUMn6
+         H3zsU1efzzIFRMEaHuviaGAUiGszphuhaYbYaOXruIisgTUHo1zXIp7C0bRQWeGW9sVX
+         I7SQ==
+X-Forwarded-Encrypted: i=1; AL+hErGw5uyf3RNDceg0n6UaoMuuKrhReyWtQ1P2qW/zPtyGoTkuYBE0dGnGPfmjDPL+Nfi90bYUf1hYGLUg2iw=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+gaHLV0h0QTYqCHTX9xZB69bMuH8fMVYdMgA2qMLy6xN+pWCbU
+	3F1aiutxlKBN+Hk7XpHihgElOBcUBim2dgD01rmVZ0xi7AiWe/iHQIn40gnvz/8g6Fy/TDE3Y3k
+	0zsConuC77UAUbS2zvU6m3B6jr5TNvbg=
+X-Gm-Gg: AYBFou2ztlR4tR3glQ1cRPkjloEkGxNU7IUPrJPP3eiV1NBFZ7se8bVziOM+ocyDiRC
+	VkNr+v5OaiEBc1M852NMFt+CyDvkUID2AIy9QDtPiV5/zRd86eA4SGSSO8Ju4HZIGaC0HRyi31P
+	gKoNXRfWTNDUjYx19rkY7ud5wOvQ0MOXEJfC6zkeGvQwMnTc754lWBVgmIfpWU0PyJannH2Q8Uf
+	nyUKBgXYEgJKQbDVudS3ZKy+CEX+mdH2CMmFjbzLuHr6bADkclL+Klaj/7qpLynOgN7/wj41A62
+	qBRqnFUYeaxNYDBnsiLrdYgHyVv1vmc9Al1KBnZj2NP96MEVunBvOLf0ua6TtWPtlr5u+cMGl0h
+	Ng8UbXniZHGd13WNhFDylLvI5KO8A0FeYuDO5y346D6fQUDJfVFPdXs+lb8v5Z+PnqpYZX5mpTV
+	66FPP2UrHR8VzVm4ISjvRpSiLQ/GwiMRglRp+CyGV0A/KvI/foSPHQtzEC1siM66rljsqG5JnSE
+	xbTTpSACQwvUEX+STCfA5E6HqnGJVzu9X5hZDbdR+JwxhGH3rj8Txv6CKiOahr4FKPAEaOF
+X-Received: by 2002:a05:6512:6201:b0:5c0:465:3fc6 with SMTP id
+ 2adb3069b0e04-5c1aa04086amr2064153e87.4.1795084553237; Thu, 19 Nov 2026
+ 02:35:53 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -83,95 +106,85 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261119-fix-rust-build-error-modversions-v2-1-1c2271cbcab5@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAC/N/moC/5WOTQ6CMBCFr2K6dpQWBXXlPYyLtgxQQymZKQRju
- LsUT+Dye3l/H8FIDlncdh9BODl2oV9B7XfCtrpvEFy1slCZKqSUF6jdDDRyBDO6rgIkCgQ+VBN
- SyjKcdH3Oz1jZq1FirRkI18w28Xj+mEfzQhtTb3IYzQiGdG/bJI0DR0Ltj9tMj3NMptZxDPTej
- k4ylf3xaZIgobQyU3lZnOo8uzdeu+5ggxfPZVm+bFXCkgcBAAA=
-X-Change-ID: 20261118-fix-rust-build-error-modversions-4af535edc9b2
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
- Danilo Krummrich <dakr@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Sami Tolvanen <samitolvanen@google.com>, 
- Matthew Maurer <mmaurer@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
- Gwan-gyeong Mun <gwan-gyeong.mun@intel.com>, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- linux-modules@vger.kernel.org
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795083567; l=2248;
- i=peder.bergan@gmail.com; s=kernel-contributions;
- h=from:subject:message-id;
- bh=dbbgO3cdXEYZnqxuqEQFpr48GQcdzVFtPCT9yziI+74=;
- b=tae+5P4ETQ7tXxOEyLVULdo6qfYAyHFcHGGYHK8B2HaCV+oz05eO5UPy0B9Ijz6zN869I5j52
- 3/d3NVa5wfmAJb0zYT6QHK8/qAQl1vfSpqWRqT+A3M6W+sT3zEX4/a9
-X-Developer-Key: i=peder.bergan@gmail.com; a=ed25519;
- pk=39790pn1YZCulHBoUG1uiQI1Hm01EvhBEa2zVrS/yN0=
-X-Endpoint-Received: by B4 Relay for
- peder.bergan@gmail.com/kernel-contributions with auth_id=1395
-X-Original-From: Peder Bergan <peder.bergan@gmail.com>
-Reply-To: peder.bergan@gmail.com
-Content-Transfer-Encoding: 7bit
+References: <20261118-rust-merge-functions-v1-1-fe86126522b9@google.com>
+In-Reply-To: <20261118-rust-merge-functions-v1-1-fe86126522b9@google.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 19 Nov 2026 11:35:41 +0100
+X-Gm-Features: Aa3M54oL5-b8rD0ZNwQf4CmOodKRTjORBepmsgS7qWBa91ie7LuuwJN18wbz1S0
+Message-ID: <CANiq72m0uZRVWG=SwzUUzHo1nPX=2Q3npz-9jU_ORBSdcoAGeA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: rust: disable function merging unconditionally
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
+	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Tamir Duberstein <tamird@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Matthew Maurer <mmaurer@google.com>, 
+	Sami Tolvanen <samitolvanen@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Peder Bergan <peder.bergan@gmail.com>
+On Wed, Nov 18, 2026 at 2:09=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> w=
+rote:
+>
+> Function merging causes various different issues:
+>
+> * For CONFIG_CFI there's an LLVM bug causing functions with different
+>   CFI hashes to get merged. This can lead to crashes at runtime.
+> * For gendwarfksyms it causes functions with different CRCs to get
+>   merged. This leads to broken MODVERSIONS information if the function
+>   changes in the future so that it can no longer be merged.
+> * Wrong backtraces when a crash occurs in a merged function.
+> * Possibly also issues with pahole/BTF as the merged function's debug
+>   info is lost.
+>
+> These issues are new to Rust because in clang, function merging is off
+> by default, so these things have never come up before. Because of this,
+> turn this option off for all configurations.
+>
+> Link: https://lore.kernel.org/all/avy_9SPRaPSKD8b4@google.com/
+> Fixes: ac61506bf2d1 ("rust: Use gendwarfksyms + extended modversions for =
+CONFIG_MODVERSIONS")
+> Signed-off-by: Alice Ryhl <aliceryhl@google.com>
 
-CONFIG_RUST_BUILD_ASSERT_ALLOW exports rust_build_error to modules.
-When CONFIG_MODVERSIONS is also enabled, modpost warns that the export
-has no symbol version and records a zero CRC because the build_error.o
-rule skips gendwarfksyms.
+Applied to `rust-fixes` -- thanks everyone!
 
-Let the existing Rust library rule run gendwarfksyms for build_error.o
-so modpost gets a version calculated from the Rust definition.
+I also added Cc: stable@
 
-Fixes: ac61506bf2d1 ("rust: Use gendwarfksyms + extended modversions for CONFIG_MODVERSIONS")
-Reported-by: Gwan-gyeong Mun <gwan-gyeong.mun@intel.com>
-Closes: https://github.com/Rust-for-Linux/linux/issues/1201
-Signed-off-by: Peder Bergan <peder.bergan@gmail.com>
----
-A clean x86-64 build with Clippy enabled generated the same nonzero CRC
-for the kernel export and an external Rust module that references it.
-An output tree built before this patch can reuse rust/build_error.o
-without generating the CRC. Rebuild that object before relinking.
-External modules built with the old CRC for rust_build_error also need
-rebuilding against the corrected kernel.
+    [ The LLVM bug is tracked at [1]. Nick asked what function merging
+      refers to here, and Alice writes [2]:
 
-OpenAI Codex assisted with coding and testing.
----
-Changes in v2:
-- Drop the rust/Makefile prerequisite after Gary's review.
-- Omit Sami's v1 Reviewed-by because v2 changes incremental rebuild behavior.
-- Link to v1: https://lore.kernel.org/rust-for-linux/20261118-fix-rust-build-error-modversions-v1-1-7c1023764f30@gmail.com/
----
- rust/Makefile | 1 -
- 1 file changed, 1 deletion(-)
+        No, this isn't linker ICF. rustc doesn't pass --icf, and in any cas=
+e
+        kbuild invokes rustc with --emit=3Dobj and does the final link itse=
+lf, so
+        rustc's linker arguments never come into play.
 
-diff --git a/rust/Makefile b/rust/Makefile
-index 0165626decbe..189c5cbdf44f 100644
---- a/rust/Makefile
-+++ b/rust/Makefile
-@@ -773,7 +773,6 @@ $(obj)/pin_init.o: $(src)/pin-init/src/lib.rs $(obj)/compiler_builtins.o \
- # treated as such so that we pass the same flags. Otherwise, for instance,
- # `rustc` will complain about missing sanitizer flags causing an ABI mismatch.
- $(obj)/build_error.o: private is-kernel-object := y
--$(obj)/build_error.o: private skip_gendwarfksyms = 1
- $(obj)/build_error.o: $(src)/build_error.rs $(obj)/compiler_builtins.o FORCE
- 	+$(call if_changed_rule,rustc_library)
- 
+        What I'm referring to is LLVM's MergeFunctions IR pass
+        (llvm/lib/Transforms/IPO/MergeFunctions.cpp). It runs as part of th=
+e
+        optimization pipeline, within a single codegen unit, before any obj=
+ect
+        file is emitted. Clang only enables it with the cc1-only flag
+        -fmerge-functions, which the kernel never passes, so C code in the
+        kernel never sees it.
 
----
-base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
-change-id: 20261118-fix-rust-build-error-modversions-4af535edc9b2
+        rustc, however, enables it by default whenever optimizing for speed=
+ or
+        size (opt-level 2, 3, s or z), which covers both kernel configurati=
+ons.
+        It uses the "aliases" mode: when two functions have identical bodie=
+s,
+        one is deleted and its symbol becomes a GlobalAlias to the other. Y=
+ou
+        can turn it off with -Zmerge-functions=3Ddisabled.
 
-Best regards,
---  
-Peder Bergan <peder.bergan@gmail.com>
+          - Miguel ]
 
-
+Cheers,
+Miguel
