@@ -1,63 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795169339;
-	b=RexyJ3mdtkLN8CO2QIvQrOxI9Q0TU6/9E3mem3X5mDMF/cPsqdWBJPORsuGGL5NYY//z
-	 ObiRLw0aM7tc7CkbnOb7BptOBzXQEJcp6fcjNyzKZ87LBVr0LI5Uvz3pceRxYp0YWTIF6
-	 swLBHjzsrVGHEzanOOo9bO3BO+lmc6gugmVpPgf3sTwYw50SOFrWkdLjdgRXi5QyDSfep
-	 bsu+/0LHKMWTeym81dbcj+hEFqTObe9WKO5lqQT9V2ZOeEbW9aQNVRFeH44HQb6DdoxID
-	 Bqb4340kuwJ0sYSMAXYvg8TNZtt2aPp4j+ZfKYChl8l/zVoCleVfaF+Fr0q6GCEKLKA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795169339;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=a/yPvsuyQKidDGPeEKJxrugs2SOnd4NXe099F4lVUCE=;
-	b=D5wUjtfPdb40D+2DVdGUpbuliKJT3Y4UZCYGpQuBMaIDRsdFadhdc7e6flwJmC9ipjtA
-	 RefCOwbIsNZHGg5Z0XlLpojKzykN2CnYOTUMgcY/McvGnhwKSdHIgCOAno7SwGAGn6ph7
-	 jcTlTkMRHD4gDeYRs3tzBUC/3kbmrrapM46o/l1z4LipObzuIBXGaB9xT57jqmNnwr0mA
-	 otFAPVAm0Ta9LqOL/cO3Vi7XYxd0Boi14Ft6BGMPWts+sduGnKe6sCSa24axLAFr0UqRR
-	 dBbzDsYrOmpt3UJCUdjlK1CG5AdWJvUPXq25sQ17weqxRqnOvCdVJL6yZbANDp76nKA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=MKY2zM2T;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2047C606A334;
-	Fri, 20 Nov 2026 10:08:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2047C606A334
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=209.85.167.47
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
+	t=1795171758;
+	b=zDomdTMNcIaNfb/UibmhZhltbFv9DZArRmBvCPYu5asCDObq5Rc0d3yQ2FBjVJul+iwY
+	 2VUixci6kv8l6V3ePTp8zoOemo86ZiVzpf7faClNQdQU2Tw5zVoDqNr5gzEAhdJ6X1eky
+	 8aMrdd4w12KdkqoOvhka1kKgsV/h2UY4OvB4k9QNs9jZmotMe5sSm0FGgyTmKUgZ8OB5L
+	 w32Eaosk80gydxXB9NpbsTmtKeOxXHYZ0oOCK6yQY7COBydW98++E/+95H0mblz9SJsvP
+	 qH+GKrkdyxeZN/G9iGBsudTTQelQZ5PDbyDiQccyKg1nm8uhdxL7gbWpzD2MqOo3/2Q==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795171758;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=dWYxYowsGCBLSnSh6cLqulqT3GbnJrbr+1e6JgGH388=;
+	b=XZeSZ41+r6DfGrqILZiozkNcGKFWrnqNtXb7vJRg9BtXtDoEOgxhdaSE7I0SUoS3WcQE
+	 /lRuENIexEL0mcBHXKrYW8Awhsu9MEDqc3KG+SgOxw5mYtBqQ0+X0NS5FMsCgeVcFHB0f
+	 DluJbDl0XNh6T7HmLo/T5/qGGZtdaQNFUxMlau6BZLNSJnqvBH/r/PCv59BKSiSQVNAh3
+	 cePQdK7FxsBixDrn+/qZbFqa0RKCgA03a1wbW35aEE78cvVRZok8PCs8/NaNMS2I/B3Pw
+	 7ditFdXMC75XtbMHLUsM7cpmsSfGtjH4BEnFZ6fdyWDghXOokDBe+ZyIhSkPiaXCLGg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="PEsZh/YA";
+	arc=fail smtp.remote-ip=209.85.167.47
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21004606A331
+	for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 10:49:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 21004606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=MKY2zM2T
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3883B1477;
-	Fri, 20 Nov 2026 02:08:55 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 940733F632;
-	Fri, 20 Nov 2026 02:08:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795169338; bh=smHjf+1WZoiuJVQZvV/DEHqRPCzJJYdPwysB/bAQ1zs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MKY2zM2TUN5Q+pNCTCxoFwyfgg26V5F5lkzPVsLWwQHx/8ZXd9xvPclM2IvabwAS2
-	 mfFfTxd8N/pcAB4ky49bECNwb6SZBYu1hpKE7S0p81QPf3DndprYgWPQ+dLv1J21h6
-	 y7QEi5I7IniNAmFdsGDAsqQLz5eOMJrOUmTD+0rs=
-Date: Fri, 20 Nov 2026 10:08:54 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>, linux-kbuild@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb+git@google.com>, Will Deacon <will@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Eric Biggers <ebiggers@kernel.org>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: (subset) [PATCH 0/4] Get rid of all NEON intrinsics stdint.h
- type hacks
-Message-ID: <awAcNlbDwM6xmLjH@arm.com>
-References: <20261029135020.272082-6-ardb+git@google.com>
- <179508547602.2557572.9682726373932810888.b4-ty@b4>
- <81ddf2f1-faec-47ec-b3b1-7210b4e7712b@app.fastmail.com>
- <20261119192848.GB875856@ax162>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PEsZh/YA
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5be3dd6f636so68311e87.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 02:49:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795171756; cv=none;
+        d=google.com; s=arc-20260327;
+        b=dqh6ffn0WY715tezEtjnaURLEitFk3DZjFpvQP2eVEsyhViC6zMh/H3D+9zW29HdZm
+         9Kjz7uL4J6oWwBVwS/YCKknLfje/IzJtagQ9dL2IRt/AQ5aI08YVjNnfHamweqpjk2WE
+         T1oMGze9TAyLyWk3Hi3TvcdUs1A7k6obxSZd7HujgXPY70bLfX5+SPCQJpIQGQxsLnhD
+         eP71WVH8Z7urfnYiu+L477t0OmlsI/WMyLSjSvRCqU1RdrjjUWWYqxlP6nw1WB/CX4xc
+         RfCzV/bYasJdjy4yX6750TCVKHPBwMrKKl4KDkGRmr7/QjUlzIsG6dzEmwR/4VrKgjx0
+         3OaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=dWYxYowsGCBLSnSh6cLqulqT3GbnJrbr+1e6JgGH388=;
+        fh=A9RXYeH9RmAsd0pIXxvUKxbg2WYUmnL86MMf1kwoCNw=;
+        b=Zo3tYj3O3j7rMVhpYfpAvKH4MUcyA3tZhjHJBVjS3KOK9V9M4gTRjNzmXvnSp2R556
+         l65wqL6gy32ouhDoh1qLxQV85wt7/JCx1CceX3DMIgkdhutWHRGRmmVNHZxfuzZxLeSw
+         3asPong9G2pCjVydcYipo+Q9YGdo09yNgqOlBLLwAJoypO4jI4QZMLcuuSfGx6fPf1+C
+         lMZmCEvxqojPacBEeBW2j/W3yQ180pFyLDhE4+JPTvnKBuA1UKerrDJ4kyLWq5HWY1F4
+         a/MfrCju3oVLVFEK+4ET5rRGlPJg3/JdBysTTTUSkbVdnW5NzQaZgL4d2RdDjKFVJaU5
+         mWIg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795171756; x=1795776556; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=dWYxYowsGCBLSnSh6cLqulqT3GbnJrbr+1e6JgGH388=;
+        b=PEsZh/YAAYQUmMsoLTE0P4DoaYxjX0K0WOe3frsYoTr8l3r+nSK7sMDRX+LpT5WITu
+         p5da11rIxNERXMD5GQ7vP5rHjtNAiDvJJ1IP3EaCgCiy+uIEDqg/M3B2qWZu33gr9z2H
+         0Ntd3BKnx5dLbi8bNJnC6C/w2cTuMVdfAufG4YrMW6gJs5fkUtJkyKGZOAOEfSGC3URw
+         mPL2nagnait/4H97dChQkWFc9nriIUt48kJnZskAOVjsNDXahY1zXAfCtf4wIzRSv1E2
+         cn8ohWhoG0vQTsgDCFFyQQQuVWTfYzneroC/a9LhzXB34Z6ONgKLPfSMXLK8FB3frR1y
+         T3ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795171756; x=1795776556;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=dWYxYowsGCBLSnSh6cLqulqT3GbnJrbr+1e6JgGH388=;
+        b=AJiHITxSpvqSHaYwRGP+5otnD0xeQDikiEjsoEze7OApOngxlnyo78iHe4F5qkDDc+
+         tM8ChC5CXijXuN3DrNxk+A5mSA4UCkxPmdTLEEXDNkZ/NvhKD4AOPR5dNAUeGWWU6AsN
+         geYoWfCdEAM0omqdBjBZ49zmSfjsQJGtvTPSK1TUUpl1eco7H8Bq3aiqSgPDltQXaxHg
+         T7NIoSRk1Yr6iGGBfHhxaCRVIbTlWOkRNJoyqzVSHy+PBRe0QqM9FLEt1LFeWnrzPxHm
+         3ziJVO84Qz4qc422d3OycggSwpL+ZA2aZalLz40Q6zuTHyF8jNoTzzHeSAnf1vd5Kob9
+         ri5A==
+X-Forwarded-Encrypted: i=1; AL+hErGmgbUdB3vS4IEYBBcGerGgJE6/DRjKlNttu5jZzBHKPJmKryahZ0DNKmLSjUca0uJeKsZdUMWdw4pvp+8=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8/R0T+A+M1B5mdBuJui2ddsyz0r/uXK8dAz2Fk4ElUBkahj0c5
+	f6iqiSOnEriRMByTUWu3PDaoIIXLrk6MlcsBxCEOwX+pPUM4wAM1mbppe3r8JXDx0VqH6YqJyVH
+	6j0WikR/2foXExPuxca0evHYO1LHCZN4=
+X-Gm-Gg: AZFdTZcuD2I/2/4ey6pysQvSfGiZaMSHL7cJF+PnWSAsfCqRXwjwy0IaqVKQXfFJ7YC
+	ALvJ+/C7TxdQKBV1LBqFiXR5Xml8K9F3YyD/yvkFfpWImlw5nal9N8VYt5mmhY/WVNEezYW0rBS
+	uwLrAEcsHL4mk/PMEgW+CLm0OI1kJr5HN6n5WlGBr71suWSE5uAvHkm2Tz73J8wmuW4Bbl37uPe
+	C/XXtL/dKWeQ2onIFQM5Sc2lu5ARJ+zwwJ+nyy8se0FN3xOpvzRL/15/Hn6tB4f85RHdJ7pFLPP
+	Ycumo0IJ6Zt4Y4Hm0VY5p0qaOpH5YiyoJT3N5eZAWkMGsD7UQFDChzJB5kPMLBkEdBjsI/7BMjX
+	usCy4AdX4zefiMlQ20C9s1OKp+UKhsy3eKNa0JDnrNnjDCt6A7+60A523vpC409/I0Nkd16rtMr
+	z4T5hq+JrxJnCCy3bOXLyAigpm7KnsEpMLTY8evREGi6BTmBWBp3XOv3xIXozNYsePlZ+HOCcz/
+	WSHsrxH9tlZKNOQoyZcVaN6HGeBw7XRO7Ze+o2wKKnWNS6IzyoSbJTNgIPMnRz1QFVCaO7+
+X-Received: by 2002:a05:6512:31c3:b0:5bf:e6a1:3115 with SMTP id
+ 2adb3069b0e04-5c1bc76a33fmr1167983e87.2.1795171756051; Fri, 20 Nov 2026
+ 02:49:16 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -67,27 +106,41 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261119192848.GB875856@ax162>
+References: <20261119-fix-rust-build-error-modversions-v2-1-1c2271cbcab5@gmail.com>
+In-Reply-To: <20261119-fix-rust-build-error-modversions-v2-1-1c2271cbcab5@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 20 Nov 2026 11:49:04 +0100
+X-Gm-Features: Aa3M54qW6il0gb-hxlX-Nj8ioiKgQABk89cMHbmkyFDNFAXmsl_FtiHnKL79t1w
+Message-ID: <CANiq72=vz2D7XYNEHmAnbh5iTJ6T_qtSV3bosQrB8HOYsBXtzA@mail.gmail.com>
+Subject: Re: [PATCH v2] rust: kbuild: generate a symbol version for rust_build_error
+To: peder.bergan@gmail.com
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Sami Tolvanen <samitolvanen@google.com>, Matthew Maurer <mmaurer@google.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Gwan-gyeong Mun <gwan-gyeong.mun@intel.com>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 19, 2026 at 12:28:48PM -0700, Nathan Chancellor wrote:
-> On Thu, Nov 19, 2026 at 01:08:51PM +0100, Ard Biesheuvel wrote:
-> > On Thu, 19 Nov 2026, at 11:51, Catalin Marinas wrote:
-> > > I left the last patch out, IIUC it's just clean-up rather
-> > > than fixing a problem on arm32 and can go separately via Russell's tree
-> > > during the next merge window (let me know if you think otherwise).
-> > 
-> > I'll let Nathan respond to that.
-> 
-> Yeah, as far as I am aware, we only need the arm64 bits. arm builds are
-> fine right now. Russell's tree would need to have the first two patches
-> to apply the arm change if I understand correctly so it could either go
-> to 7.5 with a backmerge or 7.6 with a base of 7.5-rc1.
+On Thu, Nov 19, 2026 at 11:19=E2=80=AFAM Peder Bergan via B4 Relay
+<devnull+peder.bergan.gmail.com@kernel.org> wrote:
+>
+> - Omit Sami's v1 Reviewed-by because v2 changes incremental rebuild behav=
+ior.
 
-I plan to send the first three patches as fixes for -rc, so they'll be
-in 7.4. Russell can merge the other one for 7.5-rcX (well, Ard still
-needs to cc him; copied now).
+I guess Sami is still OK with it, given it is a subset of the previous
+patch and the core part of it.
 
--- 
-Catalin
+But I will wait for his confirmation -- this one is not urgent.
+
+Thanks for the patch!
+
+Cheers,
+Miguel
