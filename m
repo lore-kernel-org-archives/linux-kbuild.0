@@ -1,71 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795206441;
-	b=5ExFDnUO/4/Fl3eHuUqWNOiIWUoQFmM69EQBxoYKt8zGMP2tG/rtZlQbc18vk+JWMhfE
-	 mDW7xqSY63lvshxyJoHpwvstouAGjFtuO5hNnJvIe5315HYcREu9aYWh1oJqJRzjQAMQo
-	 tDRlcuY5SURrxbTQ81GKNvAgKdNLRju4v/bklhTGlIo4aJzJ87hZuvORCJUisHetMqCgr
-	 h7lP0W3ePA62wH+TEYMeMwf93KfTBr9mD530QRaSkt0mIe3AnzoS8a6x8b33QxSSxI4nN
-	 z9Rh7ltVg9xwN7kENlNzOQ+VpX44YYgG0BZKkJCJPT3ADr3kD4PPn8hHGafG1z0vZqg==
+	t=1795207533;
+	b=ZSbw5BYVUvB9TGkiwcSziXGDPE02iB7NzcbAWaqmSyg3xH9ZTSn8D60HtcLB6EJQIuIy
+	 bLs9hS3ypSpn1NCJgdFBdQ4a4bWwrOwKEuyxoKYMbHxmQOpAz63CeXr9R6+Jj3kYB43wD
+	 xEUcZ6ph5oNKUXxKAdEEGDy9Slfelf1vpNP75gpmS91qJZlvKKq+MUc2bp2rno56tVU9N
+	 J+vqS3/puML6r5h+alWShsl4YHiGVXc494Tahxb4SWEoYJM9KhP0g+Vp7yf8FUEhd2+24
+	 dketT+AjwsxaASvYwiG57ficxD6p70JgR2AnWhTp9ufYkWOpuxiX5xLHMBBAGiJDAOA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795206441;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=WqSlxQyh/dRBNidv695WpWTljoCnNVjA21ZydepqoMA=;
-	b=di8FUR0lRjT+ZHrFkYrAtmbLU2uAxxtq5aDy2Ll8aNCJgwoB3qnvZayAX2aF88XqZVqz
-	 OSW3IsQlilAK5XUkCE/uJYPjCPxvbS6ChIocJ/XEjCry6AYN7XDT0Hmb/iBC2ck2xtN6k
-	 l5L1VTEBaB0ip61Wh/l8dnpXhYlbNCHvcryKOhVjdVwwS6A5RIy1moI5pHmOMmSaLkZSx
-	 pe0B+kSQeXFFqOUmh12N9ESuIn+yfI7MBz8acPLZFB0wjEot6H3pSLd1D3lQ2GxnaEH2G
-	 wnx5zdzwHK3fS31ZGrdEwXbAqfs7XFte/lko2y2kXTZhZN6IBV62aHgDqeYlS/Iqgug==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795207533;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=As7wgnuaTDmdzucyAyvtnzrGfDzLFSOkyHn3nxH5xv0=;
+	b=t7er0ymPdUk3iTYbpYMaAS/FoK4CBm+1SEmQ2hGeec3JamGo+0NUadsknG+U2YisL7wH
+	 9fIr/EP5eH36BihSDFnLLnLYbbTVrYvUHC2PKc/TFjJSD0kdQlVyNXINdpuwqMtc7iM53
+	 2hY0KozfbTVsEv1vpU1C0HjK8sK/KKA4lncw7G5821bjHnf7AWypTEnIzYtl3woshTO+4
+	 kUidJ4y13O/AA5oJoNi6eNoKcCat+lGg+ZQuiWVGvnxH6wY8/yPhvK9HZ7+S78cDb1Ryc
+	 9yu4FHFyTkY/vx+XpGMp0v83k2kU58Ta7b9uL/5oHfAj/iMZ1FFB/gJ3VKDHgbpSEkQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aAh0JewX;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IMjT760m;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 859A6606A334;
-	Fri, 20 Nov 2026 20:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E2A606A8E9
+	for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 20:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aAh0JewX
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 482A51F0093C;
-	Fri, 20 Nov 2026 20:27:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IMjT760m
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E1591F000CF;
+	Fri, 20 Nov 2026 20:45:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795206440;
-	bh=WqSlxQyh/dRBNidv695WpWTljoCnNVjA21ZydepqoMA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=aAh0JewXcORIykTJumZLPOgBhpU1O1hlpDrce6ow61FXnF/Whwv+JbEvYmfeAxVLt
-	 v6rAqCv5Omd54azLHfA9A9qlfwC2DRIAUFmsNvPSd7uRg2nqMCUtg+94d610TpC10p
-	 D3DrDk81X3mmt4wyu9EL6fPHJZs+l5fYufbCZ05kABLisAkfOM1xcVVxYUG9yvCM6/
-	 iB1FXeQQgb5NIrwC7n+wq13jtreBzqEt3D+0MEkHW1mfrZWGgIjXECzPAZrxR+A4/Q
-	 35jrfBasep83+NQWsREqh2dh7YkvFSaUt2n4dftk9h7bUxxGCgQVaSApJzOK4uxtmL
-	 BDZsEikzLY0qQ==
-From: Nicolas Schier <nsc@kernel.org>
-To: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-kbuild@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"kernelci.org bot" <bot@kernelci.org>,
-	Nicolas Schier <n.schier@fritz.com>
-Subject: [PATCH] Move struct cpu_feature to a <linux/device-id/cpu_feature.h>
-Date: Fri, 20 Nov 2026 21:27:11 +0100
-Message-ID: <20261120202712.3377691-1-nsc@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <awCruYkI2TkxJfPC@levanger>
-References: <awCruYkI2TkxJfPC@levanger>
+	s=k20260515; t=1795207532;
+	bh=As7wgnuaTDmdzucyAyvtnzrGfDzLFSOkyHn3nxH5xv0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=IMjT760mDBdwo8JHxbCq2fSXeON7OwrWRUfrVM5a5qjCO91yQlej4cocdhdhUr4o7
+	 bdPjBninZPb4EFusrzmerhloZw7lkiAqMaRkhsz/BXVaKTqt1Gu33WD9QrToGNt8rU
+	 QrNP6J4fw8Wki2YiRV1oCxq3uNRJ/5vTMhoW/ik1IYxfC7LDoh8kS5J6E3JNuzLvCk
+	 dDIB/AzpS0GOb5mlmt2EFwNk/dOYla7E3g4C9Zt2fCklkaJWFZa9OVvEOT0qFSm12V
+	 Go7h7Or/UjYS2TejZMg4WagnDHM4VKghLn8AK1IHYei6O5T5Gbx4j6Pt/hi42+dgmo
+	 bdE7TQpU7ArYg==
+Message-ID: <sashiko-outbox-226092@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v6 4/7] kbuild: record cmd-prereqs in .cmd files
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Luis Augenstein" <luis.augenstein@tngtech.com>, nathan@kernel.org, nsc@kernel.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, gregkh@linuxfoundation.org, kstewart@linuxfoundation.org, maximilian.huber@tngtech.com
+In-Reply-To: <20261119204457.9968-5-luis.augenstein@tngtech.com>
+References: <20261119204457.9968-1-luis.augenstein@tngtech.com>
+ <20261119204457.9968-5-luis.augenstein@tngtech.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Nov 2026 20:45:32 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -74,138 +59,77 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-From: Nicolas Schier <n.schier@fritz.com>
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Low] kbuild: fixdep: strip leading ./ from dep->name in
+  print_make_prereqs()
+--
 
-struct cpu_feature used to be defined in <linux/mod_devicetable.h>. Move
-it to <linux/device-id/cpu_feature.h> to let users of mod_devicetable.h
-that only need struct cpu_feature switch to the new include file, and
-to reduce the number of users of mod_devicetable.h.
+commit 893f80d84c71797a734bc7704bb47fc515aee146
+Author: Luis Augenstein <luis.augenstein@tngtech.com>
 
-While moving struct cpu_feature to <linux/cpufeature.h> instead sounds
-reasonable, it would break defconfig on loongarch and mips [1].
+kbuild: record cmd-prereqs in .cmd files
 
-Link: https://lore.kernel.org/r/f610c07f39df15f3e7ebdc63bfcd759ca7a687a8.1794233316.git.sashal@kernel.org # [1]
-Original-patch-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
-Original-patch-by: Sasha Levin <sashal@kernel.org>
-Signed-off-by: Nicolas Schier <n.schier@fritz.com>
----
-This patch is a combination of [1] and [2]; both patches have been
-merged to prevent failures during bisecting.
+This commit records prerequisites not covered by deps_<target> as
+make_prereqs_<target> in .cmd files and teaches fixdep to filter out
+dependencies from the current depfile.
 
-Acked-by, Reported-by and Closes tags have been dropped due to the
-rewrite.
+Link: https://lore.kernel.org/r/a01233b9-23a2-4666-91ed-f1cf030dcb9f@tngtec=
+h.com
 
-Thanks to Uwe and Sasha!
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 8c311b997e246..94a0711b66934 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -181,6 +181,9 @@ endif
+>  # (needed for the shell)
+>  make-cmd =3D $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(c=
+md_$(1)))))
+> =20
+> +# prerequisites to record in .cmd files, excluding those covered in deps=
+_*
+> +cmd-prereqs =3D $(call escsq,$(filter-out $(patsubst ./%,%,$(deps_$@)), =
+$(real-prereqs)))
+> +
+[ ... ]
+> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+> index f514ef606ec63..005c1c3df494a 100644
+> --- a/scripts/basic/fixdep.c
+> +++ b/scripts/basic/fixdep.c
+[ ... ]
+> @@ -478,23 +480,63 @@ static void print_dep_file(const char *target, cons=
+t struct dep_info *info)
+>  	printf("$(deps_%s):\n", target);
+>  }
+> =20
+> +/*
+> + * Print make_prereqs_<target> from prereqs, excluding the deps listed
+> + * in info.
+> + */
+> +static void print_make_prereqs(const char *target, const char *prereqs,
+> +			       const struct dep_info *info)
+> +{
+> +	struct item *seen_prereqs_hashtab[HASHSZ] =3D {};
+> +	const struct dep_item *dep;
+> +	const char *p =3D prereqs;
+> +
+> +	for (dep =3D info->deps; dep; dep =3D dep->next)
+> +		in_hashtable(dep->name, strlen(dep->name),
+> +			     seen_prereqs_hashtab);
 
-[2]: https://patch.msgid.link/bc9fbf5784f6788e10c749a05d56c42bdb68f3d9.1792144769.git.u.kleine-koenig@baylibre.com
----
- arch/loongarch/kvm/main.c             |  2 +-
- include/linux/cpufeature.h            |  3 ++-
- include/linux/device-id/cpu_feature.h | 23 +++++++++++++++++++++++
- include/linux/mod_devicetable.h       | 14 +-------------
- 4 files changed, 27 insertions(+), 15 deletions(-)
- create mode 100644 include/linux/device-id/cpu_feature.h
+[Severity: Low]
+Should print_make_prereqs() strip a leading "./" from dep->name before
+inserting it into seen_prereqs_hashtab?
 
-diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
-index c65ae2fa4c4b..fb3dc8237499 100644
---- a/arch/loongarch/kvm/main.c
-+++ b/arch/loongarch/kvm/main.c
-@@ -5,7 +5,7 @@
- 
- #include <linux/err.h>
- #include <linux/module.h>
--#include <linux/mod_devicetable.h>
-+#include <linux/device-id/cpu_feature.h>
- #include <linux/kvm_host.h>
- #include <asm/cacheflush.h>
- #include <asm/cpufeature.h>
-diff --git a/include/linux/cpufeature.h b/include/linux/cpufeature.h
-index 6aff540ee9e5..cd470987777f 100644
---- a/include/linux/cpufeature.h
-+++ b/include/linux/cpufeature.h
-@@ -6,10 +6,11 @@
- #ifndef __LINUX_CPUFEATURE_H
- #define __LINUX_CPUFEATURE_H
- 
-+#include <linux/device-id/cpu_feature.h>
-+
- #ifdef CONFIG_GENERIC_CPU_AUTOPROBE
- 
- #include <linux/init.h>
--#include <linux/mod_devicetable.h>
- #include <asm/cpufeature.h>
- 
- /*
-diff --git a/include/linux/device-id/cpu_feature.h b/include/linux/device-id/cpu_feature.h
-new file mode 100644
-index 000000000000..e14fe8bba85a
---- /dev/null
-+++ b/include/linux/device-id/cpu_feature.h
-@@ -0,0 +1,23 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef LINUX_DEVICE_ID_CPU_FEATURE_H
-+#define LINUX_DEVICE_ID_CPU_FEATURE_H
-+
-+/*
-+ * This file is included by scripts/mod/file2alias.c which is compiled
-+ * using the host compiler which might not have <linux/types.h> but the
-+ * __u{8,16,32} types are defined there locally.
-+ */
-+#ifdef __KERNEL__
-+#include <linux/types.h>
-+#endif
-+
-+/*
-+ * Generic table type for matching CPU features.
-+ * @feature:	the bit number of the feature (0 - 65535)
-+ */
-+
-+struct cpu_feature {
-+	__u16	feature;
-+};
-+
-+#endif /* ifndef LINUX_DEVICE_ID_CPU_FEATURE_H */
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index d1581bb64729..a69947f2c1dc 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -8,10 +8,6 @@
- #ifndef LINUX_MOD_DEVICETABLE_H
- #define LINUX_MOD_DEVICETABLE_H
- 
--#ifdef __KERNEL__
--#include <linux/types.h>
--#endif
--
- #include "device-id/acpi.h"
- #include "device-id/amba.h"
- #include "device-id/ap.h"
-@@ -21,6 +17,7 @@
- #include "device-id/ccw.h"
- #include "device-id/cdx.h"
- #include "device-id/coreboot.h"
-+#include "device-id/cpu_feature.h"
- #include "device-id/css.h"
- #include "device-id/dfl.h"
- #include "device-id/dmi.h"
-@@ -69,13 +66,4 @@
- #include "device-id/x86_cpu.h"
- #include "device-id/zorro.h"
- 
--/*
-- * Generic table type for matching CPU features.
-- * @feature:	the bit number of the feature (0 - 65535)
-- */
--
--struct cpu_feature {
--	__u16	feature;
--};
--
- #endif /* LINUX_MOD_DEVICETABLE_H */
--- 
-2.47.3
+Make strips leading "./" from prerequisites in $(real-prereqs), whereas
+compiler depfiles record paths under -I./include (and similar flags using
+$(objtree) or $(srctree) when set to ".") with a leading "./".  On a clean
+build, those dep->name entries will not match the tokens in prereqs and
+will be recorded in both make_prereqs_<target> and deps_<target>, while an
+incremental build filters them out via $(patsubst ./%,%,$(deps_$@)) in
+cmd-prereqs.
 
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261119204457.9968=
+-1-luis.augenstein@tngtech.com?part=3D4
