@@ -1,114 +1,103 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795171872;
-	b=d+R+lumS9HXkkRrilMHTLrgjTwHSc91xoevpFaSwoN7fLZ1ErmIWs2+2RKEspc/sWG26
-	 +CBFgkwng/60JSPon8fSd45IKGHr9QwAfG6RMlGT4N6dSboBey/h06ufmOzh2id7r4J3L
-	 hUxZGSQiUjODPAUW8T5GRTzaeYGFpeCDVo5hRYx+PCALMSabyou/hOG2/22kfHFriwLJB
-	 xx1C8zFGUsVdQt1tTVYzAPM4nzMSDah844LBGmD0eRjsgegVwRlFnw/Lrgv0p0WjtZo8v
-	 rp2U2XZfefmK/v8wd1RTLrrGuyjCYdEU2vxazeStYOKw2TLdBo3b7XKg5yI0VjcpjBg==
+	t=1795173952;
+	b=M4v8rK//XsKqZu+ouVTzVLDH1lNXT4sA1J6QMDYUQAcs5dYFZgwRi/TByBuhAgUhVApZ
+	 WW8UEpP14QdSZaBHzFPRAjkzfv4h/YXF4uacUp9q9RTa9L3W7QRzXLEJAigCF8A/lKJBR
+	 oXyDsqEdhe+zmb5XQ3nvf7iRWDNq/PxYsFu2sogeBB8XNdm8w6OYNwnDWRmJ0pFGLg2qv
+	 dJE44TY/AP2Pcbrj5INWyH1XQRWyc4pbTi373napp+9uvQrlUSzEs/nQ0L0d0BCEsCg9I
+	 Bz4EvN4gst40Fzu3n4PtEjJ9eA/yvB2Sj4iHe/4Kz86KvUC8RbpXvF/y3InmEQqAiWA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795171872;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Message-ID:Subject:From:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date:
-	 MIME-Version:User-Agent:X-TM-AS-GCONF:X-Proofpoint-Reinject:
-	 X-Proofpoint-GUID:X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=ub6uVwbshCbu/GNhE2f5A/6m7aPhZB0osZVqaeuTvHA=;
-	b=EkOs9DcsBMc/uAsTyMp0Xnpuaq77cLYnmUiImhIlHUfbKuGqCmnyX/GyGUJsXG2emo3g
-	 uJtHQx4TVp5VI4LbyZuPztwa60LNcZlOR9GwbAmdPteHQtq+i1MQvBlxM8cmzvdIgdA5D
-	 BltB2VSusXLoHDyFrr66pQYazhXb+Xdgv4WJgiHB1qHwGBMop0WVra9Lpn7Jw7qMRjAcM
-	 6owasXlTiqmw87Rk0kOBwVAqy08sUsWIR2HmqCLg3jsYCdhfRHqhuYGawraLhHC1imHhO
-	 qytwtcxTV+j5nJ8C0hJ1Bv5h7XegBxxa7UjHYgOVvYu8V8sfrmCkRDS7jV1TOmwzeQA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795173952;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=NcV0t79NYJ/mK1aZ8pQRTmJ9otnohMh+O0hfCgV3Lfg=;
+	b=RdaCuUsAeCnIfARHflXMdafRZiLEHIgIWIG/0kAm0aiP+oZS5h/aedKfIyPbaYID7WrV
+	 fyTe/XZgSD49ysnsFhLoTe/4OWFmWuTcN3te8ex7sv0cYAQKrhBmlqefPitUr4To0uSuT
+	 fTU80a0BF/FTmQf+Iex6l5eyTMooq/t5BTjtPASC4EcXu8vMpGenGCH9Zfdm7c9rsAF4U
+	 79ERFB7KSqe4hxm81To13z8+ndTc4QxSIjcrhba3jKFIgR/PB7UNYVwDU5WeqtT+zSnGT
+	 jvsKcisJ0nZrmN56QfUVhYCPVY32a2ItxuGDRx4q6H2WRembxesdmfbt2gVifPQ+FlQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=AkpBTIWH;
-	arc=none smtp.remote-ip=148.163.158.5
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=baylibre.com;
+	spf=pass smtp.mailfrom=baylibre.com;
+	dkim=pass header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=CiypTjF2;
+	arc=none smtp.remote-ip=209.85.128.50
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7DA60A2600;
-	Fri, 20 Nov 2026 10:51:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EB7DA60A2600
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E239A60A2612
+	for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 11:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E239A60A2612
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=AkpBTIWH
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AK7uZLn1291381;
-	Fri, 20 Nov 2026 10:50:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ub6uVw
-	bshCbu/GNhE2f5A/6m7aPhZB0osZVqaeuTvHA=; b=AkpBTIWHXdaJDlfwXZ0Q65
-	SGgBmHzgPL7BPqJk7e1PE9FxYyrNktKftH2jhXZUTKnL+woWuSucYrnvHGbRXUeP
-	VNXsNJCJ59aUUKEk0Y7XlVm1TF1YBfXd+vm0rSXuo/ZZ1oWonLl5pMfMV6d3mSqH
-	8xV8VhC4pJeo3Uuog/rwMrjK1OfLhnEkZJk6itxZndNVftAWUqFxIIYhllOi92RO
-	8cQWu6OfsB3OtysHKd03MvUTdX5LZ7fumH9aI2wDTcWnBtCh/2Yckb+KHmZuA7wl
-	DLEQlYmeJyaxx++rZ0uQYwTOKl+671IQS3+F1j8QpXHAvt+rMA+jrS1VFSgKruEw
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j105w7eey-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 20 Nov 2026 10:50:13 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AKAo2G11031967;
-	Fri, 20 Nov 2026 10:50:12 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4j17c54cny-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Nov 2026 10:50:12 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6AKAoBop25428646
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Nov 2026 10:50:12 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B832358043;
-	Fri, 20 Nov 2026 10:50:11 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 033135805D;
-	Fri, 20 Nov 2026 10:50:10 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.105.144])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 20 Nov 2026 10:50:09 +0000 (GMT)
-Message-ID: <bff9077bad99a5b2c9137a44d98be8fd16be7b48.camel@linux.ibm.com>
-Subject: Re: [PATCH v6 0/4] initramfs: add support for xattrs in the
- initial ram disk
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Christian Brauner <brauner@kernel.org>,
-        Roberto Sassu
-	 <roberto.sassu@huaweicloud.com>,
-        Danny Hu <dannyhu@arista.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Roberto Sassu	
- <roberto.sassu@huawei.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        Eric Snowberg <eric.snowberg@oracle.com>, Jan Kara <jack@suse.cz>,
-        Victor
- Kamensky <kamensky@cisco.com>,
-        Taras Kondratiuk <takondra@cisco.com>,
-        Zheng Zengkai <zhengzengkai@huawei.com>,
-        zhangguangzhi	
- <zhangguangzhi3@huawei.com>,
-        Jason Yan <yanaijie@huawei.com>, silviu.vlasceanu@huawei.com,
-        hpa@zytor.com, arnd@arndb.de, james.w.mcmechan@gmail.com,
-        niveditas98@gmail.com, pierre@arista.com, julien@arista.com,
-        kbharathi@arista.com, alexandr.lobakin@intel.com,
-        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        initramfs@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bug-cpio@gnu.org
-In-Reply-To: <20261117-makaber-paranoia-gefilde-7d976e97e12a@brauner>
-References: <20261105193743.2654656-1-dannyhu@arista.com>
-		 <20261110-hengst-tontechnik-ausfuhr-265b06d68611@brauner>
-		 <a9edb8a433e8efcba3d11b2a06fa1063df41a24d.camel@huaweicloud.com>
-		 <20261117-makaber-paranoia-gefilde-7d976e97e12a@brauner>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Nov 2026 05:49:03 -0500
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=CiypTjF2
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4a35d5d4a20so7172215e9.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 03:25:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre.com; s=google; t=1795173950; x=1795778750; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=NcV0t79NYJ/mK1aZ8pQRTmJ9otnohMh+O0hfCgV3Lfg=;
+        b=CiypTjF2jy/+DduTc91OBItjPmjWpksDx731Tt8/ASANkcMr1qve4vciEqTA7oaXjS
+         Xc1+NzyNM/1DbXQFxqX7HWPOn6ouSdVuX4ofW2to7spZnhnTL9JBforLhr/Dnzua54x+
+         dVB1ngsDoIsn8vk6NHMS9eE2JwW0muMQwBMYLUNt/IMxqlhdj5Y2e0tA+MtWKgxPXVpW
+         ThSeGhuoKFMCiAvhH6HiHCvM76x1BzJ15t5W0Fr9VLPZrwD8pVVhd2YSms8QQ2AbP1+e
+         Pg1GX4IfQf91KCY6EVW1dUwu5e8lYiA9oSsKMy/zisB1TuqrmGv3rBGMzzgwsDwfN2T4
+         Injg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795173950; x=1795778750;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NcV0t79NYJ/mK1aZ8pQRTmJ9otnohMh+O0hfCgV3Lfg=;
+        b=Mzlnil4fS6g/NN/te6D93t4o5ttsla6ArvCoscZKYwGhixD4HtxF9t0MNiCkFW8W8e
+         jhIuN7zQu1TxPA1ugs0ZAT8EcVeAfXyY7geKHfewpdplkdzChCfqGraHdAMkVU3ukwbJ
+         +3wYhAg3LN/y0+vW51vncGhRg6x+EuWwCXAuR6gjeUSBJbNUaa4KoLpS6EIbHstzgfUE
+         NRqu1gM+CmIptOpi7uz1E7nU+qnEI+/2ynL+JtOHzshgWxD66OTvag59sx0h6HmWjyvk
+         ZL8IJXvZoPZNN+9dYt9mIAGrscQodDHXyKPc6bLlVtByUDRiYmBpHW7pgJSK7HSfDIWg
+         lRAQ==
+X-Forwarded-Encrypted: i=1; AL+hErFb3eBbElqdUoj74q8lVv6oMum0NNuhqmnNx5r73Oz+E0fhrfsXQj8ONpLPpdjmtgBxpCQzppMw2Ryx3KE=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9oi0aDEFQz9SC6cNjAOX8m+1bLblrrG8Qj4oSYzyWkVicXYBFb
+	dwGhzPCQJZQZGjI6vKVS+P5A+RTJ/nog/eEozmls0fLEfcFU+TDE3cI+CZXvkUVKE8w=
+X-Gm-Gg: AYBFou3/qUe7D80duf4VgVBuC+2912yFymC4aUgtRnVRCWqRfZ2Hu+BvGzFquxLEFNK
+	nP6BYhTdKKKdvnXoEGxDQHnbQpPdPmpwuInPWp21HVjV4TnGxEGqtFUjqj0N0I6QHZBYQQSZWmt
+	K+nwVKQHqbMuDx3AiXQjkJAIwep8ygsqQOYUEnj50ab3aSVOZreAa69a71+QRjtJuJKUNn9YArh
+	eOxVfTeezf6lE3Lp0k9rQsW2lYQ6y3Q6/Ud82JDBwuNC331DVyAbl1TubrcRFppjHMKD3m+lKYI
+	TRfZm70MA2Xsyjti0h7YyI9TMzunr+AUHJM0KqSJ1dOEYqtcD0gxPo69KDTUr1SDisnx5wJihBu
+	kMUDh38xSHddsvO7nmQnxoZMiHwXn0iu0o91+unesbhU0sgzJQiD2tAbZOg2fuwtVHkye8KFMsx
+	QGmdoZdnUxQ5rVw/GY9EuPi6hNTB3nZqvccurz75+ieGJczt5rSb/CtNq9Lhu+jo4e6jT29IILw
+	NWIEdgJXMZQmJZF3NltNeqrb2bY0OTOzUDOBJpolrsl4p+lqOC0HYFNF1PSbo+BHOgXftbK8IDE
+	rKp8/0r0VueIcjnQDi7bIpqcuyM+GOgErsbUnZnWpK2kIVHecFwSrOC05K9dGgWzdps9DvbwtoM
+	yhyaZIYWauiX7tyHp
+X-Received: by 2002:a05:600c:64c7:b0:4bb:68c4:2044 with SMTP id 5b1f17b1804b1-4bb887fe725mr56451745e9.11.1795173950208;
+        Fri, 20 Nov 2026 03:25:50 -0800 (PST)
+Received: from localhost (p200300f65f19a904be03815e1634e776.dip0.t-ipconnect.de. [2003:f6:5f19:a904:be03:815e:1634:e776])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4bb884b8429sm117437835e9.14.2026.11.20.03.25.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Nov 2026 03:25:49 -0800 (PST)
+Date: Fri, 20 Nov 2026 12:25:48 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Nicolas Schier <n.schier@fritz.com>, 
+	Nathan Chancellor <nathan@kernel.org>
+Cc: Sasha Levin <sashal@kernel.org>, 
+	Harald Freudenberger <freude@linux.ibm.com>, Holger Dengler <dengler@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	WANG Xuerui <kernel@xen0n.name>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"kernelci.org bot" <bot@kernelci.org>, Nicolas Schier <nsc@kernel.org>
+Subject: Re: [PATCH 2/2] devicetable-offsets: Get struct cpu_feature from a
+ device-id header
+Message-ID: <awAtvSIQeLJq2hvF@monoceros>
+References: <179424040477.1704532.18231793404479518924.b4-ty@b4>
+ <av8Uv7EV3sLqUBfr@derry.ads.avm.de>
+ <20261119194738.GC875856@ax162>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -118,89 +107,67 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Evolution 3.58.3 (3.58.3-2.fc43) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: ZqdJIFsgCUKjEC8YYQnPbz-cnCueBzAq
-X-Authority-Analysis: v=2.4 cv=Z8x5j3RA c=1 sm=1 tr=0 ts=6b0025e6 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=i0EeH86SAAAA:8 a=n2GhSfulAAAA:8 a=P9hg6L4mTtILJBKynr4A:9
- a=QEXdDO2ut3YA:10 a=9NqWk_7B-uqI6kdQTXIl:22
-X-Proofpoint-ORIG-GUID: 5kOz6Gl1NjdF4oL33T-IpMiwaH8-ELgO
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTIwMDA0MSBTYWx0ZWRfX+YHMuW6NnsUe
- 86lQVCsuPp/NvRoxrnqRoc3bnDhG0hnemG/Y3xQRZx0puMuQb463PTCrFx4qgBvkTFzzXcVnUpU
- Xhqp+qerRq7eKUVdQ+GyReus0x+B+4I=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTIwMDA0MSBTYWx0ZWRfX+0h3WbhtntiE
- XZdsdCmbDr9WEUPoksnezsPv31YninLxwWzklkMYjPZG0jLs8VSFPwSEOoUqxVahXgE3qk6DxFc
- mxjgcd0sniJf9dHzHI8V4l9MgpeYMD5qt6IB7AF57liGYDsPU7Fag8d59MKFbEsrebSlNuXJlDo
- tzsS2SvN5/+Ez0sVZsQKscPY7JgHn8nBzluswB4Olg/Ytel4wvA9udJuaL1K0eVVtH/blQ16kD4
- p68qnaj3yYFTGk8DhmwFtG8s3oXkABaKh8OC4NEdh8mrgr+3FnnUkThoz4c+qCaVQjMaXo8R6uF
- ZWuCKkKibbIdEhwE6yZ4llmWHFmmhZ1/CZpnsBnkOow2nkA9uiO5AGrrXjFUAGO2LRiXglBmcPs
- zjpodmzKyrEGQ3s6X8tKLqjMrm2Q6723CMdP/P6Bko0/SxdT8EtSbugWNbjSyRDHOC6Nonr0rrh
- w5BZ+8d2PaJl6+SxqhA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-20_03,2026-11-19_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0
- adultscore=0 bulkscore=0 clxscore=1015 impostorscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611200041
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tv3l72rardngbokt"
+Content-Disposition: inline
+In-Reply-To: <20261119194738.GC875856@ax162>
 
-Hi Christian,
 
-On Tue, 2026-11-17 at 15:04 +0100, Christian Brauner wrote:
-> If you want xattrs in the initramfs then that needs to be a proper,
-> versioned cpio format that userspace tooling understands. I'm not
-> taking METADATA!!!. So still no, sorry.
+--tv3l72rardngbokt
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 2/2] devicetable-offsets: Get struct cpu_feature from a
+ device-id header
+MIME-Version: 1.0
 
-Regarding your request for a versioned cpio format, that is the first appro=
-ach
-we tried. I posted an RFC extending newc with xattrs in January 2015 [1],
-followed by a v1 later that month [2], after Al Viro advised extending cpio=
- at
-the 2014 Kernel Summit. Taras Kondratiuk and Victor Kamensky carried the wo=
-rk
-forward in 2018 as "newcx" [3]. The discussion then turned to redesigning t=
-he
-format itself: ASCII fixed-width fields, no header length, the in-band
-TRAILER!!! end marker, and whether to use pax/tar instead [4].
+Hello,
 
-Roberto=E2=80=99s later series [5], carried forward by Danny Hu in v6 [6], =
-aimed to
-provide xattr support within the existing format, since the format discussi=
-on
-had stalled. It began with xattrs in separate files and later moved to a
-metadata file placed after each file it describes, following review comment=
-s
-asking for self-contained per-file records that work when several initramfs
-archives are loaded.
+On Thu, Nov 19, 2026 at 12:47:38PM -0700, Nathan Chancellor wrote:
+> On Thu, Nov 19, 2026 at 04:24:47PM +0100, Nicolas Schier wrote:
+> > So my questions:
+> >=20
+> >  * Shall we keep it the way it is to keep the original patch order
+> >    (bisect might fail on the two commits before this patch)?
+> >=20
+> >  * Or shall the patch be moved before Uwe's (removing the 'Fixes' tag,
+> >    and rewriting the commit msg)?
+> >=20
+> > I am in favor of the latter.  Are there any objections?
+> >=20
+> >=20
+> > [1]: https://git.kernel.org/kbuild/c/f1dc66c38b7eb4b2fb946a2fd6929250ec=
+d2d85a
+> > [2]: https://patch.msgid.link/bc9fbf5784f6788e10c749a05d56c42bdb68f3d9.=
+1792144769.git.u.kleine-koenig@baylibre.com
+>=20
+> If history is already being rewritten, I believe it is always good to
+> fix potential bisection issues like this. Rewriting the commit message
+> (and maybe some of the diff?) and placing it in an order such that the
+> build cannot break sounds great to me (but others are free to disagree).
 
-I wanted to share this background in case it=E2=80=99s useful to whoever ta=
-kes on a new
-versioned cpio format with xattr support.
+Full ack. I think the danger to hit that point during bisection is
+small, but I like the 2nd option as this reduces the small chance to 0
+in that case that people yell at me :-)
 
-Thanks,
+So from my side: go!
 
-Mimi
+Best regards
+Uwe
 
-References:
+--tv3l72rardngbokt
+Content-Type: application/pgp-signature; name="signature.asc"
 
-[1] RFC, Jan 2015, extend initramfs archive format to support xattrs:
-https://lore.kernel.org/all/1584934.WkKQGAFadF@sifl/T/
-[2] v1, Jan 2015:
-https://lore.kernel.org/lkml/1421781180-24425-1-git-send-email-zohar@linux.=
-vnet.ibm.com/
-[3] newcx v3, Feb 2018 (Taras Kondratiuk):
-https://lore.kernel.org/all/1519153284.14218.18.camel@tycho.nsa.gov/t/
-[4] Why cpio rather than tar:
-https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs=
-.rst
-[5] v3, May 2019 (Roberto Sassu):
-https://lore.kernel.org/lkml/20190517165519.11507-1-roberto.sassu@huawei.co=
-m/
-[6] v6, Nov 2026 (Danny Hu):
-https://lore.kernel.org/linux-integrity/20261105193743.2654656-1-dannyhu@ar=
-ista.com/
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmsALjoACgkQj4D7WH0S
+/k4lAAgAru4huUD6XgX/xEc0md/r2uTYSHfAeG9y3GIzcVC+zkGIzmFUEZ2+X4HN
+rc4d07ok+2mGRZ9v9k7dO2SUzjDaoahlVqRd5ldtCwi2b03QrEfGe2Bkte8IiCCM
+0vWjLcJWss62UN3gAxmKMHIxKvKcYFle+LjAYqi8dWM+YPc2SXS0gqmTZISLjEXN
+HHeBGqcecdsyrFtzxYnMLvmdJ9vefsQNNlLcyy6V/EUtnk2yt1k5ZwXozAUEojXQ
+OhiuLXypzkqUPvCXOQKtrqveg6g0hxnDtqlFTZfptssoqxNVMwLsN52Nsic5nzT2
+9LO+HiyUPz5SPNVTac2QsyHue4WN2g==
+=RzUQ
+-----END PGP SIGNATURE-----
+
+--tv3l72rardngbokt--
