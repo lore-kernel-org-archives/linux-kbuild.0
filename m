@@ -1,89 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795215808;
-	b=NU/kvxMYZV/2t/24jHUHUpwDwE/tdUH+1AhSTXsaKy29UbOfvoPo/MdJXf9ldAVpEj0W
-	 ALZGtb/4Gaen5Tv4nQdOR+8l2TCHXEJyst9YTLXXYqlKD3xqW1yEO4iIWnQhlOhNXyohg
-	 rzZcS2pZr6ErPHD2h1dVn6FnYEJvixaADgjqEuVTqYTsk0F3ObnhYyieKSFeZzsYkey1v
-	 m6nJRl/Tjqw3XkuJ8gPcnT2ENDgqdFkRIP41F4P1vEaOLfqfmj1vbW/DwrCGzuX0Kic+7
-	 fJjSCLPHd0OTyRIakO4OdZvh57lsHCLujWIU81Dzn2FzduupbC+aUKNtfoByHbRrikg==
+	t=1795216314;
+	b=NOks0hcbICaB4JbXHLsY/V6OwuRM0FitiI6vcU73ELZmjKMDqOC1RFy+2x5DHn9zPCAr
+	 OSGa6UUcG9PN+ew2/LvQnCoigmXdvykenYrECBnTJG8nqweLUdFLR1tSMxmMNzEjJJYbN
+	 pvz6eeMUMh92+4TThLTMFoE3ZPpT62IKEolZzdtECNoor4ISrZNmy9lPHqkw8gRcFFFqI
+	 pwc1elbxI+59pOJNUeu+Tk/pmdP2JBgJAXkB/9oII6xriQrf9QPITFq/bMNH9s2nYsTbI
+	 eLLgpnWBkOSHOohuV7HXcpPxPFV6IM1bT/5IbSEVuCF88kk9ABEaKFZGYL8i9BsPaLw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795215808;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795216314;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Received:X-Forwarded-Encrypted:X-Received:MIME-Version:References:
 	 In-Reply-To:From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=5GqNarA8yhniPQn8im3r/1O/fx/VgqmvibkYDqdOfy0=;
-	b=C2dt9hz+Hpj6gkiDZATK7WNskjBQNn5GOpVQ69/+oxKA2pVy3G8o+5qUkB7RCo0PfSE/
-	 tLC7uHXxdNt0Yh4XV/AIVsWTL0rgt1rA4xOGOlaEKWyZ99EUTYZw6sdR7Uglc6fd8dRMi
-	 lAfVpizHdIFxqwZaJGnbBuApru8CDcVyw78cCeQdt7bgeb6OxFExVTZWAnTojks9omk9u
-	 sEE5hPE4m2RlsHA0RPpYjKx3lU8ZTO76f/AM9fV4p6cyl/Yadb9YngntR2lsIDpORpNXM
-	 6RnH+Ib+8tYTJdxaKZvUCcZ4QkVY/9qpXflhYrkcZJw+qHtNvQPRQAdAqPPOEN/sDhg==
+	bh=Fwdc+YW/XiGo0Denx5Zmu82rn+nvG4NZ73DkXRr2reM=;
+	b=Tdru9TiaRyFd/jXt/7ZPXNZJ+oQrTKq/LwEVE9JP2CodPfv/YEsQbKwnfBUbVTkuSQS4
+	 2zsCIsMjKKwbMwhfGzwkEJxtRLRNQsuh4kpsrtrSN9TmKXSlSQDhXicYQZxdVyQdnNIZ0
+	 ws66PrAjMkSj+heymk5ofvxYpOIicUdx5dUfWVlFZ91AG7ENuVS+DCjyskSRNMswWBXNi
+	 qsH/ZhiMo5JgIsgvSiUO2/59blt93/974wddD+LtTRBM9JUbPrGT/x1LsjobLmCkyh11p
+	 nRRq9zEANItH70k400RCl45ccZCnkX33tn2luvL3xhJMV3HkE2l0QURbLyoFxddkP3Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=chromium.org;
 	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=fxNmALEs;
-	arc=none smtp.remote-ip=209.85.208.44
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ULUmbLtj;
+	arc=none smtp.remote-ip=209.85.218.46
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C281606A68B
-	for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 23:03:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7C281606A68B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3710D606A6B5
+	for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 23:11:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3710D606A6B5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=fxNmALEs
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6b8a2518f7cso1714979a12.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 15:03:27 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ULUmbLtj
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c40e30c26a4so545459166b.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 15:11:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1795215806; x=1795820606; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1795216311; x=1795821111; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=5GqNarA8yhniPQn8im3r/1O/fx/VgqmvibkYDqdOfy0=;
-        b=fxNmALEs7giTEZ/uC2VoLWNHbrXDh/y49zw0XXfkx7c/tRl8Ca7795+3FYcde9jr3h
-         UcHDRtr9Bg3wLRStLNAws0oeCq/o+f2OiFtk/qUTK0XDkk+ewDiv+M1so/eheAIe21Jy
-         4KTn5W9zN01S2wIpkjJ56qvi9kOd2+FOAQ4sk=
+        bh=Fwdc+YW/XiGo0Denx5Zmu82rn+nvG4NZ73DkXRr2reM=;
+        b=ULUmbLtjx2oVdvu/C7WyEixb1qrM8dl1ZrpCAxWiilR1mQydYGnNZDAofBDUa3eYyw
+         dvKefBkS30VFvqGNpFKG8QAmvJWiffV9Ajgr/DGefKTvHNcUX/2YUcTaLYU/iH4e/UtS
+         cWDAzPbDZeIHNCji3J79UvwLSS/NZGQS/Qaio=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795215806; x=1795820606;
+        d=1e100.net; s=20260707; t=1795216311; x=1795821111;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=5GqNarA8yhniPQn8im3r/1O/fx/VgqmvibkYDqdOfy0=;
-        b=cbs/8Ttas7FCp9A3pfXJIhdWTViYoqHUAPFlwurkIka6mYe8yNWtnKOBidz3k5E7lf
-         qTBwExTvG0futomaYM/5JZ341XZyGMOH7r5PIlFWVFzu6Bros5wPP6TKC64qlyYwcRjn
-         GyBsSnMlfYl5lIR+5gJQ5x1ASYnWLkSm9mAzLLWruU/uwvBp0rRUMzr2/HcSrH7Su0VH
-         NE2HQAxgRCSn/WgyaLz+yVmpKmqJyDvfMWNkwPzuNnSrxPpUf7yiaWvtP8y7sg4rimK9
-         5S2n7bqDOQD+b8rTkenlKwjKj2jFtH97h8KeeoXsK3EZW7iupOy3K/8U4wTenfv+zWsd
-         f4Ug==
-X-Forwarded-Encrypted: i=1; AL+hErEIoavqSiA/kOTeW2liE3e44IaIOp9GWGlb5gnvadEmbVM/foEE/Swh546aachtOXWKPOCAcE/cU+p6mrc=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9QUOY7HEYo8DsEwnOx5A3pJQiKD5zKhZu8idL7W75J2jMeZPod
-	UvX3eyxa5InwPgdb6DW5a4GQUpvCajJsmwaCbGc7LhE1VWHfMUVaF1b9lIF4b1j/FtUNN73wLZE
-	4XRoNeSEf
-X-Gm-Gg: AZFdTZe6KjAXiHstYQvnOzjVMT/4CvpGvK0O8+Pr1vt/9aJzXUmNhx4dfj/VnPziWNO
-	5cVCQFgfiWumtObYUaNkp2Ja+KwwZ8v/VlNNK5eWoyjTvX4CZ447a4Wx8sY8dEXgYAaak/qCdrj
-	U0HgjIUTxg7n/QgnxVFW4uGLQN2nTd87amjrg0j95uJ6+ErIR+lY17uo727KwnIvgwdOcgdFhO3
-	EDCl1oPfnqrM6T2aVHlDrNdC58YLseOgxE/0UgNo5koy6ta0Hc0QFlZF4B7iZlDhh9BSg563XOx
-	0HIluS1Yfx+beTeXRxLVYasVogWOWqdfQWxOHbo9E5giPT+9+SX1JNM2hjNsLrZTIWWqyrQCS5q
-	uMWpX0C1r+Vlff8GLer5eLdgdV8Yd/C4GL9F2pT3sPDety6bWtjxCyvvtWQzz7onxTjz1Z+aChj
-	QHjKB/70TqfHXoS6ApfD3RXvpilBzFC6UyUGkXZTGFW+ApdPfeILWPmDklljlOrxjNKc2l++GSR
-	ole7d2y8lCsxfL2i+BQr+0EHact4UXcbFaSHJ5XFHFZX+Iw7PHkHOWM7gyK58g1MJCeEtAlboRy
-	MK9mpGNRv2VMreFGPXVH/0qbUjKkTyR0tGc7cQbfILePtXgEDqmdjiR46FDGjznlEK6s
-X-Received: by 2002:a05:6402:5005:b0:6b8:791e:5d4d with SMTP id 4fb4d7f45d1cf-6ba638a6273mr814568a12.27.1795215805781;
-        Fri, 20 Nov 2026 15:03:25 -0800 (PST)
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com. [209.85.221.42])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6ba370cd368sm1640739a12.8.2026.11.20.15.03.23
+        bh=Fwdc+YW/XiGo0Denx5Zmu82rn+nvG4NZ73DkXRr2reM=;
+        b=MHwaUPdNYJE/0a/nC7UURaRUqYLpxV3mClXAPtBUHjdwGH1vFWb0i8VJeYymhWdc4/
+         Ldf+ejPr/d+Xbur+WLW79LadRjduU21hj8JT54eK1NNQqsEZ2LfknTLCWR9OIle4RwgU
+         nFibrVvm8g2buK7bYrfJYISRJJZFXQH27vF83EJ7uniKGl2UaCoHAdycMLLg4ibHfhNi
+         AwuIaC2/eWPOVQHxLeh1H0oJkR+pXTAMqvScfG3Xt23UyGsx/un6wqBSAImbWjwplLXG
+         sgxs68je4z73HT1AKj5Rra+ocqRNA0PzE0hm2uRBuCYVO8rEAqQzW7MPpHCPHF0UNK4O
+         IIXw==
+X-Forwarded-Encrypted: i=1; AL+hErF5mGaV92Bq9ax/A/b/awZ+OjF8GisT/RsE9U4UY1O4sPZ0GMikCoZK3zuxLpbXSpI+hmmk/UJkOe/1S7c=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9fzG87RJE5H8GRX+Pp4rfDArcq90eGklYP2iNeUlX71nkpusbs
+	3iT46D5KV0IxLjd8dPvIj8wbBYxm9vGm9WscVc2iGeafy/Lj5gkrqHS7xttxSpitAVamdtBFqCh
+	2y+IdrrJC
+X-Gm-Gg: AZFdTZepC4VQzfI5U9JNQ0fktt3PuA5dMs4Fad1e1k63TORUTbYBUJRNY4DoMjhEBt7
+	se+VZ8cXoijO97ryz0WpkduO74OSZ9MFRjcCu90begg9qcTkdhR9hDpQHXbJzVUaeh5gBiO/75R
+	tHiXXbVfolE/UBhe8qnuyp+o0dktdZpL5ZqRjSId7Goj/PSq/iatWuBv0UP6hdn/r8wZZrE3N2P
+	O62bBlDAkLSGuakaWzrnkeFL4CVxa5dqVSpUZszdKxOwZoTAZVnCIt8SUoFP+1GS7Yue+hZYUh3
+	jbmlbilnP2fb12onXr4o2QnHqpvUzMiXL7EQzCgBsugasHk35NabPRriMbv4HZMUKydH1oQzVR/
+	DDyv2dBsH812jDophoPb3dlxNC/LPdo6bucgxoL7Mk2W+/ipQlzC0n7jpkAOHLtbwc919IeOOBm
+	zAWZGzwpkwTUGmCZuUlSky+Oa9qju2cjAwgMubs5cKihd6cDFu3InV7DXhL+CE8UWH57J+VlkPM
+	G6474/6A18Nm6dRrkbr/r2aiNbyXacC5yiIjJpcpb/UAlPfPNEnrfiPpQHIpfmPTECdGh3+TybG
+	rDds2J8nMxbqq11bXhU/HNbDtfbiKZgu5LBmCtXpzEaUtCxHBpjlKVUXGsIlhcOLw8Sd
+X-Received: by 2002:a17:907:8745:b0:c2e:7fe7:2898 with SMTP id a640c23a62f3a-c513a82fa27mr406932366b.12.1795216311618;
+        Fri, 20 Nov 2026 15:11:51 -0800 (PST)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c513ae68788sm138050066b.29.2026.11.20.15.11.51
         for <linux-kbuild@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Nov 2026 15:03:24 -0800 (PST)
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-492690dd5daso1071491f8f.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 15:03:23 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErHG7Lk8phubozHPmi5PvdVdMQngTnR0qLska9LQf8HQei7IF1Ddi+p/5/hzBoMXmtEZLRL323VSogDgtQs=@vger.kernel.org
-X-Received: by 2002:a05:6000:2c13:b0:4a6:dfe3:fd93 with SMTP id
- ffacd0b85a97d-4abb41f4dc6mr9300663f8f.40.1795215802107; Fri, 20 Nov 2026
- 15:03:22 -0800 (PST)
+        Fri, 20 Nov 2026 15:11:51 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b87a1a2babso5125374a12.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 15:11:51 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErFdMzVCTp0RYomrAQg6BUmV8BGAUlZkbSogEeJPP72qLahK8Ybk/apiVJkEf5mg98mKOROC82fKexJ5wQE=@vger.kernel.org
+X-Received: by 2002:a05:6000:2c05:b0:48e:6651:5956 with SMTP id
+ ffacd0b85a97d-4aa488c85eamr14307450f8f.0.1795215881201; Fri, 20 Nov 2026
+ 15:04:41 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -94,15 +94,15 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 References: <20261113210918.356261-1-dianders@chromium.org>
- <20261113130858.RFC.v2.2.I5cd8aab4380bc4cfd302c4e4708af58c43370715@changeid> <sashiko-outbox-215033@kernel.org>
-In-Reply-To: <sashiko-outbox-215033@kernel.org>
+ <20261113130858.RFC.v2.3.I4a691041bb6d31e5ab2fde8cd4139ca72ee72c5b@changeid> <sashiko-outbox-215034@kernel.org>
+In-Reply-To: <sashiko-outbox-215034@kernel.org>
 From: Doug Anderson <dianders@chromium.org>
-Date: Fri, 20 Nov 2026 15:03:10 -0800
-X-Gmail-Original-Message-ID: <CAD=FV=U=wMCvb2UXgvSpZxoBNJnMw8fy-JzfYFOtQGs1-=w-MQ@mail.gmail.com>
-X-Gm-Features: Aa3M54pRDnkxai3VLH8umlmccjAtNqBNTUBcGhqs9gRyZZN92t4mYXIwkfZVL_Q
-Message-ID: <CAD=FV=U=wMCvb2UXgvSpZxoBNJnMw8fy-JzfYFOtQGs1-=w-MQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 2/5] kbuild: fit: Support selecting DTBs and config
- properties from a file
+Date: Fri, 20 Nov 2026 15:04:29 -0800
+X-Gmail-Original-Message-ID: <CAD=FV=VqHE5PjK1vFbv73G1UaN_BwxvRJjUJbHVB=9wL_h9PDg@mail.gmail.com>
+X-Gm-Features: Aa3M54qr05eSVV9PwOwJNdqAzu1uH37TTf3Dyh-iO_tgJlOvdvevguI12yuhb0E
+Message-ID: <CAD=FV=VqHE5PjK1vFbv73G1UaN_BwxvRJjUJbHVB=9wL_h9PDg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 3/5] kbuild: fit: Add opt-in FIT_FACTOR_DTBS
+ support using fdtfactor
 To: sashiko-reviews@lists.linux.dev
 Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
 	Conor Dooley <conor+dt@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
@@ -124,80 +124,38 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Sat, Nov 14, 2026 at 1:09 PM <sashiko-bot@kernel.org> wrote:
 >
-> > +# If FIT_CONFIG is specified on the command line (either relative to $(srctree)
-> > +# or relative to arch/$(SRCARCH)/boot/dts/), locate that file and extract the
-> > +# list of .dtb files to build.
-> > +ifdef FIT_CONFIG
-> > +FIT_CONFIG_REL := $(firstword $(patsubst $(abs_srctree)/%,%,\
-> > +     $(patsubst $(srctree)/%,%,$(patsubst ./%,%,$(wildcard \
-> > +     $(FIT_CONFIG) \
-> > +     $(srctree)/$(FIT_CONFIG) \
-> > +     $(srctree)/arch/$(SRCARCH)/boot/dts/$(FIT_CONFIG))))))
-> > +ifeq ($(FIT_CONFIG_REL),)
-> > +$(error FIT_CONFIG '$(FIT_CONFIG)' not found)
-> > +endif
-> > +FIT_CONFIG_FILE := $(srctree)/$(FIT_CONFIG_REL)
-> > +ifndef FIT_CONFIG_DTBS
-> > +export FIT_CONFIG_DTBS := $(addprefix $(dir $(FIT_CONFIG_REL)), \
-> > +     $(shell $(MAKE_FIT) -C $(FIT_CONFIG_FILE) --list-dtbs))
-> > +$(if $(FIT_CONFIG_DTBS),,$(error Failed to parse DTB list from $(FIT_CONFIG_FILE)))
-> > +endif
->
 > [Severity: Medium]
-> Does $(dir $(FIT_CONFIG_REL)) prepend a leading ./ to every entry in
-> FIT_CONFIG_DTBS when FIT_CONFIG points to a file in the root of $(srctree)?
+> As reported by Simon Glass on RFC [1], can composite DTBs built via
+> cmd_fdtoverlay reach fdtfactor with incomplete /__local_fixups__ when
+> FIT_FACTOR_DTBS=1 is used without FIT_DECOMPOSE_DTBS=1?
 >
-> When FIT_CONFIG_REL has no slash (or when FIT_CONFIG is passed with a
-> leading ./ in an out-of-tree build so $(patsubst ./%,%,...) runs before
-> $(srctree)/ is stripped), $(dir $(FIT_CONFIG_REL)) evaluates to ./.  In
-> scripts/Makefile.dtbs, $(filter $(obj)/%, $(FIT_CONFIG_DTBS)) compares
-> against $(obj) without a leading ./, so nothing matches, dtb-y is cleared
-> across all DTS directories, and no DTBs are built.  Stripping ./ from
-> $(dir $(FIT_CONFIG_REL)) and running $(patsubst ./%,%,...) after stripping
-> $(srctree)/ and $(abs_srctree)/ would avoid this.
+> Although DTC_FLAGS passes -@ -L to dtc for the base .dtb and .dtbo inputs,
+> fdt_overlay_apply() in the in-tree scripts/dtc/libfdt/fdt_overlay.c merges
+> __overlay__ and __symbols__ into the target DTB without merging the
+> overlay's /__local_fixups__.  When FIT_DECOMPOSE_DTBS is not set,
+> make_fit.py packs those composite .dtb blobs into image.fit, leaving
+> fdtfactor without local fixup entries for phandle properties originating
+> from the overlays.
 >
-> [ ... ]
+> Until in-tree libfdt preserves overlay /__local_fixups__, should
+> FIT_FACTOR_DTBS imply --decompose-dtbs (or reject composite DTBs when
+> FIT_DECOMPOSE_DTBS is not enabled)?
 >
-> > +    if args.config:
-> > +        config = parse_config(args.config)
-> > +        by_name = {os.path.basename(fn): fn for fn in args.dtbs}
-> > +        config_dir = os.path.dirname(args.config)
-> > +        dtb_configs = [
-> > +            (by_name.get(dtb, os.path.join(config_dir, dtb)), props)
-> > +            for dtb, props in config.items()
-> > +        ]
-> > +    else:
-> > +        dtb_configs = [(fname, {}) for fname in args.dtbs]
->
-> [Severity: Medium]
-> Will by_name.get(dtb, ...) always miss in out-of-tree (O=) builds when a
-> .fitconfig section header includes a subdirectory path such as
-> [google/lga-blazer.dtb]?
->
-> by_name is keyed by os.path.basename(fn), so any dtb key containing a
-> slash never matches and falls back to os.path.join(config_dir, dtb).
-> Because scripts/Makefile.lib sets FIT_CONFIG_FILE in $(srctree),
-> config_dir points into the source tree rather than $(objtree) where the
-> compiled .dtb and .dtb.cmd files live, causing process_dtb() to fail with
-> FileNotFoundError.  Looking up os.path.basename(dtb) (or matching the
-> suffix against args.dtbs) would find the built DTB in $(objtree).
+> [1] https://lore.kernel.org/r/CAFLszTh6vmFGVD4_Reewe9p4QqQjN=CVJ3SgfQKosAhedJpAQA@mail.gmail.com
 
-Addressed both for v3 by simplifying how `.fitconfig` specifies DTB
-paths: rather than inferring the DTB directory from the `.fitconfig`
-file's location on disk, `.fitconfig` now supports an optional
-`[fitconfig]` section with `dtb-dir = arch/.../boot/dts/...` relative to
-the kernel tree root, and `parse_config()` returns normalized
-tree-relative DTB paths (`os.path.normpath(os.path.join(dtb_dir, sec))`)
+Rather than trying to handle older in-tree `libfdt`/`fdtoverlay` (and we
+wouldn't want `FIT_FACTOR_DTBS` to imply `--decompose-dtbs`, both
+because single-base composite DTB families would leave fewer than two
+non-overlay `flat_dt` nodes for `fdtfactor` to factor and because
+bootloaders like Pixel 10's expect a single base `.dtb` plus a single
+per-board `.dtbo`), this series will remain RFC until the `fdtfactor` /
+`fdtoverlay` `/__local_fixups__` changes land in upstream `dtc`. Once
+they land, the first patch in the non-RFC series will update
+`scripts/dtc/` so in-tree `fdtoverlay` preserves `/__local_fixups__`
 directly.
 
-With that:
-- `scripts/Makefile.lib` simply looks up `FIT_CONFIG` via `$(wildcard
-  $(FIT_CONFIG) $(srctree)/$(FIT_CONFIG))` (supporting external
-  `.fitconfig` paths too) and takes `FIT_CONFIG_DTBS` straight from
-  `make_fit.py --list-dtbs` with no `$(dir ...)` / `./` manipulation.
-- `_process_dtbs()` in `scripts/make_fit.py` uses those normalized
-  `$(objtree)`-relative paths directly (since Kbuild runs `make_fit.py`
-  from `$(objtree)`), so `O=` builds, subdirectory entries, and external
-  `.fitconfig` files all work without basename lookup.
+I had only mentioned that in the notes below `---` on patch 3/5 rather
+than in the cover letter; I've updated the cover letter as well so that
+plan is explicit if another RFC goes out before the `dtc` changes land.
 
 -Doug
