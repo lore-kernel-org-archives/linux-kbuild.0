@@ -1,89 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.15
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795216314;
-	b=NOks0hcbICaB4JbXHLsY/V6OwuRM0FitiI6vcU73ELZmjKMDqOC1RFy+2x5DHn9zPCAr
-	 OSGa6UUcG9PN+ew2/LvQnCoigmXdvykenYrECBnTJG8nqweLUdFLR1tSMxmMNzEjJJYbN
-	 pvz6eeMUMh92+4TThLTMFoE3ZPpT62IKEolZzdtECNoor4ISrZNmy9lPHqkw8gRcFFFqI
-	 pwc1elbxI+59pOJNUeu+Tk/pmdP2JBgJAXkB/9oII6xriQrf9QPITFq/bMNH9s2nYsTbI
-	 eLLgpnWBkOSHOohuV7HXcpPxPFV6IM1bT/5IbSEVuCF88kk9ABEaKFZGYL8i9BsPaLw==
+	t=1795262541;
+	b=HmF1gsdBcBrB93a/FD33f8hlO5btIRCGQYnKuvvJeJc2fZq3XGipotWGxUlSmVs7k15n
+	 CW8dhwoqvDKHA+EgY9mdEor1zZMvTp8tT56bOwQ1DH/E2cP+kTvoiVIfu7t9H58KiwjJV
+	 nhadvD8PpFvx4LduyoZTXG93TwQttjAK3kuBVZCvIxN3QZ2dHxCphWrzDRvQgco/aGfLy
+	 eOFmo53APQ96A0CG9HrKwKpEBChdNBKR1Xgtc1VdZJsQjGEYthboPK+8mJSQsOHtay1lF
+	 18sKfmy7Ij3K/8Qxx4wH/Ihi6iaYVcPLR/EiutjF4/XphFuDwBNkGiqa0e8ar5Y7Uyw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795216314;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:X-Forwarded-Encrypted:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=Fwdc+YW/XiGo0Denx5Zmu82rn+nvG4NZ73DkXRr2reM=;
-	b=Tdru9TiaRyFd/jXt/7ZPXNZJ+oQrTKq/LwEVE9JP2CodPfv/YEsQbKwnfBUbVTkuSQS4
-	 2zsCIsMjKKwbMwhfGzwkEJxtRLRNQsuh4kpsrtrSN9TmKXSlSQDhXicYQZxdVyQdnNIZ0
-	 ws66PrAjMkSj+heymk5ofvxYpOIicUdx5dUfWVlFZ91AG7ENuVS+DCjyskSRNMswWBXNi
-	 qsH/ZhiMo5JgIsgvSiUO2/59blt93/974wddD+LtTRBM9JUbPrGT/x1LsjobLmCkyh11p
-	 nRRq9zEANItH70k400RCl45ccZCnkX33tn2luvL3xhJMV3HkE2l0QURbLyoFxddkP3Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795262541;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=PbAv1us9HdouZq9hBUL7raj+IUgCOfT9Bkr5fu4RIiw=;
+	b=5GDQz0EK8rG6Yxox1fWYITTUrIn5pbmtYmqlAThhc52bj4YQ3DRnRd8601ELSJTabBHB
+	 PXXbU+3rvQulhF0Z+fUT36lRAgERgXGZvHsK7MDx4ppWgKhZ2bjCuMDdygw7LFncxZspC
+	 Zng1J7IW8lsRqfzHUpKahfm5ehqER3zI+lHjOYRZbYqtklxkLdJKK5QAawQVZ9cxSN56J
+	 VeF8Ot0yHsHpHPUjRqFk8xEMPn5OkLER5C2TbGZQTmStFr1dViw0f6rAGy3oG6wUxh68h
+	 sG1uWxC0SLcTfaYpRkiyEnbOwhC2yv4ZmZEH5oEuHuC6jJ14dskWumnKu3pmlE8LT0w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chromium.org;
-	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ULUmbLtj;
-	arc=none smtp.remote-ip=209.85.218.46
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=TaDV1DCl;
+	arc=none smtp.remote-ip=192.198.163.15
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3710D606A6B5
-	for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 23:11:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3710D606A6B5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD8D606A320;
+	Sat, 21 Nov 2026 12:02:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FD8D606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=ULUmbLtj
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c40e30c26a4so545459166b.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 15:11:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1795216311; x=1795821111; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Fwdc+YW/XiGo0Denx5Zmu82rn+nvG4NZ73DkXRr2reM=;
-        b=ULUmbLtjx2oVdvu/C7WyEixb1qrM8dl1ZrpCAxWiilR1mQydYGnNZDAofBDUa3eYyw
-         dvKefBkS30VFvqGNpFKG8QAmvJWiffV9Ajgr/DGefKTvHNcUX/2YUcTaLYU/iH4e/UtS
-         cWDAzPbDZeIHNCji3J79UvwLSS/NZGQS/Qaio=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795216311; x=1795821111;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Fwdc+YW/XiGo0Denx5Zmu82rn+nvG4NZ73DkXRr2reM=;
-        b=MHwaUPdNYJE/0a/nC7UURaRUqYLpxV3mClXAPtBUHjdwGH1vFWb0i8VJeYymhWdc4/
-         Ldf+ejPr/d+Xbur+WLW79LadRjduU21hj8JT54eK1NNQqsEZ2LfknTLCWR9OIle4RwgU
-         nFibrVvm8g2buK7bYrfJYISRJJZFXQH27vF83EJ7uniKGl2UaCoHAdycMLLg4ibHfhNi
-         AwuIaC2/eWPOVQHxLeh1H0oJkR+pXTAMqvScfG3Xt23UyGsx/un6wqBSAImbWjwplLXG
-         sgxs68je4z73HT1AKj5Rra+ocqRNA0PzE0hm2uRBuCYVO8rEAqQzW7MPpHCPHF0UNK4O
-         IIXw==
-X-Forwarded-Encrypted: i=1; AL+hErF5mGaV92Bq9ax/A/b/awZ+OjF8GisT/RsE9U4UY1O4sPZ0GMikCoZK3zuxLpbXSpI+hmmk/UJkOe/1S7c=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9fzG87RJE5H8GRX+Pp4rfDArcq90eGklYP2iNeUlX71nkpusbs
-	3iT46D5KV0IxLjd8dPvIj8wbBYxm9vGm9WscVc2iGeafy/Lj5gkrqHS7xttxSpitAVamdtBFqCh
-	2y+IdrrJC
-X-Gm-Gg: AZFdTZepC4VQzfI5U9JNQ0fktt3PuA5dMs4Fad1e1k63TORUTbYBUJRNY4DoMjhEBt7
-	se+VZ8cXoijO97ryz0WpkduO74OSZ9MFRjcCu90begg9qcTkdhR9hDpQHXbJzVUaeh5gBiO/75R
-	tHiXXbVfolE/UBhe8qnuyp+o0dktdZpL5ZqRjSId7Goj/PSq/iatWuBv0UP6hdn/r8wZZrE3N2P
-	O62bBlDAkLSGuakaWzrnkeFL4CVxa5dqVSpUZszdKxOwZoTAZVnCIt8SUoFP+1GS7Yue+hZYUh3
-	jbmlbilnP2fb12onXr4o2QnHqpvUzMiXL7EQzCgBsugasHk35NabPRriMbv4HZMUKydH1oQzVR/
-	DDyv2dBsH812jDophoPb3dlxNC/LPdo6bucgxoL7Mk2W+/ipQlzC0n7jpkAOHLtbwc919IeOOBm
-	zAWZGzwpkwTUGmCZuUlSky+Oa9qju2cjAwgMubs5cKihd6cDFu3InV7DXhL+CE8UWH57J+VlkPM
-	G6474/6A18Nm6dRrkbr/r2aiNbyXacC5yiIjJpcpb/UAlPfPNEnrfiPpQHIpfmPTECdGh3+TybG
-	rDds2J8nMxbqq11bXhU/HNbDtfbiKZgu5LBmCtXpzEaUtCxHBpjlKVUXGsIlhcOLw8Sd
-X-Received: by 2002:a17:907:8745:b0:c2e:7fe7:2898 with SMTP id a640c23a62f3a-c513a82fa27mr406932366b.12.1795216311618;
-        Fri, 20 Nov 2026 15:11:51 -0800 (PST)
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c513ae68788sm138050066b.29.2026.11.20.15.11.51
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Nov 2026 15:11:51 -0800 (PST)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b87a1a2babso5125374a12.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 20 Nov 2026 15:11:51 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFdMzVCTp0RYomrAQg6BUmV8BGAUlZkbSogEeJPP72qLahK8Ybk/apiVJkEf5mg98mKOROC82fKexJ5wQE=@vger.kernel.org
-X-Received: by 2002:a05:6000:2c05:b0:48e:6651:5956 with SMTP id
- ffacd0b85a97d-4aa488c85eamr14307450f8f.0.1795215881201; Fri, 20 Nov 2026
- 15:04:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=TaDV1DCl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1795262541; x=1826798541;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YCdP8OB2HvkWl/omwLPrcGPAcUnRnZ92M0pgI5LSpjA=;
+  b=TaDV1DCl9O/PHBijt0wA1BLgIhuh4c9e7PnvVkd5wvtSQt5c48XXfvzl
+   xwB2ZOXR7wVgFm0vYbzV0DjRFDevchSQx1gp6HbhVALpICEWJmRbGCmvx
+   4LN01J3EouT4G3vArS/sTkQEzVOZgOL8lfCa3RkYGvQKS53JjCSA0ZkLS
+   ZnkzavdyWj9+m84cS/BZpojpCiT11aMxyfnNxo2MlehNazbzHRh8I/OvO
+   ZTjp7yjg6jkXtNUaXLEyuYclFVe38jOsUX0sBP0qooXOUC1i0wy8LYvod
+   OGennNhscxGs1qbjy85FLBI+YFz/hWVFElCJ0KLLEWM4qen9qP/7ePGo8
+   A==;
+X-CSE-ConnectionGUID: fOlZjXc8Q4iQo4XWB0wEsg==
+X-CSE-MsgGUID: 1Og2H5ljR8+YdMYtnio/qg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11972"; a="4118799"
+X-IronPort-AV: E=Sophos;i="6.27,224,1787036400"; 
+   d="scan'208";a="4118799"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2026 04:02:09 -0800
+X-CSE-ConnectionGUID: PcmNyewOSt6LniGQD01MiQ==
+X-CSE-MsgGUID: +pivHS+iSOWajqfhEPoMtw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,224,1787036400"; 
+   d="scan'208";a="11199182"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 21 Nov 2026 04:02:03 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xUjn6-00000001Jzr-1GYu;
+	Sat, 21 Nov 2026 12:02:00 +0000
+Date: Sat, 21 Nov 2026 20:01:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Nicolas Schier <nsc@kernel.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Nicolas Schier <nsc@kernel.org>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+	linux-kernel@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>
+Subject: Re: [PATCH] Move struct cpu_feature to a
+ <linux/device-id/cpu_feature.h>
+Message-ID: <202611211941.G0rlpNpN-lkp@intel.com>
+References: <20261120202712.3377691-1-nsc@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -93,69 +97,69 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261113210918.356261-1-dianders@chromium.org>
- <20261113130858.RFC.v2.3.I4a691041bb6d31e5ab2fde8cd4139ca72ee72c5b@changeid> <sashiko-outbox-215034@kernel.org>
-In-Reply-To: <sashiko-outbox-215034@kernel.org>
-From: Doug Anderson <dianders@chromium.org>
-Date: Fri, 20 Nov 2026 15:04:29 -0800
-X-Gmail-Original-Message-ID: <CAD=FV=VqHE5PjK1vFbv73G1UaN_BwxvRJjUJbHVB=9wL_h9PDg@mail.gmail.com>
-X-Gm-Features: Aa3M54qr05eSVV9PwOwJNdqAzu1uH37TTf3Dyh-iO_tgJlOvdvevguI12yuhb0E
-Message-ID: <CAD=FV=VqHE5PjK1vFbv73G1UaN_BwxvRJjUJbHVB=9wL_h9PDg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 3/5] kbuild: fit: Add opt-in FIT_FACTOR_DTBS
- support using fdtfactor
-To: sashiko-reviews@lists.linux.dev
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Julius Werner <jwerner@chromium.org>, Michal Simek <michal.simek@amd.com>, 
-	=?UTF-8?Q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>, 
-	Simon Glass <sjg@chromium.org>, Peter Griffin <peter.griffin@linaro.org>, 
-	linux-kbuild@vger.kernel.org, Tudor Ambarus <tudor.ambarus@linaro.org>, 
-	Chen-Yu Tsai <wenst@chromium.org>, Will Deacon <will@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Devicetree@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Nicolas Schier <nsc@kernel.org>, 
-	Saravana Kannan <saravanak@kernel.org>, Brian Norris <briannorris@chromium.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, 
-	Manuel Ebner <manuelebnerli@mailbox.org>, Marco Elver <elver@google.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Randy Dunlap <rdunlap@infradead.org>, Rong Xu <xur@google.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261120202712.3377691-1-nsc@kernel.org>
 
-On Sat, Nov 14, 2026 at 1:09 PM <sashiko-bot@kernel.org> wrote:
->
-> [Severity: Medium]
-> As reported by Simon Glass on RFC [1], can composite DTBs built via
-> cmd_fdtoverlay reach fdtfactor with incomplete /__local_fixups__ when
-> FIT_FACTOR_DTBS=1 is used without FIT_DECOMPOSE_DTBS=1?
->
-> Although DTC_FLAGS passes -@ -L to dtc for the base .dtb and .dtbo inputs,
-> fdt_overlay_apply() in the in-tree scripts/dtc/libfdt/fdt_overlay.c merges
-> __overlay__ and __symbols__ into the target DTB without merging the
-> overlay's /__local_fixups__.  When FIT_DECOMPOSE_DTBS is not set,
-> make_fit.py packs those composite .dtb blobs into image.fit, leaving
-> fdtfactor without local fixup entries for phandle properties originating
-> from the overlays.
->
-> Until in-tree libfdt preserves overlay /__local_fixups__, should
-> FIT_FACTOR_DTBS imply --decompose-dtbs (or reject composite DTBs when
-> FIT_DECOMPOSE_DTBS is not enabled)?
->
-> [1] https://lore.kernel.org/r/CAFLszTh6vmFGVD4_Reewe9p4QqQjN=CVJ3SgfQKosAhedJpAQA@mail.gmail.com
+Hi Nicolas,
 
-Rather than trying to handle older in-tree `libfdt`/`fdtoverlay` (and we
-wouldn't want `FIT_FACTOR_DTBS` to imply `--decompose-dtbs`, both
-because single-base composite DTB families would leave fewer than two
-non-overlay `flat_dt` nodes for `fdtfactor` to factor and because
-bootloaders like Pixel 10's expect a single base `.dtb` plus a single
-per-board `.dtbo`), this series will remain RFC until the `fdtfactor` /
-`fdtoverlay` `/__local_fixups__` changes land in upstream `dtc`. Once
-they land, the first patch in the non-RFC series will update
-`scripts/dtc/` so in-tree `fdtoverlay` preserves `/__local_fixups__`
-directly.
+kernel test robot noticed the following build errors:
 
-I had only mentioned that in the notes below `---` on patch 3/5 rather
-than in the cover letter; I've updated the cover letter as well so that
-plan is explicit if another RFC goes out before the `dtc` changes land.
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on kvm/next linus/master v7.4-rc3]
+[cannot apply to kvm/linux-next next-20261119]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
--Doug
+url:    https://github.com/intel-lab-lkp/linux/commits/Nicolas-Schier/Move-struct-cpu_feature-to-a-linux-device-id-cpu_feature-h/20261120-212711
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20261120202712.3377691-1-nsc%40kernel.org
+patch subject: [PATCH] Move struct cpu_feature to a <linux/device-id/cpu_feature.h>
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20261121/202611211941.G0rlpNpN-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 3b14d7c370558b46e5f0c6494a05c492e59bf32c)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261121/202611211941.G0rlpNpN-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611211941.G0rlpNpN-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/s390/crypto/pkey_cca.c:22:45: error: array has incomplete element type 'struct ap_device_id'
+      22 | static struct ap_device_id pkey_cca_card_ids[] = {
+         |                                             ^
+   drivers/s390/crypto/ap_bus.h:158:9: note: forward declaration of 'struct ap_device_id'
+     158 |         struct ap_device_id *ids;
+         |                ^
+   1 error generated.
+--
+>> drivers/s390/crypto/pkey_ep11.c:23:46: error: array has incomplete element type 'struct ap_device_id'
+      23 | static struct ap_device_id pkey_ep11_card_ids[] = {
+         |                                              ^
+   drivers/s390/crypto/ap_bus.h:158:9: note: forward declaration of 'struct ap_device_id'
+     158 |         struct ap_device_id *ids;
+         |                ^
+   1 error generated.
+
+
+vim +22 drivers/s390/crypto/pkey_cca.c
+
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  20  
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  21  #if IS_MODULE(CONFIG_PKEY_CCA)
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22 @22  static struct ap_device_id pkey_cca_card_ids[] = {
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  23  	{ .dev_type = AP_DEVICE_TYPE_CEX4 },
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  24  	{ .dev_type = AP_DEVICE_TYPE_CEX5 },
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  25  	{ .dev_type = AP_DEVICE_TYPE_CEX6 },
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  26  	{ .dev_type = AP_DEVICE_TYPE_CEX7 },
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  27  	{ .dev_type = AP_DEVICE_TYPE_CEX8 },
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  28  	{ /* end of list */ },
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  29  };
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  30  MODULE_DEVICE_TABLE(ap, pkey_cca_card_ids);
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  31  #endif
+8fcc231ce3bea12 Harald Freudenberger 2024-08-22  32  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
