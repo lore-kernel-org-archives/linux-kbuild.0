@@ -1,85 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795266998;
-	b=AzNbGvHHy1ehSFjcmkYJI6J220L/ZTJ+0SRP13j87L3UjO/V8YLcigQcLzpds0wpdlSY
-	 UaxdwytEU4nf++sDl3xEcaiGO01JjE2VTu3HhoK6MyOPz1UQq4eLehy/W/x6UI6J6z68J
-	 pq7BfFaQsB3v/niVOs0t1FNIdI9+fT6XbdDmIc10h7yW1rAjbvCSSm7nQxyahvdzK0/Yv
-	 8kYtSOv4maITplIF6ZhBk8eEPsHP3vIJOrx6xLWC8iyxth3tcyI05+bmOLLByLXw+coPl
-	 pKhbVh3Acn6v5qcgSObHzcumc77PVONxnpUIxhAkQgN4xC2H4YPBJ/4wP0XF8CSAABg==
+	t=1795292852;
+	b=kBWGPXWRrVXJ10C/avRImMlW8dO2zO2wyVfHBXR+gPxbN2YbE/T7pBrIhHOv1nz2rQfI
+	 e18m/VZdoS1z5QrE7GKCYMjeun8ufgviInd6vs9OFtWMmivMPDSTgYOHRO02V+00rKeXx
+	 20TjcR9xtoQ0lukRUPK0gNmXOBFOd5cq+Kt5ufaL/ZgX3ST7rcsstD8Dk2bgE/zZY7Ae2
+	 r611YB2oEajy2gCDPHh424hyoojSdOqF8unG15TRZYQL2Oft6ViSkpbDo2xak3f9X/oBQ
+	 hdgmORqjGfdTWacMEobadnx2X+0p/SZtoxnjiXCtMwGUt8oh7HUv7xu7tb6pwJ0WNwg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795266998;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=TxW/RAptOpxLkind6FtvVROcaKbdd/cBMgMOKwStZeM=;
-	b=U3NkHpsa4qmmNgUoA1YsEvU/t4ZJL/1SaCrn3ACeq3Sxoi4J6NEwaQQmEpfCRvpWT0/P
-	 oBWHWR8mpxXCeZdCAUH/6H96dg6apN1nnPdKzk8JimjZJuFc8FMOHD8KBR22NaWX3egzF
-	 XBHgEwViFkiY8JcalCYdNicDMOLST997JAVwLSoy0eLyfq1OMw2/Or60lj16lL+rH+u47
-	 fXRiMXm4MKMjFEhWygN610iTsy08a5H2bGtw/fM3YUCbQnS4u1SKogBzaMNLDQp8DSMpT
-	 zb6ObHBgkBHAWSs6/Z3IHd1apupBTIGgbsBpEA0LgF/ZJy7hSO0+IjMF1toS7S3aEgA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795292852;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=0re6fpub3fTmpH8TxeQSKcoylwCTw/SPGEPC0+vOGB4=;
+	b=t6Ks0ugKm4Ok9kLXQq15+WqtP04iXu5ldMXvXepi8oso6/VsrTTtQusB9qMZ31rFWxni
+	 5IiYnrLwUI6VMTzXgBA8EEZWVuMLmceJTlX/IpFRioaB/5GiShCZJnvpjNY4lXyEzjw5F
+	 aoJ1fo43YG/gi+UD+3RVzEV5vxanvLZWzUQ8ZWMVKYVtU+INKLuPjbKJiMO05UttyPJP6
+	 On/HHJJCGAoXYB5sQwSh5u5iN14T+RMS99gdJYccdOR8Y0f47qClYLrNuLkB62Kg1muCL
+	 rollTxQvmLdTqrx+53U/orqQdM/6I394Drq/fZlb0aN63yc0YIWNxU06cnnYJ7GcGGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bPAShBr7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WycZltiE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 77793606A32C;
-	Sat, 21 Nov 2026 13:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3D8606A320;
+	Sat, 21 Nov 2026 20:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bPAShBr7
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 930CA1F000C0;
-	Sat, 21 Nov 2026 13:16:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WycZltiE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79D621F000C0;
+	Sat, 21 Nov 2026 20:27:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795266998;
-	bh=TxW/RAptOpxLkind6FtvVROcaKbdd/cBMgMOKwStZeM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=bPAShBr7KOOGPBKH+XTeVXkgXBPFn40auFQSlE9hM8FDZmc2VPBT8Pq0gw83FDHHz
-	 puDG/SloQy85d6f6pt40euCNXoB9KNLlbgkAg8nEZEwPv26NTv12dnjuIX1/hEkd7F
-	 Y+v34WLQW/heaHEZxlua+xB+3xcxWtK887Hdmb/5Kj5r/xUU7kORPO2reS/uCP5scj
-	 28VUcr02GlWxQzAWdy5DXSsAacKGZplfY7yTt8sxZ31jBcV/4+tI3snCWxj+0uAVEJ
-	 Hbjv/Gkh1sBmM/osurXObPF/vRMcavLbYjGrfmTZo2LL7YmOjGy/E0D83NqUxvDb/r
-	 +CjTnZ4TPRP7g==
-Date: Sat, 21 Nov 2026 13:51:44 +0100
-From: Nicolas Schier <nsc@kernel.org>
-To: kernel test robot <lkp@intel.com>
-Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Sasha Levin <sashal@kernel.org>, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>
+	s=k20260515; t=1795292851;
+	bh=0re6fpub3fTmpH8TxeQSKcoylwCTw/SPGEPC0+vOGB4=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=WycZltiEXCZkOANAq82d6AZPfXwk6z02PQt7z4jj4OkvoDjoo/ffv+2dGKyojlSoJ
+	 Xli5U0eavl1n5q7d8YwOh+u+ZEmyc/d9V3fNmzhzFBpPgZNdkEt6HSVE9Qh7EwGdng
+	 69WCNueMOBgVIM35K+gXGynx8gFrQC80QdzxYzCnyxVaBEF+Hk7MHA6KhI9vqsS0hi
+	 fKN9WYjcdR9YvWUx0Q7s6EWmam6G7He0dOPt93/2u40dQtPSn6FeFV/iQkSamQIm9D
+	 FvhTGjRoVnMslTld9LM0KhYvXYAZlqIMBBu8V0QsyNnbw+5N9Kw6zES9wOC4wwm0aA
+	 dAM0snb+usuZg==
+Message-ID: <sashiko-outbox-227340@kernel.org>
+From: sashiko-bot@kernel.org
 Subject: Re: [PATCH] Move struct cpu_feature to a
  <linux/device-id/cpu_feature.h>
-Message-ID: <awGT4AhwcFcLsW0c@levanger>
-Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	kernel test robot <lkp@intel.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Sasha Levin <sashal@kernel.org>, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>
-References: <20261120202712.3377691-1-nsc@kernel.org>
- <202611211941.G0rlpNpN-lkp@intel.com>
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Nicolas Schier" <nsc@kernel.org>, =?utf-8?b?VXdlIEtsZWluZS1Lw7ZuaWc=?= <u.kleine-koenig@baylibre.com>, "Nathan
+ Chancellor" <nathan@kernel.org>, "Sasha Levin" <sashal@kernel.org>
+Cc: "Harald Freudenberger" <freude@linux.ibm.com>, "Holger Dengler" <dengler@linux.ibm.com>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, "Huacai Chen" <chenhuacai@kernel.org>, "WANG
+ Xuerui" <kernel@xen0n.name>, "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>, linux-kbuild@vger.kernel.org, linux-s390@vger.kernel.org, "kernelci.org
+ bot" <bot@kernelci.org>, "Nicolas Schier" <n.schier@fritz.com>, "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261120202712.3377691-1-nsc@kernel.org>
+References: <awCruYkI2TkxJfPC@levanger>
+ <20261120202712.3377691-1-nsc@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 21 Nov 2026 20:27:30 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -88,58 +66,55 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202611211941.G0rlpNpN-lkp@intel.com>
 
-On Sat, Nov 21, 2026 at 08:01:20PM +0800, kernel test robot wrote:
-> Hi Nicolas,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on kvm/queue]
-> [also build test ERROR on kvm/next linus/master v7.4-rc3]
-> [cannot apply to kvm/linux-next next-20261119]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Nicolas-Schier/Move-struct-cpu_feature-to-a-linux-device-id-cpu_feature-h/20261120-212711
-> base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-> patch link:    https://lore.kernel.org/r/20261120202712.3377691-1-nsc%40kernel.org
-> patch subject: [PATCH] Move struct cpu_feature to a <linux/device-id/cpu_feature.h>
-> config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20261121/202611211941.G0rlpNpN-lkp@intel.com/config)
-> compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 3b14d7c370558b46e5f0c6494a05c492e59bf32c)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261121/202611211941.G0rlpNpN-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202611211941.G0rlpNpN-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
-> >> drivers/s390/crypto/pkey_cca.c:22:45: error: array has incomplete element type 'struct ap_device_id'
->       22 | static struct ap_device_id pkey_cca_card_ids[] = {
->          |                                             ^
->    drivers/s390/crypto/ap_bus.h:158:9: note: forward declaration of 'struct ap_device_id'
->      158 |         struct ap_device_id *ids;
->          |                ^
->    1 error generated.
-> --
-> >> drivers/s390/crypto/pkey_ep11.c:23:46: error: array has incomplete element type 'struct ap_device_id'
->       23 | static struct ap_device_id pkey_ep11_card_ids[] = {
->          |                                              ^
->    drivers/s390/crypto/ap_bus.h:158:9: note: forward declaration of 'struct ap_device_id'
->      158 |         struct ap_device_id *ids;
->          |                ^
->    1 error generated.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [High] s390/pkey: build failure in pkey_cca.c and pkey_ep11.c due to
+  missing ap.h
+--
 
-That is fixed by [1] which is to be applied before the patch referenced
-above.
+commit 543ef19435c07903669c00abccf0dfdd05854de2
+Author: Nicolas Schier <n.schier@fritz.com>
 
-[1]: https://lore.kernel.org/linux-kbuild/66e4ee9c7f9b4bc48fcee92a94b6bb6d92fe1ad2.1794233316.git.sashal@kernel.org/
+Move struct cpu_feature to a <linux/device-id/cpu_feature.h>
 
--- 
-Nicolas
+This commit moves the definition of struct cpu_feature from
+<linux/mod_devicetable.h> into a new <linux/device-id/cpu_feature.h> header
+and updates <linux/cpufeature.h> and arch/loongarch/kvm/main.c to include
+the new header directly.
+
+Link: https://lore.kernel.org/r/f610c07f39df15f3e7ebdc63bfcd759ca7a687a8.17=
+94233316.git.sashal@kernel.org # [1]
+
+> diff --git a/include/linux/cpufeature.h b/include/linux/cpufeature.h
+> index 6aff540ee9e57..cd470987777f3 100644
+> --- a/include/linux/cpufeature.h
+> +++ b/include/linux/cpufeature.h
+> @@ -6,10 +6,11 @@
+>  #ifndef __LINUX_CPUFEATURE_H
+>  #define __LINUX_CPUFEATURE_H
+> =20
+> +#include <linux/device-id/cpu_feature.h>
+> +
+>  #ifdef CONFIG_GENERIC_CPU_AUTOPROBE
+> =20
+>  #include <linux/init.h>
+> -#include <linux/mod_devicetable.h>
+>  #include <asm/cpufeature.h>
+> =20
+>  /*
+
+[Severity: High]
+Does removing <linux/mod_devicetable.h> here break the s390 build when
+CONFIG_PKEY_CCA=3Dm or CONFIG_PKEY_EP11=3Dm?
+
+drivers/s390/crypto/pkey_cca.c and drivers/s390/crypto/pkey_ep11.c define
+arrays of struct ap_device_id (pkey_cca_card_ids[] and
+pkey_ep11_card_ids[]) without directly including <linux/device-id/ap.h>.
+They previously got that definition transitively through
+<linux/cpufeature.h> -> <linux/mod_devicetable.h>, so struct ap_device_id
+is now an incomplete type in both files.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261120202712.3377=
+691-1-nsc@kernel.org?part=3D1
