@@ -1,65 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795450094;
-	b=Fq0YzU6rSpLqNXB4JnA9Qn7TrJ39B/+teiJ5hMKGm+POR16PzYA/vtNkK1a2/IC1Nflq
-	 VBP6975JQDmxXM5rBs5lSoWACf0h+kGdT5ojSv1XonxB+KL8hwq/wHl2T0k92Y0OP+I1x
-	 I3T7tmvE/dWRAQi+AWYGQfmRMxbIn2RcnUqAd8UWbVS3z9b1xWc5Z4861v1ArfCocaSZH
-	 /VKD6z1l/89W+3Gkz5tqzrdFxszGKcjLwyAz098z6+svjVYoR3HA5HE0YuOo/PkoM1sRL
-	 RP8ItPx/whQk8CL9/ulkT7eGpW+RwWJ4dQ9gUJl1GUVWz4pSQhrP/JHHEiZMUa3kLfw==
+	t=1795452828;
+	b=fsRez3F8xUO/KMng0h1Es4Pe9wLPLmxXwEoF8EWQ67nE4LOAX5huwyz0w8G9RljTS8eN
+	 ENDYTOoXGb5qXf1ppcohMeOPnysRNOwfDnnxOmO8ZPI2eezvScV7P5Lq5ePLc+q+rqtYs
+	 CL/rRLJ/P/0sD9MqSEzJ6qISyyeIEV/oum/YpDN1XnRt6zlHmkYGfV+nAPvdvr1Kdd0mP
+	 EDS4TLqCSlnULCMz4JDi3PyZ22GK6uwn4j8Dphz8mn4MHhzMIWF09A7YtsnRQ6WPMoRvl
+	 IXZkWPhCYrcdj2l3gKYj3f+Cs1HibiyvRWiTPQPrWfUDqX44nF5cPLV4UV3guU2o1Sw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795450094;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795452828;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 Mail-Followup-To:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=FtTfCAP+uj6SKc3h12JbdbROUwV3iVgdUmum2yJZR/g=;
-	b=MmeoyO8p5Mr2Kl0Q8ftqwJR9kUjRFuHVq4ub/TB/ANXpWHbdpX2HoMmxbge2mzlFSJhg
-	 aX6mMheknGx3Tv/SAygidSriKLto+lG1c1DuHOrV9ECSCSD3tO7F5IOlxqzKlQ+6CRODT
-	 lafBjy83lux94Bwq2KN7tfszhrWD2iMjRJAmN/tJs+ydm8VkhKArEDNtfenChRPWVbF8n
-	 m2S894N2EAbqM5UcvQK1WJRnaz4awSSe7ZJHhcsiTs/0HiN3AxBM38KUfEKOSiSI7tV8d
-	 J/5dp08zcZVqzCOlaQaIHESTluUy2GoyUaZcao7CvrDHQfxUu91t8V7KLqSVhqPhNNA==
+	bh=HPv8LvXts+euY0KV0U6e4nJCYlvsoxCBfrj0/hwpm38=;
+	b=pUvJkngFGF72PXG1XbqOyxHVnTFejmnSlesfN5ot2IV2DhtRfPXiBTjd548WWl+Ccffx
+	 T5eQccl1UT+LFeJ8/G1qL97aO9Q0cvsnI2UYgoLgMMMuGdeqjfpc4jFWqblkqGjU87KhJ
+	 Wf3W3+LclyMQXA5fQDdARJnAx0sIZMgI4Y2SZMHzlVDlPuI0jHFMWnlR5q/uPnCs3nKKN
+	 sS4LnQV3n8fXxC8iyFPl0KsgjsM7DA0ENQZSCQOCKnYNlDW8s9f3nQijso+Wjo2LIS7H4
+	 1H4yXcLdx9R4dbxloKKKyLXCjJuLNETvlxitFt7eeZH9RcUad8EzdsT8klUwQAOHZAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c4NNxdfv;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dZuLWmsJ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 2F7DB606A31E;
-	Mon, 23 Nov 2026 16:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id F1B00606A31F;
+	Mon, 23 Nov 2026 16:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c4NNxdfv
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 2EC511F000C6;
-	Mon, 23 Nov 2026 16:08:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dZuLWmsJ
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 000A61F000C4;
+	Mon, 23 Nov 2026 16:53:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795450093;
-	bh=FtTfCAP+uj6SKc3h12JbdbROUwV3iVgdUmum2yJZR/g=;
+	s=k20260515; t=1795452827;
+	bh=HPv8LvXts+euY0KV0U6e4nJCYlvsoxCBfrj0/hwpm38=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=c4NNxdfvlB0XPUghwPq2l4p7IE5n1jmftxzenMABCroEcnV9uh+vqYtAWlckYqgUr
-	 9G3LyVFzUGIR83ExDipW/cvClfFi+1Fez4WIIvw1amtgevi/mKmIXjV2X0jgh+dzIM
-	 SsgIDRKOu2sb02HReaCai2DjKrwmt2awCORo5kFKQDa7Gu5VPIzl89ioeqPGhcinCj
-	 ZzdHdfawCR0U8maLPhLmv9/oclSkpBeB3rtGwFyfDrabWY1maDUjtCq2aehfQOimRf
-	 LipTpJcjXsGZuA+M2hiLUsOgoFlsd5zTzl2M9LwqzLYBATN1RyHG8YOk65pVV90lO8
-	 fpDRV4+c6tFzQ==
-Date: Mon, 23 Nov 2026 16:58:04 +0100
+	b=dZuLWmsJ4Ur8+E/0/lYf4+1Y0Fio9wr7Y5cy4BK0DtngtdZuj8tLFRAEL99mYg3sQ
+	 1mtOwBFLJnU3pqD/HaAjnhVsWmXaoeU2hSH5tp2f9uSihyIuMKFgUwZLS0n8MtM5sj
+	 iRA8VN4Mf3E652QB2NKzdcmSIcFPpJGXvVSTmHVvQNLkrYcn7YRCVlZLoCB8ZoPmYB
+	 4Vea51Q3IOPXYqM3xjv9cOdDrrmhMjY2U6ytGVZfFYpyA+kzJGGPvfhs3XyuDeln0U
+	 7e62tgio9UpJV5ht6VDMIHIwE1fyIoUFPfbBTnyHEch81bvPNg9CzcRfTJhR3cOuYd
+	 hIgSEQ86QPVEg==
+Date: Mon, 23 Nov 2026 17:52:35 +0100
 From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Christian Heusel <christian@heusel.eu>,
-	linux-kbuild@vger.kernel.org,
-	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>
-Subject: Re: [PATCH] kbuild: package: Install System.map to build tree only
-Message-ID: <awRijCPFYK4J5L6C@levanger>
+To: sashiko-reviews@lists.linux.dev
+Cc: Vincent Mailhol <mailhol@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 3/3] kbuild: move scripts/mod target out of single-build
+Message-ID: <awRvU8_wAUlkd1Nj@levanger>
 Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
 	sashiko-reviews@lists.linux.dev,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Christian Heusel <christian@heusel.eu>,
-	linux-kbuild@vger.kernel.org,
-	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>
-References: <20261116-package-install-system-msp-to-build-dir-v1-1-ec53d3d39146@kernel.org>
- <sashiko-outbox-219115@kernel.org>
- <20261122213504.GA1454693@ax162>
+	Vincent Mailhol <mailhol@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org
+References: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
+ <20261111-reduce-single-build-dependencies-v1-3-7196ca986a85@kernel.org>
+ <sashiko-outbox-211218@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -71,110 +65,80 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261122213504.GA1454693@ax162>
+In-Reply-To: <sashiko-outbox-211218@kernel.org>
 
-On Sun, Nov 22, 2026 at 02:35:04PM -0700, Nathan Chancellor wrote:
-> On Tue, Nov 17, 2026 at 03:53:56PM +0000, sashiko-bot@kernel.org wrote:
-> > Thank you for your contribution! Sashiko AI review found 1 potential
-> > issue to consider:
-> > - [Medium] kbuild: package: System.map dropped from tar-pkg and dir-pkg
-> >   in buildtar
-> > --
-> > 
-> > commit 4e40237f8938f58bf4db63fc401e165ccfea766e
-> > Author: Nicolas Schier <nsc@kernel.org>
-> > 
-> > kbuild: package: Install System.map to build tree only
-> > 
-> > This commit removes the target-specific installation of System.map to
-> > /boot and instead installs System.map into the packaged kernel build tree
-> > via scripts/package/install-extmod-build.
-> > 
-> > > diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-> > > index cc87a473c01f4..057ca4fc7d71f 100755
-> > > --- a/scripts/package/buildtar
-> > > +++ b/scripts/package/buildtar
-> > > @@ -45,7 +45,6 @@ make ARCH="${ARCH}" -f ${srctree}/Makefile INSTALL_MOD_PATH="${tmpdir}" modules_
-> > >  #
-> > >  # Install basic kernel files
-> > >  #
-> > > -cp -v -- "${objtree}/System.map" "${tmpdir}/boot/System.map-${KERNELRELEASE}"
-> > >  cp -v -- "${KCONFIG_CONFIG}" "${tmpdir}/boot/config-${KERNELRELEASE}"
-> > >  cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
-> > 
-> > [Severity: Medium]
-> > Does removing this copy drop System.map from the tar-pkg and dir-pkg
-> > targets altogether?  Unlike PKGBUILD, builddeb, and kernel.spec, buildtar
-> > does not package a kernel build tree or call
-> > scripts/package/install-extmod-build, so System.map is no longer included
-> > anywhere in the resulting tarball or directory.
+On Thu, Nov 12, 2026 at 01:45:43PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential
+> issue to consider:
+> - [Low] kbuild: unordered modpost_prepare and stack_protector_prepare
+>   mutates CFLAGS
+> --
 > 
-> Seems legitimate.
+> commit 08ffc13380249741520c2ea434688d701b5d0e9b
+> Author: Vincent Mailhol <mailhol@kernel.org>
 > 
-> This got me thinking a little more about this change and I am not sure
-> this is actually a good direction to go in. Tying the existence of
-> System.map to the external module build feels wrong to me since it may
-> be useful for other tools and /boot/System.map-${KERNELRELEASE} is a
-> common place for it to be. I think we should probably leave it where it
-> is in the current set of packaging scripts but symlink it to the
-> external module build location in the places that need it.
-
-As Distros are moving everything to /usr/ -- but I haven't seen
-/usr/boot/ anywhere -- I'd prefer to move it away from /boot.  The
-kmod build tree looks like the native location to me (as per
-scripts/depmod.sh) and from what I can find, most debugging tools use
-vmlinux or /proc/kallsyms rather than System.map; but I have never ever
-tried to debug a Linux without the full source + build tree at hand.
-
-Does System.map still help with regular debugging with CONFIG_KASLR
-enabled?
-
-If it wasn't for 'depmod -e' I'd like to put System.map to the
-linux-image-${KVER}-dbg_*.deb, as Debian does.
-
-
-> Something
-> like this maybe (completely untested):
+> kbuild: move scripts/mod target out of single-build
 > 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index ba1defc61652..4261963a901e 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -147,6 +147,13 @@ install_kernel_headers () {
->  		"${srctree}/scripts/package/install-extmod-build" "${pdir}/usr/src/linux-headers-${version}"
->  	fi
->  
-> +	if [ "${ARCH}" = um ] ; then
-> +		system_map="/usr/lib/uml/modules/${KERNELRELEASE}/System.map"
-> +	else
-> +		system_map="/boot/System.map-${KERNELRELEASE}"
-> +	fi
-> +	ln -s "${system_map}" "${pdir}/usr/src/linux-headers-${version}/System.map"
-> +
+> This commit moves the scripts/mod build out of prepare0 into a new
+> modpost_prepare target depended on by modules_prepare and modpost.
+> 
+> > diff --git a/Makefile b/Makefile
+> > index 2c1289a44c560..93236f310f080 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1405,7 +1405,7 @@ scripts: scripts_basic scripts_dtc
+> >  # archprepare is used in arch Makefiles and when processed asm symlink,
+> >  # version.h and scripts_basic is processed / created.
+> >  
+> > -PHONY += prepare archprepare
+> > +PHONY += prepare archprepare modpost_prepare
+> >  
+> >  archprepare: outputmakefile archheaders archscripts scripts include/config/kernel.release \
+> >  	asm-generic $(version_h) include/generated/utsrelease.h \
+> > @@ -1414,6 +1414,8 @@ archprepare: outputmakefile archheaders archscripts scripts include/config/kerne
+> >  
+> >  prepare0: archprepare
+> >  	$(Q)$(MAKE) $(build)=. prepare $(if $(single-build),,prepare_checks)
+> > +
+> > +modpost_prepare: archprepare
+> >  	$(Q)$(MAKE) $(build)=scripts/mod
+> 
+> [Severity: Low]
+> Should modpost_prepare be ordered relative to stack_protector_prepare (or
+> depend on prepare)?
+> 
+> On arm, arm64, powerpc, and riscv, prepare depends on
+> stack_protector_prepare, which depends on prepare0 and mutates the
+> exported KBUILD_CFLAGS variable at recipe execution time:
+> 
+> arch/arm64/Makefile:
+> prepare: stack_protector_prepare
+> stack_protector_prepare: prepare0
+> 	$(eval KBUILD_CFLAGS += -mstack-protector-guard=sysreg		  \
+> 				-mstack-protector-guard-reg=sp_el0	  \
+> 				-mstack-protector-guard-offset=$(shell	  \
+> 			awk '{if ($$2 == "TSK_STACK_CANARY") print $$3;}' \
+> 				$(objtree)/include/generated/asm-offsets.h))
+> 
+> Previously, scripts/mod was built inside prepare0, so it always ran before
+> stack_protector_prepare modified KBUILD_CFLAGS.  With modpost_prepare
+> only depending on archprepare, a parallel build runs modpost_prepare
+> concurrently with prepare0 before stack_protector_prepare updates
+> KBUILD_CFLAGS, whereas a serial build or make modules_prepare runs
+> prepare first and passes the updated KBUILD_CFLAGS to scripts/mod.
+> 
+> Because scripts/mod/empty.o is compiled with KBUILD_CFLAGS, switching
+> between parallel and serial or single-module builds changes its recorded
+> command line, rebuilding empty.o, regenerating elfconfig.h (which uses
+> if_changed), and forcing a full rebuild of modpost.
 
-What about doing it the other way round?  We could provide the symlink
-in the old /boot/ location for now and move System.map to the module
-build tree?
+Well yes,
 
+   make scripts/mod/empty.o && make modules
 
-
->  	mkdir -p $pdir/lib/modules/$version/
->  	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
->  }
-> diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
-> index 8f0933cbbe45..3add2b2c7dd2 100644
-> --- a/scripts/package/kernel.spec
-> +++ b/scripts/package/kernel.spec
-> @@ -122,6 +122,7 @@ fi
->  ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}/lib/modules/%{KERNELRELEASE}/build
->  %if %{with_devel}
->  %{make} %{makeflags} run-command KBUILD_RUN_COMMAND='${srctree}/scripts/package/install-extmod-build %{buildroot}/usr/src/kernels/%{KERNELRELEASE}'
-> +ln -fns /lib/modules/%{KERNELRELEASE}/System.map %{buildroot}/usr/src/kernels/%{KERNELRELEASE}/System.map
-
-Looking at line 122 (start of hunk), /lib/modules/%{KERNELRELEASE} seems to be a symlink to
-/lib/modules/%{KERNELRELEASE}/build/, thus that line will would create a
-funny symlink. ;)
-
+leads to a rebuild of empty.o and modpost triggered by 'make modules'.
+But if that is the only negative implication, this is not relevant as I
+expect no human wants to build scripts/mod/empty.o as a single-target.
 
 -- 
 Nicolas
