@@ -1,64 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795441901;
-	b=zgV7u+XxfqQ3f/8q9J2lPMTBjmlzfDLlknwFtx02ADfXGWoe0oLNRk9/1EpBEdH+o13q
-	 3cVq+PmSAb2KepYUzCvxjBJIPjkpITd2Lz0a70oF36/PWbN0TyfOLQRwKIUWfH/Gna/r8
-	 zYJbrHpA+puiL54Bf2uDDnAUEpHLFGU0J5V5H104lBRFYasaTII/OVKirk9OxDUorg4Dk
-	 fjNIEcfKTrzY/OJCrX50CXGMWCOUrpAlJJibReBG+CL+umuQArZe2wBJ/ihX+663ZBfp/
-	 9f2bvwVNmVJz0uMhuWpobxirteLgxzQOkuEQrEewFuDLRx6Q/R+rDrmzBfA4BNoDfjg==
+	t=1795450094;
+	b=Fq0YzU6rSpLqNXB4JnA9Qn7TrJ39B/+teiJ5hMKGm+POR16PzYA/vtNkK1a2/IC1Nflq
+	 VBP6975JQDmxXM5rBs5lSoWACf0h+kGdT5ojSv1XonxB+KL8hwq/wHl2T0k92Y0OP+I1x
+	 I3T7tmvE/dWRAQi+AWYGQfmRMxbIn2RcnUqAd8UWbVS3z9b1xWc5Z4861v1ArfCocaSZH
+	 /VKD6z1l/89W+3Gkz5tqzrdFxszGKcjLwyAz098z6+svjVYoR3HA5HE0YuOo/PkoM1sRL
+	 RP8ItPx/whQk8CL9/ulkT7eGpW+RwWJ4dQ9gUJl1GUVWz4pSQhrP/JHHEiZMUa3kLfw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795441901;
-	h=DMARC-Filter:From:DKIM-Signature:DKIM-Signature:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Developer-Signature:X-Developer-Key;
-	bh=JPmhvZcQZsMI6w6eJvQYmGXP4b/7L7ItLiKaLRPpFiQ=;
-	b=N8kE23H7VDN8zh7XmWAeScgqM/NboF89Q4dsEeNx4hJ8v3wwczLoF0YKUmOBIidWsdPh
-	 Sj6PxtzcNYZxjqmjWtSYTUs36MevFoOadm08USUKNC+aD5Nqdd8AjfU0kxVElt+PZvdQS
-	 Xnsb3x/JMmSEVw8rcoKgWDxbCDB10+y0kN95xC2/88jUv13ymjqdG7Uaqb1T+bM/aV1pZ
-	 2eLQ9pU7mkr/pF0B/dbfMf6r0ccbYK8W4np2wRrwmz5dAhWhzAUBbxKHFQlVjl4qDiH62
-	 Sv2v5WbXz/hHjCMW+Ixg5QMCcxY8964HLsnlwsveg8DNM24Ma6psG50PvioHImZtUMg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795450094;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 Mail-Followup-To:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=FtTfCAP+uj6SKc3h12JbdbROUwV3iVgdUmum2yJZR/g=;
+	b=MmeoyO8p5Mr2Kl0Q8ftqwJR9kUjRFuHVq4ub/TB/ANXpWHbdpX2HoMmxbge2mzlFSJhg
+	 aX6mMheknGx3Tv/SAygidSriKLto+lG1c1DuHOrV9ECSCSD3tO7F5IOlxqzKlQ+6CRODT
+	 lafBjy83lux94Bwq2KN7tfszhrWD2iMjRJAmN/tJs+ydm8VkhKArEDNtfenChRPWVbF8n
+	 m2S894N2EAbqM5UcvQK1WJRnaz4awSSe7ZJHhcsiTs/0HiN3AxBM38KUfEKOSiSI7tV8d
+	 J/5dp08zcZVqzCOlaQaIHESTluUy2GoyUaZcao7CvrDHQfxUu91t8V7KLqSVhqPhNNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linutronix.de;
-	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=rCXDMhbM;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=Vihz+OSm;
-	arc=none smtp.remote-ip=193.142.43.55
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c4NNxdfv;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37103606A32A;
-	Mon, 23 Nov 2026 13:51:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 37103606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 2F7DB606A31E;
+	Mon, 23 Nov 2026 16:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=rCXDMhbM;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=Vihz+OSm
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1795441899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JPmhvZcQZsMI6w6eJvQYmGXP4b/7L7ItLiKaLRPpFiQ=;
-	b=rCXDMhbMNovmfoO6qyadNrRk7f6HVHBen34hmO8c2sCJxmWlrI+kuN6Fu1RHeKKsk6EY24
-	E0SacrConMBbHsRxfbnnA1QmrkSNG5ig6+9Hj82q0+fcZzQog4JMvSX6BdBkvLPKAZY09a
-	cmajQWcX84aMnEYYUqKcjQOYaLNnWLHV9hW4r1F+KoYJyRFvRAAJZbR87Cv1533ZENWlNL
-	1IH3b3cUootBgp4GSIrRdqXPpBA39+LY1KQmZGiOE+gUNUvfwW3zvseTDo78nzug9YZv0c
-	Nf0/IEvGQ27iEzT9+d3kiH4e7e72aytWDiOonz7mndTpsY7S1mpQeK4PjYtpeQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1795441899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JPmhvZcQZsMI6w6eJvQYmGXP4b/7L7ItLiKaLRPpFiQ=;
-	b=Vihz+OSme/gaZLLhdpsDZx8NOwH494utLHXdBxi1jGqiwVH9qbyOTU05x0YmhKAKY4MP4H
-	F0xPTtLbZf0pAzDg==
-Date: Mon, 23 Nov 2026 14:51:02 +0100
-Subject: [PATCH v6 11/11] vDSO: Automatically enable VDSO_CHECK
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c4NNxdfv
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 2EC511F000C6;
+	Mon, 23 Nov 2026 16:08:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795450093;
+	bh=FtTfCAP+uj6SKc3h12JbdbROUwV3iVgdUmum2yJZR/g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=c4NNxdfvlB0XPUghwPq2l4p7IE5n1jmftxzenMABCroEcnV9uh+vqYtAWlckYqgUr
+	 9G3LyVFzUGIR83ExDipW/cvClfFi+1Fez4WIIvw1amtgevi/mKmIXjV2X0jgh+dzIM
+	 SsgIDRKOu2sb02HReaCai2DjKrwmt2awCORo5kFKQDa7Gu5VPIzl89ioeqPGhcinCj
+	 ZzdHdfawCR0U8maLPhLmv9/oclSkpBeB3rtGwFyfDrabWY1maDUjtCq2aehfQOimRf
+	 LipTpJcjXsGZuA+M2hiLUsOgoFlsd5zTzl2M9LwqzLYBATN1RyHG8YOk65pVV90lO8
+	 fpDRV4+c6tFzQ==
+Date: Mon, 23 Nov 2026 16:58:04 +0100
+From: Nicolas Schier <nsc@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: sashiko-reviews@lists.linux.dev,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Christian Heusel <christian@heusel.eu>,
+	linux-kbuild@vger.kernel.org,
+	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>
+Subject: Re: [PATCH] kbuild: package: Install System.map to build tree only
+Message-ID: <awRijCPFYK4J5L6C@levanger>
+Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	sashiko-reviews@lists.linux.dev,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Christian Heusel <christian@heusel.eu>,
+	linux-kbuild@vger.kernel.org,
+	=?iso-8859-1?Q?Adri=E1n_Garc=EDa?= Casado <adriangarciacasado42@gmail.com>
+References: <20261116-package-install-system-msp-to-build-dir-v1-1-ec53d3d39146@kernel.org>
+ <sashiko-outbox-219115@kernel.org>
+ <20261122213504.GA1454693@ax162>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -68,204 +69,112 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20261123-vdso-absolute-reloc-v6-11-161e218dd217@linutronix.de>
-References: <20261123-vdso-absolute-reloc-v6-0-161e218dd217@linutronix.de>
-In-Reply-To: <20261123-vdso-absolute-reloc-v6-0-161e218dd217@linutronix.de>
-To: Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Alexandre Ghiti <alex@ghiti.fr>, Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Andy Lutomirski <luto@kernel.org>, 
- Vincenzo Frascino <vincenzo.frascino@arm.com>, Kees Cook <kees@kernel.org>, 
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
- "H. Peter Anvin" <hpa@zytor.com>, Richard Weinberger <richard@nod.at>, 
- Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Russell King <linux@armlinux.org.uk>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Madhavan Srinivasan <maddy@linux.ibm.com>, 
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
- Alexander Gordeev <agordeev@linux.ibm.com>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>, 
- Sven Schnelle <svens@linux.ibm.com>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
- Danilo Krummrich <dakr@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
- Christophe Leroy <chleroy@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Nicolas Schier <nsc@kernel.org>
-Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
- llvm@lists.linux.dev, linux-mm@kvack.org, linux-um@lists.infradead.org, 
- linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
- loongarch@lists.linux.dev, linux-s390@vger.kernel.org, 
- linux-mips@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, Jan Stancek <jstancek@redhat.com>, 
- Arnaldo Carvalho de Melo <acme@redhat.com>, 
- Peter Zijlstra <peterz@infradead.org>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795441872; l=4650;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=tCXUwkZUh4Hl18kwgGqhcWJoeos+T/6rMQq0M5SHQdY=;
- b=gvQ6fSLlDUp8t1Kpx0/BBIhQ7AihqhesygBcKjwQL0dpVUoOyS5DoqWuOa59xHy5yVuHPzbgt
- Z/t2kJ3fm0ZAJfn4xh2H2o29XKP0jwDQOX8shG9Arg4eFHtoqbgV9U/
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261122213504.GA1454693@ax162>
 
-All architectures using the generic vDSO library should enable
-VDSO_CHECK. Now that this is the case, enable VDSO_CHECK automatically.
+On Sun, Nov 22, 2026 at 02:35:04PM -0700, Nathan Chancellor wrote:
+> On Tue, Nov 17, 2026 at 03:53:56PM +0000, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 1 potential
+> > issue to consider:
+> > - [Medium] kbuild: package: System.map dropped from tar-pkg and dir-pkg
+> >   in buildtar
+> > --
+> > 
+> > commit 4e40237f8938f58bf4db63fc401e165ccfea766e
+> > Author: Nicolas Schier <nsc@kernel.org>
+> > 
+> > kbuild: package: Install System.map to build tree only
+> > 
+> > This commit removes the target-specific installation of System.map to
+> > /boot and instead installs System.map into the packaged kernel build tree
+> > via scripts/package/install-extmod-build.
+> > 
+> > > diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+> > > index cc87a473c01f4..057ca4fc7d71f 100755
+> > > --- a/scripts/package/buildtar
+> > > +++ b/scripts/package/buildtar
+> > > @@ -45,7 +45,6 @@ make ARCH="${ARCH}" -f ${srctree}/Makefile INSTALL_MOD_PATH="${tmpdir}" modules_
+> > >  #
+> > >  # Install basic kernel files
+> > >  #
+> > > -cp -v -- "${objtree}/System.map" "${tmpdir}/boot/System.map-${KERNELRELEASE}"
+> > >  cp -v -- "${KCONFIG_CONFIG}" "${tmpdir}/boot/config-${KERNELRELEASE}"
+> > >  cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
+> > 
+> > [Severity: Medium]
+> > Does removing this copy drop System.map from the tar-pkg and dir-pkg
+> > targets altogether?  Unlike PKGBUILD, builddeb, and kernel.spec, buildtar
+> > does not package a kernel build tree or call
+> > scripts/package/install-extmod-build, so System.map is no longer included
+> > anywhere in the resulting tarball or directory.
+> 
+> Seems legitimate.
+> 
+> This got me thinking a little more about this change and I am not sure
+> this is actually a good direction to go in. Tying the existence of
+> System.map to the external module build feels wrong to me since it may
+> be useful for other tools and /boot/System.map-${KERNELRELEASE} is a
+> common place for it to be. I think we should probably leave it where it
+> is in the current set of packaging scripts but symlink it to the
+> external module build location in the places that need it.
 
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
----
- arch/arm/mm/Kconfig    | 1 -
- arch/arm64/Kconfig     | 1 -
- arch/loongarch/Kconfig | 1 -
- arch/mips/Kconfig      | 1 -
- arch/powerpc/Kconfig   | 1 -
- arch/riscv/Kconfig     | 1 -
- arch/s390/Kconfig      | 1 -
- arch/sparc/Kconfig     | 1 -
- arch/x86/Kconfig       | 1 -
- lib/vdso/Kconfig       | 2 ++
- 10 files changed, 2 insertions(+), 9 deletions(-)
+As Distros are moving everything to /usr/ -- but I haven't seen
+/usr/boot/ anywhere -- I'd prefer to move it away from /boot.  The
+kmod build tree looks like the native location to me (as per
+scripts/depmod.sh) and from what I can find, most debugging tools use
+vmlinux or /proc/kallsyms rather than System.map; but I have never ever
+tried to debug a Linux without the full source + build tree at hand.
 
-diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
-index 7f55ed37f464..41d7b495ec45 100644
---- a/arch/arm/mm/Kconfig
-+++ b/arch/arm/mm/Kconfig
-@@ -943,7 +943,6 @@ config VDSO
- 	depends on AEABI && MMU && CPU_V7
- 	default y if ARM_ARCH_TIMER
- 	select GENERIC_GETTIMEOFDAY
--	select VDSO_CHECK
- 	help
- 	  Place in the process address space an ELF shared object
- 	  providing fast implementations of gettimeofday and
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index df22b4ed5e29..1075bc661833 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -258,7 +258,6 @@ config ARM64
- 	select TRACE_IRQFLAGS_NMI_SUPPORT
- 	select HAVE_SOFTIRQ_ON_OWN_STACK
- 	select USER_STACKTRACE_SUPPORT
--	select VDSO_CHECK
- 	select VDSO_GETRANDOM
- 	select VMAP_STACK
- 	help
-diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
-index ad4cafeddbb8..b5ed4881d3c0 100644
---- a/arch/loongarch/Kconfig
-+++ b/arch/loongarch/Kconfig
-@@ -211,7 +211,6 @@ config LOONGARCH
- 	select TRACE_IRQFLAGS_SUPPORT
- 	select USE_PERCPU_NUMA_NODE_ID
- 	select USER_STACKTRACE_SUPPORT
--	select VDSO_CHECK
- 	select VDSO_DATASTORE
- 	select VDSO_GETRANDOM
- 	select ZONE_DMA32 if 64BIT
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index 31c247c2faeb..ed17c9b1624c 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -106,7 +106,6 @@ config MIPS
- 	select TRACE_IRQFLAGS_SUPPORT
- 	select ARCH_HAS_ELFCORE_COMPAT
- 	select HAVE_ARCH_KCSAN if 64BIT
--	select VDSO_CHECK
- 
- config MIPS_FIXUP_BIGPHYS_ADDR
- 	bool
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 1c4a75c3a830..c3b6cd655606 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -327,7 +327,6 @@ config PPC
- 	select SYSCTL_EXCEPTION_TRACE
- 	select THREAD_INFO_IN_TASK
- 	select TRACE_IRQFLAGS_SUPPORT
--	select VDSO_CHECK
- 	select VDSO_DATASTORE
- 	select VDSO_GETRANDOM
- 	#
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 2a0f5fbcd7e3..e7891a2a89da 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -226,7 +226,6 @@ config RISCV
- 	select THREAD_INFO_IN_TASK
- 	select TRACE_IRQFLAGS_SUPPORT
- 	select UACCESS_MEMCPY if !MMU
--	select VDSO_CHECK if MMU
- 	select VDSO_DATASTORE if MMU
- 	select VDSO_GETRANDOM if MMU && 64BIT
- 	select USER_STACKTRACE_SUPPORT
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index 71a614832886..7138d923d86f 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -289,7 +289,6 @@ config S390
- 	select TRACE_IRQFLAGS_SUPPORT
- 	select TTY
- 	select USER_STACKTRACE_SUPPORT
--	select VDSO_CHECK
- 	select VDSO_GETRANDOM
- 	select VIRT_CPU_ACCOUNTING
- 	select VMAP_STACK
-diff --git a/arch/sparc/Kconfig b/arch/sparc/Kconfig
-index 90df77235184..742ffff8c37f 100644
---- a/arch/sparc/Kconfig
-+++ b/arch/sparc/Kconfig
-@@ -114,7 +114,6 @@ config SPARC64
- 	select ARCH_SUPPORTS_SCHED_SMT if SMP
- 	select ARCH_SUPPORTS_SCHED_MC  if SMP
- 	select ARCH_HAS_LAZY_MMU_MODE
--	select VDSO_CHECK
- 	select GENERIC_GETTIMEOFDAY
- 
- config ARCH_PROC_KCORE_TEXT
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 09d3aa04ee82..58dce0b66179 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -302,7 +302,6 @@ config X86
- 	select HAVE_UNSTABLE_SCHED_CLOCK
- 	select HAVE_UNWIND_USER_FP		if X86_64
- 	select HAVE_USER_RETURN_NOTIFIER
--	select VDSO_CHECK
- 	select VDSO_GETRANDOM			if X86_64
- 	select HOTPLUG_PARALLEL			if SMP && X86_64
- 	select HOTPLUG_SMT			if SMP
-diff --git a/lib/vdso/Kconfig b/lib/vdso/Kconfig
-index 559f5534831e..741de1abe923 100644
---- a/lib/vdso/Kconfig
-+++ b/lib/vdso/Kconfig
-@@ -6,6 +6,7 @@ config VDSO_DATASTORE
- config GENERIC_GETTIMEOFDAY
- 	bool
- 	select VDSO_DATASTORE
-+	select VDSO_CHECK
- 	help
- 	  This is a generic implementation of gettimeofday vdso.
- 	  Each architecture that enables this feature has to
-@@ -21,6 +22,7 @@ config GENERIC_VDSO_OVERFLOW_PROTECT
- config VDSO_GETRANDOM
- 	bool
- 	select VDSO_DATASTORE
-+	select VDSO_CHECK
- 	help
- 	  Selected by architectures that support vDSO getrandom().
- 
+Does System.map still help with regular debugging with CONFIG_KASLR
+enabled?
+
+If it wasn't for 'depmod -e' I'd like to put System.map to the
+linux-image-${KVER}-dbg_*.deb, as Debian does.
+
+
+> Something
+> like this maybe (completely untested):
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index ba1defc61652..4261963a901e 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -147,6 +147,13 @@ install_kernel_headers () {
+>  		"${srctree}/scripts/package/install-extmod-build" "${pdir}/usr/src/linux-headers-${version}"
+>  	fi
+>  
+> +	if [ "${ARCH}" = um ] ; then
+> +		system_map="/usr/lib/uml/modules/${KERNELRELEASE}/System.map"
+> +	else
+> +		system_map="/boot/System.map-${KERNELRELEASE}"
+> +	fi
+> +	ln -s "${system_map}" "${pdir}/usr/src/linux-headers-${version}/System.map"
+> +
+
+What about doing it the other way round?  We could provide the symlink
+in the old /boot/ location for now and move System.map to the module
+build tree?
+
+
+
+>  	mkdir -p $pdir/lib/modules/$version/
+>  	ln -s /usr/src/linux-headers-$version $pdir/lib/modules/$version/build
+>  }
+> diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
+> index 8f0933cbbe45..3add2b2c7dd2 100644
+> --- a/scripts/package/kernel.spec
+> +++ b/scripts/package/kernel.spec
+> @@ -122,6 +122,7 @@ fi
+>  ln -fns /usr/src/kernels/%{KERNELRELEASE} %{buildroot}/lib/modules/%{KERNELRELEASE}/build
+>  %if %{with_devel}
+>  %{make} %{makeflags} run-command KBUILD_RUN_COMMAND='${srctree}/scripts/package/install-extmod-build %{buildroot}/usr/src/kernels/%{KERNELRELEASE}'
+> +ln -fns /lib/modules/%{KERNELRELEASE}/System.map %{buildroot}/usr/src/kernels/%{KERNELRELEASE}/System.map
+
+Looking at line 122 (start of hunk), /lib/modules/%{KERNELRELEASE} seems to be a symlink to
+/lib/modules/%{KERNELRELEASE}/build/, thus that line will would create a
+funny symlink. ;)
+
 
 -- 
-2.56.1
-
+Nicolas
