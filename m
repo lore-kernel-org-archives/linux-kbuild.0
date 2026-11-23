@@ -1,65 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=18.194.254.142
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795436273;
-	b=IKn4Os74fAhT75Ctu3psUlByJZXPkhT+F+r1UEAkz9cYEM9Gspaem1hcrxEAKoeeW0Xk
-	 jdzo4t7BVpxG6jH5oGoCxSsnSm96rC57p2bqETopM7hvKOlN5dh5OEioEybiq253bC8tX
-	 75I/hsIKzM15WI5OFzJgkybMoCzAHYOsj7o8vaR6YXuDL/Ziuiuzj065E7YkxZEcZpyg9
-	 VYfQfsmJMoCCobmFRpRYGBrYs0w+m2ptV0RwxJvy/4ufztJTPwbXLUpRLxG9FXAaO2V7f
-	 /kxXlPqinIdW58luHZRE+ITy83SnIeJRCAZDGJJSDXLbrkJqnT01VLvg4sHkpDCfxBw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795436273;
-	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
-	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:From:To:Cc:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:X-QQ-XMAILINFO:
-	 X-QQ-XMRINFO:X-QQ-RECHKSPAM;
-	bh=w/P7Au62M+92CbRcPyECeOn9VVSwxvVTLIBVsrRkV4U=;
-	b=RHArcmsdSEklh4KRCJBSJCAjtg3eGH737BHUipON/n1wYF2/ouDZdSMLFmi1M3OWpUE2
-	 FfT/t32DRCYdlDV+GoOQlPYXsVTlZYGnl5Zgk+7NBMs3i/D4lmRC+iR/Y4J90GPluT9y3
-	 5GkoPKYgKRvopE2iuHpoV8C+0gpZ4W0c5T2DK6iI4TMIHhITbNzIDMdqJ6NmoGIO55u9C
-	 gEt2qa7sgko3PgC5/pSg9lXvb4YOLhba0GElbPMsy8G06YTGJtsW4yjvadrOBVjy6IkQq
-	 fCoNhgfTJtUUWQB+kAL2rFJweJaUWeMjdj/wjBXV30PZYKEVHNsxlZczttiaWOvrqOA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=uniontech.com;
-	spf=pass smtp.mailfrom=uniontech.com;
-	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=c6jWfE6f;
-	arc=none smtp.remote-ip=18.194.254.142
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.175
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795440551;
+	b=RKQ9OCn8jBcsZ/XnXnmaNpFDAokmaIR15RqghIO/UDd3k3SumO5ySeTu0R8U/k2xAGq9
+	 +zyA1BqFkzTLOPuD+EwEsBntBcTl2F/n+qob/GIYKGorJ9Ax4W2srIwBe7hrg7aX9I8TB
+	 SfTkM1H4XOaJSAjArLp6Le4P6VHWBsaLpTKNLFUR+Du/zG+IwfC9yCH5YF4NItAGRsroG
+	 y8mSHJ5uATMjIR8w91PLPVNL3vjQU33BtWeRo4qImB7ARwhRndsaGDTiNMXiey6Pn0S+y
+	 +S4aHzqSLASj+fzGag0rxwSB0N/v467BrQwJAPaHuowEISXMzRFqYM6EWXCWpEBXozw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795440551;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=5P0SfAg0RNgf//T93vMcvwfndd3128+sOIInvKqWpbA=;
+	b=qOk9jrrHPvvxMmC2kqG7yUGETx0ZR6ThAUiOPt65AluhJWq0GfnlFNjAk0k9QHKQfGja
+	 OrkC6qw5prVQUQoBjlDydRhh/AdzvyGy9+NbZh4ZRbJYKB9u92klJ/Smrtw4L1voGrVRb
+	 htndB2RqcUxHmxrO9nU3O06r7tyOGEE/L66VOUik7k63bUb92Wok7qqfrVeQO3psIopat
+	 S+cBWx336LkvYphZ55gAZ7YqRG6JU9u+Uq7RhLNoOrAVADnCDjH0+GoBqFVTh5CUlEJuC
+	 EjC+7+ZqY7+yWK5AqdXycjMs4WEAhwZPfoMcxsnvlgtgdQvXFXeEav9ZVdkXV7J99wg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=U72tvcMy;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.175
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451D5606A31A
-	for <linux-kbuild@vger.kernel.org>; Mon, 23 Nov 2026 12:17:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 451D5606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A29606A31F
+	for <linux-kbuild@vger.kernel.org>; Mon, 23 Nov 2026 13:29:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 99A29606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=c6jWfE6f
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1795436242;
-	bh=w/P7Au62M+92CbRcPyECeOn9VVSwxvVTLIBVsrRkV4U=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=c6jWfE6fs8QMnPMkZdSuqQ7WLE8ee3OyQgsxn+XuawzwQ2iKTWsIu286sWIGu2pS0
-	 /3HtLr7A8g7GaYv4qyxf9DfwjVGlajN469GNMlABA5fwgbd7tlo994dnDMuyAZXN1E
-	 GzZ+SRf7V51Ditvnp+2AeeedcoXHhxk7xvIjxOhE=
-X-QQ-mid: zesmtpsz8t1795436226t187c8887
-X-QQ-Originating-IP: m11/7KgAf6dNCDHmt9WGjVhdPFueqtJpyyEwn2eQiWw=
-Received: from localhost.localdomain ( [61.183.83.60])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 23 Nov 2026 20:16:38 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 2967070718750964981
-EX-QQ-RecipientCnt: 5
-From: Wentao Guan <guanwentao@uniontech.com>
-To: chenhuacai@kernel.org,
-	nathan@kernel.org
-Cc: linux-kbuild@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	Wentao Guan <guanwentao@uniontech.com>
-Subject: [PATCH RFC] kbuild: deb-pkg: strip orphaned debug labels from LoongArch modules
-Date: Mon, 23 Nov 2026 20:15:55 +0800
-Message-ID: <E73BE2D8A39F2EBF+20261123121554.2559667-2-guanwentao@uniontech.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=U72tvcMy
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3ab1e5a01a1so2887141fa.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 Nov 2026 05:29:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795440550; cv=none;
+        d=google.com; s=arc-20260327;
+        b=WlcpJ6MNiuxN90UPhqNiYS9u8CWxXQGmQVGYDKGQvGTwnTHTH9XQwX7lDTySNKbKcd
+         n1gtM8OWiC8xagSjmnIleg647tAI77E3tKGeJ8ytxAmpWEaMS3jhfNT7BQdv9YnCm7QI
+         z7V7gz73vpL8amddVbKrSo0oaUNX9Rovu/EVxAcgDGA58cvkO8AjtcnBfxbWqJfiaYoS
+         mMaGpy/dp5cAKTo4EHZaph1lgd1aMH8f2fcu+xOs8uBtPgcg2vI3IuHH8y5o7+IQzEgb
+         SkBplnTWyZcTvjNdzHwRs9vyjuAy/m7ajuawjNKiI8XP+suV0DGImwbpYzdaN9cwy0LE
+         YhRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=5P0SfAg0RNgf//T93vMcvwfndd3128+sOIInvKqWpbA=;
+        fh=4Wm5n4bEclkl/nhJJxCm1Opo8N4ir5O/XgCi+082o8c=;
+        b=JtmNb/AQIWykkX0iRs41AaKtgOQu1mQ0/jQldBybxRO0CQOdyquXgaq3IQrVJw80JH
+         JZh1qBPz4fT/i3cHnzMIEb6igyi9SU65cdqxa5If9YRo1rgdvTr+UST2G70mEJqD5nId
+         ML24loLnnI5nx+plhTtLRRXcbMNf0aIVipwTgPWxnE7TUiiPHtfdQ02u1kQ840eh1Qnm
+         NKHG8USkUh632k3kJqXMF+eflffcH5oU3wefRUOYiraCa/gxliRFpGCUN7U0H5VLGTXZ
+         S01Wewsnq68qmV99woXMKVQgyLjUTyOyYFEOtlw8h0yD1W6UJRjG+a0xZjTLeC3ytsAq
+         npsA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795440550; x=1796045350; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=5P0SfAg0RNgf//T93vMcvwfndd3128+sOIInvKqWpbA=;
+        b=U72tvcMyV5XMhL9cZWj+pz06WurNiz2d005dmAPzrrXo6karRJl+VT0FOaBnD0G7wV
+         ai9Z3lRkjFc3cL7DveVH4oLwS6Ya2AbR4zjbWXV0ySev18N+WySR8FRgj38zCV79zsyy
+         0QgOAmP7d++U35Pp+P3xZmSLuwEo6a9+t5lY19X+k7rxKAKPk7Ab5Iqe5ka2iOkGnOza
+         QfCW8GbQjbJqmNHdxS2QsECbA7IBX5C/n5LJDcWpuyDpj8YumNchG1QW9m1tEz4AMBLb
+         xBbre5Xtd+L89N2pkXYlClp/sRqqcQ+RSpDiL4mozFN/hcCbiT0rGPX6ANhH10LFM0P2
+         LVKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795440550; x=1796045350;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=5P0SfAg0RNgf//T93vMcvwfndd3128+sOIInvKqWpbA=;
+        b=Qix3gb4gl+UXZrtedryZl+NTPb/xyfskITpcBIQjyFx+kpPfvcz7lHfEHxX/+N2/aj
+         h80Ko8SoE9oXtgJVn+3tRC9WKwfGGyKmqvltcozDxXGYkMrwEfnWDKdBZ1RhuqnRkrYF
+         D5iun+K5vZy5/eE3suMhLbvlmrM2t7GDk0gRmaH/l3zYffr6TyIGTg2YRjfKxBDGuGrj
+         ZAG8vZEhz5bNxP7apjKQlnYuZ8tasGbqjD9LHW76whNi5VJYA/05kyViOmuyWsnamIIS
+         A6R+BlaS+pwBrxC/7ps7IWPp8/8XKOY0ACPM3SznxAKeZYZOlVOzVmkbcrhDVd3RqExv
+         F/vw==
+X-Forwarded-Encrypted: i=1; AL+hErH2JLMS+YY1tZddLTbiypecNRKC3Ad5861nJVMuZyvn1RgwigPjQzVDhakULMZ6EfOoZAhrfW5JUqRLABQ=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+B19uZfbUdYuGvsxOQ+SQzRKZFx5wyFIPns2T7L16Fu1OknnZu
+	1QwDjIrCru5cA4rWj2XX5tz9kK73GifPGUGzzDGK8RYcWq4K5jV2O8KLqYaoXfwZsdbI8Tu2cMn
+	KUOyjp+x2oEUtHGfILjx5YGQwFUqAH8o=
+X-Gm-Gg: AZFdTZeyEEKdXzKNiRx0mV/s+fNpaeez6wh4MV2AC2vNkEJI6bK66LpyZwl0vNSg308
+	PKUDqbT7n89wztCY+IZIZLebSGy38G1HCwkLZWiXgWaKCBigG6uzYp301NK/Jho7VGJE5Hm/eIu
+	IJPA9rO+gids+0uLo+Rbnab3oYcENi5sIJEzAO144jXdSjCv7efoEP69xG26oBNGldK0Q7O5BH7
+	zlSUuyxyTYzN0WzGGRUsSA1CirKIczaEYBFoYHdSV79tywNqIA62NtM9w05ZS8X9UVqNZFkX+lx
+	aCscI9A1L5h3JHYdJuo+EtswTyu6DOnZLjRzh+Lj++P6Jxowt6C6pXDRy7qIMNCcEU71c84RbZb
+	QMQjCbbwAr2Yj7Pkt+mB5wqrAAnrXHW5wHxrZTylwy4p2+/jIpBBitTIk+ni+0aCOFNSCorLgme
+	9ReicZdkxY6As+iLGYqYVqW2cwQ77lfpOEN5SOQtGeSjnThW0WI3mUtKvCpdTjf/hBJQ7GjzzzH
+	Zm64n1RX8X7/92kmwr04i5SsD/CeoNElHrAGeRGdB25SzAL4ywJat2ux+LoE6Zoq8ZjcYbh
+X-Received: by 2002:a05:6512:6718:b0:5c1:57b6:c731 with SMTP id
+ 2adb3069b0e04-5c1bc55528amr2860372e87.0.1795440549518; Mon, 23 Nov 2026
+ 05:29:09 -0800 (PST)
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -69,109 +106,64 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz3a-0
-X-QQ-XMAILINFO: OOH5Lt9wNw30p5dDjYlENwairEk+43N76HHMpgtxTuRflNnbgKT/76aj
-	X6h8a8rDAW59OdaqHUPphFT9CDEywlTsu7S2LSB6R7Tbzo9vE3WxS0lofDnjjnJ7Kqkxdwi
-	qxAtaUtRjbH5VHv0rw918Fxw7vXp4GOmH3KDc3HpXe7uchhL6leYuaZgxTw9VAv7T3etSaw
-	Fl2vZoYdAgHXe74a0egwynxa4blMAIOA5qS9yjg6amKOdpWqog0IyaKIwHEzyM2HKmre/f2
-	3vFj33O4rtaqHlMnymzVjDhc0ebNKOAUnXX2BDpbdwUx2hob83QZ+G7C7HOCC0D6AfA8cbE
-	LWTZSj/f5CFpEa8jbsT7CHpk34/squ8Ez6LTak7w6xDgWL8LH9LPdN+PC0i+Ln8jA6/mBqU
-	d3iwqxlPzDzhJYdkwePVQ8iwuWPhjc37MEagJMACnsaF65qhgd+7OrBtg7k1BI0O3BOrGNl
-	VWIYUOrtTHgHFB76SJYpc6IOngSKawWme8+eurh5KKMvXULHmjvOPxIYpOoU0VV0gGqgRIU
-	rEQbYWCBVmTbG5dg25mI7INKuDxU2Cq35y7x7nzay61O4mVszr8G7ddWAM6XuRAAWGs84j9
-	mUV+HaTIqldjjUXBTFwUxA8wFjJ+z3Usrc9B7vc4DZeQLkR+fRrLstL/GJmb26h5WN4JI8L
-	iAZY30YW+IM8jd4AU5jMw2e6TUVm1tMguKvMTAU/oK/XDPZyzonXL6oA9Qli3UB+8iyo2nG
-	1iUTkjDrWvVZy2EqoWj5RCnS8Pk620CyK5vobwMvzY3kg2vlf8yshY50BWWU4s7stpAWyve
-	ocPX4eUn+Z9R/x/R+uRWsLy3rbUYyXdSriExCBQdFuvo3Rr3Ub3CAuMGNXdlj0gSuCYPoI4
-	6mwK2LSjwmg0tmDW4N2rlzpFs23MuekhXRNEnAFZjmh86f11+11waOnF+kbB4J4hCdki2QJ
-	JGR+WSCGxzajU0MTCN4og0tCA8o7Tc2cU8qnl9XA7mPUxShVQaaqGrkjGY+97MGpTCFdXsx
-	bZCDLxJY+gJO4S3Xiuuj0MZ9ZYA4WkXgu9DI4SgES6qe3aIiHgA37TjVuWgrM=
-X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
-X-QQ-RECHKSPAM: 0
+References: <20261104-build-speedup-v5-0-0f6018be8dae@kernel.org>
+ <20261104-build-speedup-v5-2-0f6018be8dae@kernel.org> <sashiko-outbox-199744@kernel.org>
+In-Reply-To: <sashiko-outbox-199744@kernel.org>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 23 Nov 2026 14:28:57 +0100
+X-Gm-Features: Aa3M54p2MuaVPrel21pLHhiv7_UQjxDcbruYJqUL7bjr4LeGvFh_ddwRm4qiHrQ
+Message-ID: <CANiq72m57kFE5LTjT6V0Vajbwv_oPFEVwkBWgp5B2Xhh1E9uFg@mail.gmail.com>
+Subject: Re: [PATCH v5 02/11] kbuild: implement and use depcheck to check
+ dependency timestamps
+To: sashiko-reviews@lists.linux.dev
+Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+	Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	Aaron Tomlin <atomlin@atomlin.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
+	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+	linux-kbuild@vger.kernel.org, linux-m68k@lists.linux-m68k.org, 
+	linux-modules@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With CONFIG_DEBUG_INFO, gcc emits .L-prefixed labels for function and
-block boundaries and for location views (.LVL, .LBI, .LBB, .LFB, .LPFE),
-and the assembler keeps them in .symtab as long as a debug section
-references them.  On x86-64 those references are expressed as a section
-symbol plus an addend and the labels are discarded, but the LoongArch
-assembler has to name them in relocations:
+On Thu, Nov 5, 2026 at 7:22=E2=80=AFPM <sashiko-bot@kernel.org> wrote:
+>
+> - [Medium] kbuild: missing fixdep prerequisite for depcheck in scripts/ba=
+sic/Makefile
+> - [Medium] kbuild: concurrent Makefile.build runs race on .depcheck.mk.tm=
+p and .depcheck.mk
 
-    0000000000000057 R_LARCH_64          .LFB1 + 0
-    0000000000000015 R_LARCH_ADD_ULEB128 .LVL0 + 0
+I have been using some of the patches of this series for something
+else, and I have been hitting these two issues that Sashiko mentions.
 
-so they end up in the object's symbol table.
+For the first one, e.g. `olddefconfig` in a clean tree can give:
 
-INSTALL_MOD_STRIP=1 expands to "strip --strip-debug", which is a section
-operation: it drops .debug_* and .rela.debug_* but leaves the symbol
-table alone, so every label that was only referenced from debug data
-stays behind as an orphan.  On 7.2.2-loong64-desktop-rolling 86.7% of the
-roughly 3M module symbols are such labels.  Nothing uses them at run time,
-yet they cost 22% of the module payload (168 MB -> 130 MB) and 19% of the
-linux-image package (195 MB -> 157 MB).  This is the same problem
-commit ac031f26e89cc ("kbuild: add option for stripping modules while
-installing them") addressed for the general debug-info case.
+      HOSTCC  scripts/basic/depcheck
+    /bin/sh: line 1: ./scripts/basic/fixdep: No such file or directory
 
-Strip them with --discard-locals as well.  binutils removes a local
-symbol only when its name still follows the assembler's local label
-convention (.L, .., _.L_ and the L<digits> pseudo labels) *and* no
-relocation in the output still names it: mark_symbols_used_in_relocations()
-sets BSF_KEEP on every relocation target and filter_symbols() keeps those
-unconditionally.  What the module loader needs therefore survives -- the
-relocation set of every module is byte-for-byte identical before and
-after, .LC, .LPFE and the -fpatchable-function-entry labels stay, exactly
-one SHT_SYMTAB remains as elf_validity_cache_index_sym() requires, and
-the modules are still signed, because modules_install strips before it
-signs.  The dbg package is built from the unstripped modules in the build
-tree, so it keeps all debug information.
+The suggested prerequisite fixes it for me.
 
-Restrict this to LoongArch on a GNU toolchain, everyone else keeps
-INSTALL_MOD_STRIP=1.  Other architectures never see these labels: on
-x86-64 the option drops two unreferenced .LC symbols out of an amdgpu.ko
-and leaves all 429,648 relocations alone, so there is nothing to gain
-there.  LLVM builds have to keep the plain option, because
-kbuild hands the same value to llvm-strip for LLVM=1 and llvm-strip
-refuses to strip a symbol that a relocation still names, aborting the
-build, while clang does emit such labels for string constants:
+For the second one, e.g. `make -j4 rustdoc rusttest` runs two Make
+instances on `rust/` in parallel. Most of the time one of them prints:
 
-    llvm-strip: error: 'super.ko': not stripping symbol '.L.str.1'
-    because it is named in a relocation
+    rust/.depcheck.mk: No such file or directory
 
-Clang none the less generates none of the debug labels that make the
-package grow, so an LLVM build loses nothing by being left alone.
+and sometimes the build fails:
 
-Boot tested with qemu-system-loongarch64 (EDK2 firmware, vmlinuz.efi,
-test modules loaded from the initramfs with finit_module()): modules
-stripped with --strip-debug, --discard-locals and --strip-unneeded all
-load with rc=0, while --strip-all is rejected with "module has no symbols
-(stripped?)".
+    rust/.depcheck.mk:1: warning: NUL character seen; rest of line ignored
+    [...]
+    rust/.depcheck.mk:22: *** missing separator.  Stop.
 
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
----
- scripts/package/builddeb | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+I hope that helps!
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index a806f5094da44..a355d65927115 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -35,7 +35,14 @@ install_linux_image () {
- 		${MAKE} -f ${srctree}/Makefile INSTALL_DTBS_PATH="${pdir}/usr/lib/linux-image-${KERNELRELEASE}" dtbs_install
- 	fi
- 
--	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH="${pdir}" INSTALL_MOD_STRIP=1 modules_install
-+	mod_strip="1"
-+	if [ "${SRCARCH}" = loongarch ] &&
-+		"${STRIP:-strip}" --version 2>/dev/null | grep -qs "^GNU strip"; then
-+		mod_strip="--strip-debug --discard-locals"
-+	fi
-+
-+	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH="${pdir}" \
-+		INSTALL_MOD_STRIP="${mod_strip}" modules_install
- 	rm -f "${pdir}/lib/modules/${KERNELRELEASE}/build"
- 
- 	# Install the kernel
--- 
-2.47.3
-
+Cheers,
+Miguel
