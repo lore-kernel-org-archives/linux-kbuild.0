@@ -1,64 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.142.43.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795441885;
-	b=k/ANo6PIMr8Hb5M1md0ECU9V+v6oAPNLQuxkI4zII2nuohUvFi17YbdTUG2mloUa30C2
-	 xdtUi9TY+bCAmohqrDDwvr9q4ZOA5HygVBIjsgIEQjic8HhP45v7Fu2fBP9mWc9XqsvDv
-	 bb8vzHTwwJ0zEVus9xhrZkNelJFH4ZDRKkqrNa2JoUsLfeAb5sYTz6+9XqaGOHj3L/HfV
-	 Kclv9N3fxzkcWomWPTMdWEf69FOGBimcENK7aoTe1NcxgDkyvWuivvhm1CDM2q8t2z+Eu
-	 zhNbWNvnQ79GUwoT/i3aTKmOlMjxqMF/53uLsfSpv7sAlOy4cZGcsqyz4DV+/sp9f3Q==
+	t=1795441886;
+	b=3bhX/Z+4Gr9wOVZ6I41izoJa+HVnsBKxK0l+4VbKTh0naJ0gQ66fZaBCCP0v6Q4kx6F3
+	 AecBwkIJl9tzOUCzHL9FUia+Xlioz8v4ylZH851Y014rmoFIbU4x+LOngmydlxV7p4BSn
+	 ncvePRQbMocP2DfewsLRcnPR/b191yBOIlElRTEOru9RZ2tTAeW6R4FegH+Ovbfy8arCm
+	 WRvymxOueZgj6vOKywbHucv8kKMKFEZECaEjAVEvroR2Qce3fpy360v9J0DoP2uOls+Lp
+	 4zBHXNeEO9eqosyDN5xwh48a/52TsJi0jWNNbowpvWkJAsx8RELI12e6kHEfiVnDLhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795441885;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795441886;
 	h=DMARC-Filter:From:DKIM-Signature:DKIM-Signature:Date:Subject:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
 	 References:In-Reply-To:To:Cc:X-Developer-Signature:X-Developer-Key;
-	bh=wbaUWZC28smuRoW90pWpaXz3GGY4MsOKGg8st7PIjvw=;
-	b=2KNvR2i/dYpETpv1VzVWLdeTUnyqvn7ZeFZKd6HhTpy/iJW8BNNv/Iza192Dvh+6jCZz
-	 BSlXS2VTWhZ2JwTKGbQWw9txJYmQvW8fFfFFSXe0//Ca8fdeSSaSZmM0DoKMKzdEtLiGp
-	 lGMDEMehCyakuzqqaCNtoqfZcv7j1rOsMNuzXR04cAwyNaFVHgk7KJL3DzXqnOiOfKabh
-	 l9WvLcXrapWuuA5HZ7AagjAPfC0HF2x635Iu3yVlSOfPamophRveVVoFhxIqXast8Zpjj
-	 UghM84rkxoAbI/fizJibiB6rLW6vi0XNZAvxW6m9Bc6FB3Hd0vGg1/u12tOrtvDfYjQ==
+	bh=4eFtOIUXlB/3zrN30y5Vr5c5KdL9zNbkcXs+QwRBLLo=;
+	b=iaMyTmLicGhZrkCyteDbFf/BCsXJW3dX60qjLl+6sm2WFCuy57E9ZxSP8mLbgts4GV1o
+	 ln/LPbao/a7YqfQ+HjMaiug1R0bvGVE5rQPuljep3Geiqrvc/LCauZ7TdPR37J5zLDG5I
+	 QO8pnEMTyjoEFBOTFn4k2kIdW2pPagErlk2QbE3pr/Gkv+IF5ZIGMv9rFoXf7u8wl6Y/T
+	 N+fli3WhK+YWwHhBIiB2OErwJM4BWaApeoCd9lWyPaGTwurAEomskAP/yajFCSBqkMNI2
+	 LY4x8p0/fzIH9qj0OFP0SWPpibqUCbSR9SK2XmOSDVw+01DWR3b+sYp1cQB9HcuTm1g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linutronix.de;
 	spf=pass smtp.mailfrom=linutronix.de;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b="AdnWR/fT";
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=CiSYPSUw;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=y2qrpUFH;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=XY2hGy4c;
 	arc=none smtp.remote-ip=193.142.43.55
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E92A606A684;
-	Mon, 23 Nov 2026 13:51:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E92A606A684
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4978360A2604;
+	Mon, 23 Nov 2026 13:51:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4978360A2604
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=AdnWR/fT;
-	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=CiSYPSUw
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.a=rsa-sha256 header.s=2020 header.b=y2qrpUFH;
+	dkim=pass header.d=linutronix.de header.i=@linutronix.de header.a=ed25519-sha256 header.s=2020e header.b=XY2hGy4c
 From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1795441882;
+	s=2020; t=1795441883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wbaUWZC28smuRoW90pWpaXz3GGY4MsOKGg8st7PIjvw=;
-	b=AdnWR/fT44yXzm+ht95OqsrELNCyH358idfw54sxV+82ZCQh8b1aIvskImaSeMPYYiPAGX
-	tMSFHMm39iz7ISqX2w8pj4D8L/qzXb1g+WS97tFqN8moTMNum/DjAz0AOhUR9mHeaYQxj9
-	5LZEWcHDHmfyVG3iQ0WvT8vFcoQbpRxTznUUUuQTu76cbBTyn3KQ4CodP8l937jaO91ZuP
-	Qt441N7af+F5t3S2BxLy/sH8WAJ3bW5O4y6lY0UQw0K7A+UQhTXKdNOY7nqA7niM/tyffr
-	0vxJK9JiP8+NfpneuW9wJzwcEPrvj3p/SNvKjKHMhV35bVoateZvXcf6rspcBQ==
+	bh=4eFtOIUXlB/3zrN30y5Vr5c5KdL9zNbkcXs+QwRBLLo=;
+	b=y2qrpUFHjyo+0pMBHaWwUhYXbTJNPIcVR4whnZwubVPwGrLaE+1Mmk2Mwi5WKuQDu7n6iK
+	IxT3kxQpnVBBexAnF0ihS5lfLDaFO2yZB/xnwdS5zoFeUyigBfLzBR9hxvT3x4gDmc+6ZJ
+	flIELvpITzh8VhPCfJya5ZOTnXK/xiterHEPXNFbpa5f+Qizmz2LKuMplLRNcmsaccPT71
+	bzlF810zu1Rww5Diqxf9sA0ClHmhjYZs9LcDI8M2QN/FteZKxNbWWCxFnzgO4x1Y2LXygE
+	/0EP1KSgGHVkf/dr39ZaV3wh4xEEjOL8onok1E/zu4qmvtjdVXNW+2xfMnH4iQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1795441882;
+	s=2020e; t=1795441883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wbaUWZC28smuRoW90pWpaXz3GGY4MsOKGg8st7PIjvw=;
-	b=CiSYPSUwyavYYl1x/i+wWbxPyj9epV9FlY90gd2wiTfE4WxtGjnCDB5MgwLKxaEC26eTmC
-	kUVvWJED9GTdvTAw==
-Date: Mon, 23 Nov 2026 14:50:56 +0100
-Subject: [PATCH v6 05/11] powerpc/vdso: Enable the vdsocheck tool
+	bh=4eFtOIUXlB/3zrN30y5Vr5c5KdL9zNbkcXs+QwRBLLo=;
+	b=XY2hGy4cWmay/FFPNrPlsYtYrkhSLiBVvC67xaDxTH8uahrD+vR0WYB/jdZNhsfoWk9NzD
+	rmVwXtqSDk1V2JAg==
+Date: Mon, 23 Nov 2026 14:50:57 +0100
+Subject: [PATCH v6 06/11] riscv: vdso: Enable the vdsocheck tool
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -70,7 +70,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20261123-vdso-absolute-reloc-v6-5-161e218dd217@linutronix.de>
+Message-Id: <20261123-vdso-absolute-reloc-v6-6-161e218dd217@linutronix.de>
 References: <20261123-vdso-absolute-reloc-v6-0-161e218dd217@linutronix.de>
 In-Reply-To: <20261123-vdso-absolute-reloc-v6-0-161e218dd217@linutronix.de>
 To: Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -112,11 +112,11 @@ Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
  Arnaldo Carvalho de Melo <acme@redhat.com>, 
  Peter Zijlstra <peterz@infradead.org>, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795441872; l=3226;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795441872; l=3576;
  i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=Cgbtb7qSJ3AcXOvZFi0BZIPMWqlXOiwZ1bBjbdIILZ8=;
- b=tf9jQyiu6Hx303xQeraxjP8OCezqMY+3qKghsgR/OWQajoh6hO04aKYTX/3KWhg5DquWsJP8b
- aAXQOlfMR3eDCtoARUDmA0kN0uVLstrGS/+wTZDeacxxM2luRimKr84
+ bh=MntGa2c7F/hFX8g0jBZrZAZFlve/PN+fivtH3qTBWPk=;
+ b=E0OeOrGeIR7bOANcC60kOQeCX/ghNoL4OOe/6jVEwOUqPM8BuZA5TNCH2kWGUvAnrKk1cra32
+ Sqyo9hLfgFEAlCARi9PB7WSaGZbX9p2AcUfrE8XdPahGDH8DoZdd3Qg
 X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
  pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
@@ -128,70 +128,75 @@ Wire it up for the architecture.
 
 Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 ---
- arch/powerpc/Kconfig              |  1 +
- arch/powerpc/kernel/vdso/Makefile |  4 ++--
- lib/vdso/check/vdsocheck.rs       | 27 +++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+), 2 deletions(-)
+ arch/riscv/Kconfig              |  1 +
+ arch/riscv/kernel/vdso/Makefile |  4 ++--
+ lib/vdso/check/vdsocheck.rs     | 26 ++++++++++++++++++++++++++
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index c3b6cd655606..1c4a75c3a830 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -327,6 +327,7 @@ config PPC
- 	select SYSCTL_EXCEPTION_TRACE
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index e7891a2a89da..2a0f5fbcd7e3 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -226,6 +226,7 @@ config RISCV
  	select THREAD_INFO_IN_TASK
  	select TRACE_IRQFLAGS_SUPPORT
-+	select VDSO_CHECK
- 	select VDSO_DATASTORE
- 	select VDSO_GETRANDOM
- 	#
-diff --git a/arch/powerpc/kernel/vdso/Makefile b/arch/powerpc/kernel/vdso/Makefile
-index 0d1a49529885..b2e399e10273 100644
---- a/arch/powerpc/kernel/vdso/Makefile
-+++ b/arch/powerpc/kernel/vdso/Makefile
-@@ -82,9 +82,9 @@ targets += vdso64.lds
- CPPFLAGS_vdso64.lds += -P -C
+ 	select UACCESS_MEMCPY if !MMU
++	select VDSO_CHECK if MMU
+ 	select VDSO_DATASTORE if MMU
+ 	select VDSO_GETRANDOM if MMU && 64BIT
+ 	select USER_STACKTRACE_SUPPORT
+diff --git a/arch/riscv/kernel/vdso/Makefile b/arch/riscv/kernel/vdso/Makefile
+index c023046a3fd7..b15039d0309e 100644
+--- a/arch/riscv/kernel/vdso/Makefile
++++ b/arch/riscv/kernel/vdso/Makefile
+@@ -75,7 +75,7 @@ endif
+ $(obj)/$(vdso_o): $(obj)/$(vdso_so)
  
  # link rule for the .so file, .lds has to be first
--$(obj)/vdso32.so.dbg: $(obj)/vdso32.lds $(obj-vdso32) $(obj)/vgettimeofday-32.o $(obj)/vgetrandom-32.o $(obj)/crtsavres-32.o FORCE
-+$(obj)/vdso32.so.dbg: $(obj)/vdso32.lds $(obj-vdso32) $(obj)/vgettimeofday-32.o $(obj)/vgetrandom-32.o $(obj)/crtsavres-32.o $(vdsocheck) FORCE
- 	$(call if_changed,vdso32ld_and_check)
--$(obj)/vdso64.so.dbg: $(obj)/vdso64.lds $(obj-vdso64) $(obj)/vgettimeofday-64.o $(obj)/vgetrandom-64.o FORCE
-+$(obj)/vdso64.so.dbg: $(obj)/vdso64.lds $(obj-vdso64) $(obj)/vgettimeofday-64.o $(obj)/vgetrandom-64.o $(vdsocheck) FORCE
- 	$(call if_changed,vdso64ld_and_check)
- 
- # assembly rules for the .S files
+-$(obj)/$(vdso_so_dbg): $(obj)/$(vdso_lds) $(obj-vdso) FORCE
++$(obj)/$(vdso_so_dbg): $(obj)/$(vdso_lds) $(obj-vdso) $(vdsocheck) FORCE
+ 	$(call if_changed,vdsold_and_check)
+ LDFLAGS_$(vdso_so_dbg) = -shared -soname=linux-vdso.so.1 \
+ 	--build-id=sha1 --eh-frame-hdr
+@@ -97,7 +97,7 @@ include/generated/$(vdso_offsets): $(obj)/$(vdso_so_dbg) FORCE
+ # The DSO images are built using a special linker script
+ # Make sure only to export the intended __vdso_xxx symbol offsets.
+ quiet_cmd_vdsold_and_check = VDSOLD  $@
+-      cmd_vdsold_and_check = $(LD) $(CFI_FULL) $(ld_flags) -T $(filter-out FORCE,$^) -o $@.tmp && \
++      cmd_vdsold_and_check = $(LD) $(CFI_FULL) $(ld_flags) -T $(filter-out FORCE $(vdsocheck),$^) -o $@.tmp && \
+                    $(OBJCOPY) $(patsubst %, -G __vdso_%, $(vdso-syms)) $@.tmp $@ && \
+                    rm $@.tmp && \
+                    $(cmd_vdso_check)
 diff --git a/lib/vdso/check/vdsocheck.rs b/lib/vdso/check/vdsocheck.rs
-index 0d5ceaca34d7..da58ff220eab 100644
+index da58ff220eab..37455d326110 100644
 --- a/lib/vdso/check/vdsocheck.rs
 +++ b/lib/vdso/check/vdsocheck.rs
-@@ -69,6 +69,33 @@ fn allowed_relocations_for_machine(machine: u16) -> Option<AllowedRelocations<'s
+@@ -96,6 +96,32 @@ fn allowed_relocations_for_machine(machine: u16) -> Option<AllowedRelocations<'s
              ..Default::default()
          }
          .into(),
-+        bindings::EM_PPC => AllowedRelocations {
++        bindings::EM_RISCV => AllowedRelocations {
 +            in_object_file: &[
-+                10,  /* R_PPC_REL24 */
-+                11,  /* R_PPC_REL14 */
-+                26,  /* R_PPC_REL32 */
-+                249, /* R_PPC_REL16 */
-+                250, /* R_PPC_REL16_LO */
-+                251, /* R_PPC_REL16_HI */
-+                252, /* R_PPC_REL16_HA */
-+            ],
-+            ..Default::default()
-+        }
-+        .into(),
-+        bindings::EM_PPC64 => AllowedRelocations {
-+            in_object_file: &[
-+                10,  /* R_PPC64_REL24 */
-+                11,  /* R_PPC64_REL14 */
-+                26,  /* R_PPC64_REL32 */
-+                44,  /* R_PPC64_REL64 */
-+                249, /* R_PPC64_REL16 */
-+                250, /* R_PPC64_REL16_LO */
-+                251, /* R_PPC64_REL16_HI */
-+                252, /* R_PPC64_REL16_HA */
++                16, /* R_RISCV_BRANCH */
++                17, /* R_RISCV_JAL */
++                18, /* R_RISCV_CALL */
++                19, /* R_RISCV_CALL_PLT */
++                23, /* R_RISCV_PCREL_HI20 */
++                24, /* R_RISCV_PCREL_LO12_I */
++                25, /* R_RISCV_PCREL_LO12_S */
++                33, /* R_RISCV_ADD8 */
++                34, /* R_RISCV_ADD16 */
++                35, /* R_RISCV_ADD32 */
++                36, /* R_RISCV_ADD64 */
++                37, /* R_RISCV_SUB8 */
++                38, /* R_RISCV_SUB16 */
++                39, /* R_RISCV_SUB32 */
++                40, /* R_RISCV_SUB64 */
++                43, /* R_RISCV_ALIGN */
++                44, /* R_RISCV_RVC_BRANCH */
++                45, /* R_RISCV_RVC_JUMP */
++                51, /* R_RISCV_RELAX */
++                57, /* R_RISCV_32_PCREL */
 +            ],
 +            ..Default::default()
 +        }
