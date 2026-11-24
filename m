@@ -1,53 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795492787;
-	b=eW8hcHA0hoGpfy2odSOCsbR2g8qDC9NbRJGHQOprThNV3SnSvprYfYDoQ+T9whKS95e0
-	 l727SpdwPMM+paFtSn36BQvLMPLPKVALNqHkgICWFJDn/afLdg+2gBi4Xawx2CMQpQmQ1
-	 aqXqbItMv1Yh6gRIq9jU47CN8fMrBXicCoamS64b0AoQj9D5SN9LUujXOXz2jzGziKmHY
-	 1C4j3G3h3h5eMFzNT0rg5MHctw9tJNQYtn3UU5K6VD/iRb6b1uzaa7R7dGURVJ9FaMvMl
-	 uttB4Kl7XuFhKaw3oEa+WZgsR+1oxQO3y1fCWun0T4lnLRWvY8txyJSVmEtdoPjOFcA==
+	t=1795505094;
+	b=gzO48HMjADLlgC2k3L9txbWx3IAe4mnlbW8j0KhvJ7+9r0h8w+GxiOwqF7BTsLGFyV5p
+	 r/53KOfSmd+RZffQECaAlmyWDh01cbSSskqdtGrWSO2mvjLjs6GNlH2sd65QZGIUzhcuD
+	 di/5O+VcAET4bymV3sNJjp1JB+SG/uHoezySIthQzMiAZoXdkeo0By5x10+jMW/NFKB48
+	 99JaaexfUxARUadxjnvzyBUNgnT0bXznH9QcbdBuDV9+1ohkM/GU/AeDGulMDP4UCJHa4
+	 0YAYQthOSE26PZjMIJQfcRYncpJjrkiScQfFL/x51ghhQKONB+Rs9/A6XRAOeFyUyEQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795492787;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=D5LeOMqsJtStfPtah2unndSv6bQPxqZYjgEqECB3thM=;
-	b=iU7zi4cImz5kgLBmvsocILOjML7JS+Xj1SxXGqS2RTmKhUlUm88DLbscSwHJ3Z3HS8Du
-	 EScvCVvN2XNuKwBK6RoaD/3g4g5Aby9Mbzfoi0+EvBTGsX1kkXqJXOSYBMZyS42jVaGUG
-	 rfMNEEVcmVDcEsSniWagN4LsXAPCsNlAWaqxvOQiklnIzhYu5T27F4E5drxKyTjIQEYIK
-	 OEMJPA3kA46shftonyXa9dqAvLMn1BpERIp8INB/AvHmeLcaNXH9hTNKGQgqQ1puYgK6+
-	 WRXjWhfvNRZziWp8B6MuA27Qzditkuy+mzPKa7AUf9o3g8EnKDtt9ByEE0miUHgpvoA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795505094;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:References:From:Content-Language:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=rPpDfKVH7+4ZQFZ2BNSiTKNzv7DLDlFf+/IJ01jJcyY=;
+	b=YJQwJXCvfqc9l6kh1vnkIe0J7lHcR6t/PxqpHUZVVM9YKrjW1K8+FgE0rG5s8DMImpuX
+	 7YgTAB6EjB+ECJV+s8qUXMX4OwBPAS1d6IJbM5emT6opkxvIXFBGkbRiIaZyMk1rxh1ob
+	 tmRwxwm12/7r/CPAokLP00JwDE3rMVSSWppe5gp+6t6GmCHApmM8TWlINO11vaBicksY2
+	 MmWQr74VkqX+Xq0YKKitWcgLsFvLnU9YDyEymO8G6W+quwy6jdKBhaEIi3M2exwQ9qKDx
+	 Zf+qc8I8ie2YOwaY2dAGVENKuLO1Z6aQiR9BOeUQA9g6crIZyH8KmG91TeeSP5RGQDw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LQEkO3Io;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="kVf/QRdo";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22117606A33A;
-	Tue, 24 Nov 2026 03:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DD9606A321;
+	Tue, 24 Nov 2026 07:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LQEkO3Io
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 754431F000CF;
-	Tue, 24 Nov 2026 03:59:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kVf/QRdo
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E876C1F000CA;
+	Tue, 24 Nov 2026 07:24:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795492786;
-	bh=D5LeOMqsJtStfPtah2unndSv6bQPxqZYjgEqECB3thM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=LQEkO3Io+NWWzI6HqfHv1pePR5pVKKy1znmGzqHLrOlgfaunV1+Uk3YI9aoGZ0hLz
-	 igLCHBJNm43KSCBxi1l1SCT4xhKAJti6H6/iE9Scv17VOnLhFu291VWq4eiB1mpEjA
-	 EvYzpU6W8FiFIJ154V8aKwRuEqe/rZEPS82NoRbgdNbARlBoMgC1bdZnOZ0CyPHM40
-	 tO9CLpXynrqocCFPaMI4c5XCZ5h7rUUo+lo0b5ndVRG0DsysX0fWM0lcV1FKHRSob1
-	 apOOVMxoce7t0pXbKFuL+8XRyC0rXPAWuAjPkfEXihNR8ODzRAU/QGMfi+R4rz9juD
-	 cMIKOhhpNtgjA==
-Date: Mon, 23 Nov 2026 20:59:42 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Wentao Guan <guanwentao@uniontech.com>
-Cc: chenhuacai@kernel.org, linux-kbuild@vger.kernel.org,
-	loongarch@lists.linux.dev
-Subject: Re: [PATCH RFC] kbuild: deb-pkg: strip orphaned debug labels from
- LoongArch modules
-Message-ID: <20261124035942.GB2738970@ax162>
-References: <E73BE2D8A39F2EBF+20261123121554.2559667-2-guanwentao@uniontech.com>
+	s=k20260515; t=1795505093;
+	bh=rPpDfKVH7+4ZQFZ2BNSiTKNzv7DLDlFf+/IJ01jJcyY=;
+	h=Date:Subject:To:References:From:In-Reply-To;
+	b=kVf/QRdoDMHTMQbb2xejPdPpk0Z/3tBHz3TRXLcL97jOMZ6jrw0oCU07bKWKJwXlK
+	 VcQlQ1C7KpM1p7216MNHedVcG89nKawR4GOt39uM6ZMCKY8EtfJ9Fsm/h3/F7Nr5m6
+	 +4ADEzqwmt05bb0zw1Qza6SUtR3RNW3BfO8mMshf+eG+ibGHni8NCiKr7CTjCVh6f+
+	 Z10sZHRx/JXvyC98ixvR1FAVDVMywuGUuKiOfpm6CpSkhPpGVgVu6YbnEatTbyOd5J
+	 Pdl2DwhF0gGaDKz0nS7qvRC9mU01g8rjbb3uMMiFCtOn8JSf9/nygamzjEv+hHJ/E6
+	 5eHnXyL5kskMw==
+Message-ID: <ad506392-9010-4955-8251-602bf79c2286@kernel.org>
+Date: Tue, 24 Nov 2026 08:24:50 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -57,102 +51,123 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E73BE2D8A39F2EBF+20261123121554.2559667-2-guanwentao@uniontech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] kbuild: move scripts/mod target out of single-build
+To: Nicolas Schier <nsc@kernel.org>, sashiko-reviews@lists.linux.dev,
+ Nathan Chancellor <nathan@kernel.org>, linux-kbuild@vger.kernel.org
+References: <20261111-reduce-single-build-dependencies-v1-0-7196ca986a85@kernel.org>
+ <20261111-reduce-single-build-dependencies-v1-3-7196ca986a85@kernel.org>
+ <sashiko-outbox-211218@kernel.org> <awRvU8_wAUlkd1Nj@levanger>
+From: Vincent Mailhol <mailhol@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBAhsDBQsJCAcC
+ AiICBhUKCQgLAgQWAgMBAh4HAheAFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmrTM8wFCR1O
+ HxcACgkQq1/riG27mcJ2KAEAhG19xBSkjiA9dtatvq2WJnGaes4SUmY+LSn7dh1Lf7YBAIwB
+ lsMMmigMTk3Qgwymg1nT+Z8z1Owc/TGtRlo4ZcwMzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmAhsMFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmrTNKcFCRUFdT0ACgkQq1/riG27mcLEVwD/VmnQtTf6yhowaIFj
+ AjUtwiyQz9ja4NRu9GOvz/pb2L8A/3QcADR0dcxADGsmOiBpN2M9KI7nqdNIq3VPM/3/5fcB
+In-Reply-To: <awRvU8_wAUlkd1Nj@levanger>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 23, 2026 at 08:15:55PM +0800, Wentao Guan wrote:
-> With CONFIG_DEBUG_INFO, gcc emits .L-prefixed labels for function and
-> block boundaries and for location views (.LVL, .LBI, .LBB, .LFB, .LPFE),
-> and the assembler keeps them in .symtab as long as a debug section
-> references them.  On x86-64 those references are expressed as a section
-> symbol plus an addend and the labels are discarded, but the LoongArch
-> assembler has to name them in relocations:
-> 
->     0000000000000057 R_LARCH_64          .LFB1 + 0
->     0000000000000015 R_LARCH_ADD_ULEB128 .LVL0 + 0
-> 
-> so they end up in the object's symbol table.
-> 
-> INSTALL_MOD_STRIP=1 expands to "strip --strip-debug", which is a section
-> operation: it drops .debug_* and .rela.debug_* but leaves the symbol
-> table alone, so every label that was only referenced from debug data
-> stays behind as an orphan.  On 7.2.2-loong64-desktop-rolling 86.7% of the
-> roughly 3M module symbols are such labels.  Nothing uses them at run time,
-> yet they cost 22% of the module payload (168 MB -> 130 MB) and 19% of the
-> linux-image package (195 MB -> 157 MB).  This is the same problem
-> commit ac031f26e89cc ("kbuild: add option for stripping modules while
-> installing them") addressed for the general debug-info case.
-> 
-> Strip them with --discard-locals as well.  binutils removes a local
-> symbol only when its name still follows the assembler's local label
-> convention (.L, .., _.L_ and the L<digits> pseudo labels) *and* no
-> relocation in the output still names it: mark_symbols_used_in_relocations()
-> sets BSF_KEEP on every relocation target and filter_symbols() keeps those
-> unconditionally.  What the module loader needs therefore survives -- the
-> relocation set of every module is byte-for-byte identical before and
-> after, .LC, .LPFE and the -fpatchable-function-entry labels stay, exactly
-> one SHT_SYMTAB remains as elf_validity_cache_index_sym() requires, and
-> the modules are still signed, because modules_install strips before it
-> signs.  The dbg package is built from the unstripped modules in the build
-> tree, so it keeps all debug information.
-> 
-> Restrict this to LoongArch on a GNU toolchain, everyone else keeps
-> INSTALL_MOD_STRIP=1.  Other architectures never see these labels: on
-> x86-64 the option drops two unreferenced .LC symbols out of an amdgpu.ko
-> and leaves all 429,648 relocations alone, so there is nothing to gain
-> there.  LLVM builds have to keep the plain option, because
-> kbuild hands the same value to llvm-strip for LLVM=1 and llvm-strip
-> refuses to strip a symbol that a relocation still names, aborting the
-> build, while clang does emit such labels for string constants:
-> 
->     llvm-strip: error: 'super.ko': not stripping symbol '.L.str.1'
->     because it is named in a relocation
-> 
-> Clang none the less generates none of the debug labels that make the
-> package grow, so an LLVM build loses nothing by being left alone.
-> 
-> Boot tested with qemu-system-loongarch64 (EDK2 firmware, vmlinuz.efi,
-> test modules loaded from the initramfs with finit_module()): modules
-> stripped with --strip-debug, --discard-locals and --strip-unneeded all
-> load with rc=0, while --strip-all is rejected with "module has no symbols
-> (stripped?)".
-> 
-> Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
-> ---
->  scripts/package/builddeb | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index a806f5094da44..a355d65927115 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -35,7 +35,14 @@ install_linux_image () {
->  		${MAKE} -f ${srctree}/Makefile INSTALL_DTBS_PATH="${pdir}/usr/lib/linux-image-${KERNELRELEASE}" dtbs_install
->  	fi
->  
-> -	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH="${pdir}" INSTALL_MOD_STRIP=1 modules_install
-> +	mod_strip="1"
-> +	if [ "${SRCARCH}" = loongarch ] &&
-> +		"${STRIP:-strip}" --version 2>/dev/null | grep -qs "^GNU strip"; then
-> +		mod_strip="--strip-debug --discard-locals"
-> +	fi
-> +
-> +	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH="${pdir}" \
-> +		INSTALL_MOD_STRIP="${mod_strip}" modules_install
->  	rm -f "${pdir}/lib/modules/${KERNELRELEASE}/build"
->  
->  	# Install the kernel
-> -- 
-> 2.47.3
-> 
+Hi Nicolas,
 
-I don't like this patch. This feels like a generic problem that is being
-stuffed in the wrong place. At the very least, this probably belongs in
-scripts/Makefile.modinst rather than the Debian packaging. Furthermore,
-are other architectures impacted by this? Is there a toolchain bug filed
-for this?
+Thanks for the review!
 
--- 
-Cheers,
-Nathan
+On 23/11/2026 at 17:52, Nicolas Schier wrote:
+> On Thu, Nov 12, 2026 at 01:45:43PM +0000, sashiko-bot@kernel.org wrote:
+>> Thank you for your contribution! Sashiko AI review found 1 potential
+>> issue to consider:
+>> - [Low] kbuild: unordered modpost_prepare and stack_protector_prepare
+>>   mutates CFLAGS
+>> --
+>>
+>> commit 08ffc13380249741520c2ea434688d701b5d0e9b
+>> Author: Vincent Mailhol <mailhol@kernel.org>
+>>
+>> kbuild: move scripts/mod target out of single-build
+>>
+>> This commit moves the scripts/mod build out of prepare0 into a new
+>> modpost_prepare target depended on by modules_prepare and modpost.
+>>
+>>> diff --git a/Makefile b/Makefile
+>>> index 2c1289a44c560..93236f310f080 100644
+>>> --- a/Makefile
+>>> +++ b/Makefile
+>>> @@ -1405,7 +1405,7 @@ scripts: scripts_basic scripts_dtc
+>>>  # archprepare is used in arch Makefiles and when processed asm symlink,
+>>>  # version.h and scripts_basic is processed / created.
+>>>  
+>>> -PHONY += prepare archprepare
+>>> +PHONY += prepare archprepare modpost_prepare
+>>>  
+>>>  archprepare: outputmakefile archheaders archscripts scripts include/config/kernel.release \
+>>>  	asm-generic $(version_h) include/generated/utsrelease.h \
+>>> @@ -1414,6 +1414,8 @@ archprepare: outputmakefile archheaders archscripts scripts include/config/kerne
+>>>  
+>>>  prepare0: archprepare
+>>>  	$(Q)$(MAKE) $(build)=. prepare $(if $(single-build),,prepare_checks)
+>>> +
+>>> +modpost_prepare: archprepare
+>>>  	$(Q)$(MAKE) $(build)=scripts/mod
+>>
+>> [Severity: Low]
+>> Should modpost_prepare be ordered relative to stack_protector_prepare (or
+>> depend on prepare)?
+>>
+>> On arm, arm64, powerpc, and riscv, prepare depends on
+>> stack_protector_prepare, which depends on prepare0 and mutates the
+>> exported KBUILD_CFLAGS variable at recipe execution time:
+>>
+>> arch/arm64/Makefile:
+>> prepare: stack_protector_prepare
+>> stack_protector_prepare: prepare0
+>> 	$(eval KBUILD_CFLAGS += -mstack-protector-guard=sysreg		  \
+>> 				-mstack-protector-guard-reg=sp_el0	  \
+>> 				-mstack-protector-guard-offset=$(shell	  \
+>> 			awk '{if ($$2 == "TSK_STACK_CANARY") print $$3;}' \
+>> 				$(objtree)/include/generated/asm-offsets.h))
+>>
+>> Previously, scripts/mod was built inside prepare0, so it always ran before
+>> stack_protector_prepare modified KBUILD_CFLAGS.  With modpost_prepare
+>> only depending on archprepare, a parallel build runs modpost_prepare
+>> concurrently with prepare0 before stack_protector_prepare updates
+>> KBUILD_CFLAGS, whereas a serial build or make modules_prepare runs
+>> prepare first and passes the updated KBUILD_CFLAGS to scripts/mod.
+>>
+>> Because scripts/mod/empty.o is compiled with KBUILD_CFLAGS, switching
+>> between parallel and serial or single-module builds changes its recorded
+>> command line, rebuilding empty.o, regenerating elfconfig.h (which uses
+>> if_changed), and forcing a full rebuild of modpost.
+> 
+> Well yes,
+> 
+>    make scripts/mod/empty.o && make modules
+> 
+> leads to a rebuild of empty.o and modpost triggered by 'make modules'.
+> But if that is the only negative implication, this is not relevant as I
+> expect no human wants to build scripts/mod/empty.o as a single-target.
+
+This is indeed a low priority report, but regardless, after thinking a
+bit about it, I came up with a v2 which I found a bit more elegant:
+
+https://lore.kernel.org/all/20261113-reduce-single-build-dependencies-v2-0-93ba1f6c4e46@kernel.org/
+
+The dependencies goes from v1:
+
+  modpost_prepare: archprepare
+  modules_prepare: prepare modpost_prepare
+
+to v2:
+
+  modpost_prepare: prepare
+  modules_prepare: modpost_prepare
+
+It both resolves the issue and read more naturally.
+
+
+Yours sincerely,
+Vincent Mailhol
