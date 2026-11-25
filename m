@@ -1,88 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=159.69.126.157
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795600986;
-	b=SyL5XgmrjesRTGPOyqLlVu7Mk5KqbLJNGC+LzaARyByinq6M151FWeXRAKJ/nvvRefE9
-	 a6jXISObp8bmwfh5fLJ76AJaH+5impVplzvklnZOp4rWCFGEP+d+J+YMJSy2X2Hs/IgAH
-	 s6czXH5wBuOWHgOF4t6GbvlQ8P25v0vCrTjJF5Nws9zSq2kx/5ZeeO/2EY9yKp8uJOVFC
-	 gNhdAMiAfQ5dwl8Y9EasuPvvgAmR1a5h3ygWmSoSOCcgaFScinR2M2Fu0Z9cGPvV/b3HD
-	 /Zb6BCLyiMBobu2CaDoKUcmuWVGhUoCBIvpdGiZyiOW8y5jzJMgDuJvkWPvvHy92Dog==
+	t=1795602434;
+	b=v3ZhrFlgRt2icb/HDLIIDAi/aOW20BElWPGjonw329/i++flVwsy8UaJjqE+Wy4oPWQg
+	 LPLZBCemJuKkxFfbmp6jUOP7SgTsfacRiAg+0XTs6vXFQxJm4NoX/xwYJPuYL31T69MXV
+	 CyldloIud7fC4KsM/wS6PLMrrldJZdGXeERhrT5dG5NKW3GoUxtg2BeszdoU0ae7yQ4or
+	 lj9VZ/JsfHyo1jqqFh1Vlq+GrAePrhZ5XfOFr/0FnQdNdrimwnZ8O/xaq8N+l+dDmA0Ja
+	 2aaSLIufBT2vOsX7VGTZ8jHapGVUv7YBaVg0Fl9l7kYyPlG65dtKz+UWautIm1915gg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795600986;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=O13UsNDL/bH4zWwx+DfiJHWknsxleVix5d+Kxzd1OWY=;
-	b=sAHm8Fu+ZGgy3dAch1lEiQ01bzNHiyWyZzK+wQakBAe7KkTncrVfZrLRcDxF61f39ccm
-	 VFwGIVl+vDTnQc4NLFJcbSoXJtngYad9e7yK+tF8nCOUPhu+i3H0BD374fxzAw/xIiaBQ
-	 NVcOKNd7ToGkRw+74EAfmrBrmAPEEi8ubvVYaSNM2ZTzbp2nEVwR5ZFYE6FY3VbnE+CMs
-	 rbwJWbZmrlBjdIX0v0HJ6ldS3NQFfLK6Dk7o63Yj9GtgX85uED0aMc4P2x16eH2+P06I0
-	 JaHF570GnGtFoQcUSc+7ywmkKZ0FnzCYyJWtwdBVJHajkdGVQEUE1RMT9XXHD4v91Jw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795602434;
+	h=DMARC-Filter:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=UdjPSrmIIN+yK0pjcfXNzdP1bLb3/Iq2/gmCvGpuUSM=;
+	b=5kwz0aDBkE6HYRsMGpulNKeI9hnRYuDEtzmn1Rj2PwKNiDngsvuILFqr7mHYTv4ZbSuY
+	 afRKjMZHnqoNuDZdBj01BsooLH7I4wXts3nBZT4O5iuAPlcGZlBpZaeladS6VgT2XPI9P
+	 6YsKwZHSVVFU0WzSUFIOe66ESvNAst74dJY3Qijs90mznuNaDxgX3r1PjACDGz6mRTzYx
+	 k6aTSJVv8K9ANTjdBeikle4iOUb/11GIed4wU1+A40F6wrbQloHVCNoM3ilqHITJ+SieW
+	 X+nt+AVMX72Hp7f6/5slp03wiCCwNMUrQ/+w8OwZEHOShP+q5FCWxfQwnEqbkkh6WWQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="InI/35eW";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=weissschuh.net;
+	spf=pass smtp.mailfrom=weissschuh.net;
+	dkim=pass header.d=weissschuh.net header.i=@weissschuh.net header.a=rsa-sha256 header.s=mail header.b=O0jDoNL7;
+	arc=none smtp.remote-ip=159.69.126.157
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 83E7D606A323;
-	Wed, 25 Nov 2026 10:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498A5606A32E;
+	Wed, 25 Nov 2026 10:27:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 498A5606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=InI/35eW
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 645291F000C0;
-	Wed, 25 Nov 2026 10:03:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795600986;
-	bh=O13UsNDL/bH4zWwx+DfiJHWknsxleVix5d+Kxzd1OWY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=InI/35eWuYB+ucgg71M3f6aPF8ims5sfg7vm4vHs+tKA/kGD1EhYahM6PohlTEXOM
-	 KSuOJFvMgd3UGH79fBGuikXd7XcjRp9hfwqD9e2+qRNB3BiOrlITQpW9O8EGrMNQJO
-	 mYzpirZVSsEDKNkFZRq0YSFEXmZDA1OLGni3xQPh4pdiXlqjkEFfqjUlXZKhC8ye70
-	 PHJ2ojeXxj/3tOn8pf7KlZjxYfVc4fLXD4kMCpbXXnLz9XXW/GBk98lX0czfZ85NUQ
-	 RyQsWlnk+OTGR29+ZoPIMhQ2oZUOumI8CpcBuqmAFYQdC2H/x+8iV70QnYcBL26tRv
-	 FsSpPxihE1/zQ==
-From: Nicolas Schier <nsc@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
-	Nicolas Schier <n.schier@fritz.com>,
-	Kees Cook <kees@kernel.org>,
-	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Nicolas Schier <nsc@kernel.org>,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	linux-m68k@lists.linux-m68k.org,
-	linux-modules@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v6 0/7] kbuild: significantly speed up kernel builds
-Date: Wed, 25 Nov 2026 11:02:54 +0100
-Message-ID: <179560086157.3880976.7669895635153146949.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261124-build-speedup-v6-0-141a4f861c67@kernel.org>
-References: <20261124-build-speedup-v6-0-141a4f861c67@kernel.org>
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.a=rsa-sha256 header.s=mail header.b=O0jDoNL7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1795602430;
+	bh=9UPOXoCV2CfcVJuo2UQgfeUtoe1J/CgkmQtANG3RcC8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O0jDoNL7/5eA2Nl4OgQYadtK1gO6tMJYxBTHeMev1YWHAF5NieOiuKvV3dngmD5w3
+	 Q8HrDGOAJvMvpSpVv+9tq2J9/W3wLTvqi+jspzqeFwi/R5j5LMl7copWKYfr18jNro
+	 iGSq5N3daWa9fHkB7QNC7nCqqC0HJtI3lnpxlI08=
+Date: Wed, 25 Nov 2026 11:27:10 +0100
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Nicolas Schier <nsc@kernel.org>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Julian Braha <julianbraha@gmail.com>, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, 
+	stable@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v3 1/2] kbuild: Introduce CONFIG_CROSS_COMPILING
+Message-ID: <25eaa926-c244-40a5-b7b9-e5182e601446@t-8ch.de>
+References: <20261124-x86-no-march-native-on-non-x86_64-v3-0-268354149c5f@kernel.org>
+ <20261124-x86-no-march-native-on-non-x86_64-v3-1-268354149c5f@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -92,42 +62,48 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261124-x86-no-march-native-on-non-x86_64-v3-1-268354149c5f@kernel.org>
 
-On Tue, 24 Nov 2026 12:20:10 +0000, Lorenzo Stoakes (ARM) wrote:
-> A typical kernel build consists of a frustratingly large amount of time
-> spent stuck in single-threaded bottlenecks.
+On 2026-11-24 23:43:12-0700, Nathan Chancellor wrote:
+> There are times where decisions may want to be made within Kconfig when
+> cross compiling. Introduce a small script to call '$(HOSTCC) -v' and
+> '$(CC) -v' and compare the first part of the target triples to see if
+> they match.
 > 
-> It turns out that there's a lot we can do about this and doing so
-> significantly impacts kernel build times.
+> This check is cheap but approximate, as Kconfig does not have all the
+> information available such as endianness and bit width for the target to
+> pass along to compiler. For example, a user building for x86 with a
+> compiler that can build both with '-m32' / '-m64' may have
+> CONFIG_CROSS_COMPILING set depending on the default value of the
+> toolchain and what's being targeted. Should this become problematic in
+> the future, the logic can be expanded to cover these corner cases but
+> for now, keep the implementation simple and cover the majority of cases.
+> Leave some informational prints to make it easy to debug future reports
+> with
+
+The expansion to bit width and endianess will be a lot of busy-work.
+See the CC_CAN_LINK infrastructure.
+
+We already have host-architecture detection in kbuild through
+scripts/subarch.include. So CC_HAS_MARCH_NATIVE could depend on
+$(ARCH) = $(SUBARCH), after exporting SUBARCH. Or maybe give the
+variable a better name, like HOSTARCH.
+
+This would avoid the introduction of a new, not-really-correct flag
+and also the whack-a-mole that Boris complained about.
+
+>   $ make ... run-command KBUILD_RUN_COMMAND='$(srctree)/scripts/check-cross-compiling.sh "$(HOSTCC)" "$(CC) $(CLANG_FLAGS)"'
 > 
-> This series makes allmodconfig builds up to 36% faster, incremental builds
-> up to ~70% faster, and noop builds up to ~90% faster.
-> 
-> [...]
+> Cc: stable@vger.kernel.org # dependency of future change
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Link: https://lore.kernel.org/CAHk-=wgmkoWHWwaQ6nsGoCiBp0hrpJuiwmoVbQ=Efun8JyUNKw@mail.gmail.com/
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+>  MAINTAINERS                      |  1 +
+>  scripts/Kconfig.toolchain        |  3 +++
+>  scripts/check-cross-compiling.sh | 26 ++++++++++++++++++++++++++
+>  3 files changed, 30 insertions(+)
 
-Patches 1 and 3-5 applied to kbuild/linux.git (kbuild-next-unstable), thanks!
-
-[1/7] kbuild: calculate list, composite object state per object
-      https://git.kernel.org/kbuild/c/d3c49492
-[3/7] modpost: cache section relocation mismatch state
-      https://git.kernel.org/kbuild/c/db57178f
-[4/7] modpost: emit module descriptors as assembly
-      https://git.kernel.org/kbuild/c/4894ced3
-[5/7] kbuild: batch module finalisation
-      https://git.kernel.org/kbuild/c/81593e2e
-
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
-
-Patches applied to the kbuild-next-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-next branch in about a week if no
-issues are found.
-
-Best regards,
--- 
-Nicolas
-
+(...)
