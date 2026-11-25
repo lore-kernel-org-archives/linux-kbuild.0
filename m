@@ -1,59 +1,76 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795572412;
-	b=rNESibwINw3XA41XfZGtaz6KtuUWUIHfCAk+KaY949C5EZJ/B7j4hQSRCY8E7M9AIcVt
-	 Xa3xMsIo9f+SzamLkpH1dJK2OBEakLK4nb7IhY6+srXU944Lsp6voTGsrJ0VpAVmey+l9
-	 619YMsX1BcqSffXhvyFBrm5HoQqvSdlx7NXl17muMj9eFMsTR08EneXQXVwy8AwF4oWr3
-	 7Pp1vS0jFeoyjfEOJtBarQE+SWLi/s50fFUoA1/mMdL4uOMi3WQFvDEhl9iMBaPhDqSX/
-	 wKn1v+cG55MQdMF7SI5KaZbR0/KQL9rgxIBFeoZ8fsqNT0oeClCP+m15VYXvNvfm4DQ==
+	t=1795572415;
+	b=tp1k3EVThBgPz6KBYLMMBQGDRk4KpV1UP3eeAYR+X/7slmrmWX8Le+nws8jryto8qBp0
+	 4mjN7UV8zCZCfEkbm+6yscXY5UpWbtsR5AUU85hcuW5+S92FAWJrnYRX8Ithd6WmcDYhn
+	 TXhFztNsK8Sw0/YVzNIOwLmuk920s472XuSf3pFkErGbPNMMOw02IhEdzvNG6qNG8/VHC
+	 sr6apxPxqrrMQ5AXRD5YatPMhyUcT8/ranqHazUgcCso8wFupVfXHk+gnyoNGvCzWizCQ
+	 qZXkg3kFhmtwMSGV5grE5cqkGJ5ViyCPIFqEj4M9rBnNCr0tAryYPD2cg+Oz4GzL0JA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795572412;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795572415;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=iNtN9KGTIQKbiiuxbum6DdOI9gPPlvKGxzSwL4r8vnU=;
-	b=haMtjkwCsUKV/KKe76CHkYLwTB+S9LURDiKxz14ge3k1lN/fKMLIXLfcl5FjpEhANUkv
-	 JIDmwoYaLj+m6V2NuXp0wG8TSO4uoeFC7ipyi+npGrSxRmrbRPsKGXnLVXfm/dQ3ANPCh
-	 vY8kh/ByV+WAWLHACjDED3PUpc2F2/yLNTYq6FT8zLvhZ7r7kkAQjvYsK2by69zH4XiEf
-	 J5PpImApioF4eJ/uGF8LMmc5/hfwFzWKzQ2oW4hMtgbx1xowdvgCG4x5z+GlGYSg8tf+h
-	 g+y+DUFmXkKVynwp5mrYJA4CJDMf+xjc1xjzTY25qGGFvnWvYQjIEGx202ERT6bNLqQ==
+	bh=tdesGFo2gvb7lstfuQLq+1yzVhj59qUZoNASZ3nLc64=;
+	b=rc8Azj7SsRcx2q9lAlHrUfJs4reVvdUzKHMB/7FvCcimDwsod5+TVBRgaTVLEQ2xDKCK
+	 ZoP9xFmxRU5oGyNZXmKg9epNDeL0UoQOS6XkLqvQ0DYoxlI2Yrb6/LnmLVSv6PvpPWIKS
+	 QeQC3PinXDhxnpNgDB19K7oFAhyw+x94mtLhqDHBb/uSnVKnlDfqwlhi9aleFeVPFfqSr
+	 D3cryqUoZIlgMH/85EhpSjF/OMT0C3HhTWCvjJEfjskE/TFxMR0NV8d5b0S6tlMk6ucHM
+	 XQg4+6/jM7gl0tUiefZFYOpxp14EiUg6uH8bMDMVsXnv+RHuq/4NgKXDhBY3Fo/I0WQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XxcX3CdI;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MOzH5Rru;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0FB606A686;
-	Wed, 25 Nov 2026 02:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD8A606A33E;
+	Wed, 25 Nov 2026 02:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XxcX3CdI
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6151B1F000D2;
-	Wed, 25 Nov 2026 02:06:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MOzH5Rru
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 249CD1F000D2;
+	Wed, 25 Nov 2026 02:06:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795572411;
-	bh=iNtN9KGTIQKbiiuxbum6DdOI9gPPlvKGxzSwL4r8vnU=;
+	s=k20260515; t=1795572415;
+	bh=tdesGFo2gvb7lstfuQLq+1yzVhj59qUZoNASZ3nLc64=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XxcX3CdIzDMH0kSKCgUetltdjeZv4VhbNu+Q6GZvauML+Xk2mJaQSh1moCHxvZRz+
-	 CxkeOwnX00epTeZw9JnlLkH634mWjus3fATSgvxwpB5HaPwmmJQoVLf6HFRbyCYMbZ
-	 fB4BkGR2F/ziboTTh1wjLIRgY6CccNzQM3Q8eGn5zbSGLUa7eyi2W65XX/Yy7sdQSK
-	 rpDZflW/+/xcJEPwtrxzh8OJvbR8AFfg3fNSpZLUbsL/Ul/v+zPM0rsUPRAIwEoLA0
-	 CcGem9TLZDfYk4g9qTGPX47tQlohJlffNrbp6bPOR3hNKOcU9LI2lHjYsCNMKHGZms
-	 ZVZ0CUtTi4feQ==
+	b=MOzH5RrubIHH0xdG1qa6SXAy8I5qToyyikEPfeVC69kcczGmBTHG27KlWgF7AcPmW
+	 hOVgpskgrRAwzYrpvmF8wIfgNdsmNo+hQ8nqq7MzOPxsR8SOrVE2XEaxos23b/AoE+
+	 kAb4/Vzk8V5qUSfW557O0CaKOut+w8pbnSCMrYLhr5PlgeV+uCwSoXHQgUiNIsvpwR
+	 y/wrpNHWmlknXQuRTKfo52SM+TbKLUibkxcbk9vWW1g0BFXQshnibZMCcS9+Yi9jin
+	 ZZ9QzPwD+gds3gz6+ZgPw+syb3jV0z99X6dgBmHr4tR2WI52ZVRwepncoPkUH3cE7A
+	 XU3ctJ5nBQjkg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Chuck Wolber <chuck@wolber.net>,
+Cc: Alexander Potapenko <glider@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Bill Wendling <morbo@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Chuck Wolber <chuck@wolber.net>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Julian Braha <julianbraha@gmail.com>,
+	Justin Stitt <justinstitt@google.com>,
+	kasan-dev@googlegroups.com,
 	linux-kbuild@vger.kernel.org,
+	linux-um@lists.infradead.org,
+	llvm@lists.linux.dev,
 	Marco Elver <elver@google.com>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
 	Nicolas Schier <nsc@kernel.org>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
 	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@kernel.org>
-Subject: [PATCH v3 17/19] kconfig: add CC_HAS_CONDITION_COVERAGE for MC/DC support detection
-Date: Tue, 24 Nov 2026 21:06:01 -0500
-Message-ID: <20261125020603.3934222-18-sashal@kernel.org>
+	Richard Weinberger <richard@nod.at>,
+	Thomas Gleixner <tglx@kernel.org>,
+	x86@kernel.org
+Subject: [PATCH v3 18/19] gcov: add MC/DC condition coverage support
+Date: Tue, 24 Nov 2026 21:06:02 -0500
+Message-ID: <20261125020603.3934222-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261125020603.3934222-1-sashal@kernel.org>
 References: <20261125020603.3934222-1-sashal@kernel.org>
@@ -68,31 +85,76 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a Kconfig symbol to detect compiler support for -fcondition-coverage,
-which enables MC/DC (Modified Condition/Decision Coverage) instrumentation.
-This flag is available since GCC 14.
+Support CONFIG_COVERAGE_MCDC with gcov, using GCC's MC/DC condition
+coverage instrumentation (-fcondition-coverage), which is available
+since GCC 14. The data is shown by "gcov --conditions".
+
+Add -fcondition-coverage to the gcov compiler flags when enabled, and
+disable the warnings about decisions it leaves out, as is done for
+Clang. Both are gated on the config option to avoid Clang warnings
+about unknown options.
 
 Signed-off-by: Sasha Levin <sashal@kernel.org>
+Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
 ---
- scripts/Kconfig.toolchain | 5 +++++
- 1 file changed, 5 insertions(+)
+ kernel/coverage/Kconfig   | 7 +++++--
+ kernel/coverage/gcov/fs.c | 3 ++-
+ scripts/Makefile.gcov     | 5 +++++
+ 3 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Kconfig.toolchain b/scripts/Kconfig.toolchain
-index 8571cd16a2edd..661db9e7a89ee 100644
---- a/scripts/Kconfig.toolchain
-+++ b/scripts/Kconfig.toolchain
-@@ -193,6 +193,11 @@ config CC_OPT_WNO_PGO_COVERAGE
- 	# gcc: not supported
- 	def_string "$(cc-option-str,-Wno-pgo-coverage)"
+diff --git a/kernel/coverage/Kconfig b/kernel/coverage/Kconfig
+index 173a321741f87..77df4c04945dc 100644
+--- a/kernel/coverage/Kconfig
++++ b/kernel/coverage/Kconfig
+@@ -108,8 +108,8 @@ config COVERAGE_PROFILE_ALL
  
-+config CC_HAS_CONDITION_COVERAGE
-+	# gcc-14: https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=08a52331803f66a4aaeaedd278436ca8eac57b50
-+	# clang: not supported
-+	def_bool $(cc-option,-fcondition-coverage)
+ config COVERAGE_MCDC
+ 	bool "Measure modified condition/decision coverage (MC/DC)"
+-	depends on LLVM_COV_KERNEL
+-	depends on CLANG_VERSION >= 220000 || !WERROR
++	depends on LLVM_COV_KERNEL || (GCOV_KERNEL && CC_HAS_CONDITION_COVERAGE)
++	depends on !(LLVM_COV_KERNEL && CLANG_VERSION < 220000 && WERROR)
+ 	help
+ 	  MC/DC verifies that each condition of a boolean decision has been
+ 	  shown to independently affect the outcome of the decision. It is
+@@ -119,6 +119,9 @@ config COVERAGE_MCDC
+ 	  Decisions that the compiler can't instrument are not measured, and
+ 	  only get branch coverage.
+ 
++	  With gcov this requires GCC 14 or later, and the data is shown by
++	  "gcov --conditions".
 +
- config LD_OPT_FORCE_GROUP_ALLOCATION
- 	def_string "$(ld-option-str,--force-group-allocation)"
+ 	  If unsure, say N.
  
+ config LLVM_COV_MCDC_MAX_CONDITIONS
+diff --git a/kernel/coverage/gcov/fs.c b/kernel/coverage/gcov/fs.c
+index fe1b85d54ede0..aa51e76c0e530 100644
+--- a/kernel/coverage/gcov/fs.c
++++ b/kernel/coverage/gcov/fs.c
+@@ -861,7 +861,8 @@ void gcov_event(enum gcov_action action, struct gcov_info *info)
+ }
+ 
+ static const struct coverage_backend gcov_backend = {
+-	.name	= "gcov",
++	.name		= "gcov",
++	.features	= IS_ENABLED(CONFIG_COVERAGE_MCDC) ? "mcdc" : NULL,
+ };
+ 
+ /* Create debugfs entries. */
+diff --git a/scripts/Makefile.gcov b/scripts/Makefile.gcov
+index 1cfe04d89b0a2..977c8ee023f68 100644
+--- a/scripts/Makefile.gcov
++++ b/scripts/Makefile.gcov
+@@ -18,4 +18,9 @@ CFLAGS_COVERAGE	+= $(call try-run,\
+ 	cmp -s "$$TMP.ubase" "$$TMP.utest",\
+ 	-fprofile-update=prefer-atomic)
+ endif
++ifdef CONFIG_COVERAGE_MCDC
++CFLAGS_COVERAGE	+= -fcondition-coverage
++# As for Clang: KCFLAGS=-Wcoverage-too-many-conditions lists what's left out.
++KBUILD_CFLAGS	+= -Wno-coverage-too-many-conditions
++endif
+ export CFLAGS_COVERAGE
 -- 
 2.53.0
 
