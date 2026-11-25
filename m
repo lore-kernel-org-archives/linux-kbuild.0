@@ -1,55 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795638801;
-	b=GcTSscBfCVNEulqsZxwV5Gh4llASW/Y9CcD6UZ5SiuMwrzd7tjt/mr2Q7kbyLj2bTU3c
-	 67nGOkRHDOIlD/qEgFiDKbDB8kQ0RXRiyVyE/lKRpTcvfBmy8yS9+SMgXy7PWIh6LGe+A
-	 uJg0HWeZheAJGbnfKxRwW5W9/3HCq4nuhCnB3TWrU8gYrEHbf7s4/xomDHFYbYZV4w0b5
-	 A2ujnXwV9y/bE5B3vgeKhMDCTGCNgZyZ+ktYb4pmF+LjvKpSDyXgAzd1RNyw3evpI0rH+
-	 5J/E6ePHHRFPkAqyBAATkBbbuemj7SSehR1yE7+nBA0ppV4gKUdJ0FjcBttQooBiaPQ==
+	t=1795648216;
+	b=QfYB3QJ7fbII7OsQketsZJNiHSIXMq9jy2J1MsRrFpv0u6Hk4o9DjhTFa/Oug1D9kmm5
+	 jcTzW7mKt2z7adOVAEEEAepCBJlLfU4yyzF7qYxr4YOEXxjoTKYoJCMLuIMm7QOFMbw5T
+	 25qgd3+TJDrHR7vmT0DPJLnl16PUZEPA6VTnY6YrECBuJ1nz9I3KszdhKp4gB/cyvHLBF
+	 I4XAmgcCSKjuAPO9QLOINY/PfZwNBZkZ15i1XpaIBVvfn2oa2Ex6AdOsdcS7g8jB3Lzwh
+	 wu2LI1vH0KapWc5Vla698atBNWfL6dKesh7YmCTD7DeKdC8KBDy/P18MZJBAt6ULlBA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795638801;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=t3kOzNsQufxZzFIonsmCvTESKohciNYU75no5dyN69Y=;
-	b=p9Wm/loxZTE+kEe4U+ZdR4jbLg0KnabPk+0p12nHFE6BjECwMlWPCZMf01GKL+snewiB
-	 UZYo16UWfJQRusGQCdDA/74VBCy6CcOVLjKqKeIxAwSPatamCzkCKc77CL89hhjO7jEP0
-	 WRT1qWuNlFHSzVKy7RFCxYm4JfUIxDaM0eLfWvXI3/8h21xLeCoVl4u+jUhbV56/N8nPH
-	 sly7r8tjxo1sRhCNKSDFjozy2NqdCr0EnUHZ2s2mK+BWQ6AoCRzSKRCJb35sv5Na6eVBO
-	 qawFuV0RPUYDl3ZDl3rGC/fkz1gaV8UyZkdgArWclqox0898JPe0iiAJVWKyYBRWSXQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795648216;
+	h=Received:DKIM-Signature:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Subject:From:To:Cc:In-Reply-To:References:
+	 Date:Message-Id:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=m3GJxlGj0azuDPZoGR5k/X5Csq7kPX8Bj7+lpyBb/r4=;
+	b=wcT1F+hggYf92A7KqmXbaHLl8bG5NEP0jGqWIjxkoSXo2iFLSnGsO0N34s3+i3rMiB8l
+	 Oa1zw2rUYUZDDrOMCQHjv+oNHBwLSQEliZWqUUwxFgE9eJ/gzTpf2bNsIEpFfnRsVMZGb
+	 xDbvauT+OPBviEfvbvuaARte93x150YTUIEzuz6dv3gBG/fgEd3hqh/9zChA0Njfyn0Eb
+	 poqVXIZNrccHFajnHbG1OAqU7rmxT+VH1tIDOZV0rJ54HsQ+LqqwmUulfVVyHL7RDzHz3
+	 83EVtulIEvrlVPoeAJ2TbU1Jy33Wbt1QXxIS8nSBbk8GB8Hq9dOXc1QQQeznzcMAErw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XbxvxcXm;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LMrYJXXm;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 6CEB3606A31E;
-	Wed, 25 Nov 2026 20:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BFA606A333;
+	Wed, 25 Nov 2026 23:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XbxvxcXm
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 717951F000C6;
-	Wed, 25 Nov 2026 20:33:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LMrYJXXm
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABD2E1F000D0;
+	Wed, 25 Nov 2026 23:10:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795638800;
-	bh=t3kOzNsQufxZzFIonsmCvTESKohciNYU75no5dyN69Y=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=XbxvxcXmfdsXSvbHOAncQq8im61axPm2Msl9LSc1UMhvynDCuS7KoiLShJ37/Dcmk
-	 4hrC4Y0qko8bQC3QgQoYdxn0iURnXGqSMSKLKI8tC5xyxsuSefIK8jwo6w3oZI9sTi
-	 2Wll5hwjxNc2Abefwk6Ve+j4ZL5O/YH9aHjGTfeHGtBpC09tcyMKSeEQWGTgJ0A8SZ
-	 UpcLr9kn1i5/yjXP7x0xI48LQTz1hSENqumNQao/O5LGO7gJI+6YgQPa0qbEpaJ2sO
-	 8vRzd6m7SZqrFhf17wdvWg1daZPaQD2QUJUgsTN5zhvehsbKm+iR4SHooE1Qx1p5Ou
-	 uTT4m++TT6u3w==
-From: Nicolas Schier <nsc@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>, 
- Dmitry Voytik <voytikd@gmail.com>
-Cc: Nicolas Schier <n.schier@fritz.com>, linux-kernel@vger.kernel.org, 
- linux-kbuild@vger.kernel.org
-In-Reply-To: <20261117132513.52725-1-voytikd@gmail.com>
-References: <20261117132513.52725-1-voytikd@gmail.com>
-Subject: Re: [PATCH v8] scripts/config: honor $KBUILD_OUTPUT by default
-Message-Id: <179562217907.3911508.5781947408297959984.b4-ty@b4>
-Date: Wed, 25 Nov 2026 16:56:19 +0100
+	s=k20260515; t=1795648216;
+	bh=m3GJxlGj0azuDPZoGR5k/X5Csq7kPX8Bj7+lpyBb/r4=;
+	h=Subject:From:To:Cc:In-Reply-To:References:Date;
+	b=LMrYJXXmwE9Um5fWOppFdRbWQouDqJJnYjeaVF2jm0RD7mQs92975ePjPqPMESF+M
+	 aJmFd8AdF9bqXqHy2fwqBTv776+/0W1gLJ2109/Xt1W2XG8K41FA/GGp6qgWOIeSrw
+	 ZIvWNw+ZXUOAKQ1p8SJXQn3OCUW9cgAMBr0e0xz3vseKx1R++Mo/XbspM3JeAxE8Fd
+	 VIOVetcJiZKoS3TLLi5GplVfvXe8RTQbP3JXkppLNWfSIK1yEvEmFla41CbwVU6xWs
+	 ObqtmhShd77Gh+PoDZiwKsHw6c821D/LsNHwyaQZuqNLyICxO3Msl2fQCAZeZB6QNV
+	 xxatrYD0pleiQ==
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -61,44 +51,97 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-96b3f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=713; i=nsc@kernel.org;
- s=20250924; h=from:subject:message-id;
- bh=gHrm6Ye02hXiXxxYizXyZ81yvSb5/LNO+6CIkN4nleM=;
- b=owEBbQKS/ZANAwAKAQdSCnAWJhJpAcsmYgBrBwUnmBtUPR3oEHwcMYZPsYEuSaWuN4haNDS67
- lEkdmjb00mJAjMEAAEKAB0WIQSHQTenhzckp4G+wsYHUgpwFiYSaQUCawcFJwAKCRAHUgpwFiYS
- afPkEADHoXG1XbUb0BR6frs5ZimDZdxHwxvJO8SnvHjR3YEuioz+QeGVKPHhizmiRNUB3opIgVK
- RS60B5vLfkT3B4GogZqJ4YLCetYhIy4hSXSblG2tMQ7lYX+jCtHXTXLWWq9gDNgGjud8kXUkZ/i
- kvnaRWvbqyw97uZSCGROc5K/h0qy2GahUyNZc1+DVBQU15IeXl+PL0idXnfUu+oOgQs0EVU5s6C
- WQQWf5yL2lCduErL3W69XU5o8+E8ts6hF4z2d0LiddGei5MvNTP3UMoyZ16yQuvT2D60eAVKpUs
- eYzM7iytqgfvSf9wyJuadZ/r30fxgHmyx7JPekGJgEDUZ+v8fKhnFIWrXpVjApvPVDGoCvBwSJJ
- vCdYvaNYQwNnpyfq2jTYnOoU84/r3jjsmM9jU69npSIDFmcHhkBbJTfwhPfQMdsm17qBy6PNBfO
- ZHAxOK1Na0n3Myx2i8k2AgNhnxlgQ+e/mrw0lk4cRWLKcrZNwBn5qmtoKEpZ+1VJnXtpAPjvpG1
- aSU3cMnaUVvFpWUUfjTDcliAtZ4h+y6oV0XFxN0+JnpjDNZH7hYthdKDGH4+IWU/61QTuQTB313
- o5WrHgF9V/X1UKv25shl00h2XP3SxxBgHEhUTAECpNxKL87fMwcCqNs/sHV+PTOhxDhl/VRl+zv
- WCe8wlTAzyDGrzA==
-X-Developer-Key: i=nsc@kernel.org; a=openpgp;
- fpr=18ED52DBE34F860EE9FBC82B7D97093255A0CE7F
+Subject: Re: [PATCH] kconfig: warn about malformed KCONFIG_SEED values
+From: Nathan Chancellor <nathan@kernel.org>
+To: Priyanshu Singh <singhpriyanshu9838@gmail.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+ Julian Braha <julianbraha@gmail.com>, 
+ "Yann E . MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20261118071557.791279-1-singhpriyanshu9838@gmail.com>
+References: <20261118071557.791279-1-singhpriyanshu9838@gmail.com>
+Date: Wed, 25 Nov 2026 16:10:10 -0700
+Message-Id: <179564821041.3369856.2083626361406656618.b4-reply@b4>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3895; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=yUref+BatIH1CfDhNYmtWum8QHtrY7It7k/mSbU2ALY=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDNnsWZdyn3fz1B0+3u788+SV4opAXx/N4JK0bcZO7WeKD
+ h+YFfGjo5SFQYyLQVZMkaX6sepxQ8M5ZxlvnJoEM4eVCWQIAxenAEzk/VdGhr/yirMyHQzfxKfu
+ 0t3xwjD8Q7nwgjnv7okqfX74XLF9KQvDf19Xj4Ib76wMbjunPzlY3DG9Q6MxdD5Dpv+uh/x79VS
+ FuAE=
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Tue, 17 Nov 2026 14:25:12 +0100, Dmitry Voytik wrote:
-> scripts/config: honor $KBUILD_OUTPUT by default
+On 2026-11-18 07:15 +0000, Priyanshu Singh wrote:
+> randconfig parses KCONFIG_SEED with signed strtol(), causing several
+> validation and cross-architecture bugs:
+> 
+> - Artificial constraints and portability issues:
+>   32-bit seeds in [0x80000000, 0xFFFFFFFF] and values > UINT_MAX
+>   are capped to LONG_MAX (0x7FFFFFFF) on 32-bit hosts instead of
+>   matching 64-bit host behavior.
+> - Whitespace handling asymmetry: Trailing whitespace leaves
+>   *endp != '\0', discarding the seed in favor of gettimeofday()
+>   while leading whitespace is accepted.
+> - Garbage handling: Invalid strings (e.g., "xyz", "42_foo") fall back
+>   to the clock seed and exit with status 0, ignoring KCONFIG_WERROR.
+> 
+> Switch to strtoull(..., 0) and consume trailing whitespace so
+> whitespace-padded seeds are not discarded. Reject 0b/0B prefixes
+> explicitly so C11 and C23 builds behave identically.
+> 
+> Emit a warning whenever KCONFIG_SEED deviates from a canonical unsigned
+> 32-bit integer, and exit(1) if KCONFIG_WERROR is set. Otherwise, retain
+> modulo 2^32 truncation for parseable 64-bit integers and fall back to
+> the clock seed on unparseable inputs or ERANGE overflow.
+> 
+> Add regression tests in scripts/kconfig/tests/randconfig_seed/.
+> 
+> Fixes: 0d8024c6ebad ("kconfig: allow specifying the seed for randconfig")
+> Signed-off-by: Priyanshu Singh <singhpriyanshu9838@gmail.com>
+> ---
+> Notes for reviewers:
+> - 0b/0B guard: Under glibc 2.38+ with -std=gnu2x/-std=c23, strtoull()
+>   maps to __isoc23_strtoull() which accepts 0b/0B binary prefixes in
+>   base 0, whereas C11 stops at 'b'. Rejecting 0b/0B prior to strtoull()
+>   keeps behavior identical across toolchains.
+> - Backward compatibility (KCONFIG_WERROR unset): Non-canonical but
+>   parseable 64-bit integers (whitespace, signs, -1, or > UINT_MAX
+>   timestamps like `date +%s%N`) emit a warning and truncate modulo 2^32
+>   across both 32-bit and 64-bit hosts, while unparseable strings or
+>   > 64-bit ERANGE overflows fall back to gettimeofday().
+> 
+> Input                   Pre-Patch (64-bit)    Pre-Patch (32-bit)    Post-Patch (32 & 64-bit)
+> ----------------------  --------------------  --------------------  ------------------------------------
+> "42" / "0x2a"           0x2A (quiet)          0x2A (quiet)          0x2A (quiet)
+> "0x80000000"            0x80000000 (quiet)    0x7FFFFFFF (clamp)    0x80000000 (quiet)
+> " 42"                   0x2A (quiet)          0x2A (quiet)          0x2A + warn (WERROR -> exit 1)
+> "42 "                   Clock fallback        Clock fallback        0x2A + warn (WERROR -> exit 1)
+> "-1"                    0xFFFFFFFF (quiet)    0xFFFFFFFF (quiet)    0xFFFFFFFF + warn (WERROR -> exit 1)
+> "4294967296" (2^32)     0x0 (quiet)           0x7FFFFFFF (clamp)    0x0 + warn (WERROR -> exit 1)
+> "18446744073709551616"  0xFFFFFFFF (clamp)    0x7FFFFFFF (clamp)    Clock fallback + warn (WERROR -> 1)
+> "0b1010"                Clock (C11)/10 (C23)  Clock (C11)/10 (C23)  Clock fallback + warn (WERROR -> 1)
+> "xyz" / "42_foo"        Clock (ignores WERR)  Clock (ignores WERR)  Clock fallback + warn (WERROR -> 1)
+> 
+> Tested via `make testconfig` (40 passed).
 
-Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+I am pretty ambivalent about this patch. Most of what you bring up in
+the commit message is in "who cares" territory for me personally since
 
-[1/1] scripts/config: honor $KBUILD_OUTPUT by default
-      https://git.kernel.org/kbuild/c/9930db30
+- 32-bit builds are going to be pretty uncommon nowadays
 
-Please look out for regression or issue reports or other follow up
-comments, as they may result in the patch/series getting dropped,
-reverted or modified (e.g. trailers).
+- Fixes is over 13 years old and it does not look like anyone has
+  noticed this in practice based on searching linux-kbuild
 
-Patches applied to the kbuild-next-unstable branch are accepted pending
-wider testing in linux-next and any post-commit review; they will
-generally be moved to the kbuild-next branch in about a week if no
-issues are found.
+- The documentation states this is just an integer value; if people are
+  plugging in arbitrary values, that's on them
 
-Best regards,
+- Most people are just going to be using a previously generated
+  KCONFIG_SEED; can these issues happen with the default logic?
+
+That said, Julian and Nicolas are free to disagree with me.
+
 -- 
-Nicolas
-
+Cheers,
+Nathan
 
