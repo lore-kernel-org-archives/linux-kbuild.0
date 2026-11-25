@@ -1,71 +1,88 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795600984;
-	b=fio5iOE2gq12GOSIFUDQEdqwxT90kK2A02E9GZAlpjAwyXgOk1AlAos8i3NJbqCNnjLu
-	 mU/7gvrFD273vmh0fs/rrDTOBkqoTkSKJLLQbz8LEa3+ulj4uS5ibaHXWbyNyBbTOiOTn
-	 lyZ0U0iJgu67ORiNLQnmYmG0c2KcWWt5VsORKiHRJ++cw/WHY27aHp7h2+Ceu9u4rMO+X
-	 LgFHVLYtKvGtuNAxuKYjIEE2oSrgdbWhC7c3Uw5Wp3bgdcN+QChPrloXMD6cYIZhu3vEi
-	 RbaeI0he2kUyId4Yq6rqzelEkdXbqB4UaUGgbF+ze/p6x+ZJxkjCikcfhOJrCGtKvCw==
+	t=1795600986;
+	b=SyL5XgmrjesRTGPOyqLlVu7Mk5KqbLJNGC+LzaARyByinq6M151FWeXRAKJ/nvvRefE9
+	 a6jXISObp8bmwfh5fLJ76AJaH+5impVplzvklnZOp4rWCFGEP+d+J+YMJSy2X2Hs/IgAH
+	 s6czXH5wBuOWHgOF4t6GbvlQ8P25v0vCrTjJF5Nws9zSq2kx/5ZeeO/2EY9yKp8uJOVFC
+	 gNhdAMiAfQ5dwl8Y9EasuPvvgAmR1a5h3ygWmSoSOCcgaFScinR2M2Fu0Z9cGPvV/b3HD
+	 /Zb6BCLyiMBobu2CaDoKUcmuWVGhUoCBIvpdGiZyiOW8y5jzJMgDuJvkWPvvHy92Dog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795600984;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795600986;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=qEPIxvGniF/YhXwPA5SSWIjPSSOSPgJQxE6JPjadhkc=;
-	b=15725jIJgGNw7penEM57gzGue3NMTognQuW4G/+MCqX2Af/YVJNf6pMt6YSdZvJNPiIT
-	 rc1x/Ai2BNacLsHjiYBRtbGiXyHbakIz/v56ADISm90AQcZ3P369cmp+Y/ICORThaX26b
-	 6TS8d5kD3LPe+V67/x8iy7sL+l+KHHSzx2RXHIFeruh2czK0ZvIAYjH0pVeUxYbbdoiHv
-	 pfAMR/AY2Cu3nqgn4M6gyouYrUA9s8F+xRdZznd9BmK51Y0h72/IJzepAJK26nW2etbnP
-	 sRFdRyN0nbNkohYpQATZi9Tac1lZM3Yy38gc6fGcQlAHDE5XEfy3CR8kQoC+EDEcTBQ==
+	bh=O13UsNDL/bH4zWwx+DfiJHWknsxleVix5d+Kxzd1OWY=;
+	b=sAHm8Fu+ZGgy3dAch1lEiQ01bzNHiyWyZzK+wQakBAe7KkTncrVfZrLRcDxF61f39ccm
+	 VFwGIVl+vDTnQc4NLFJcbSoXJtngYad9e7yK+tF8nCOUPhu+i3H0BD374fxzAw/xIiaBQ
+	 NVcOKNd7ToGkRw+74EAfmrBrmAPEEi8ubvVYaSNM2ZTzbp2nEVwR5ZFYE6FY3VbnE+CMs
+	 rbwJWbZmrlBjdIX0v0HJ6ldS3NQFfLK6Dk7o63Yj9GtgX85uED0aMc4P2x16eH2+P06I0
+	 JaHF570GnGtFoQcUSc+7ywmkKZ0FnzCYyJWtwdBVJHajkdGVQEUE1RMT9XXHD4v91Jw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ogVPeFFd;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="InI/35eW";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 2F80A606A31E;
-	Wed, 25 Nov 2026 10:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 83E7D606A323;
+	Wed, 25 Nov 2026 10:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ogVPeFFd
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 3AF5E1F000C4;
-	Wed, 25 Nov 2026 10:03:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=InI/35eW
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 645291F000C0;
+	Wed, 25 Nov 2026 10:03:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795600983;
-	bh=qEPIxvGniF/YhXwPA5SSWIjPSSOSPgJQxE6JPjadhkc=;
+	s=k20260515; t=1795600986;
+	bh=O13UsNDL/bH4zWwx+DfiJHWknsxleVix5d+Kxzd1OWY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ogVPeFFdbHD/v3IA3n2ctcWEn1t+zZ8PaFug04K7Y/geumcSZ3pFGJzH2uHhKBoUJ
-	 k+2h9EfsyXSVTHP1l1awa3eMEAkCzVmmW3Jb4hTRz9CSXadmFvgjQvsgjmiaSxQn0e
-	 087Htz6rk5oJXpnx689Xd8qB7zf+hoeYW8psuUV70R8n1gRiQdeN337lkmfaqYEiHf
-	 2yrzsEOLKdDban0JBOybghKhD0JiLnCgLdsBxEaMpqw3LX6els8Md6Hkd6vE6Lfdqx
-	 oA5LsOK1zTdXDL2cyaVpEacAZgdF9BcGDoTmps0wtw5LkVsV+Ykgiz3KCZSpzgpPQI
-	 PyWT3f1Yw0r0w==
+	b=InI/35eWuYB+ucgg71M3f6aPF8ims5sfg7vm4vHs+tKA/kGD1EhYahM6PohlTEXOM
+	 KSuOJFvMgd3UGH79fBGuikXd7XcjRp9hfwqD9e2+qRNB3BiOrlITQpW9O8EGrMNQJO
+	 mYzpirZVSsEDKNkFZRq0YSFEXmZDA1OLGni3xQPh4pdiXlqjkEFfqjUlXZKhC8ye70
+	 PHJ2ojeXxj/3tOn8pf7KlZjxYfVc4fLXD4kMCpbXXnLz9XXW/GBk98lX0czfZ85NUQ
+	 RyQsWlnk+OTGR29+ZoPIMhQ2oZUOumI8CpcBuqmAFYQdC2H/x+8iV70QnYcBL26tRv
+	 FsSpPxihE1/zQ==
 From: Nicolas Schier <nsc@kernel.org>
-To: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	Nathan Chancellor <nathan@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	Nicolas Schier <nsc@kernel.org>
-Cc: Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Daniel Gomez <da.gomez@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Aaron Tomlin <atomlin@atomlin.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	Nicolas Schier <n.schier@fritz.com>,
+	Kees Cook <kees@kernel.org>,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>,
 	linux-kbuild@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	"kernelci.org bot" <bot@kernelci.org>,
-	Nicolas Schier <n.schier@fritz.com>
-Subject: Re: [PATCH] Move struct cpu_feature to a <linux/device-id/cpu_feature.h>
-Date: Wed, 25 Nov 2026 11:02:55 +0100
-Message-ID: <179560086128.3880976.17009453982842504625.b4-ty@b4>
+	llvm@lists.linux.dev,
+	linux-m68k@lists.linux-m68k.org,
+	linux-modules@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v6 0/7] kbuild: significantly speed up kernel builds
+Date: Wed, 25 Nov 2026 11:02:54 +0100
+Message-ID: <179560086157.3880976.7669895635153146949.b4-ty@b4>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261120202712.3377691-1-nsc@kernel.org>
-References: <20261120202712.3377691-1-nsc@kernel.org>
+In-Reply-To: <20261124-build-speedup-v6-0-141a4f861c67@kernel.org>
+References: <20261124-build-speedup-v6-0-141a4f861c67@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -78,21 +95,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Fri, 20 Nov 2026 21:27:11 +0100, Nicolas Schier wrote:
-> struct cpu_feature used to be defined in <linux/mod_devicetable.h>. Move
-> it to <linux/device-id/cpu_feature.h> to let users of mod_devicetable.h
-> that only need struct cpu_feature switch to the new include file, and
-> to reduce the number of users of mod_devicetable.h.
+On Tue, 24 Nov 2026 12:20:10 +0000, Lorenzo Stoakes (ARM) wrote:
+> A typical kernel build consists of a frustratingly large amount of time
+> spent stuck in single-threaded bottlenecks.
 > 
-> While moving struct cpu_feature to <linux/cpufeature.h> instead sounds
-> reasonable, it would break defconfig on loongarch and mips [1].
+> It turns out that there's a lot we can do about this and doing so
+> significantly impacts kernel build times.
+> 
+> This series makes allmodconfig builds up to 36% faster, incremental builds
+> up to ~70% faster, and noop builds up to ~90% faster.
 > 
 > [...]
 
-Applied to kbuild/linux.git (kbuild-next-unstable), thanks!
+Patches 1 and 3-5 applied to kbuild/linux.git (kbuild-next-unstable), thanks!
 
-[1/1] Move struct cpu_feature to a <linux/device-id/cpu_feature.h>
-      https://git.kernel.org/kbuild/c/a48b8e3e
+[1/7] kbuild: calculate list, composite object state per object
+      https://git.kernel.org/kbuild/c/d3c49492
+[3/7] modpost: cache section relocation mismatch state
+      https://git.kernel.org/kbuild/c/db57178f
+[4/7] modpost: emit module descriptors as assembly
+      https://git.kernel.org/kbuild/c/4894ced3
+[5/7] kbuild: batch module finalisation
+      https://git.kernel.org/kbuild/c/81593e2e
 
 Please look out for regression or issue reports or other follow up
 comments, as they may result in the patch/series getting dropped,
