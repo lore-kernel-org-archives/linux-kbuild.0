@@ -1,79 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795572415;
-	b=tp1k3EVThBgPz6KBYLMMBQGDRk4KpV1UP3eeAYR+X/7slmrmWX8Le+nws8jryto8qBp0
-	 4mjN7UV8zCZCfEkbm+6yscXY5UpWbtsR5AUU85hcuW5+S92FAWJrnYRX8Ithd6WmcDYhn
-	 TXhFztNsK8Sw0/YVzNIOwLmuk920s472XuSf3pFkErGbPNMMOw02IhEdzvNG6qNG8/VHC
-	 sr6apxPxqrrMQ5AXRD5YatPMhyUcT8/ranqHazUgcCso8wFupVfXHk+gnyoNGvCzWizCQ
-	 qZXkg3kFhmtwMSGV5grE5cqkGJ5ViyCPIFqEj4M9rBnNCr0tAryYPD2cg+Oz4GzL0JA==
+	t=1795576018;
+	b=epIr3ltJhFmjq9MCtdjUWOFZO5AQvL4mngYitpjIA3TvZuWVbpAv3HLW5YWx6Vtpkw7z
+	 TI6Hn6kzQm6mQ+MvhU1CgMEKoznzTR7C9uyiSu4rJTm6spBLoIu1u4WEy9dKmXbYyWXKD
+	 6fO0jhZTrJtS6Pdw1RjD3OD7x/HiRBFIAcaMdcQ3uy78+kx/dAfQ6m18mkjqH1bKMghPd
+	 kLhNvbiHmifYQoX/P2rydh15Sj3tFScPcSJCKvxnPBf3NwahYUA2qIOKMG5JtI4hCavRY
+	 vHMAvYYfhsd/VMxgrcY+QRr1alU+WegD0qoouil36aRwzB+QtGEDCY8Dodjea/5wvag==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795572415;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=tdesGFo2gvb7lstfuQLq+1yzVhj59qUZoNASZ3nLc64=;
-	b=rc8Azj7SsRcx2q9lAlHrUfJs4reVvdUzKHMB/7FvCcimDwsod5+TVBRgaTVLEQ2xDKCK
-	 ZoP9xFmxRU5oGyNZXmKg9epNDeL0UoQOS6XkLqvQ0DYoxlI2Yrb6/LnmLVSv6PvpPWIKS
-	 QeQC3PinXDhxnpNgDB19K7oFAhyw+x94mtLhqDHBb/uSnVKnlDfqwlhi9aleFeVPFfqSr
-	 D3cryqUoZIlgMH/85EhpSjF/OMT0C3HhTWCvjJEfjskE/TFxMR0NV8d5b0S6tlMk6ucHM
-	 XQg4+6/jM7gl0tUiefZFYOpxp14EiUg6uH8bMDMVsXnv+RHuq/4NgKXDhBY3Fo/I0WQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795576018;
+	h=Received:DKIM-Signature:Received:Subject:From:In-Reply-To:References:
+	 X-PR-Tracked-List-Id:X-PR-Tracked-Message-Id:X-PR-Tracked-Remote:
+	 X-PR-Tracked-Commit-Id:X-PR-Merge-Tree:X-PR-Merge-Refname:
+	 X-PR-Merge-Commit-Id:Message-Id:Date:To:Cc;
+	bh=X01M37vtnb5PSXNYqW5T1ZO4yds6vtXWHeZ1c4iujGk=;
+	b=OOsK272lz3I8nCDrAO5jmFA86cLGJh3FGmYE0Zs51Tv9BM7YHZCL+apBXPmmt+XMNTR1
+	 p0J4KEzDHIY0gnxdjvWalw6Kmqo9C3udyNoK9GnJnHD89Lpn/Sh0zVWOZ3b3lpHA69ltS
+	 XXq4FlX0rcT0TiGnPnwk6foqIvNJmFtx953qjbmQCMjRd4QRMgU5i/CtkDUE8Ypdtm+fI
+	 HcVHUVbZ/IXCudg0hh89SRk1vJZvsCVeBQLAeg/AfDaat12I9NS3GQDSPlj45zmXdDTJA
+	 BNh7vQznH6pnSxAxxOKQeurbCy2fmfMrrcDEm+sL2BXn5jsiajnNvl6C3ldkXx2pTyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MOzH5Rru;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HQKL3oMn;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD8A606A33E;
-	Wed, 25 Nov 2026 02:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBF8606A31E;
+	Wed, 25 Nov 2026 03:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MOzH5Rru
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 249CD1F000D2;
-	Wed, 25 Nov 2026 02:06:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HQKL3oMn
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 444F21F000D2;
+	Wed, 25 Nov 2026 03:06:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795572415;
-	bh=tdesGFo2gvb7lstfuQLq+1yzVhj59qUZoNASZ3nLc64=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MOzH5RrubIHH0xdG1qa6SXAy8I5qToyyikEPfeVC69kcczGmBTHG27KlWgF7AcPmW
-	 hOVgpskgrRAwzYrpvmF8wIfgNdsmNo+hQ8nqq7MzOPxsR8SOrVE2XEaxos23b/AoE+
-	 kAb4/Vzk8V5qUSfW557O0CaKOut+w8pbnSCMrYLhr5PlgeV+uCwSoXHQgUiNIsvpwR
-	 y/wrpNHWmlknXQuRTKfo52SM+TbKLUibkxcbk9vWW1g0BFXQshnibZMCcS9+Yi9jin
-	 ZZ9QzPwD+gds3gz6+ZgPw+syb3jV0z99X6dgBmHr4tR2WI52ZVRwepncoPkUH3cE7A
-	 XU3ctJ5nBQjkg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Bill Wendling <morbo@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Chuck Wolber <chuck@wolber.net>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Justin Stitt <justinstitt@google.com>,
-	kasan-dev@googlegroups.com,
-	linux-kbuild@vger.kernel.org,
-	linux-um@lists.infradead.org,
-	llvm@lists.linux.dev,
-	Marco Elver <elver@google.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Nicolas Schier <nsc@kernel.org>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Richard Weinberger <richard@nod.at>,
-	Thomas Gleixner <tglx@kernel.org>,
-	x86@kernel.org
-Subject: [PATCH v3 18/19] gcov: add MC/DC condition coverage support
-Date: Tue, 24 Nov 2026 21:06:02 -0500
-Message-ID: <20261125020603.3934222-19-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261125020603.3934222-1-sashal@kernel.org>
-References: <20261125020603.3934222-1-sashal@kernel.org>
+	s=k20260515; t=1795576018;
+	bh=X01M37vtnb5PSXNYqW5T1ZO4yds6vtXWHeZ1c4iujGk=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=HQKL3oMnFS/+I/Xv7iUNnk/iU9YMtZSIqJm4vIPBq+aU+Q+xDXTrkbr8IzC0DfTbH
+	 DWID99xnxAZTBv/InS2RiZd0R7e+wTnuxdyndf1FgQzTjbYHgra7LiAkYUraWQkx3d
+	 m8WXnwHZsDiRi4lYso2QRvHn3HqbCQxXeS0t6wXeOducT0ulub1XkAX4Zez1gboQYx
+	 655ulRSw74H9lKZNBdc6tOVxDm50VNZHTZ3Vjs/mbDub/0i87y5N56JYqDl7MGSY/x
+	 mmYcADi0qMO2VdSSQfkjkr4LfXZ/n46xQ8y/UXHdIkiM/a8BvVB06C0ZCX2+Cr2XA5
+	 /F3858/Ghs/6w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A4713808209;
+	Wed, 25 Nov 2026 03:06:58 +0000 (UTC)
+Subject: Re: [GIT PULL] Kbuild fixes for 7.4 #2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20261124035200.GA1950519@ax162>
+References: <20261124035200.GA1950519@ax162>
+X-PR-Tracked-List-Id: <linux-kbuild.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20261124035200.GA1950519@ax162>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-7.4-2
+X-PR-Tracked-Commit-Id: 3df238d7a9f5ac7d78115958fd7a36139f61ca34
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4ca7b0f616629ca70148c45707e10455f3135fd4
+Message-Id: <179557601676.190026.8943913611717875396.pr-tracker-bot@kernel.org>
+Date: Wed, 25 Nov 2026 03:06:56 +0000
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, Nicolas Schier <nsc@kernel.org>, linux-kbuild@vger.kernel.org
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -82,79 +67,16 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Support CONFIG_COVERAGE_MCDC with gcov, using GCC's MC/DC condition
-coverage instrumentation (-fcondition-coverage), which is available
-since GCC 14. The data is shown by "gcov --conditions".
+The pull request you sent on Mon, 23 Nov 2026 20:52:00 -0700:
 
-Add -fcondition-coverage to the gcov compiler flags when enabled, and
-disable the warnings about decisions it leaves out, as is done for
-Clang. Both are gated on the config option to avoid Clang warnings
-about unknown options.
+> https://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux.git tags/kbuild-fixes-7.4-2
 
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
----
- kernel/coverage/Kconfig   | 7 +++++--
- kernel/coverage/gcov/fs.c | 3 ++-
- scripts/Makefile.gcov     | 5 +++++
- 3 files changed, 12 insertions(+), 3 deletions(-)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4ca7b0f616629ca70148c45707e10455f3135fd4
 
-diff --git a/kernel/coverage/Kconfig b/kernel/coverage/Kconfig
-index 173a321741f87..77df4c04945dc 100644
---- a/kernel/coverage/Kconfig
-+++ b/kernel/coverage/Kconfig
-@@ -108,8 +108,8 @@ config COVERAGE_PROFILE_ALL
- 
- config COVERAGE_MCDC
- 	bool "Measure modified condition/decision coverage (MC/DC)"
--	depends on LLVM_COV_KERNEL
--	depends on CLANG_VERSION >= 220000 || !WERROR
-+	depends on LLVM_COV_KERNEL || (GCOV_KERNEL && CC_HAS_CONDITION_COVERAGE)
-+	depends on !(LLVM_COV_KERNEL && CLANG_VERSION < 220000 && WERROR)
- 	help
- 	  MC/DC verifies that each condition of a boolean decision has been
- 	  shown to independently affect the outcome of the decision. It is
-@@ -119,6 +119,9 @@ config COVERAGE_MCDC
- 	  Decisions that the compiler can't instrument are not measured, and
- 	  only get branch coverage.
- 
-+	  With gcov this requires GCC 14 or later, and the data is shown by
-+	  "gcov --conditions".
-+
- 	  If unsure, say N.
- 
- config LLVM_COV_MCDC_MAX_CONDITIONS
-diff --git a/kernel/coverage/gcov/fs.c b/kernel/coverage/gcov/fs.c
-index fe1b85d54ede0..aa51e76c0e530 100644
---- a/kernel/coverage/gcov/fs.c
-+++ b/kernel/coverage/gcov/fs.c
-@@ -861,7 +861,8 @@ void gcov_event(enum gcov_action action, struct gcov_info *info)
- }
- 
- static const struct coverage_backend gcov_backend = {
--	.name	= "gcov",
-+	.name		= "gcov",
-+	.features	= IS_ENABLED(CONFIG_COVERAGE_MCDC) ? "mcdc" : NULL,
- };
- 
- /* Create debugfs entries. */
-diff --git a/scripts/Makefile.gcov b/scripts/Makefile.gcov
-index 1cfe04d89b0a2..977c8ee023f68 100644
---- a/scripts/Makefile.gcov
-+++ b/scripts/Makefile.gcov
-@@ -18,4 +18,9 @@ CFLAGS_COVERAGE	+= $(call try-run,\
- 	cmp -s "$$TMP.ubase" "$$TMP.utest",\
- 	-fprofile-update=prefer-atomic)
- endif
-+ifdef CONFIG_COVERAGE_MCDC
-+CFLAGS_COVERAGE	+= -fcondition-coverage
-+# As for Clang: KCFLAGS=-Wcoverage-too-many-conditions lists what's left out.
-+KBUILD_CFLAGS	+= -Wno-coverage-too-many-conditions
-+endif
- export CFLAGS_COVERAGE
+Thank you!
+
 -- 
-2.53.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
