@@ -1,58 +1,50 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795588852;
-	b=UkcEg4SQBEelmlbGBd893ccRT5v2/D4LZ/UinGZ5VYD0v90egjuFuKZwkzwTaIQ+Yjgr
-	 NHwCpydetUkj6aikVfGZ+1MzPWCfNsSAm8ykIaT+G4VnV0m6kidbKdcPtdZv0WwqISkWS
-	 IAF4HFuLDzCSSEwXGuDuPv0U1XsSN37fyiyyUcn8H/7E+TugBu+fUyEPG7DwjGs/coMHo
-	 G7U9Px/VCMctm74jlMk9fXF5H4oo3jgXgn5yiKKzeth81T25Srmm/ttptAGCdVEyRV9bP
-	 g3b5oLS0G2euwFYIDftIN1Nxp+AzviC5812VJ1Zbpk2WF9+kZPDwGpEn+8Zd/qQbCGQ==
+	t=1795589009;
+	b=zBXRfH6Gs+IqjlTuQAN5I69y1x1i6OPST834FAbU1sRr+O/oMPvcmd9rfkWBWqVzCwo2
+	 xR8P9qCLfL/aFA0IpB6KlQC2f06/u81oHMn0EUMhUDyy+SM7LxftEzeMtmLV7HxjkQkgj
+	 oOSfTivTzcHjBgfVDGh2Rg6oSgsMowTgi4l8dkVYFux7zh6JnukuX0yFgbrHNivNFCYM3
+	 UngwcSw7O0Ex4IR5efrmFNgwWq8V3c/4sxtTWTwki4ERryE5pYx3X36jM62JS1LVxdl05
+	 oK7/kNHdbiL75ACN54v4Aya27gyB2xjIDKYtMJ66MlJmaAc0CHP0FIAFAMnDNcz5YLw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795588852;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=5wHiCqQ5RJKdTEaymXEWQCXKotqpwnEC2TLXNJY03WQ=;
-	b=laQVQXAMGdU585rAel2+ey6DhePwzqF1X55uXhsuhGdFhjFFp5pwjLFNtdTOWEo6pQhe
-	 VgWcWxxEa6jmC4uhVBIjQAyxCrEeEi9d34iprhcc8K/ejZxqfXXVqtRvIcXoAF03c4qpY
-	 lsqPJ3+k1TeY6jQ7ZGNdoxTQKHzAJAhsi0KcbXMBgDfRDvbP++s63h+p9q8qTSF6sWigA
-	 /1taifLsUBAP4VhFCS7lyGqM0cK2OLH12eichauLSgV4q4GnAVFAVQ6JAwG7nHAPAxwLA
-	 zmfrMLNEcckqXHLaKiVODKnWPp9zyb6rrYduJ+4nuMUMxbBqe79qDJ6ZmjHcOfBJ2Ow==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795589009;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=5hzEwCw8ytaH6XOSTbdNB/Jv8UgZrq9U0lXcnqhzXsE=;
+	b=yUEdBdbbF9ht1tJAQOu4mLB8y9Ntolz7tKOFXf2kVzn1dQlxNQpy0Ttk98IPOufduIsm
+	 R/QK7dRzrSvniHYUmQpXr2yznlIMILyIOhAqz3GX8mQjO71hXbSXgp5u2aMISQ4qfByYk
+	 O7YBjdQ1+OIB47ZwvsIO364ygaG4kCh1+faqgLtHQls1ZhqpAXexQf+6ugNwoAJbTEUxg
+	 AKT321bbUt7Ebqev72a9r+93FLxYbqIa8LzbMDVMANC0PBAHROPFZEgRn0ELhaLHjJ4qj
+	 XYuHM15cZDZKjPfWdnhQPnMt7gngkTwEX8tDWQXNo3Xe0CdLItoEOoUTLpRWVKJR7vw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="ClgA2X/c";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TyYEY3mu;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEDD606A31E;
-	Wed, 25 Nov 2026 06:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F124606A31E;
+	Wed, 25 Nov 2026 06:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ClgA2X/c
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01A561F000C4;
-	Wed, 25 Nov 2026 06:40:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TyYEY3mu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 764771F000C0;
+	Wed, 25 Nov 2026 06:43:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795588851;
-	bh=5wHiCqQ5RJKdTEaymXEWQCXKotqpwnEC2TLXNJY03WQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ClgA2X/ckiuiaB40ZujYlDOSDtxO7AmDlxj1QmTRr8vMUqxQSpSUHg8DXfUYRW8JF
-	 vxHWkEOuHyNClT22VRPe6l92TWfenahT3FLQqbBtU6pLZKBc4msFym+smmvDlVTLIK
-	 Fewot6TbFl6fpFFwX1UQuxbXkNYBd6XbXKPvQmZY0ydDxDQki/2CjNXbzFOwrjJyT2
-	 I7gp+c6v8umeWrf/yaEUfBvzXf4Sg3D23Qm2fMNNCUneskiNEPINBsqzFGwa24JWMp
-	 JbT1DsUiHG0BCNNOz99C6Pd+W1fQUFFhCfJKRI9z35RyGXPH0WfVstyTlql0PUalpQ
-	 bo7rPM8vTEnFg==
-Message-ID: <sashiko-outbox-232724@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 29/30] tools/unwind: Add x86-64 ORC cross-check
- oracle to verify_cfi
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Ian Rogers" <irogers@google.com>, linux-trace-kernel@vger.kernel.org
-Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org, mingo@redhat.com, tglx@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, acme@kernel.org, namhyung@kernel.org, linux-perf-users@vger.kernel.org, mhiramat@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org, nathan@kernel.org, nsc@kernel.org, linux-kbuild@vger.kernel.org, ojeda@kernel.org, ardb@kernel.org, linux-efi@vger.kernel.org, "Marc
- Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, shuah@kernel.org, indu.bhagat@oracle.com, jremus@linux.ibm.com, wnliu@google.com, dylanbhatch@google.com, gary@garyguo.net
-In-Reply-To: <20261125061523.1540234-30-irogers@google.com>
-References: <20261125061523.1540234-1-irogers@google.com>
- <20261125061523.1540234-30-irogers@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 06:40:49 +0000
+	s=k20260515; t=1795589008;
+	bh=5hzEwCw8ytaH6XOSTbdNB/Jv8UgZrq9U0lXcnqhzXsE=;
+	h=From:Subject:Date:To:Cc;
+	b=TyYEY3mu2ZyZgg5PExsQAI1/wtCwpgu70CXdVO/6zS0lumwVh0VWwu//D8ExLp7zy
+	 /eB1Dd+4OgYCvcCbhkBLrPS0VSa9FS2T4jB+jNNBiq9z0hAYkmWLlpxzEIxMpbNn0S
+	 HfDKA/z915TVTracHPV8F16m5VM1h4yYrWGrSAx0nec3+4Ss5TAdOBMaemEBZNvwhF
+	 oGmnDAwZm6iU6Tgb/GvZ4eYX+Avg+RbdA0nsv7b0DIs/ggJFLzOhYGi26uP/UzvFkz
+	 XNp51jRjzyWNLvYewpx3HSK8m63RgsfJKCCHrEfL3y3BIRr+BBjL81jynD2dyPDzgi
+	 y65HKxcYN8N6g==
+From: Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH v3 0/2] x86: Avoid CONFIG_X86_NATIVE_CPU=y when cross
+ compiling
+Date: Tue, 24 Nov 2026 23:43:11 -0700
+Message-Id: <20261124-x86-no-march-native-on-non-x86_64-v3-0-268354149c5f@kernel.org>
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -61,94 +53,71 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAA/5WOyw7CIBBFf6Vh7RiBitSV/2GMATq1+AADldSY/
+ rugG93p8t65OWceJGKwGMm6epCAyUbrXQ58VhHTK3dAsG3OhC2YoJRyGKUA5+GigunBqcEmBO9
+ y5cppL2qQknGua6lW7YpkzjVgZ8eXY7t753jTRzRDAZdFb+Pgw/31RKJl948vUaBgtJF60YiWm
+ npzwuDwPPfhQIowsU/k8hcky8hO864RvNZUmy/kNE1PP1xBJjgBAAA=
+X-Change-ID: 20261113-x86-no-march-native-on-non-x86_64-88233b48a7d7
+To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Julian Braha <julianbraha@gmail.com>, linux-kernel@vger.kernel.org, 
+ llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, stable@vger.kernel.org, 
+ Linus Torvalds <torvalds@linux-foundation.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1621; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=Evbp4fCKJyX4p3JTCj/jaQPeXVTACj3MLjZz/W4+f4c=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDNlszZ0pZ1N3rdx69Il+TojEuisfrufVi/X2ajwTzvn6q
+ HPe+TVSHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAi7OsZ/gfmJXMvuJtwuyEw
+ vaNMwvv8r+VJZQqZ8+W51m6IUXWpsWZkWL9sHru/6R7deddFD2zc8+WT6E2DaTK7XK+K7Yj8l7l
+ lOwcA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] tools/unwind: missing ORC_TYPE_UNDEFINED tie-break in
-  verifyOracle3Orc()
---
+This series addresses an massive spew of warnings that I see when cross
+compiling x86 allmodconfig on certain ARM machines. To resolve these
+warnings, introduce a Kconfig symbol for when cross compiling and avoid
+allowing CONFIG_X86_NATIVE_CPU to be enabled when it is set.
 
-commit 21fa29da140895241f891570070d39da3828738f
-Author: Ian Rogers <irogers@google.com>
+This could go through either the kbuild or -tip tree, I don't have a
+strong preference.
 
-tools/unwind: Add x86-64 ORC cross-check oracle to verify_cfi
+---
+Changes in v3:
+- Introduce CONFIG_CROSS_COMPILING to perform the host == target check
+  from v1 in a generic way and make CONFIG_X86_NATIVE_CPU depend on it
+  not being set (Linus)
+- Add bug link to second patch (Nick)
+- Link to v2: https://patch.msgid.link/20261115-x86-no-march-native-on-non-x86_64-v2-1-fb3f9634b1bc@kernel.org
 
-This commit adds verifyOracle3Orc() to tools/unwind/verify_orc.cpp to
-cross-check x86-64 ORC_TYPE_CALL entries against Minimal DWARF CFI across
-every instruction covered by an FDE.
+Changes in v2:
+- Rather than checking if host == target, just make X86_NATIVE_CPU
+  depend on !COMPILE_TEST, which makes sense anyways (Borislav)
+- Link to v1: https://patch.msgid.link/20261113-x86-no-march-native-on-non-x86_64-v1-1-cbc8b096d1c4@kernel.org
 
-> diff --git a/tools/unwind/verify_orc.cpp b/tools/unwind/verify_orc.cpp
-> new file mode 100644
-> index 0000000000000..629849f3187ec
-> --- /dev/null
-> +++ b/tools/unwind/verify_orc.cpp
-> @@ -0,0 +1,205 @@
+---
+Nathan Chancellor (2):
+      kbuild: Introduce CONFIG_CROSS_COMPILING
+      x86/build: Do not allow X86_NATIVE_CPU to be enabled when cross compiling
 
-[ ... ]
+ MAINTAINERS                      |  1 +
+ arch/x86/Kconfig.cpu             |  1 +
+ scripts/Kconfig.toolchain        |  3 +++
+ scripts/check-cross-compiling.sh | 26 ++++++++++++++++++++++++++
+ 4 files changed, 31 insertions(+)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+base-tree: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+change-id: 20261113-x86-no-march-native-on-non-x86_64-88233b48a7d7
 
-> +void verifyOracle3Orc(const ArchSpec &AS, uint64_t eh_hdr_vma,
-> +		      StringRef eh_hdr_bytes, StringRef orc_bytes,
-> +		      StringRef orc_ip_bytes, uint64_t orc_ip_vma,
-> +		      const std::vector<ExecSec> &exec_secs,
-> +		      const std::vector<FuncSym> &func_syms,
-> +		      const MCDisassembler &Disasm, const MCSubtargetInfo &STI,
-> +		      MCInstPrinter &InstPrinter, const VerifyOptions &opts,
-> +		      VerifyStats &st)
-> +{
-> +	st.has_orc =3D true;
-> +	constexpr size_t kOrcEntSz =3D 6;
-> +	size_t n_orc =3D orc_bytes.size() / kOrcEntSz;
-> +	size_t n_ip =3D orc_ip_bytes.size() / 4;
-> +	size_t n =3D std::min(n_orc, n_ip);
-> +	const uint8_t *orc_raw =3D
-> +		reinterpret_cast<const uint8_t *>(orc_bytes.data());
-> +	const uint8_t *ip_raw =3D
-> +		reinterpret_cast<const uint8_t *>(orc_ip_bytes.data());
-> +
-> +	std::vector<std::pair<uint64_t, size_t>> sorted_orc;
-> +	sorted_orc.reserve(n);
-> +	for (size_t i =3D 0; i < n; i++) {
-> +		int32_t rel =3D (int32_t)support::endian::read32le(ip_raw + i * 4);
-> +		uint64_t epc =3D orc_ip_vma + i * 4 + (uint64_t)(int64_t)rel;
-> +		sorted_orc.push_back({epc, i});
-> +	}
-> +	std::stable_sort(sorted_orc.begin(), sorted_orc.end(),
-> +			 [](const auto &a, const auto &b) {
-> +				 return a.first < b.first;
-> +			 });
-> +
-> +	auto lookupOrcIdx =3D [&](uint64_t pc, size_t &idx_out) -> bool {
-> +		auto it =3D std::upper_bound(
-> +			sorted_orc.begin(), sorted_orc.end(), pc,
-> +			[](uint64_t val, const std::pair<uint64_t, size_t> &e) {
-> +				return val < e.first;
-> +			});
-> +		if (it =3D=3D sorted_orc.begin())
-> +			return false;
-> +		--it;
-> +		idx_out =3D it->second;
-> +		return true;
-> +	};
+Best regards,
+--  
+Cheers,
+Nathan
 
-[Severity: Low]
-Can lookupOrcIdx() return an ORC_TYPE_UNDEFINED section-terminator entry
-instead of the real ORC_TYPE_CALL entry at contiguous text section
-boundaries?
-
-objtool appends an ORC_TYPE_UNDEFINED terminator at the end address of
-each non-empty text section.  When an unsorted .orc_unwind table is used
-(such as a vmlinux built with CONFIG_UNWINDER_DWARF_CFI=3Dy where
-scripts/sorttable does not sort the ORC table) and a lower-VMA text
-section appears after an adjacent higher-VMA text section in ELF section
-order, sorting only by epc leaves the terminator after the next section's
-first entry at the same address.  Because lookupOrcIdx() picks the
-rightmost entry with epc <=3D pc, it selects the ORC_TYPE_UNDEFINED entry
-and verifyOracle3Orc() silently skips verifying the boundary instructions.
-
-In arch/x86/kernel/unwind_orc.c and scripts/sorttable.c, orc_sort_cmp()
-breaks ties at equal addresses by ordering ORC_TYPE_UNDEFINED entries
-before real entries.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125061523.1540=
-234-1-irogers@google.com?part=3D29
