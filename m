@@ -1,48 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795589012;
-	b=Wok3BwlStx/UcyxbfkYkPFaUPW03fNXcRgF1/uyGA8msGBuiTLPkzMUtxOfcnM29JleV
-	 AyW/8iJr1GUyEZA+4DmR052ZM98alzsRwOxGq6DK/TCiXfBkeuq8sfhbZblIiShwAi99S
-	 2oIzO8mWbrXUYk3hKAwuhdDrvxqWF69FaBxUnYnlwuZYhh97A7EUHYy3aFI/LTyvYy/bR
-	 5QeA7SptdoBCCOemRKBAMFCOYYSm0NQNIFvO2WeBow8bfYCH5Z4gLVRQPOIyUtS5oPIre
-	 sAgNhvZn7RpI6Xddnmc+A2hAqUPC07sJ3C68TpuftFsnpZy7x01BeofAWprJlXr3K2Q==
+	t=1795589260;
+	b=o8ioq8lB8OQ/rRJSDHG6JEGn7eJyEv9wYH6HGUdSkPd20cpdnytYBY8TLk4uQz/qiK6f
+	 QtTnyuCQely+PxXLralDD5BJOmdLR2GasOFisd/iO1fR8LUPLzRK2rP7U2CKFd4eUFSd6
+	 yLHnplrDDnMjUfQdLH7Gb0tUFBvQwE0VZE45KMm7YAluvXysDfF6zUoo48irsqbH1LXmv
+	 I1VFbKDWv1QDtzz0M7yAIm3DXO9g939q8hFwJtN7I5zH+53hQCuRTGBAQcUIiqv1tQnO7
+	 OLBhWxA0gS91RX8QWTQIRPPKcNQ0eLEqoK7RpIOXXHvg649gujuM+uvTXoKe7OwyetQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795589012;
-	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=AKC2tkDm00sEM5kiM7oiH6yWOlLbOjMsx2e0QI8ecJQ=;
-	b=D5WLTLaoIgFli4M3IIJkmGhhbM/MOtJQmkVoFC8o1gOzLj2m1VFcrM/ymCbvyfd9T3bm
-	 tdSsZjYnUXUJjBJiooA+xHtZTSmzFDzhujn+9A+UGQOOGpYxAxzC3p425kXXESiCpeu4Y
-	 qLZ7a0Tu0OVHWryGyakp4OV6iFgDsj/wdGLc2oVi1/27tv8/kmKTFSZbDvKLhNtIis6Pr
-	 K5WNqQk14ZB2SXhlw39NbiS0xTqstLIl0Vd50TrY8l7BNt9vROCMlC7tu4m+6o5djBzy7
-	 UsNJr+PZvBkKNP7uIdtXs9Y4GV9HlKeTujavGzjtiEpnD/hHhQgM1Hfmov2Q64Mj83A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795589260;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=c6E3vhJF18VT/ALtmOG218hDUmfoGGhX7E17vVzgQpc=;
+	b=Ah4L1f8i2K2rQGZfUxEMVmOqAMbLbJAmiTVT0SOFDk/0NPPXzoxZCDPWC7f9L6GY1x5G
+	 Yrrvwm+mXOK7q/4B0OJDrUnUxhvRxy18OklfIV1YqoOTssbb4HizMwiBKsIAymascRuNF
+	 kj94Bl2AySeMIzix8uE6AmaRt6enONVn0pTTszNqzElTlib+Fp6hcW+A6amb6zXfW0Q6+
+	 R4h3OlZ05RvFlWwMwkPqnCfgC18lHXf1yw3ePMg+d6ubDG46QsLmHFtk974qygoXx+7oV
+	 nMK8s7D2dBeab8fCX1QFXGAqn52BttK0tY0KitOXPhq3xVH3OCAN3dr6TZk5aVpp4cw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Bdvf+s33;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZuOoomng;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978D3606A326;
-	Wed, 25 Nov 2026 06:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92618606A31E;
+	Wed, 25 Nov 2026 06:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Bdvf+s33
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0744D1F000C6;
-	Wed, 25 Nov 2026 06:43:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZuOoomng
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 402E21F000C6;
+	Wed, 25 Nov 2026 06:47:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795589012;
-	bh=AKC2tkDm00sEM5kiM7oiH6yWOlLbOjMsx2e0QI8ecJQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=Bdvf+s33CkKn+4Ga6bHVw8r+eiybmiKYC1IP10NJhJ6SyJSGcXtuSUUdCHXJhdXhB
-	 pT9ZQDs4nzgftdvJG8ZoHOUJexXqcsVmFYJW9TjTwEScmljdlVItY1T+shMPuSkFuZ
-	 MeIbSjJ9PeNduyTL9KsM2HF1GQg4FBkfdqiY9DN79saQb7yeyyaC3ip4uP/pzAYFLT
-	 p2d7luBGqw0szosl7tvKod+Lk73HowCjwIAbtoCeLGhu2SdLAQpc6rl6oX5hvL3+H8
-	 IydMJTaFnTxzMkG8BtpBUMqmyADv++DVURVjc+luneI9TTMgXAJNfXfWHsZ7SQDQou
-	 ArsCqbe6LkYoA==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Tue, 24 Nov 2026 23:43:12 -0700
-Subject: [PATCH v3 1/2] kbuild: Introduce CONFIG_CROSS_COMPILING
+	s=k20260515; t=1795589260;
+	bh=c6E3vhJF18VT/ALtmOG218hDUmfoGGhX7E17vVzgQpc=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ZuOoomng7Q0qCBf3+h0s8WhDgOeLPtQNBhGaQ7/q/g9+tToaiE3s8xa3c+h3BFVfd
+	 lE/dWb+paBw8VYwJdpNPvOJouCekbYBYXKBfuZN8V9kCSumeiH+dMppie69Y4tr3kl
+	 FvG8eBLYdLrtdpYVVyc89TOsec71ZwEJJveINY84Qb0r+fvo7478W3J5OzpFM0/YuL
+	 ie5dZMbS030VExWdAhTY7OoYC92yqcjK3eq/xpJa+pOpUBoGzzO6b3xAphe2e3r50Y
+	 c+lEzjS8EUwCO+zvwq6Y1S7+GG2Mbj5he07cCJOmgens0p4ggxiq5kCVaDvBQv6OGK
+	 sQea1O/gfXBIw==
+Message-ID: <sashiko-outbox-232735@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC PATCH v2 19/30] riscv/unwind: Add Minimal DWARF CFI kernel
+ unwinder
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Ian Rogers" <irogers@google.com>, linux-trace-kernel@vger.kernel.org
+Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org, mingo@redhat.com, tglx@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, acme@kernel.org, namhyung@kernel.org, linux-perf-users@vger.kernel.org, mhiramat@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org, nathan@kernel.org, nsc@kernel.org, linux-kbuild@vger.kernel.org, ojeda@kernel.org, ardb@kernel.org, linux-efi@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, shuah@kernel.org, indu.bhagat@oracle.com, jremus@linux.ibm.com, wnliu@google.com, dylanbhatch@google.com, gary@garyguo.net
+In-Reply-To: <20261125061523.1540234-20-irogers@google.com>
+References: <20261125061523.1540234-1-irogers@google.com>
+ <20261125061523.1540234-20-irogers@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Nov 2026 06:47:37 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -51,118 +61,110 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261124-x86-no-march-native-on-non-x86_64-v3-1-268354149c5f@kernel.org>
-References: <20261124-x86-no-march-native-on-non-x86_64-v3-0-268354149c5f@kernel.org>
-In-Reply-To: <20261124-x86-no-march-native-on-non-x86_64-v3-0-268354149c5f@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
- Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Julian Braha <julianbraha@gmail.com>, linux-kernel@vger.kernel.org, 
- llvm@lists.linux.dev, linux-kbuild@vger.kernel.org, stable@vger.kernel.org, 
- Linus Torvalds <torvalds@linux-foundation.org>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3026; i=nathan@kernel.org;
- h=from:subject:message-id; bh=WCPVykomrLHR2RSfrqFhfpH7aLiC+e0g58OYuf5iZwc=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDNlszZ3vjqzbIPH9xMXrJgKM91qDrvxdNSXsaUjTr/vul
- 7ZGd0W0d5SyMIhxMciKKbJUP1Y9bmg45yzjjVOTYOawMoEMYeDiFICJlOxnZHjnVLro6uZDDLsE
- wwqVOLO25pn8uFg3b6VqcFJS8rUjuY6MDM+3cRgus+X62WJr/U2XZWFmlllK6rrjEi57pk3P/Mq
- wjh8A
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-There are times where decisions may want to be made within Kconfig when
-cross compiling. Introduce a small script to call '$(HOSTCC) -v' and
-'$(CC) -v' and compare the first part of the target triples to see if
-they match.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] riscv: ftrace: missing arch_ftrace_fill_perf_regs() breaks
+  fprobe unwind
+--
 
-This check is cheap but approximate, as Kconfig does not have all the
-information available such as endianness and bit width for the target to
-pass along to compiler. For example, a user building for x86 with a
-compiler that can build both with '-m32' / '-m64' may have
-CONFIG_CROSS_COMPILING set depending on the default value of the
-toolchain and what's being targeted. Should this become problematic in
-the future, the logic can be expanded to cover these corner cases but
-for now, keep the implementation simple and cover the majority of cases.
-Leave some informational prints to make it easy to debug future reports
-with
+commit 3d24292fed2450c8bd95936a258cfa1db43fe2ca
+Author: Ian Rogers <irogers@google.com>
 
-  $ make ... run-command KBUILD_RUN_COMMAND='$(srctree)/scripts/check-cross-compiling.sh "$(HOSTCC)" "$(CC) $(CLANG_FLAGS)"'
+riscv/unwind: Add Minimal DWARF CFI kernel unwinder
 
-Cc: stable@vger.kernel.org # dependency of future change
-Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-Link: https://lore.kernel.org/CAHk-=wgmkoWHWwaQ6nsGoCiBp0hrpJuiwmoVbQ=Efun8JyUNKw@mail.gmail.com/
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- MAINTAINERS                      |  1 +
- scripts/Kconfig.toolchain        |  3 +++
- scripts/check-cross-compiling.sh | 26 ++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+)
+This commit adds a Minimal DWARF CFI kernel unwinder
+(CONFIG_UNWINDER_DWARF_CFI) and reliable stack trace support for 64-bit
+RISC-V.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 93abbb315065..fb76f9e82f65 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14454,6 +14454,7 @@ F:	scripts/Kbuild*
- F:	scripts/Makefile*
- F:	scripts/bash-completion/
- F:	scripts/basic/
-+F:	scripts/check-cross-compiling.sh
- F:	scripts/clang-tools/
- F:	scripts/container
- F:	scripts/dummy-tools/
-diff --git a/scripts/Kconfig.toolchain b/scripts/Kconfig.toolchain
-index 2acbd40a38f1..ac2e3de50ac0 100644
---- a/scripts/Kconfig.toolchain
-+++ b/scripts/Kconfig.toolchain
-@@ -32,6 +32,9 @@ config CLANG_VERSION
- 	default $(cc-version) if CC_IS_CLANG
- 	default 0
- 
-+config CROSS_COMPILING
-+	def_bool $(success,$(srctree)/scripts/check-cross-compiling.sh "$(HOSTCC)" "$(CC) $(CLANG_FLAGS)")
-+
- config AS_IS_GNU
- 	def_bool $(success,test "$(as-name)" = GNU)
- 
-diff --git a/scripts/check-cross-compiling.sh b/scripts/check-cross-compiling.sh
-new file mode 100755
-index 000000000000..4c1e6a061b3b
---- /dev/null
-+++ b/scripts/check-cross-compiling.sh
-@@ -0,0 +1,26 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+
-+HOSTCC="$1"
-+CC="$2"
-+
-+get_target() {
-+    "$@" -v 2>&1 | grep -o 'Target: \([^-]\+\)'
-+}
-+
-+if ! hostcc_target=$(get_target $HOSTCC); then
-+    echo >&2 "$0: Could not get target for HOSTCC!"
-+    exit 1
-+fi
-+
-+if ! cc_target=$(get_target $CC); then
-+    echo >&2 "$0: Could not get target for CC!"
-+    exit 1
-+fi
-+
-+echo "HOSTCC: '$hostcc_target'"
-+echo "CC: '$cc_target'"
-+
-+if [ "$hostcc_target" = "$cc_target" ]; then
-+    exit 1
-+fi
+> diff --git a/arch/riscv/include/asm/ftrace.h b/arch/riscv/include/asm/ftr=
+ace.h
+> index e5026cd8f022f..663831d950e57 100644
+> --- a/arch/riscv/include/asm/ftrace.h
+> +++ b/arch/riscv/include/asm/ftrace.h
+> @@ -217,6 +217,7 @@ ftrace_partial_regs(const struct ftrace_regs *fregs, =
+struct pt_regs *regs)
+>  	regs->sp =3D afregs->sp;
+>  	regs->s0 =3D afregs->s0;
+>  	regs->t1 =3D afregs->t1;
+> +	regs->cause =3D 0;
+>  	return regs;
+>  }
+> =20
 
--- 
-2.56.1
+[ ... ]
 
+> diff --git a/arch/riscv/include/asm/perf_event.h b/arch/riscv/include/asm=
+/perf_event.h
+> index bcc928fd3785c..30d0c6b37e910 100644
+> --- a/arch/riscv/include/asm/perf_event.h
+> +++ b/arch/riscv/include/asm/perf_event.h
+> @@ -14,9 +14,11 @@
+> =20
+>  #define perf_arch_fetch_caller_regs(regs, __ip) { \
+>  	(regs)->epc =3D (__ip); \
+> +	(regs)->ra =3D 0; \
+>  	(regs)->s0 =3D (unsigned long) __builtin_frame_address(0); \
+>  	(regs)->sp =3D current_stack_pointer; \
+>  	(regs)->status =3D SR_PP; \
+> +	(regs)->cause =3D ~0UL; \
+>  }
+>  #endif
+> =20
+
+[ ... ]
+
+> diff --git a/arch/riscv/kernel/stacktrace.c b/arch/riscv/kernel/stacktrac=
+e.c
+> index c7555447149bf..45d81aa11a8e2 100644
+> --- a/arch/riscv/kernel/stacktrace.c
+> +++ b/arch/riscv/kernel/stacktrace.c
+
+[ ... ]
+
+> +static __always_inline int
+> +walk_stackframe_cfi(struct task_struct *task, struct pt_regs *regs,
+> +		    bool (*fn)(void *, unsigned long), void *arg,
+> +		    bool require_reliable)
+> +{
+> +	unsigned long fp, sp, pc, ra =3D 0, min_sp =3D 0, caller_fp =3D 0, call=
+er_pc =3D 0;
+> +	bool ra_valid =3D false, exact_pc =3D false, unreliable =3D false;
+> +	struct llist_node *kr_cur =3D NULL;
+> +	unsigned int used_stacks =3D 0;
+> +	int graph_idx =3D 0;
+> +	int level =3D 0;
+> +
+> +	if (!task)
+> +		task =3D current;
+> +
+> +	if (regs && regs->cause =3D=3D ~0UL && !regs->ra) {
+> +		if (require_reliable || task !=3D current)
+> +			return -EINVAL;
+> +		min_sp =3D regs->sp;
+> +		caller_fp =3D regs->s0;
+> +		caller_pc =3D regs->epc;
+> +		regs =3D NULL;
+> +	}
+
+[Severity: Medium]
+Should arch/riscv/include/asm/ftrace.h also define
+arch_ftrace_fill_perf_regs()?
+
+fentry_perf_func() and fexit_perf_func() in kernel/trace/trace_fprobe.c
+allocate regs from the per-CPU __perf_regs[rctx] buffer via
+perf_trace_buf_alloc() and populate it with ftrace_fill_perf_regs().
+Without arch_ftrace_fill_perf_regs(), ftrace_fill_perf_regs() is a no-op
+that only calls ftrace_partial_regs().  If an earlier tracepoint or
+software perf event on the same CPU ran perf_arch_fetch_caller_regs(),
+__perf_regs[rctx] retains regs->cause =3D=3D ~0UL and regs->ra =3D=3D 0 alo=
+ng
+with the earlier event's sp, s0 and epc, causing walk_stackframe_cfi() to
+match the sentinel and filter the fprobe callchain against stale frame
+bounds (or if __perf_regs[rctx] was never initialized, regs->status =3D=3D 0
+causes user_mode(regs) to skip kernel callchain unwinding in
+get_perf_callchain()).
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125061523.1540=
+234-1-irogers@google.com?part=3D19
