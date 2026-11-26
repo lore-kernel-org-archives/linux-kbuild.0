@@ -1,61 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795675423;
-	b=3mP0meGFhTh7R1jehcz+BC68dT+QSLl+3a5oqFLLALvvwfe+vKp3BEydm0gJSXRePWwP
-	 DkRd33WhBTVXi0U8VzsQdXr3hJNGjAIhBavd6+vCAJ2nro/Z/0pdDh3Mme+RkUDVSITB4
-	 lxVM9eKB6+wt7Ytu0Ares52lRM6OhAuzGZcXb4SmuEoEChMni8EnINZrYIn7cXlnxeaNs
-	 fE9PEZn/EDNf0WzPO8c02vQJQ9uMHvE8Dt+CqHov57fwNqxU4mP+1oVt5TtaA5tnYdY3s
-	 GB3+WWTz0CESIiCy3lf+faWuy5AVHTeEknSS00k/vRz9yEMgLYsLrNteP8FkKseYD2Q==
+	t=1795712273;
+	b=M4roWykZaoJ/vV6Ei5bgMrB7BhgQWlZHUgQ0sLzOPpRy7O+an91iU1Q7du2SS7PY4GZf
+	 Eu5zpjq8eTxcCh84f8PmvPE4VWUIptdvwhC4Qqg5GpZghwHgz/VUys58iUqeKgjf7hSkY
+	 WLvdUtBlkfJDPrdI9rHbfpnRHpmbkH+FzHd4ERDbU27nHpsZrXxr5ULryVKUb24A7hCcB
+	 vYr9f38pj/x+wMHIJgstcWYkPJWGJFStB5pRElDQBU7/c3u7ENTVqm6R/wmH4Oa9G/fO+
+	 +npmBxGlFSB2OCkw/1tR0yvGSmdSgffJ5i1mLjPcYUpl6RRi5V9yRXLcr8dZux259+g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795675423;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=VTZrY4RaRFLLd3ml+mubk2bvf6qsTqby9nV31hm0gpE=;
-	b=22TsIpf8Zf2r1qaWweW0LLUS/Myg5nXmJSkfDS2jmpapZi1/GpoXQHYuyWKzSIH9DurF
-	 2Ahv9VX71hL+A39KsgLYforUNT9PkycAIf3VAMhnjDKntftQL6b1gXseKQH9TCF8t+P/Y
-	 pIFCPutYKdeTn4RjKEfrNt6gkLiH0I+Kxc+Wi8aQAzQBk+ea9QvCKovu/D8ZOMIatMF4s
-	 nRSheZmWBoXBGFnMsNO7/lTcKIrjUYj7KggDP6eYVt/UYiO6vlQLE1PbMZVirqMI6O97R
-	 wDSAhw2uWXevLLevLikxb1A+ocjIJnBDquZ4kBhmHozt5R1HqHKLicjV/79mzIgk+1Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795712273;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Developer-Key:X-Developer-Signature:X-Mailer:Message-ID:Subject:
+	 From:To:Cc:Content-Type;
+	bh=EbzDc5IQTnuzR0VW7Y/c20qDWcWC8/2koHRhDseDoYM=;
+	b=CzgtIfNIxZM/VSqrshavofhMGpDA+lzeqGYX36kagrVTy3TnGDDNTDlbrlctMd+Vsk7Y
+	 V7o1zK/7vk1sRXnaEWnrPdLN+sM5M8URPRwseWrwytHvyg4NfBznUrY+U4Nch636U+/ye
+	 4u13qg+hg4uQN0cNnCpBVqZLfGqbcrpNnm9Se83WRsSKiY9PcgmH0fCdCaLHynog4zyqh
+	 8Cv01QAA1+AtEFbwEvt/SNwPSa5+bg2EtdMOMKhqanUH+ZMmBqW+8sSidV1TROT9GbqAY
+	 gYCC9ArcvKlVuKR0Af3OXsxmy0dFOmxoV+E/zJMFdgUknYtPpMq52ZZZAAoQKqQM//Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KRlyU233;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--ardb.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=GYdf48Re;
+	arc=none smtp.remote-ip=209.85.208.69
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89E8606A323
-	for <linux-kbuild@vger.kernel.org>; Thu, 26 Nov 2026 06:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EDF606A31E
+	for <linux-kbuild@vger.kernel.org>; Thu, 26 Nov 2026 16:57:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 12EDF606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KRlyU233
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEA891F000C0;
-	Thu, 26 Nov 2026 06:43:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795675422;
-	bh=VTZrY4RaRFLLd3ml+mubk2bvf6qsTqby9nV31hm0gpE=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=KRlyU233Z3eAgXqv9O2kMPXblO1PiaQ31WsbnlW5FTg3HwhXrJqBrO1+5+can0m5I
-	 OUE0NdxAvP7/mTlQfGM7m4KBfCrjcQ0CU+2Kd2jD+JajAEUTPEiWWMlvOXDNBDPNJA
-	 VCxQDvA2aLJUfkJvEvJmLpfLztSMdBMiTmN6rwmCMSTKAPyyGkWCGDH0h7uNCfAwpS
-	 NqgkPDkmE/2WODRWVauyWxVWLrnhKxGtuavJim5nUQL0c6pTTklDON6rGp5uJmh3eK
-	 mYU5Ls1oJmfaF+FQGr405lDsPSgRiCpnIIQj9caDj0qrvEQRI8oFPZ7KLYkIE5WaRw
-	 VD+0oAuPdu8PA==
-Message-ID: <sashiko-outbox-234889@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 1/2] kbuild: Introduce CONFIG_CROSS_COMPILING
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Nathan Chancellor" <nathan@kernel.org>, "Thomas Gleixner" <tglx@kernel.org>, "Ingo
- Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>, "Dave Hansen" <dave.hansen@linux.intel.com>, "Nicolas
- Schier" <nsc@kernel.org>
-Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, "Nick Desaulniers" <ndesaulniers@google.com>, "Bill
- Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>, "Julian
- Braha" <julianbraha@gmail.com>, linux-kbuild@vger.kernel.org, "Linus
- Torvalds" <torvalds@linux-foundation.org>
-In-Reply-To: <20261124-x86-no-march-native-on-non-x86_64-v3-1-268354149c5f@kernel.org>
-References: <20261124-x86-no-march-native-on-non-x86_64-v3-0-268354149c5f@kernel.org>
- <20261124-x86-no-march-native-on-non-x86_64-v3-1-268354149c5f@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Nov 2026 06:43:41 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=GYdf48Re
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6b9095eeb5bso704175a12.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 26 Nov 2026 08:57:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795712271; x=1796317071; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=EbzDc5IQTnuzR0VW7Y/c20qDWcWC8/2koHRhDseDoYM=;
+        b=GYdf48Rel+xZTNASrIkJh8dJ1IoW5cH+nuC2hdh1PR418OPqGn+m7+jt8YypxOJ42d
+         A8otXJRlCUo07fpaKyXliXivnSMaNFYr7KmUtoRuIee85UbSUTZXQejj75mIQpsaPjoD
+         faP/LQq5Wx7hlbCmKftVXBr5qUNGigWfi4cHt9QyGZ/PPDlDnpGkWYk+f2AJQ01pWkFw
+         I7miyBexbK0gx+YD4RnzrpHxMIA5/Bi6miLbCqwX4STs6UWwW9JtSPrzrppSd6ch2S11
+         XLhbtR46XvTOTQW0Vo0Yehyr6Dmdg2jgoCsiaL8pWMLcG++y49xpueNJ0ozoEF7ez5KL
+         uO1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795712271; x=1796317071;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=EbzDc5IQTnuzR0VW7Y/c20qDWcWC8/2koHRhDseDoYM=;
+        b=Y6gAW0KCsGQzxhDOJy/qVM5FpQk38iM0b1/CSrsl3FtO3lI+6BCpj6F1n16tPH1CT8
+         Dx1GmZHh+vwDeBT3OE8JJlVGzox2ox3C/u+ttr+r4yBK+eCpO007d3sW4lNwdFyq2DpB
+         hjqBTh7Wnh8BnDb1igsw2KuA8xqWBWXMEbJ3Zzd0oTXa1zQT+x1mW+FnK7n5E0pxQ6ti
+         I218+YIy1yMSmebuLi4kmpjyXGKHbBYubL/k1WAgD1Bdq38/FBS+uz/F+jLmMKyn32Wz
+         o6f6wRGDke4IK2p17cfKhng3tCR7se6lrVHVILJo1G9Ww9y/1Ls0CpMkHdo9Fp32Yglc
+         qfcA==
+X-Forwarded-Encrypted: i=1; AL+hErHEctVoEek47Qm5jHCIoMsRs2eWK86t1ky5QEZKMDZZpCyCwlMG0+NcdLlZ4y7H/5ZLroI0ZyTq5rDF0IM=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+CZOw7chJrHnF67VGwJPLT6VgZS3qlKWYtpMyLclvzUBGZCq5x
+	EzxjwPJWGUwz3eP4DhLrJNe8SF62h/juWRHSYkFb3mqNOwSbDeRv0gZ95AFus6hHWivcYyATTA=
+	=
+X-Received: from edwf26.prod.google.com ([2002:a05:6402:151a:b0:6bb:6fe7:16f8])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:1c08:b0:6ba:a614:2fa1
+ with SMTP id 4fb4d7f45d1cf-6baa6145b66mr8005803a12.20.1795712271121; Thu, 26
+ Nov 2026 08:57:51 -0800 (PST)
+Date: Thu, 26 Nov 2026 17:57:40 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -64,61 +76,75 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2078; i=ardb@kernel.org;
+ h=from:subject; bh=X6vteHyIC3rKBXp7WqfXPsq2tsAfRKOq0QrILcJganE=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIZsjlYVXgEdc6lFQ6GaplpkZXRdydVifTj6V1NvolL04/
+ n1/zcqOUhYGMS4GWTFFFoHZf9/tPD1RqtZ5lizMHFYmkCEMXJwCMJH6owy/mLTE59sm7VS/ELF6
+ hk4fc9KqgIlGs09GLtCW80h4+y/9GCPDSbdC5eijVdLpExl+Pg98mO4e5z+r1OTRv+eafBstSjq 4AA==
+X-Mailer: git-send-email 2.56.1.839.g22a8290db9-goog
+Message-ID: <20261126165739.2453269-2-ardb+git@google.com>
+Subject: [PATCH] kallsyms: Omit unnamed local symbols from System.map and kallsyms
+From: Ard Biesheuvel <ardb+git@google.com>
+To: llvm@lists.linux.dev
+Cc: Ard Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] kbuild: missing LC_ALL=3DC in check-cross-compiling.sh breaks
-  get_target()
---
+From: Ard Biesheuvel <ardb@kernel.org>
 
-commit 9280272f16cf67d3e6acabda19014fda4538151a
-Author: Nathan Chancellor <nathan@kernel.org>
+Since LLVM PR #223686 [1] ("[LLD][ELF] AArch64 Errata patch use
+STT_NOTYPE for symbols"), ld.lld --fix-cortex-a53-843419 (enabled on
+arm64 by CONFIG_ARM64_ERRATUM_843419, which defaults to y) synthesizes
+an unnamed (st_name == 0, "") STT_NOTYPE local symbol for every
+executable InputSection that lacks an STT_SECTION symbol in its input
+object, such as empty .text sections in data-only or .init.text
+translation units, or per-function sections under -ffunction-sections.
 
-kbuild: Introduce CONFIG_CROSS_COMPILING
+elf_symbol_type() classifies these unnamed STT_NOTYPE local symbols in
+executable sections as 't' (matching GNU nm and llvm-nm), and
+sysmap_omits() does not filter empty names. As a result, nameless 't'
+entries are emitted into System.map and compressed into the kernel's
+kallsyms tables.
 
-This commit introduces CONFIG_CROSS_COMPILING and a helper script,
-scripts/check-cross-compiling.sh, to detect cross-compilation by comparing
-the first component of the target triples reported by $(HOSTCC) -v and
-$(CC) -v.
+Beyond bloating the kallsyms tables with useless nameless entries, this
+causes CONFIG_KALLSYMS_SELFTEST to fail at boot ("Test for Nth symbol
+failed: ()"), because kallsyms_lookup_name("") explicitly rejects empty
+strings and returns 0.
 
-Link: https://lore.kernel.org/CAHk-=3DwgmkoWHWwaQ6nsGoCiBp0hrpJuiwmoVbQ=3DE=
-fun8JyUNKw@mail.gmail.com/
+Omit symbols with an empty name in sysmap_omits() so they are excluded
+from both System.map and kallsyms.
 
-> diff --git a/scripts/check-cross-compiling.sh b/scripts/check-cross-compi=
-ling.sh
-> new file mode 100755
-> index 0000000000000..4c1e6a061b3b1
-> --- /dev/null
-> +++ b/scripts/check-cross-compiling.sh
-> @@ -0,0 +1,26 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +HOSTCC=3D"$1"
-> +CC=3D"$2"
-> +
-> +get_target() {
-> +    "$@" -v 2>&1 | grep -o 'Target: \([^-]\+\)'
-> +}
-> +
-> +if ! hostcc_target=3D$(get_target $HOSTCC); then
-> +    echo >&2 "$0: Could not get target for HOSTCC!"
-> +    exit 1
-> +fi
+[1] https://github.com/llvm/llvm-project/commit/5da7779afdf3
 
-[Severity: Medium]
-Can get_target() fail to match "Target: " when building under a non-English
-locale?
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nsc@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Bill Wendling <morbo@google.com>
+Cc: Justin Stitt <justinstitt@google.com>
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ scripts/kallsyms-sysmap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-The top-level Makefile runs "unexport LC_ALL" and only forces LC_COLLATE=3DC
-and LC_NUMERIC=3DC, leaving LANG and LC_MESSAGES intact in the environment.
-When GCC has localized message catalogs installed, "gcc -v" translates the
-"Target: %s" line (for example, "Ziel: " in de_DE or "Cible : " in fr_FR).
-Because CROSS_COMPILING invokes this script via $(success,...), the
-resulting exit 1 is silently treated as a native build, leaving
-CONFIG_CROSS_COMPILING=3Dn during cross-compilation.  Prefixing the compiler
-invocation with LC_ALL=3DC avoids the locale dependency.
+diff --git a/scripts/kallsyms-sysmap.c b/scripts/kallsyms-sysmap.c
+index a482968eba51..1cb3b1775157 100644
+--- a/scripts/kallsyms-sysmap.c
++++ b/scripts/kallsyms-sysmap.c
+@@ -96,6 +96,10 @@ static bool sysmap_omits(const char *name, char type)
+ {
+ 	size_t i;
+ 
++	/* Unnamed symbols (st_name == 0). */
++	if (!*name)
++		return true;
++
+ 	/* Absolute, undefined and debugging symbols. */
+ 	if (type == 'a' || type == 'N' || type == 'U' || type == 'w')
+ 		return true;
+-- 
+2.56.1.839.g22a8290db9-goog
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261124-x86-no-mar=
-ch-native-on-non-x86_64-v3-0-268354149c5f@kernel.org?part=3D1
