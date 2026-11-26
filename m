@@ -1,73 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.69
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795712273;
-	b=M4roWykZaoJ/vV6Ei5bgMrB7BhgQWlZHUgQ0sLzOPpRy7O+an91iU1Q7du2SS7PY4GZf
-	 Eu5zpjq8eTxcCh84f8PmvPE4VWUIptdvwhC4Qqg5GpZghwHgz/VUys58iUqeKgjf7hSkY
-	 WLvdUtBlkfJDPrdI9rHbfpnRHpmbkH+FzHd4ERDbU27nHpsZrXxr5ULryVKUb24A7hCcB
-	 vYr9f38pj/x+wMHIJgstcWYkPJWGJFStB5pRElDQBU7/c3u7ENTVqm6R/wmH4Oa9G/fO+
-	 +npmBxGlFSB2OCkw/1tR0yvGSmdSgffJ5i1mLjPcYUpl6RRi5V9yRXLcr8dZux259+g==
+	t=1795733068;
+	b=4aD0Fsc+dJmB01sYckynKbcUOPF/6Nappdhp5q9GUUoDmmCiZ2EEiTJkcFzZTgy3yVNd
+	 PoA9LC6s2JPCZcRVZlcxiFyCf7vcml4YJpPbu/zlMRtJ4BUaF0vTviaFLauItgxua/b2X
+	 hGF1dUNrZ1Q1cyKZXYV7VqIlb35ExcTyp2JO5AyjuwQNOr7Frg5jSnO2VXdoJz7GRJ+z3
+	 TVNvT6DGqqHvDzipknvYnx+HSniGQDNiZkXisl2MpGwEpyoWHiHi/9BrmdGCuI7Ddp379
+	 +rC1nkc3VDVQ9NgG6giBTGgiITjSgL0ffLvgUyHF+vzAV4NlMxqjVls9sVup2Ol4veA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795712273;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
-	 X-Developer-Key:X-Developer-Signature:X-Mailer:Message-ID:Subject:
-	 From:To:Cc:Content-Type;
-	bh=EbzDc5IQTnuzR0VW7Y/c20qDWcWC8/2koHRhDseDoYM=;
-	b=CzgtIfNIxZM/VSqrshavofhMGpDA+lzeqGYX36kagrVTy3TnGDDNTDlbrlctMd+Vsk7Y
-	 V7o1zK/7vk1sRXnaEWnrPdLN+sM5M8URPRwseWrwytHvyg4NfBznUrY+U4Nch636U+/ye
-	 4u13qg+hg4uQN0cNnCpBVqZLfGqbcrpNnm9Se83WRsSKiY9PcgmH0fCdCaLHynog4zyqh
-	 8Cv01QAA1+AtEFbwEvt/SNwPSa5+bg2EtdMOMKhqanUH+ZMmBqW+8sSidV1TROT9GbqAY
-	 gYCC9ArcvKlVuKR0Af3OXsxmy0dFOmxoV+E/zJMFdgUknYtPpMq52ZZZAAoQKqQM//Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795733068;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:X-Developer-Signature:X-Developer-Key:
+	 Content-Transfer-Encoding;
+	bh=ysdo92WLfsDQB1Dk5sR4V6fHvnDgX8FDuI/IpRC9VDc=;
+	b=sKx32A8HX/Y5jKkY9adWrl47plbZBGzByK0ctD0BftY0SWxjw8tyiseDugqXSTDs1ajS
+	 QOQczlxoI6akK1fE5ZxNawUHFCUgggKQ7YsIqthovBjYdRPI8F2rx06DleISVAz6qudSO
+	 /JY8nNEPsJ/5tEG2MBNLY50ZFuDTA419G5yesrE+2/FgVoYNo0pLlXor6qE+1kWikjW9D
+	 OhqaHNK5Ae/8rh/TEGu3tRIbdUsWBHe598nLBEvrmK4UA2VN6vqX8Qu7cAycqb6Tvs/mu
+	 adlWrDj0zZK1oErtVr8QO3YlFgh25ecZN4/YWizGECj6FJbqF3TzPryFGuOPIPhvOAw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--ardb.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=GYdf48Re;
-	arc=none smtp.remote-ip=209.85.208.69
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LCaWd2oh;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EDF606A31E
-	for <linux-kbuild@vger.kernel.org>; Thu, 26 Nov 2026 16:57:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 12EDF606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57936606A31C;
+	Thu, 26 Nov 2026 22:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=GYdf48Re
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6b9095eeb5bso704175a12.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 26 Nov 2026 08:57:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795712271; x=1796317071; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=EbzDc5IQTnuzR0VW7Y/c20qDWcWC8/2koHRhDseDoYM=;
-        b=GYdf48Rel+xZTNASrIkJh8dJ1IoW5cH+nuC2hdh1PR418OPqGn+m7+jt8YypxOJ42d
-         A8otXJRlCUo07fpaKyXliXivnSMaNFYr7KmUtoRuIee85UbSUTZXQejj75mIQpsaPjoD
-         faP/LQq5Wx7hlbCmKftVXBr5qUNGigWfi4cHt9QyGZ/PPDlDnpGkWYk+f2AJQ01pWkFw
-         I7miyBexbK0gx+YD4RnzrpHxMIA5/Bi6miLbCqwX4STs6UWwW9JtSPrzrppSd6ch2S11
-         XLhbtR46XvTOTQW0Vo0Yehyr6Dmdg2jgoCsiaL8pWMLcG++y49xpueNJ0ozoEF7ez5KL
-         uO1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795712271; x=1796317071;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=EbzDc5IQTnuzR0VW7Y/c20qDWcWC8/2koHRhDseDoYM=;
-        b=Y6gAW0KCsGQzxhDOJy/qVM5FpQk38iM0b1/CSrsl3FtO3lI+6BCpj6F1n16tPH1CT8
-         Dx1GmZHh+vwDeBT3OE8JJlVGzox2ox3C/u+ttr+r4yBK+eCpO007d3sW4lNwdFyq2DpB
-         hjqBTh7Wnh8BnDb1igsw2KuA8xqWBWXMEbJ3Zzd0oTXa1zQT+x1mW+FnK7n5E0pxQ6ti
-         I218+YIy1yMSmebuLi4kmpjyXGKHbBYubL/k1WAgD1Bdq38/FBS+uz/F+jLmMKyn32Wz
-         o6f6wRGDke4IK2p17cfKhng3tCR7se6lrVHVILJo1G9Ww9y/1Ls0CpMkHdo9Fp32Yglc
-         qfcA==
-X-Forwarded-Encrypted: i=1; AL+hErHEctVoEek47Qm5jHCIoMsRs2eWK86t1ky5QEZKMDZZpCyCwlMG0+NcdLlZ4y7H/5ZLroI0ZyTq5rDF0IM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+CZOw7chJrHnF67VGwJPLT6VgZS3qlKWYtpMyLclvzUBGZCq5x
-	EzxjwPJWGUwz3eP4DhLrJNe8SF62h/juWRHSYkFb3mqNOwSbDeRv0gZ95AFus6hHWivcYyATTA=
-	=
-X-Received: from edwf26.prod.google.com ([2002:a05:6402:151a:b0:6bb:6fe7:16f8])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:1c08:b0:6ba:a614:2fa1
- with SMTP id 4fb4d7f45d1cf-6baa6145b66mr8005803a12.20.1795712271121; Thu, 26
- Nov 2026 08:57:51 -0800 (PST)
-Date: Thu, 26 Nov 2026 17:57:40 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LCaWd2oh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B40751F000C1;
+	Thu, 26 Nov 2026 22:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795733067;
+	bh=ysdo92WLfsDQB1Dk5sR4V6fHvnDgX8FDuI/IpRC9VDc=;
+	h=From:To:Cc:Subject:Date;
+	b=LCaWd2ohW1rJ1vBK9PLWCuKVbPI1jNlDEDlzsngTVbSL/0CleZ8sO7sgSDy0zv3Y0
+	 gxmUIHH50R8tj1GbRL0VqhUG2i5grKbNC93V+Oy6kHxg2DaqspnluVqbYK69ZaBjn1
+	 2wOnp3VAHYSJi13ACF+uxQNz/6fP2vyHQtnubYeIkS7rctl/vnqHGTPJZCndamrTbM
+	 JtEZ9LRQa/ohLy88qPtLIoqY28mxtQug7dBgeRNnPUX7ZfR27t9gTq03BwmxQBQ6K0
+	 UemorxqAhVnOmTvBC5ljAZ6xv7nqN055jax0346B074B8YVEbGFHpDpWqThxP55Y0Q
+	 aicwe3Q4HIq5w==
+From: Ard Biesheuvel <ardb@kernel.org>
+To: linux-efi@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nsc@kernel.org>,
+	linux-kbuild@vger.kernel.org
+Subject: [PATCH 0/2] efi/zboot: Put ZSTD output size where it belongs
+Date: Thu, 26 Nov 2026 23:44:01 +0100
+Message-ID: <20261126224400.10147-4-ardb@kernel.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -76,75 +58,39 @@ List-Subscribe: <mailto:linux-kbuild+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1308; i=ardb@kernel.org; h=from:subject; bh=ibV2GZO0VY+ueBY0IJ4wt/wNVWx7Y7iSY8PTFlIAuYI=; b=owGbwMvMwCVmkMcZplerG8N4Wi2JIZtjm4GX75KjyX2OT688qq/ZtqY5VmBK2cEci9+Br21bp k2Zfjq9o5SFQYyLQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEzk+geGP/zzOo41/5rolMDn p+//KpyT4/hJyXvziw6UGsqxc973dGD4X7l5WviP6UFtuWnbL2b+s08wOcuwa1qZvEyR+sGuFxF rmQE=
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2078; i=ardb@kernel.org;
- h=from:subject; bh=X6vteHyIC3rKBXp7WqfXPsq2tsAfRKOq0QrILcJganE=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIZsjlYVXgEdc6lFQ6GaplpkZXRdydVifTj6V1NvolL04/
- n1/zcqOUhYGMS4GWTFFFoHZf9/tPD1RqtZ5lizMHFYmkCEMXJwCMJH6owy/mLTE59sm7VS/ELF6
- hk4fc9KqgIlGs09GLtCW80h4+y/9GCPDSbdC5eijVdLpExl+Pg98mO4e5z+r1OTRv+eafBstSjq 4AA==
-X-Mailer: git-send-email 2.56.1.839.g22a8290db9-goog
-Message-ID: <20261126165739.2453269-2-ardb+git@google.com>
-Subject: [PATCH] kallsyms: Omit unnamed local symbols from System.map and kallsyms
-From: Ard Biesheuvel <ardb+git@google.com>
-To: llvm@lists.linux.dev
-Cc: Ard Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-From: Ard Biesheuvel <ardb@kernel.org>
+The intent of the EFI zboot format is that non-EFI loaders can access
+and decompress the payload using standard libraries and tools. However,
+the ZSTD decompressed payload size is not stored in the header where the
+standard library would look for it, but appended to the end similar to
+how GZIP stores it.
 
-Since LLVM PR #223686 [1] ("[LLD][ELF] AArch64 Errata patch use
-STT_NOTYPE for symbols"), ld.lld --fix-cortex-a53-843419 (enabled on
-arm64 by CONFIG_ARM64_ERRATUM_843419, which defaults to y) synthesizes
-an unnamed (st_name == 0, "") STT_NOTYPE local symbol for every
-executable InputSection that lacks an STT_SECTION symbol in its input
-object, such as empty .text sections in data-only or .init.text
-translation units, or per-function sections under -ffunction-sections.
+Let's fix this, by capturing and storing the input size explicitly.
 
-elf_symbol_type() classifies these unnamed STT_NOTYPE local symbols in
-executable sections as 't' (matching GNU nm and llvm-nm), and
-sysmap_omits() does not filter empty names. As a result, nameless 't'
-entries are emitted into System.map and compressed into the kernel's
-kallsyms tables.
-
-Beyond bloating the kallsyms tables with useless nameless entries, this
-causes CONFIG_KALLSYMS_SELFTEST to fail at boot ("Test for Nth symbol
-failed: ()"), because kallsyms_lookup_name("") explicitly rejects empty
-strings and returns 0.
-
-Omit symbols with an empty name in sysmap_omits() so they are excluded
-from both System.map and kallsyms.
-
-[1] https://github.com/llvm/llvm-project/commit/5da7779afdf3
+This is a prerequisite for upcoming ELF support in EFI zboot, which
+concatenates several payloads, and therefore does not support appending
+arbitrary data at the end.
 
 Cc: Nathan Chancellor <nathan@kernel.org>
 Cc: Nicolas Schier <nsc@kernel.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Bill Wendling <morbo@google.com>
-Cc: Justin Stitt <justinstitt@google.com>
 Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- scripts/kallsyms-sysmap.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/scripts/kallsyms-sysmap.c b/scripts/kallsyms-sysmap.c
-index a482968eba51..1cb3b1775157 100644
---- a/scripts/kallsyms-sysmap.c
-+++ b/scripts/kallsyms-sysmap.c
-@@ -96,6 +96,10 @@ static bool sysmap_omits(const char *name, char type)
- {
- 	size_t i;
- 
-+	/* Unnamed symbols (st_name == 0). */
-+	if (!*name)
-+		return true;
-+
- 	/* Absolute, undefined and debugging symbols. */
- 	if (type == 'a' || type == 'N' || type == 'U' || type == 'w')
- 		return true;
+Ard Biesheuvel (2):
+  scripts/Makefile.lib: Capture decompressed size in ZSTD22 metadata
+  efi/zboot: Use ZSTD frame header for uncompressed payload size
+
+ drivers/firmware/efi/libstub/Makefile.zboot          |  8 +-------
+ drivers/firmware/efi/libstub/zboot-decompress-gzip.c |  5 +++--
+ drivers/firmware/efi/libstub/zboot-decompress-zstd.c | 17 ++++++++++++++---
+ drivers/firmware/efi/libstub/zboot-header.S          |  2 +-
+ drivers/firmware/efi/libstub/zboot.lds               |  1 -
+ scripts/Makefile.lib                                 | 10 +++++++---
+ 6 files changed, 26 insertions(+), 17 deletions(-)
+
 -- 
-2.56.1.839.g22a8290db9-goog
+2.47.3
 
