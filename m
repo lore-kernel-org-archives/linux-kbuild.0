@@ -1,70 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.51.188.92
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795763884;
-	b=dy2EAPOD9DgQGCYk1iGn5ges+7hwqSIIsbk4VjUB4AUyQq8t3y72sfTH7eVq4+6fPbyG
-	 prUK3CoBy7YIx/ADHby1Ca1+/cwLyuiIW44+JJFJTo+KkcKnJ0otcraYxKMa9OHnDo2+y
-	 UPpgw8RE2yk7FzxhC+uM7Jf5lTlEbUFUt2vcLLADVDxBKXpgPRulvpKvCVtaoiqSxBye4
-	 w8tMT9XH8jutXnPUSazr79RTQ5GDmFz6Rr9BudqStGfyUdgfWNNPSrA+xN2vM8W9TtdFB
-	 4jDEerBx+eua9aDfnTV5Hsmxc5AufZ+vI/o6pa+CBOzsT9VhlwmdXTANtt9dTBoyuKw==
+	t=1795781618;
+	b=N2NP7NcH5tDAVDm2tzyktfFVIEFP88RUVxKWznZLIUP8mnhEpb3O+JjFbUFkDE6ImlXw
+	 kJDQ76V4ntFvaiU7c+62x3svRVeVBJhnLhW8aPiQCusiw9KogYQP2hK9SjJxCMs6Jem9J
+	 BwEOCkZYrh/QjZwzafVcrOnDOwk0+IlbYkAokYTCy48k4WkkmMukprg753IzUO0RTgt46
+	 dD5bueEMT1zYCWzBQhZi1JFUr8CSldupz6THiWP4cR8H6HDnmdWd41+8LbBUXCewi34Io
+	 0D9F0m/+hW9tFMwa7nLi4vgHx7+KaGNxEyUMaZZGpJtDSgspRiBBxar+MOB++YHW8Dw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795763884;
-	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:
-	 References:Date:Message-ID:User-Agent:MIME-Version:Content-Type;
-	bh=1o4py0F93e2e0eyvht3E5NDtytOClGQWFVKs2IV7jV4=;
-	b=w2nR0/+B06u9Fo8QF6CfbMGih+NPCxTJb0DGnS8MyHI//Z5BiYyc6nDra9q+gyv9x2iH
-	 fsQUfAi9X9LLXDIZh8mjBS1pCWoNuyXcL1+N8adB9lhWZp0BUVut5hYqdsGNbS2Lf/DYx
-	 nv2a0Fm7LxwEq5otQjW3HjgOgjaAEdYmGf8DBFBNf7RQcoPuc50mqsAQBXOfVJZbYR9yW
-	 xCGCOnWwS69ThHGl5tIjx6HHASWcJLk8prJIoykwuBNq3lXT1gUbtVRS2rbaBT/K7+znQ
-	 8FKXcFFPaIzHmGCwgq3G3UQFjZ7b6zirHXYnvu42/euhAVLwlU4ViQYAE5j0DHySKNg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795781618;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=GQRN6hMLtXmRb2agbnnXvDMdlpvFKVesL+5VYB+4UJE=;
+	b=iexkzkcB/n/1ZxeLhCWoijVvjeHeyUWl7s69oex2XqA8n1h1ADYOK+Z3Miw8FZLUG3rP
+	 Pfzv1wO5byW3YCkzYGfyZLg3y3dUtN8nrdCsjUJ2qU/XfMUXYcJ1eQS81UbSh59xoLLQu
+	 6FyfHo4KFPWPiVzPXtq3pEQBhjkoM1zUPOrK9XL+BRWQwWDQGB3w5nxRwdiYPDbotYOKW
+	 TYcIUTk2YP5zfbKXFkcr/f7TAuxiZ++jt7OSuR1p75a/p00cYolJjxTO7AgA+tVHqxtct
+	 Q6k6R3H8J0ZrF0+s1f9tR7LyRgh7tU/pIivsD9RxA1S95hY8+HpUVb4UiOjIkhA+UBw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gnu.org;
-	spf=pass smtp.mailfrom=gnu.org;
-	dkim=pass header.d=gnu.org header.i=@gnu.org header.a=rsa-sha256 header.s=fencepost-gnu-org header.b=qKtUW0UF;
-	arc=none smtp.remote-ip=209.51.188.92
-Received: from eggs.gnu.org (eggs.gnu.org [209.51.188.92])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b="IzTcYT/o";
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=cKnZgQSD;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F17606A33A;
-	Fri, 27 Nov 2026 07:18:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 05F17606A33A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gnu.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnu.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A64606A339
+	for <linux-kbuild@vger.kernel.org>; Fri, 27 Nov 2026 12:13:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0A64606A339
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gnu.org header.i=@gnu.org header.a=rsa-sha256 header.s=fencepost-gnu-org header.b=qKtUW0UF
-Received: from fencepost.gnu.org ([2001:470:142:3::e])
-	by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.90_1)
-	(envelope-from <jemarch@gnu.org>)
-	id 1xWqDX-0005NK-KY; Fri, 27 Nov 2026 02:17:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gnu.org;
-	s=fencepost-gnu-org; h=MIME-Version:Date:References:In-Reply-To:Subject:To:
-	From; bh=1o4py0F93e2e0eyvht3E5NDtytOClGQWFVKs2IV7jV4=; b=qKtUW0UFX1poFRH6Gcru
-	FzRUWaigR9eoIoehnucVSPy4hDEI4SxovrVM5ZAzu4tzQMFPVQj9j+V/3p2LTmikD1XMOCZfRfjVu
-	lM1Rv5otHvRhKD/ygyInw8iwozYuUV6N1HhGL0VNExu4MsBd9e5v9MUbPAzqktbfMG1Qi005JoRxu
-	fsN/136xWCqKCmsYIjW36CgXoBsSVaSZU7zNfS41D5hmjZZosGOd0QXpXgWfZXRo1My43Ly3Puwkx
-	l0rIEjaH1Psm32dHR63EILq7cIxbQogN8hvXPrx4ge9VTMkOkAxn2OMlkyE52gM/sIh60RwaNdJB1
-	N0xbF6uzAoW1Eg==;
-From: "Jose E. Marchesi" <jemarch@gnu.org>
-To: "Can" <can@tartanoglu.com>
-Cc: <bpf@vger.kernel.org>,  "Alexei Starovoitov" <ast@kernel.org>,  "Daniel
- Borkmann" <daniel@iogearbox.net>,  "Andrii Nakryiko" <andrii@kernel.org>,
-  "Eduard Zingerman" <eddyz87@gmail.com>,  "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>,  "Martin KaFai Lau" <martin.lau@linux.dev>,  "Song
- Liu" <song@kernel.org>,  "Yonghong Song" <yonghong.song@linux.dev>,  "Jiri
- Olsa" <jolsa@kernel.org>,  "Emil Tsalapatis" <emil@etsalapatis.com>,
-  "Ihor Solodrai" <ihor.solodrai@linux.dev>,  "Alan Maguire"
- <alan.maguire@oracle.com>,  "Arnaldo Carvalho de Melo" <acme@kernel.org>,
-  "David Faust" <david.faust@oss.qualcomm.com>,  "Nick Alcock"
- <nix@esperi.org.uk>,  "Bruce McCulloch" <bruce.mcculloch64@gmail.com>,
-  "Nathan Chancellor" <nathan@kernel.org>,  "Nicolas Schier"
- <nsc@kernel.org>,  <linux-kbuild@vger.kernel.org>,
-  <dwarves@vger.kernel.org>,  <llvm@lists.linux.dev>
-Subject: Re: RFC: vmlinux BTF from clang -gbtf, stock lld and a libbpf tool
-In-Reply-To: <20261121205803.b46d9bd1a88c@tartanoglu.com>
-References: <20261121205803.b46d9bd1a88c@tartanoglu.com>
-Date: Fri, 27 Nov 2026 08:17:43 +0100
-Message-ID: <87fqwmspyg.fsf@gnu.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=IzTcYT/o;
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=cKnZgQSD
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARApYGG2058109
+	for <linux-kbuild@vger.kernel.org>; Fri, 27 Nov 2026 12:13:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	GQRN6hMLtXmRb2agbnnXvDMdlpvFKVesL+5VYB+4UJE=; b=IzTcYT/ozKMWXuJA
+	qR2A1WW6ceB8r0S5rRexOAaw82FLGR9RGJL2KY1QkdqwqhxOyy8+EAURlkYrhvmd
+	bjyzWZqkIEJQRryUt/C0tMhcxF/TjRuJdu3CpvRmL4ecVAtogGaVmu8Jno+f6yXc
+	1D35w2HDNHULZb9fFmkEdlU/ey5qoHhGXXWmQ84kKqoOrd/u+VgeVOdFTzXHvTTM
+	5tuCqikXS5HG/dFoCJ7o/VM5gf2SqaMLM0AI/WEYe8yHvUDuthglQhyNU9alv+Iq
+	oT5NKBdl9W3LAoL5GNm96tf2LSb2BO8r3kIpeCe8oXIZs8fLvunOWPA420dvhkbG
+	A4NYzg==
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com [209.85.221.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j74gasc7s-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-kbuild@vger.kernel.org>; Fri, 27 Nov 2026 12:13:36 +0000 (GMT)
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-5ecdc7807f4so348735e0c.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 27 Nov 2026 04:13:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1795781616; x=1796386416; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=GQRN6hMLtXmRb2agbnnXvDMdlpvFKVesL+5VYB+4UJE=;
+        b=cKnZgQSD8br2MGLHVo+K4h83QIzyW0OkHXK/IcSJtBaa5Z4bSkpAUCioYjn07Yia3Z
+         BPNeKZJDUB3QQ54qdI3C4nbCyov8n7yKrhWA8wqB7eRRAjDOmL900FWP5dt6XywAOMPp
+         fW3S3Pm3lytDYqjEXwbAT7u/0Zx5NiVMjSWQo90ZNjGWzKQX7dvrbZaKo2Q5x47hdxJH
+         EvXtFF9XsS51AbB9tZpsW1YTOvWAkSQQhCpI2rdXp9E1NRCP/niQg2Hjtte0bpUenfW0
+         lVnyK3G9GZzr4TSvo7hLrejlYMqJtKE1dSZ5M0MQYjllKypzkwx+qS+STFUSAiXbIeEg
+         Ktng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795781616; x=1796386416;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GQRN6hMLtXmRb2agbnnXvDMdlpvFKVesL+5VYB+4UJE=;
+        b=adACxPwwaqdGh0r1DVya9CPgO7+99FT337fDZdOUuX7A6oU0zLdT45ySAbElQ2zSgH
+         YCJTbwDp9GZo115G9JAFqm38IUhP2ap+c9q4CXUNdY8CxgFIIWoEYDYkc0M+enf0Q35f
+         kjztL+wBs/AlJEyxNzMlRZhbUhHoDXK/R3HGYAJMw/JzjTSPZlH25kUwX30lVOeprQp/
+         KSugLjI/mjK0dA2jDKCeCk40aM4KpItK4aET01oSpUnIStjJKnvGyqmxGPRxMYjyqXmc
+         SnyiVCuJcGnU6fBDvsYHl0h0QJD4DtPLXrs2xjg56q1wk6C6f0z2ghhe54p8NFRLjzKr
+         p97w==
+X-Forwarded-Encrypted: i=1; AL+hErGDAfaGGLzBcYNZI+8vcuzJToHp1tTLZYRRCezVZVsyYF9IkiFcbtnGafjOik2QravWGTIWV6zxujDsJEg=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8SdMrt8iC0oeqPEXBzZgiI8B1S2n8Guod3NtTJKVVgZmcVfwko
+	rgcDYoIdkHLNcmAxoE+l7R7rqQf44BaZe7PHfoK6eU+d4CuiQo642b7R/e3We56V8/x6it+diyg
+	1XEUxwD4LOCcfN9hRVSO2n67urr9Vrtmm0r1IyaI+YiPfsoJblkYmAn9heEb3pmiLolk=
+X-Gm-Gg: AZFdTZcy4bFRuad6dhuJMioMdjPgKIrpzpN4UTYt9l4UekJOfiV3PjIeKQLmbPhTDKV
+	xBMho345HayFeMgSraOr8FVGXAMfjCPFmZtm3jMeGrePuOLcDYlPee/6W3x4Qkd+rjWtyx+n8Nt
+	ddrv9EMJJFwwgO7TLJZiLN5gIERSHcJUiS36+SnGknsuzt/2nV8AVPR9mrVo+hxZeXsoomtz+iJ
+	uQMMA0oWik7lpQ54y2sOSsyVj7zx7RN3W9ue8cWjuW2jPDFGtnYj3Q32gagy8WvvUmIhfZRwfv/
+	ZSMAUdhmr/lvdGsC1yp1cg6YckKYhiSDPEY/mNTHDaUWCCthuS706OIE795W8SvH5sqKfE3z6cY
+	A017aEn2zpqRnGp6YBNDK9oD8UHHnQfqVRCU/RAbfIDI6w2d90DyUijawkfSSg9vvaTMI5P8=
+X-Received: by 2002:a05:6122:4805:b0:5ce:bde0:9b53 with SMTP id 71dfb90a1353d-5ee8af179f3mr16376774e0c.3.1795781615898;
+        Fri, 27 Nov 2026 04:13:35 -0800 (PST)
+X-Received: by 2002:a05:6122:4805:b0:5ce:bde0:9b53 with SMTP id 71dfb90a1353d-5ee8af179f3mr16376707e0c.3.1795781615471;
+        Fri, 27 Nov 2026 04:13:35 -0800 (PST)
+Received: from [192.168.226.72] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c513aea6e29sm845002066b.43.2026.11.27.04.13.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Nov 2026 04:13:34 -0800 (PST)
+Message-ID: <c3ebad86-3421-4941-bf64-e400dc8f14eb@oss.qualcomm.com>
+Date: Fri, 27 Nov 2026 13:13:32 +0100
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -74,367 +115,88 @@ List-Unsubscribe: <mailto:linux-kbuild+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 5/5] arm64: dts: qcom: sc7180: Add
+ sc7180-trogdor.fitconfig FIT config file
+To: Douglas Anderson <dianders@chromium.org>,
+        Devicetree-compiler@vger.kernel.org, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, Julius Werner <jwerner@chromium.org>,
+        Michal Simek <michal.simek@amd.com>,
+        =?UTF-8?Q?Andr=C3=A9_Draszik?=
+ <andre.draszik@linaro.org>,
+        linux-arm-kernel@lists.infradead.org, Simon Glass <sjg@chromium.org>,
+        Peter Griffin <peter.griffin@linaro.org>, linux-kbuild@vger.kernel.org,
+        Tudor Ambarus <tudor.ambarus@linaro.org>,
+        Chen-Yu Tsai <wenst@chromium.org>, Will Deacon <will@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>, Devicetree@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Nicolas Schier <nsc@kernel.org>, linux-kernel@vger.kernel.org,
+        Saravana Kannan <saravanak@kernel.org>,
+        Brian Norris <briannorris@chromium.org>,
+        Abel Vesa <abelvesa@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        cros-qcom-dts-watchers@chromium.org
+References: <20261113210918.356261-1-dianders@chromium.org>
+ <20261113130858.RFC.v2.5.I1683fb18dd1cb29680af5efb2c2d3c3f539af0f4@changeid>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20261113130858.RFC.v2.5.I1683fb18dd1cb29680af5efb2c2d3c3f539af0f4@changeid>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: mUzhAdDQzSQaMkBKHjumTZIifErGkaKh
+X-Proofpoint-GUID: mUzhAdDQzSQaMkBKHjumTZIifErGkaKh
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA0OCBTYWx0ZWRfX5Hv3WB1x99zY
+ T9ptZXm9EoCMq272jo9WUJC0b8o1LK9dXu1lRECEViAOoLUyi0V8gVDmRQf4J5g1z81tmAiEzCJ
+ 2bX9m6Y8/+0VrFCB6pvqVaEcbx2FtK+Oyx43P/mYmx0P+m17n1F0SJFpB3QrEOBU7h4yVEihq3s
+ cP7bO9CQHRYodP2zZDmjOl70HIczCSBADySnVFj6WaQvKH5Fg63IUfMkFw1aVJF1Ynbfs1WOGkd
+ TqG1zxeE/4/a39T0N3z+YW3kjC0+Js0vmvM63dOm7tXyUYonrR24OklSmrBvgBCDQ/SITxWAOTg
+ VmaAUDO3YY6hXyen4X8hBByQeaY2ycqnnwPRQfDU/uKzoBv90Mm9RLetCxhfOuyZMnI4gKBdjZg
+ aZ3EnxyZHX2i0hrW/ySamMYKPCxxuf/gBfkyo4vgziHrludonGB3NBxylRZ/EJ0du8Zhv6nM6nr
+ zD4FIOPptN+NcS+TgjQ==
+X-Authority-Analysis: v=2.4 cv=I5bw19gg c=1 sm=1 tr=0 ts=6b0973f0 cx=c_pps
+ a=JIY1xp/sjQ9K5JH4t62bdg==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
+ a=cm27Pg_UAAAA:8 a=EUspDBNiAAAA:8 a=kMGPIAtnrfzpPBabNyUA:9 a=QEXdDO2ut3YA:10
+ a=tNoRWFLymzeba-QzToBc:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA0OCBTYWx0ZWRfXzHROcsS3xM8X
+ 59OGyNqnSTAk8I19IPmvf4Nc3FIphK7u/4thECj5KbgfPpyC7ujOQ1hmOemM3UytPa3Frb5gJQv
+ BW6EXUovPVXFFZMaO3z3jxy1+Ul4u8A=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-27_02,2026-11-26_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
+ malwarescore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611270048
 
+On 11/13/26 10:09 PM, Douglas Anderson wrote:
+> Add a FIT configuration file (`sc7180-trogdor.fitconfig`) listing the
+> SC7180 Trogdor family board DTBs, allowing the LZ4-compressed Trogdor
+> FIT image to be built with:
+> 
+>   make \
+>     FIT_CONFIG=qcom/sc7180-trogdor.fitconfig \
+>     FIT_COMPRESSION=lz4 \
+>     FIT_FACTOR_DTBS=1 \
+>     image.fit
+> 
+> Having an in-tree `.fitconfig` configuration file for Trogdor produces a
+> FIT image matching what downstream ChromeOS build scripts
+> programmatically generate, makes it easy to use `fdtfactor` on the
+> Trogdor kernel image, serves as a template for future Chromebooks (which
+> could encode board/SKU matching metadata in configuration match subnodes
+> rather than combinatorial `compatible` strings), and helps community
+> users building upstream kernels for `sc7180-trogdor` devices.
+> 
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+> ---
 
-[Fixing email adresses of David Faust and Bruce McCullough and Nick
- Alcock]
+Acked-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-> Alexei asked in llvm/llvm-project#183915 [1][2] for native-vs-pahole
-> results to come here, and suggested dropping BTF dedup from lld in
-> favour of a stock link plus a libbpf-based kernel tool. I closed
-> #183915 and tested that route on saved x86-64 kernel objects.
->
-> Two headline findings up front:
->
-> 1. On those saved objects, unmodified ld.lld plus a libbpf prototype
-> reproduced the patched linker's decoded vmlinux BTF (bpftool raw
-> dumps match) and byte-identical .BTF_ids, though not byte-identical
-> .BTF and without booting a host-tool image.
-> 2. On the booted native kernel from the earlier patched-lld run, a
-> verifier negative test (flex_array_unaligned_step in
-> verifier_btf_array_access) unexpectedly loads across all three
-> test_progs flavours because struct vring_used is only a FWD in
-> native BTF. Static checks also show shifted-register FUNC
-> prototypes (e.g. __add_to_kill) and two duplicate-ID warnings in
-> resolve_btfids that fail CONFIG_WERROR=y.
->
-> The compiler side is LLVM #183929 (-gbtf for non-BPF ELF targets);
-> its
-> Discourse RFC [3] drew a key question from LLVM DebugInfo
-> maintainers:
-> LLVM debug info is best-effort, whereas the verifier and trampolines
-> treat vmlinux BTF as trusted safety and ABI metadata. Before
-> reshaping
-> #183929 or proposing kbuild patches, I'd like feedback on where that
-> trust boundary sits, how functions and DATASECs should be handled,
-> and
-> what GCC/Clang/linker contract makes sense.
->
-> Prior art: Arnaldo outlined GCC -gbtf, linker dedup and pahole fixups
-> at LSF/MM/BPF 2025 [4]; Nick and Bruce have GNU ld BTF dedup work in
-> progress [5]; Ihor's resolve_btfids / gen-btf.sh series [6] moved BTF
-> post-processing into the tree; and pahole 1.32 now ships opt-in
-> true_signature [7]. Whatever comes out of this should work for GCC
-> objects too.
->
->
-> Setup and compiler behaviour
-> ----------------------------
->
-> Three separate comparisons were run (revisions, config, lists and
-> tool
-> source are in the gist linked below):
->
-> - Run B (booted x86-64 non-LTO kernels, QEMU TCG, no KVM): local
-> branch
-> 58b6bf74fe on bpf-next 32b66b94c, identical .config (no LTO, no IBT,
-> CONFIG_WERROR=n, DWARF enabled, existing pahole Kconfig dependency
-> retained; CONFIG_DEBUG_INFO_BTF_INLINE is rejected on the native
-> path). Native vmlinux C objects used combined LLVM 0737facd716f
-> (main 3bfae959fb6f + #183915 + #183929) with -gbtf and no pahole for
-> vmlinux; control used DWARF and pahole 1.31 with this config's flags.
-> Modules used pahole --btf_base in both. The native arm also compiled
-> a local __used bpf_ctx_convert anchor in kernel/bpf/btf.c so complete
-> program context types were retained, and selftests omitted
-> callx_rodata_elem_addr (LLVM BPF MC assert #244366). Original Run B
-> built separate selftest payloads; the coverage rerun used the same
-> baseline selftest initramfs against both saved kernels.
->
-> - Stock-link replay (not booted): saved Run B native objects relinked
-> with unmodified ld.lld 3bfae959fb6f and a 329-line libbpf prototype.
->
-> - Run A (selftest compiler check): one pahole kernel, selftests/bpf
-> built with stock clang 3bfae959fb6f vs #183929 clang 76d97ce620bf.
->
-> Compiler-flag gap vs GCC (verified on GCC 15.2 x86-64): GCC -gbtf
-> alone
-> emits .BTF without DWARF (both require -g -gbtf), emits no .BTF.ext
-> on
-> x86-64, and controls pointee pruning with -gprune-btf/-gno-prune-btf
-> (full pointees by default on x86-64). #183929 currently forces DWARF
-> on
-> and emits .BTF.ext (~49 MB and 3.1M relocations in the archive
-> replay,
-> all discarded at the executable link).
->
->
-> Saved-object replay (experimental instrument, not a kbuild API)
-> ---------------------------------------------------------------
->
-> 1. Stock ld.lld -r on the .tmp_vmlinux1 inputs (vmlinux.a plus
-> .vmlinux.export.o, init/version-timestamp.o and
-> .tmp_vmlinux0.kallsyms.o), with -Map, keeping all 3,602 .BTF blobs
-> and their .rela.BTF. Using archive-only vmlinux.o missed 3,324
-> .modinfo entries from .vmlinux.export.o and picked weak
-> linux_banner/init_uts_ns over the strong definitions in
-> init/version-timestamp.o; ET_REL offsets also don't give final
-> section placement.
->
-> 2. Stock first executable link (.tmp_vmlinux1) with -Map and a
-> discard
-> script dropping .BTF, .BTF.ext and their relocations. Keeping .BTF
-> in this link fails on x86-64 because #183929's BTFKindDataSec calls
-> emitLabelReference(sym, 4) (non-section-relative), emitting absolute
-> R_X86_64_32 (S+A) instead of a section-relative offset; lld rightly
-> rejects high-half kernel VAs. That is a producer-side encoding
-> problem for ordinary final links, not a linker quirk.
->
-> 3. The host prototype strips input DATASECs and extern FUNCs, appends
-> blobs via libbpf, places surviving non-empty/non-overlapping entries
-> from the -r relocations and two lld text maps, emits one DATASEC per
-> non-empty output section and runs btf__dedup(). It is an x86-64
-> prototype: it hardcodes lld map prefixes, pairs repeated input
-> sections by ordinal/size, uses name/size/bytes fallback for 167
-> SHF_MERGE entries, drops 14 overlaps and 27,422 script discards, and
-> retains all 96,069 VAR records even when 68,570 entries are placed.
->
-> 4. resolve_btfids runs unchanged (doing its own fixups, finalize_btf
-> ()
-> dedup/sort and ID patching).
->
-> Single-sample replay timings (not a controlled kbuild benchmark):
-> 2.97M -> 276k types before resolve_btfids; dedup 0.45 s, tool 8.4 s
-> and
-> ~555 MiB peak RSS. The extra augmented -r link took 2:57 (with 177k
-> major page faults; archive-only -r took 1.55 s, stock exec 1.76 s,
-> patched exec 6.65 s).
->
->
-> Results
-> -------
->
-> - Stock-link replay: for the augmented replay, post-resolver bpftool
-> raw dumps compare equal to the patched-lld kernel and .BTF_ids is
-> byte-identical (15,568 bytes) with no unresolved IDs. Raw .BTF
-> differs in bytes (13,554,061 vs 13,554,053, 32- vs 24-byte header and
-> string table). Both logs emit two duplicate-ID warnings
-> (bpf_lsm_inode_init_security and bpf_lsm_mmap_file), which would fail
-> CONFIG_WERROR=y (--fatal_warnings). Augmented sections were embedded
-> and extracted cleanly, but no host-tool image was booted.
->
-> - Boot and selftests (Run B, patched-lld vs pahole kernel): both boot
-> and expose /sys/kernel/btf/vmlinux. Original Run B ran only plain
-> test_progs; observed rows matched (OK/FAIL/SKIP 2557/382/113,
-> including subtests) up to a shared userspace segfault in tailcalls
-> (exit 139). bpf_testmod.ko failed with -EINVAL on both, causing
-> failures and skips and limiting module/kfunc coverage. The -cpuv4 and
-> -no_alu32 runners didn't start there. With tailcalls excluded and the
-> shared baseline selftest payload, all 2,099 missing flavour/group
-> invocations ran on both kernels. Five initial diffs did not persist
-> as native-only failures on retry (timer_async_cancel failed 2/7
-> native vs 1/7 pahole; tracing_multi_bench_attach passed on both on
-> retry). The sole persistent native-only failure is
-> verifier_btf_array_access/flex_array_unaligned_step (see vring_used
-> below).
->
-> - Size and per-CPU filter: unfiltered native .BTF is 13.6 MB (96,069
-> VAR records, 68,570 DATASEC entries in 15 sections) vs 8.0 MB
-> (7,984,202 B) pahole. Filtering the host prototype on the saved
-> objects to keep only .data..percpu VARs and DATASEC entries gives
-> 8.00 MB (8,003,505 B) pre-resolver (0.29 s dedup, 4.8 s runtime,
-> 544,072 KiB process RSS high-water after dedup), 180,130 types, and
-> 369/369 exact matches against both the final shipped ELF (zero stale
-> offsets) and pahole's (name, offset, size). Post-resolver kfunc and
-> bpf_fastcall decl-tag sets match (raw TYPE_TAG counts are 1,059 vs
-> 1,061; raw FUNC linkage is 41,566 static / 39,089 global native vs
-> 78,798 static / 0 global pahole).
->
-> - Run A: no reproducible regression attributable to #183929 (initial
-> run: 10,204/1,604/375 vs 10,204/1,603/375 across binary, test and
-> subtest rows, 5 diffs, shared tailcalls crash; a separate 954-group
-> rerun matched on subtests, with 4 initial group diffs settling to
-> timer_async_cancel 3/7 stock vs 0/7 PR on identical normalized
-> timer.bpf.o).
->
->
-> Differences from pahole
-> -----------------------
->
-> Types. In raw BTF, 132 STRUCT/UNION definitions present in pahole are
-> FWD-only in native. In the normalized C-dump comparison (23,109 exact
-> of 23,216 native and 23,490 pahole declaration rows), only 39 show up
-> in fwd_vs_definition.txt; the other 93 (including vring_used) were
-> paired as "exact" against bpftool's synthetic forward declarations
-> and
-> filed under extras.txt (111 pahole rows = 93 missing definitions + 18
-> extra FWDs; 2 native FWDs). Walking pahole's BTF from those 132 roots
-> reaches 149 of 178 pahole-only rows (e.g. acpi_gpio_params via
-> acpi_gpio_mapping).
->
-> The cause confirmed per-object in libahci.o (ahci_cmd_hdr) and
-> e1000_hw.o (e1000_shadow_ram) is clang's deferred pointee traversal,
-> which emits a FWD even when the CU's DWARF has the full definition.
-> That has two concrete failures here:
->
-> - Verifier false acceptance: struct vring_used is FWD-only in native
-> BTF (ID 271968), so flex_array_unaligned_step in
-> verifier_btf_array_access (which expects rejection of an unaligned
-> variable offset into vring_used's flexible ring[] array) gets
-> unexpected_load_success in all three test_progs flavours and on
-> confirmation, while pahole rejects it as expected.
-> - Wrong linked type: e1000_hw.o emits only a FWD for
-> e1000_shadow_ram,
-> and in the merged BTF e1000's member points at e1000e's different
-> same-name struct (different field name).
->
-> Pruning pointees is a retention policy, not a BTF-format limit (GCC
-> exposes -gprune-btf/-gno-prune-btf). Remaining C-dump diffs: 51 pairs
-> differing in nested vs flat array shape (e.g. u8 data[4][13] vs [52];
-> input DWARF not traced); ima_hooks NONE vs NONE___2 dumper spelling;
-> two anonymous enums paired with pahole typedefs; and 29 unreached
-> pahole-only / 11 non-enum native-only rows not yet traced.
->
-> Functions. Native has 80,655 FUNC records under 80,024 names vs
-> pahole
-> 1.31's 78,798 (1,227 native-only names, 1 pahole-only name, and 600
-> names with multiple native records: 17 differing only in linkage, 484
-> only in parameter names -- including 447 shared single-address
-> syscalls -- and 99 differing in arity or types). The one pahole-only
-> name is native_save_fl: an assembly STT_FUNC in
-> arch/x86/kernel/irqflags.S that pahole joins by name to an inline
-> DWARF
-> signature, which clang's machine-function emitter omits.
->
-> Replaying pahole 1.31's flags on the control DWARF classifies the
-> 1,227
-> native-only names by inference as:
->
-> - 780 ambiguous ELF addresses (625), inconsistent DWARF prototypes
-> (60), or both (95, e.g. add_grec in igmp.c vs mcast.c, 5 vs 6
-> params);
-> - 36 with no matching STT_FUNC in .tmp_vmlinux1;
-> - 411 attributed by exclusion to the unexpected-register check (which
-> can also drop valid ABIs such as ZSTD_findFrameSizeInfo's hidden
-> struct-return pointer).
->
-> For __add_to_kill, native BTF lists (tsk, p, vma, to_kill, addr),
-> while
-> DWARF and entry disassembly put to_kill and addr in the 3rd and 4th
-> argument registers. It has an ftrace site, so an fentry attach using
-> that prototype would read the wrong registers if admitted (attachment
-> was not tested). Counting by name with a concrete native DW_CC_nocall
-> DIE catches 339 of the 411, misses 72, and also marks 601 names
-> present
-> in pahole 1.31 -- including kcore_update_ram, whose return value is
-> discarded in disassembly while pahole still emits int(void).
->
-> In a detached check on the saved baseline .tmp_vmlinux1, pahole 1.32
-> emits 78,435 FUNCs with default flags and 79,077 (+642) with
-> true_signature, recovering 343 of the 1,227 native-only names (284
-> unexpected-reg, 59 inconsistent) -- including __add_to_kill with its
-> true 4-parameter ABI (tsk, p, to_kill, addr), while kcore_update_ram
-> stays int(void).
->
-> Filtering in a host tool using ELF + BTF can address some ambiguous
-> and missing-symbol cases if per-object provenance is kept (while
-> preserving kfuncs and single-address parameter-name variants like
-> weak
-> sys_ni.o stubs), but ELF + source BTF alone cannot prove parameter
-> registers or dropped returns.
->
-> Lists, config, host.c, pahole 1.32 notes and coverage diffs:
->
-> https://gist.github.com/caniko/24da79feb8f405ada030bb5ee18d27ed/
-> a0ba0b01951d6d2447e6490deba16badb36bda38
->
->
-> Known problems
-> --------------
->
-> - Final-ELF layout drift: against the shipped patched-lld vmlinux,
-> both
-> unfiltered native graphs match 65,951/68,570 DATASEC entries, with
-> 2,618 stale .rodata offsets (non-uniform deltas after kallsyms), a
-> stale .rodata section size (4,361,141 vs 10,128,309 bytes), and one
-> first+final name mismatch (bringup_idt_table vs
-> __pi_bringup_idt_table
-> from x86 .pi.o prefixing). The per-CPU-only filter avoided all of
-> these in this build (369/369 exact on final vmlinux); keeping other
-> sections requires refreshing placement across link-vmlinux.sh passes
-> without breaking kallsyms convergence or .BTF_ids.
->
-> - GCC 15.2 -gbtf fixtures deliberately write zero DATASEC offsets
-> with
-> no relocations outside CO-RE, so host.c cannot place GCC VARs.
->
-> - Modules still get BTF from pahole --btf_base. One existing
-> split-BTF
-> bpf_testmod.ko decodes identically in userspace bpftool against both
-> native bases, but native split-BTF generation, .BTF.base distillation
-> and module .BTF_ids patching are untested, loading against a
-> stock-link replay image was not tested, and Run B's load attempts for
-> bpf_testmod.ko failed with -EINVAL on both kernels.
->
-> - No LTO, IBT, GNU ld, GCC kernel, Rust, section-GC/COMDAT-loser or
-> non-x86 tests yet.
->
->
-> Questions
-> ---------
->
-> 0. Trust boundary: if compiler BTF is best-effort debug output (per
-> LLVM DebugInfo feedback [3]), what independent rule lets the kernel
-> promote it to trusted verifier/trampoline input -- and should an
-> incomplete FWD like struct vring_used independently make the
-> verifier fail closed?
->
-> 1. Functions and ABI: what evidence must bind a FUNC and its argument
-> /
-> return ABI to the prevailing body, and what must be omitted when
-> that evidence is absent? Given pahole 1.32's true_signature, is
-> there a post-lowering compiler fact worth standardizing separately
-> from ordinary debug metadata?
->
-> 2. Variable scope: is the tested per-CPU-only policy the right
-> initial
-> scope for native vmlinux BTF, or is there a concrete consumer
-> justifying final-layout placement for other sections (pahole 1.31
-> already has opt-in global_var; cf. Brennan's 2022 proposal [8])?
->
-> 3. Kbuild and linker inputs: can the minimum policy work from
-> ordinary
-> kbuild artifacts without an extra full -r link, lld-specific text
-> -Map parsing, or a final-layout/ID cycle? If not, what stable
-> provenance interface should linkers provide, and where should the
-> merge step live (tools/bpf vs resolve_btfids)?
->
-> 4. Cross-compiler ET_REL contract and flags (GCC + Clang + linkers):
-> (a) What common ET_REL representation should identify each DATASEC
-> entry's defining symbol/section and distinguish real zero offsets
-> from discards and losing definitions (instead of Clang's absolute
-> R_X86_64_32)?
-> (b) For GCC maintainers (asked on the LLVM RFC [3]): is GCC's
-> behaviour -- -gbtf omitting DWARF unless -g is also passed, no
-> .BTF.ext on non-BPF, and -gprune-btf controlling pointee pruning --
-> still the intended model for Clang to match?
->
-> Until there is agreement on the compiler/kernel contract, I'll hold
-> off
-> on ABI-signature changes and focus #183929 on matching GCC's -gbtf /
-> -gprune-btf / non-BPF .BTF.ext behaviour cleanly without
-> target-triple
-> checks.
->
-> [1] https://github.com/llvm/llvm-project/pull/183915#
-> issuecomment-4409372304
-> [2] https://github.com/llvm/llvm-project/pull/183915#
-> pullrequestreview-5960724788
-> [3] https://discourse.llvm.org/t/
-> rfc-btf-debug-info-for-non-bpf-elf-targets-gbtf/92909
-> [4] https://lwn.net/Articles/1016243/
-> [5] https://lpc.events/event/20/contributions/2395/attachments/2141/
-> 4739/2026-lpc.pdf
-> [6] https://lore.kernel.org/bpf/
-> 20251205223046.4155870-1-ihor.solodrai@linux.dev/
-> [7] https://lore.kernel.org/bpf/
-> 20251130040340.2636458-1-yonghong.song@linux.dev/
-> [8] https://lore.kernel.org/bpf/
-> 20221104231103.752040-1-stephen.s.brennan@oracle.com/
->
-> Thanks,
-> Can
->
-> Note: Claude Code and OpenCode were used to help run artifact
-> analyses,
-> fact-check numbers against saved dumps, and review this draft.
+Konrad
