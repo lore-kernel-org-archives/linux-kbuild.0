@@ -1,82 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795794384;
-	b=5WYgmUVPxB1uGEmHsHoetAAwjQaCV2ACsln82Fjgmr/MYM+XRDrTDTgiCkS2i6iytnDg
-	 w8VUnzXLwgIvrRKtQImWHRJEwKcfewOw+nlqLQr3HLgomUoaKRskbgrWAqdc7aM4Ur1mF
-	 s+R71t9yfnAwY8Gu8fY70UgtXjup7UpqSAvqz/q7cMALS7IlODgvV4xi31J+4suGI65a8
-	 3K09T33cYT0srd0OE4hMAZCAckXgjSm+b0EnrHh8qXRUGHv9GdieMJa8ylWl8e+eq947C
-	 oBJ/lmHO/v5hrFt48iFLLEsIwew9YLn6HvxGtRrgu6BPuwBmWzr+u9F7ITBgGCRFzfQ==
+	t=1795862776;
+	b=0kGyp6PGNtY8M2y0sxCpniR/hLKppDiXbRc+g5/7sPInASnbXWj1PRMlL+z8h3mQeFq5
+	 zS0DQwfwxuAFQK98RHvudC+KFYOp/8ocx2E2ima2R8FHHR6M3TRTxkXePQWjjUTdphRQP
+	 H0ivpzJAIfSEl7vbj06p9CZSg7o9KvW/5kzAr+r6cKpvsg74HhC9+QXHKOI6EBADbvRB9
+	 m6HnGJQItcAXx8M2kpWtOcV1hvPUcVQ8vAbIpfy18n4EC/x6Z28dqH8+TB4y1Qa60xx8Z
+	 pjnzA6IjIabpk+01Fed9vpN/3uTtv8OfAx0ku8uQX+5ipGHMz917BiEcdOCLZyhd8Hw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795794384;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:
-	 Organization:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 X-TM-AS-GCONF:X-Proofpoint-Reinject:X-Authority-Analysis:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=Ef79Sm+tXuuwj3ufmXm7GJ7x61OFnxYLGpboMdf9IBI=;
-	b=C/a+2C4ySS/wUkQifHDfC7NBIoZs06MMuL9CxIwo6IpCTHGql/BivVqDktb0lq5K3Z6O
-	 cLd79Bw+GpRaOGVcWBQwVfUeT+2Y/JVkOMDgBFhZegQJnJ02hgNGljcNH1uZzdTRYbHPP
-	 Fem7zxFPS2mra7h84AVlkh5lFYaKfvhjOkvQQovKqVrhZqepe/XzT4oU1umYZn6LBbnIl
-	 sZnnrmASLZpCb3xst4Doo9ZgPrerAjzCYiS0GxENVjgE7ACrPi8cfOhjY00MZXGKICM+V
-	 5x2HqMARPQf3YbKUT4bT8HTs1/UrUS/ROboh96I7Z6r1KNcIRYXcymmyPm0DQr4qYYQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795862776;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Sender:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:Content-Language:From:In-Reply-To:Content-Type;
+	bh=58a/+1zqValJNPe+f+fBjEPUXE4JHOS5ilKixH5EXsM=;
+	b=i0G9ddji+TJgHqcK8GcCVjw/DLOXLjyzCqCnTG5K3opvd+CHu6lil24b5+aVJYEIlb++
+	 h7PCjOpKZhSKW4f1hHZIbkW7fK28ONzcRyfb57zOCRI1Wwb85mtLx6/a/5L5n5h48VRE/
+	 wByzxMJ0uufD4g/MMLmoTOwn5rmUiLU6MIfsISeBoCmmFMpvedSLsGkKQXtSy1HiwSZmY
+	 64F+Q4Q7fkydmDOu1U84S94ZtXz7I6DNaxRRv8pfSDtTVDMgg2xmGfzkTJVskEaUcVWso
+	 Z6eP2FdSyzFa/1SB5/zJm6R5PmsZrgTW72bs5r4BeLsAd8NOK8jll6fzw4DvqQTdrnA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=sdEQ0NsA;
-	arc=none smtp.remote-ip=148.163.156.1
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="qEjED/nH";
+	arc=none smtp.remote-ip=209.85.128.54
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A08606A31C;
-	Fri, 27 Nov 2026 15:46:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54A08606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B407606A31F
+	for <linux-kbuild@vger.kernel.org>; Sat, 28 Nov 2026 10:46:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B407606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=sdEQ0NsA
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4xWq1650913;
-	Fri, 27 Nov 2026 15:45:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Ef79Sm
-	+tXuuwj3ufmXm7GJ7x61OFnxYLGpboMdf9IBI=; b=sdEQ0NsA1Rp5M9ki4aIM4f
-	7cZlgbBScopeC6p1ATCCEH+WXpatpRevj3IPaed0EcBpANh42lq2uuIXWlyy1qU7
-	AkeFHkXLSpPKXcnkFJDFdSLOtI/VyBJfwHC7ZMtZTsNYDZ/brU3myrmKhfiUjWPy
-	0fI8n1roGMw2d2nWhp0xrHWd4Pqao3FqfDG8U6CAbdzPwA3tXYpeymgXa8Q9aXTI
-	/BAS04+efAngyb4Ciq8AIUvwu3Loung1K6tCkLRINQO28gp3wVNH5YxoVv8t+jDY
-	eWi+1fVPMLICcXI0S937RiF/RVzMcibVDsTH60heWnzWLNRZxFvwet0mBj0ZpjfA
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4j34g3pgxr-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 27 Nov 2026 15:45:18 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARE4HlC3245420;
-	Fri, 27 Nov 2026 15:45:17 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4j5uxx9cpw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 27 Nov 2026 15:45:17 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6ARFjFm540763836
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 27 Nov 2026 15:45:15 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 08B6B2004E;
-	Fri, 27 Nov 2026 15:45:15 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C3D1120040;
-	Fri, 27 Nov 2026 15:45:12 +0000 (GMT)
-Received: from [9.111.162.114] (unknown [9.111.162.114])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 27 Nov 2026 15:45:12 +0000 (GMT)
-Message-ID: <b3e99b3a-7dd6-4e3a-97a8-3011a5f52569@linux.ibm.com>
-Date: Fri, 27 Nov 2026 16:45:12 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qEjED/nH
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4bb69f5b161so58849945e9.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 28 Nov 2026 02:46:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795862774; x=1796467574; darn=vger.kernel.org;
+        h=content-type:in-reply-to:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:sender:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=58a/+1zqValJNPe+f+fBjEPUXE4JHOS5ilKixH5EXsM=;
+        b=qEjED/nHy7RJsOmIY0mw1cYEX8pVGsl9KiW9f3/puk3+BXAvRcvCUKHinRZrOYxMjP
+         lJpR+A2rNIyWE/aIX6vnXXMwbIx/X89Uzo5SLso9vXn0HU7Rj7s80yqnCxm3kbdS5qVo
+         dFOLbs9I39qgdnDAEFj5vEBCtcP93d4zvIcSDWc7ymCo3gxvchxFlxSIhUM4ZqPKJbMR
+         1bwDK5C2+4IeVMTWvI2r87z+8szgbZjuqXQH+xCZihSvPQpFbmQ+UmQ+ZpyKIl8bKs3N
+         pdMxISq+cWcvXHlHmF0rSad/99rYVMd1nMbe0hcuYQHQjYUT5YK5lbeQNDVpljENcgct
+         As9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795862774; x=1796467574;
+        h=content-type:in-reply-to:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:sender:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=58a/+1zqValJNPe+f+fBjEPUXE4JHOS5ilKixH5EXsM=;
+        b=AH74zMCgI6Oltyy0O/fSx1X/HHwXqt3niBr7OB7jtnsqUBw8jkHrkcGa5LbLpVGVRJ
+         wttesNySG/FTaoJJtdT8Sx1B6bg+pn3NuMzDkaiCYqy3VeJTs6E+ObYuS0hQk3Q9k3Km
+         4m+K1IkLx8V1yDKfeXLGD1mOh/L5aoKUNN5fcmisdfeETnBgGJ1xUx1egdDlrEG3Vq+6
+         Vui+/JNOSGPG5KBGOr3NBO1t3vVs2gwba//cU66SxVTkkXyTy9GSlA7QcMobv3gxGPw4
+         We0D7K0M1S0RHGueRBD7htPRw6kHB0Xa2alp04Ovh7yLryNoyOwQ4I9NtRGTKoT2BjgB
+         y46Q==
+X-Forwarded-Encrypted: i=1; AL+hErHTvbfSPZXAOAB6n4BiM3AlfvUYW9fA9oqhdjabcxdokhrh84A2cWM3Tp625gfzKJ/BIEbpdij+JpDD36g=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+qri7QApUhWN+B1D2fKX3rFVCObfd8b6TrwAssKcZnEDz27xAG
+	9hvqEo8mOGR5GwOZjcjkOO7yLpa+c9fv4sG5Q8JoQS9RKu96OQj1toYY
+X-Gm-Gg: AZFdTZd+q6ftvB4ehLd4rKQrYGH2Q5dbjVWtwlRLvpgTbS0++EjdP+TDOKgfPI7k3OK
+	OGywUHpf89MmPuUrgBWu5FSP8OZfhRFHt2X/swwnyPe3mle67dLuuK8KQEq/2kil5mc6JGSGD3+
+	azaZ8+XEE96NKxEl1veMJo9UA5MQPs30N7GtOe0jEBZLefdKV6WYjV3HquixVKCFFT2Uh+j/y8l
+	yPzwOi5jK9NHr02hKtpXJsw/WAVpgVDthIBT0EFbiRRM3Btc0/W7+8ItLshNYwut2E7yjeeHX3S
+	/xgjU2QDXlFfoBPJryXGsE2KSJT/HeonmCNRPyuIOXgrXwpyRZ6AP43fNw8bbRw6DnLUvtY12co
+	9Z177ch0Ei9JBli4semYOS86nlU5Tgszwy/KLafFloEKYrg0T/QAAodImQABzsx/3AJ24Zaq36K
+	UujaaH3NhEeoW/1bZcGqENuuQeBxV390P33G5KMrWA07feshNp9lq1SsC3kiJrzrtdsNidnsP6V
+	xFl9N0+4bshcdOTRDyuSZ9qE9Y8eFGzqg1OiwHJwWXz7XgkPRrGewYPXyjGhRcpfd51lv5AzIMi
+	a4cEDHWFUe/OxZGbpUst2aXunkDvfrJNvnlYVG59ZUNECibqKA7mrzwOOxGNs5yQJlJIPhuY1mf
+	1ptPutIQpX+bBnUtfzA==
+X-Received: by 2002:a05:600c:19d0:b0:4bb:ac6c:de67 with SMTP id 5b1f17b1804b1-4bbac6ce1aemr163926935e9.14.1795862774223;
+        Sat, 28 Nov 2026 02:46:14 -0800 (PST)
+Received: from [192.168.0.41] (bl22-190-205.dsl.telepac.pt. [2.83.190.205])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853c9170sm828517335e9.14.2026.11.28.02.46.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 Nov 2026 02:46:13 -0800 (PST)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <fc17e915-d4d1-4847-a915-03a8d8daf55e@gmail.com>
+Date: Sat, 28 Nov 2026 10:46:11 +0000
 X-Mailing-List: linux-kbuild@vger.kernel.org
 List-Id: <linux-kbuild.vger.kernel.org>
 List-Post: <mailto:linux-kbuild@vger.kernel.org>
@@ -87,164 +93,143 @@ List-Owner: <mailto:linux-kbuild+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 03/30] unwind_user: Support Minimal DWARF CFI
- user-space unwinding
-To: Ian Rogers <irogers@google.com>, linux-kernel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org
-Cc: jpoimboe@kernel.org, rostedt@goodmis.org, peterz@infradead.org,
-        mingo@redhat.com, tglx@kernel.org, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, catalin.marinas@arm.com,
-        will@kernel.org, mark.rutland@arm.com,
-        linux-arm-kernel@lists.infradead.org, pjw@kernel.org,
-        palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
-        linux-riscv@lists.infradead.org, acme@kernel.org, namhyung@kernel.org,
-        linux-perf-users@vger.kernel.org, mhiramat@kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, bpf@vger.kernel.org,
-        nathan@kernel.org, llvm@lists.linux.dev, nsc@kernel.org,
-        linux-kbuild@vger.kernel.org, ojeda@kernel.org,
-        rust-for-linux@vger.kernel.org, ardb@kernel.org,
-        linux-efi@vger.kernel.org, maz@kernel.org, oupton@kernel.org,
-        kvmarm@lists.linux.dev, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org, indu.bhagat@oracle.com,
-        wnliu@google.com, dylanbhatch@google.com
-References: <20261125061523.1540234-1-irogers@google.com>
- <20261125061523.1540234-4-irogers@google.com>
+Subject: Re: [PATCH] kconfig: warn about malformed KCONFIG_SEED values
+To: Priyanshu Singh <singhpriyanshu9838@gmail.com>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: "Yann E . MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20261118071557.791279-1-singhpriyanshu9838@gmail.com>
+ <4335df02-3864-4635-8429-a2946bd76a00@gmail.com>
+ <07f2e58e-d576-49c3-a3ff-91e499d412e5@gmail.com>
 Content-Language: en-US
-From: Jens Remus <jremus@linux.ibm.com>
-Organization: IBM Deutschland Research & Development GmbH
-In-Reply-To: <20261125061523.1540234-4-irogers@google.com>
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <07f2e58e-d576-49c3-a3ff-91e499d412e5@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------ZSpO0HVhptVQBf1zPLRSpuW9"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------ZSpO0HVhptVQBf1zPLRSpuW9
+Content-Type: multipart/mixed; boundary="------------rUOHdxu0LED0EUWmKulj2rVt";
+ protected-headers="v1"; hp="clear"
+Message-ID: <fc17e915-d4d1-4847-a915-03a8d8daf55e@gmail.com>
+Date: Sat, 28 Nov 2026 10:46:11 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kconfig: warn about malformed KCONFIG_SEED values
+To: Priyanshu Singh <singhpriyanshu9838@gmail.com>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+Cc: "Yann E . MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20261118071557.791279-1-singhpriyanshu9838@gmail.com>
+ <4335df02-3864-4635-8429-a2946bd76a00@gmail.com>
+ <07f2e58e-d576-49c3-a3ff-91e499d412e5@gmail.com>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <07f2e58e-d576-49c3-a3ff-91e499d412e5@gmail.com>
+
+--------------rUOHdxu0LED0EUWmKulj2rVt
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=SoQFe/O0 c=1 sm=1 tr=0 ts=6b09a58f cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
- a=1XWaLZrsAAAA:8 a=SydnlHaeet_-pvNvn0IA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA2MiBTYWx0ZWRfX//27zJLiQVYf
- xNjLa9qa44AULBZTtm4EESxzfRForMWNqSTmBaImA7YWQRwKK193TC19ItTlLVgilaXwZcnzcHe
- QICuhIDhMKp+bHoMoSt/uaiJRuECQxw=
-X-Proofpoint-ORIG-GUID: cZ0MGuDQofjwbSOIcLLHaDoI3HDF3ZM6
-X-Proofpoint-GUID: qPE-_zE0roniklQP5kQm896Xq2TUdaEX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA2MiBTYWx0ZWRfX4zkwEbYrR0Ub
- t0vOYaJYi0U5fCUQEvK7YRpLsUhXmMQXuiM36maaVxnFZXU1rrQUthFEbLYJHfQ8mCgalEmUz9e
- B7Mif8gfIPXAX3kO+XyYclvI0cKi9WMZ/7JlebSj2IAYBHr/ka7KsyN89Cdhrx4wT4PbAfWQBAT
- vaAk2DkMcgC44nO7KjdUz6R5rjsODltvTuqXXm5ALXPLp0H/ZO8Ct1digR3BRypj4Uc1sUtuPzF
- ZH5ChZOtmSI6NzV3W/BZjmJ0Q7pdKguTBaz/OmLbUQKxiK6RMKntlafD4sSPwuDe3SlxeWhjXJO
- Vqj6sUGeFx60W2WrESFJ1gQtM74EOPI8YX9qEdKmzlI+AznCNZl6L3cVAyBCU2FLCWaOPTohD6h
- 8lDI6YxQCvH59CpgKFzbug+kiskWWh+Pqw1qEnxi9LnGRL4Ikg2RHebJTdd7adhpf3ze38WyP0K
- aXhNs6vkU6Uy4I0JVFA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-27_02,2026-11-27_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 spamscore=0 bulkscore=0 adultscore=0
- lowpriorityscore=0 clxscore=1015 malwarescore=0 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611270062
+Content-Transfer-Encoding: quoted-printable
 
-Hello Ian,
+Hi Priyanshu,
 
-some early feedback.
+On 11/27/26 01:59, Priyanshu Singh wrote:
+> Hi Julian,
+>=20
+> Thanks for the review!
+>=20
+> On 11/25/26 23:30, Julian Braha wrote:
+>>> Switch to strtoull(..., 0) and consume trailing whitespace so
+>>> whitespace-padded seeds are not discarded. Reject 0b/0B prefixes
+>>> explicitly so C11 and C23 builds behave identically.
+>> C23 builds aren't supported yet.
+>>
+>>> Emit a warning whenever KCONFIG_SEED deviates from a canonical unsign=
+ed
+>>> 32-bit integer, and exit(1) if KCONFIG_WERROR is set. Otherwise, reta=
+in
+>> Yes, it would be good to improve the input validation for KCONFIG_SEED=
+,
+>> especially to reject negative values.
+>>
+>> In a v2, could you make this part more explicit (add it to your bullet=
 
-On 11/25/2026 7:14 AM, Ian Rogers wrote:
-> Extend the generic user-space unwinder (kernel/unwind/user.c) with
-> UNWIND_USER_TYPE_CFI (CONFIG_HAVE_UNWIND_USER_CFI), resolving ELF
-> PT_GNU_EH_FRAME headers across executable VMAs in kernel/unwind/user_cfi.c.
-> 
-> Key design details:
->  - Find the executable VMA and its base ELF mapping (vm_pgoff == 0)
->    under mmap_read_lock_killable(), then drop mmap_read_lock() before
->    issuing any faultable copy_from_user() reads.
->  - Cache VMA -> PT_GNU_EH_FRAME lookups (including negative lookups for
->    anonymous/JIT VMAs so unwind_user_next() falls back per frame to FP)
->    in a 4-slot per-walk cache on struct unwind_user_state.
->  - Track stack-pointer validity (state->sp_valid and
->    unwind_user_fp_sets_sp()) across mixed CFI -> FP -> CFI walks so
->    architectures whose FP step does not recover exact caller SP reject
->    SP-based rules until an outer FP-based FDE or sigreturn restores SP,
->    and support signal-frame SP recovery from *(CFA + sp_off).
->  - Provide overridable unwind_user_frame_pointer() (guarded by
->    CONFIG_HAVE_UNWIND_USER_FP), unwind_user_fp_sets_sp(), and
->    unwind_user_sigreturn() hooks alongside unwind_user_link_register()
->    and unwind_user_strip_pac(), and allow up to UNWIND_USER_MAX_SIGNALS
->    signal frames per walk to switch stacks (SA_ONSTACK).
->  - Support link-register leaf frames, DRAP/sigframe indirect CFA rules,
->    and clean bottom-of-stack termination on DW_CFA_undefined or zero RA.
-> 
-> Signed-off-by: Ian Rogers <irogers@google.com>
+>> list of changes above?)
+> Sure, I will add negative values to the bullet list in v2.
+>=20
+> One quick clarification on negative values before I send v2:
+> Documentation/kbuild/kconfig.rst currently only states "You can set thi=
+s
+> to the integer value used to seed the RNG" and does not explicitly
+> forbid negative integers. When KCONFIG_WERROR is unset, is emitting the=
 
-> diff --git a/include/linux/unwind_user_types.h b/include/linux/unwind_user_types.h
+> malformed-format warning while preserving modulo 2^32 truncation (and
+> exiting 1 under KCONFIG_WERROR) acceptable for backward compatibility,
+> or would you prefer negative values to fall back to the clock seed even=
 
-> +/**
-> + * struct unwind_user_frame - Evaluated unwind rule for stepping one user frame
-> + * @cfa_off: Byte offset added to FP (when @use_fp is true) or SP to form CFA.
+> without KCONFIG_WERROR (along with updating kconfig.rst)?
 
- * @cfa_off: Byte offset added to CFA base register (SP or FP) to form CFA.
+Negative values should probably use the clock seed fallback, but there's
+no need to update kconfig.rst for this.
 
-> + * @sp_off: Byte offset from CFA to saved caller SP when @sp_from_cfa is true.
-> + * @ra_off: Byte offset from CFA (or SP when @ra_from_sp is true) to saved RA.
-> + * @fp_off: Byte offset from CFA, FP, or SP to saved caller FP (0 if unchanged,
-> + *          unless @fp_from_fp or @fp_from_sp is set).
-> + * @use_fp: True if the CFA base register is FP rather than SP.
-> + * @cfa_indirect: True if the computed CFA address must be dereferenced once in
-> + *                user memory (DRAP or signal trampoline frame).
-> + * @sp_from_cfa: True if saved SP is located at *(cfa + @sp_off) (e.g. vdso32
-> + *               sigreturn frame where CFA points at sigcontext).
-> + * @fp_from_fp: True if saved FP is located at *(state->fp + @fp_off).
-> + * @fp_from_sp: True if saved FP is located at *(old_sp + @fp_off).
-> + * @ra_from_sp: True if saved RA is located at *(old_sp + @ra_off).
-> + * @ra_from_reg: True if RA is still in @state->ra rather than on the stack.
+I really doubt that users might read "You can set this to the integer
+value used to seed the RNG" and think that includes negative integers.
 
-This flag soup is confusing.  For s390 support I would need to add the
-following to support DW_CFA_register, which would make it even worse:
+>=20
+>>> Fixes: 0d8024c6ebad ("kconfig: allow specifying the seed for randconf=
+ig")
+>> Improvements in input validation are good, but 'Fixes' is for bugs.
+> Agreed that input validation improvements shouldn't carry a Fixes tag.
+> However, on 32-bit hosts signed strtol() clamps seeds in
+> [0x80000000, 0xFFFFFFFF] to LONG_MAX (0x7FFFFFFF), so half of the seeds=
 
- * @sp_reg: DWARF register number containing the saved SP when if @sp_from_reg
-            is true.
- * @fp_reg: DWARF register number containing the saved FP when if @fp_from_reg
-            is true.
- * @ra_reg: DWARF register number containing the saved RA when if @ra_from_reg
-            is true.
- * @sp_from_reg: True if saved SP is located in @sp_reg.
- * @fp_from_reg: True if saved FP is located in @fp_reg.
- * @ra_from_reg: True if saved RA is located in @ra_reg.
+> printed by randconfig itself cannot be replayed on 32-bit hosts.
+>=20
+> should i split v2 into a 2-patch series?
+> - Patch 1 (with Fixes:): switch strtol() to strtoull() to fix 32-bit
+>   replay of [0x80000000, 0xFFFFFFFF] seeds.
+> - Patch 2 (without Fixes:): add malformed input warnings (negative valu=
+es,
+>   whitespace, >UINT_MAX, garbage), KCONFIG_WERROR handling, trimmed
+>   regression tests, and any Documentation/kbuild/kconfig.rst update.
 
-Wouldn't it be preferable to use something more similar to struct
-dwarf_cfi_row?
+We don't really care about 32-bit hosts, but o/w yes: this approach is
+fine, I think.
 
-  cfa_rule: UNDEFINED, SP, FP, SP_INDIRECT, FP_INDIRECT, REGISTER
-  cfa_reg
-  cfa_off
+>=20
+>> In a v2, you can remove the changes for binary 0b/0B handling.
+> Makes sense, I will drop the 0b/0B handling in conf.c along with the
+> corresponding test cases and C23 mentions in v2.
+>=20
+>>> +				seed =3D (unsigned int)val;
+>> This cast is unnecessary, you can just do 'seed =3D val;'
+> Will remove in v2.
+>=20
+>> This is *a lot* of test code for input validation of just 1 var. Could=
 
-  {sp|fp|ra}_rule: SAME, OFFSET, SP_OFFSET, FP_OFFSET, VAL_OFFSET,
-                   REGISTER, UNDEFINED
-  {sp|fp|ra}_reg
-  {sp|fp|ra}_off
+>> this be simplified at all?
+>>
+>> Is every test here absolutely necessary?
+> Definitely not, I will cut it by half or more in v2.
 
-> + * @ra_signed: True if the recovered RA carries an AArch64 PAC signature.
-> + */
->  struct unwind_user_frame {
->  	s32 cfa_off;
-> +	s32 sp_off;
->  	s32 ra_off;
->  	s32 fp_off;
->  	bool use_fp;
-> +	bool cfa_indirect;
-> +	bool sp_from_cfa;
-> +	bool fp_from_fp;
-> +	bool fp_from_sp;
-> +	bool ra_from_sp;
-> +	bool ra_from_reg;
-> +	bool ra_signed;
-> +};
-Regards,
-Jens
--- 
-Jens Remus
-Linux on Z Development (D3303)
-jremus@de.ibm.com / jremus@linux.ibm.com
+Thanks!
 
-IBM Deutschland Research & Development GmbH; Vorsitzender des Aufsichtsrats: Wolfgang Wendt; Geschäftsführung: David Faller; Sitz der Gesellschaft: Ehningen; Registergericht: Amtsgericht Stuttgart, HRB 243294
-IBM Data Privacy Statement: https://www.ibm.com/privacy/
+- Julian Braha
 
+--------------rUOHdxu0LED0EUWmKulj2rVt--
+
+--------------ZSpO0HVhptVQBf1zPLRSpuW9
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQT6qjll++tIFxF8TUPElYPCBXNxIAUCawqw8wUDAAAAAAAKCRDElYPCBXNxIB/J
+AP9gyChxWqxUpAJDxj+NIVLS+FlsedP1lJV9ATgQnxuT6AEAksTgGy2un17kk8noShT2iOEvE5R8
+9BClDNbDU6grRgI=
+=/mKU
+-----END PGP SIGNATURE-----
+
+--------------ZSpO0HVhptVQBf1zPLRSpuW9--
